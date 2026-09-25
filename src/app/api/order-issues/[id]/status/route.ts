@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { db } from '@/db';
 import { orderIssueActivities, orderIssues, users } from '@/db/schema';
 import { eq } from 'drizzle-orm';
-import { auth } from '@/lib/auth/server';
+import { requireAuth } from '@/lib/auth-utils';
 
 const VALID_TRANSITIONS: Record<string, string[]> = {
   'OPEN': ['IN_PROGRESS', 'CANCELLED'],
@@ -15,10 +15,11 @@ const VALID_TRANSITIONS: Record<string, string[]> = {
 
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const { data: session } = await auth.getSession();
-    if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const authResult = await requireAuth();
+    if (authResult.error) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.status });
     }
+    const session = { user: authResult.user! };
 
     const { status, lastUpdatedAt } = await req.json();
 

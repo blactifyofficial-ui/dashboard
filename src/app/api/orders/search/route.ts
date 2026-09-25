@@ -2,14 +2,15 @@ import { NextResponse } from 'next/server';
 import { db } from '@/db';
 import { orders } from '@/db/schema';
 import { ilike, or } from 'drizzle-orm';
-import { auth } from '@/lib/auth/server';
+import { requireAuth } from '@/lib/auth-utils';
 
 export async function GET(req: Request) {
   try {
-    const { data: session } = await auth.getSession();
-    if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const authResult = await requireAuth();
+    if (authResult.error) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.status });
     }
+    const session = { user: authResult.user! };
 
     const { searchParams } = new URL(req.url);
     const q = searchParams.get('q');

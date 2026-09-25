@@ -2,14 +2,15 @@ import { NextResponse } from 'next/server';
 import { db } from '@/db';
 import { orderIssues, orderIssueActivities, issueCategories } from '@/db/schema';
 import { eq, desc } from 'drizzle-orm';
-import { auth } from '@/lib/auth/server';
+import { requireAuth } from '@/lib/auth-utils';
 
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const { data: session } = await auth.getSession();
-    if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const authResult = await requireAuth();
+    if (authResult.error) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.status });
     }
+    const session = { user: authResult.user! };
     const { id } = await params;
     const [issue] = await db
       .select({
@@ -47,10 +48,11 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 
 export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const { data: session } = await auth.getSession();
-    if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const authResult = await requireAuth();
+    if (authResult.error) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.status });
     }
+    const session = { user: authResult.user! };
     const { id } = await params;
     
     await db.batch([

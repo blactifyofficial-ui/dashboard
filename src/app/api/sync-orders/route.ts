@@ -33,7 +33,14 @@ interface ShopifyProduct {
   } | null;
 }
 
+import { requireAuth } from '@/lib/auth-utils';
+
 export async function GET() {
+  const authResult = await requireAuth();
+  if (authResult.error) {
+    return NextResponse.json({ error: authResult.error }, { status: authResult.status });
+  }
+
   const shop = process.env.SHOPIFY_SHOP_NAME;
   const token = process.env.SHOPIFY_ADMIN_ACCESS_TOKEN;
 

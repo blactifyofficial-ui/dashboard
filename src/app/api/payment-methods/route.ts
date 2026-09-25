@@ -1,14 +1,15 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/db';
 import { paymentMethods } from '@/db/schema';
-import { auth } from '@/lib/auth/server';
+import { requireAuth } from '@/lib/auth-utils';
 
 export async function GET() {
   try {
-    const { data: session } = await auth.getSession();
-    if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const authResult = await requireAuth();
+    if (authResult.error) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.status });
     }
+    const session = { user: authResult.user! };
 
     const data = await db.select().from(paymentMethods);
     return NextResponse.json(data);

@@ -2,14 +2,15 @@ import { NextResponse } from 'next/server';
 import { db } from '@/db';
 import { expenses, expenseActivities, users, expenseCategories, paymentMethods } from '@/db/schema';
 import { eq, desc, and, ilike, or, gte, lte } from 'drizzle-orm';
-import { auth } from '@/lib/auth/server';
+import { requireAuth } from '@/lib/auth-utils';
 
 export async function GET(req: Request) {
   try {
-    const { data: session } = await auth.getSession();
-    if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const authResult = await requireAuth();
+    if (authResult.error) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.status });
     }
+    const session = { user: authResult.user! };
 
     const { searchParams } = new URL(req.url);
     const page = parseInt(searchParams.get('page') || '1', 10);
@@ -69,10 +70,11 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   try {
-    const { data: session } = await auth.getSession();
-    if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const authResult = await requireAuth();
+    if (authResult.error) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.status });
     }
+    const session = { user: authResult.user! };
 
     const body = await req.json();
     const { categoryId, paymentMethodId, title, description, amount, expenseDate, referenceNumber, initialRemark, customCategoryName } = body;
