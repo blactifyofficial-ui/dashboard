@@ -21,3 +21,8 @@ export const orderItems = pgTable('order_items', {
   quantity: numeric('quantity'),
   price: numeric('price'),
 });
+
+export const allowedUsers = pgTable('allowed_users', {
+  id: text('id').primaryKey(),
+  email: text('email').notNull().unique(),
+});

@@ -40,7 +40,7 @@ export async function GET(req: Request) {
     } else {
       return NextResponse.json({ error: 'Failed to get access token', details: data }, { status: 400 });
     }
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }

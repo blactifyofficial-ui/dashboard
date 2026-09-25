@@ -1,6 +1,6 @@
 import { db } from '../src/db';
 import { orders } from '../src/db/schema';
-import { asc, desc } from 'drizzle-orm';
+import { asc } from 'drizzle-orm';
 
 async function run() {
   const allOrders = await db.select().from(orders).orderBy(asc(orders.orderNumber));
