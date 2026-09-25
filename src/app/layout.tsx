@@ -1,4 +1,4 @@
-import type { Metadata } from"next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from"next/font/google";
 import"./globals.css";
 import Link from"next/link";
@@ -7,6 +7,11 @@ import SidebarNav from"@/components/SidebarNav";
 import LogoutButton from"@/components/LogoutButton";
 import SignOutLink from"@/components/SignOutLink";
 import { Toaster } from "react-hot-toast";
+import { auth } from"@/lib/auth/server";
+import { db } from"@/db";
+import { allowedUsers } from"@/db/schema";
+import { eq } from"drizzle-orm";
+
 const inter = Inter({
  variable:"--font-inter",
  subsets: ["latin"],
@@ -16,14 +21,14 @@ const inter = Inter({
 export const metadata: Metadata = {
  title:"Shopify Dashboard",
  description:"Real-time Shopify Sales Dashboard",
+ manifest: "/manifest.json",
+};
+
+export const viewport: Viewport = {
+  themeColor: "#000000",
 };
 
 export const dynamic ='force-dynamic';
-
-import { auth } from"@/lib/auth/server";
-import { db } from"@/db";
-import { allowedUsers } from"@/db/schema";
-import { eq } from"drizzle-orm";
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
  const { data: session } = await auth.getSession();

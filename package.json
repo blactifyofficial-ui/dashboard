@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@ducanh2912/next-pwa": "^10.2.9",
     "@neon/config": "^1.7.3",
     "@neondatabase/auth": "^0.5.0-beta",
     "@neondatabase/auth-ui": "^0.3.0-beta",
