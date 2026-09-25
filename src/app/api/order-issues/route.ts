@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/db';
-import { orderIssues, orderIssueActivities, users } from '@/db/schema';
+import { orderIssues, orderIssueActivities, users, orders } from '@/db/schema';
 import { eq, desc, and, ilike, or } from 'drizzle-orm';
 import { requireAuth } from '@/lib/auth-utils';
 
@@ -36,11 +36,22 @@ export async function GET(req: Request) {
 
     const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
 
-    const issues = await db.select().from(orderIssues)
+    const rawIssues = await db
+      .select({
+        issue: orderIssues,
+        orderNumber: orders.orderNumber,
+      })
+      .from(orderIssues)
+      .leftJoin(orders, eq(orderIssues.orderId, orders.id))
       .where(whereClause)
       .orderBy(desc(orderIssues.createdAt))
       .limit(pageSize)
       .offset(offset);
+
+    const issues = rawIssues.map(row => ({
+      ...row.issue,
+      orderNumber: row.orderNumber,
+    }));
 
     return NextResponse.json(issues);
   } catch (error) {

@@ -8,6 +8,7 @@ import ConfirmModal from '@/components/ConfirmModal';
 type Issue = {
   id: string;
   orderId: string;
+  orderNumber?: string;
   title: string;
   priority: string;
   status: string;
@@ -175,7 +176,7 @@ export default function OrderIssuesDashboard() {
                     className="hover:bg-white/5 transition-colors"
                   >
                     <td className="p-4 font-mono text-sm text-gray-400">#{issue.id.slice(0, 8)}</td>
-                    <td className="p-4">{issue.orderId}</td>
+                    <td className="p-4">{issue.orderNumber || issue.orderId}</td>
                     <td className="p-4 font-medium">{issue.title}</td>
                     <td className="p-4">
                       <span className={`px-2 py-1 rounded text-xs font-medium ${issue.priority === 'URGENT' ? 'bg-red-500/20 text-red-400' :
