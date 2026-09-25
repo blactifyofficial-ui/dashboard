@@ -2,6 +2,37 @@ import { NextResponse } from 'next/server';
 import { db } from '@/db';
 import { orders, orderItems } from '@/db/schema';
 
+interface ShopifyLineItem {
+  id: number;
+  product_id?: number | string | null;
+  title: string;
+  quantity: number;
+  price: string;
+}
+
+interface ShopifyOrder {
+  id: number;
+  order_number?: number | string | null;
+  customer?: {
+    first_name?: string | null;
+    last_name?: string | null;
+    email?: string | null;
+  } | null;
+  current_total_price: string;
+  currency: string;
+  created_at?: string | null;
+  financial_status: string;
+  fulfillment_status: string;
+  line_items?: ShopifyLineItem[] | null;
+}
+
+interface ShopifyProduct {
+  id: number;
+  image?: {
+    src: string;
+  } | null;
+}
+
 export async function GET() {
   const shop = process.env.SHOPIFY_SHOP_NAME;
   const token = process.env.SHOPIFY_ADMIN_ACCESS_TOKEN;
@@ -30,17 +61,17 @@ export async function GET() {
     const fetchedOrders = data.orders || [];
 
     // Extract unique product IDs
-    const productIds = new Set();
-    fetchedOrders.forEach(order => {
+    const productIds = new Set<string>();
+    fetchedOrders.forEach((order: ShopifyOrder) => {
       if (order.line_items) {
-        order.line_items.forEach(item => {
-          if (item.product_id) productIds.add(item.product_id);
+        order.line_items.forEach((item: ShopifyLineItem) => {
+          if (item.product_id) productIds.add(item.product_id.toString());
         });
       }
     });
 
     // Fetch product images
-    const productImages = {};
+    const productImages: Record<string, string> = {};
     if (productIds.size > 0) {
       const pIds = Array.from(productIds);
       // Shopify allows up to 250 ids per request, we can just do one chunk if it's less
@@ -53,16 +84,16 @@ export async function GET() {
       if (pResponse.ok) {
         const pData = await pResponse.json();
         if (pData.products) {
-          pData.products.forEach(p => {
+          pData.products.forEach((p: ShopifyProduct) => {
             if (p.image && p.image.src) {
-              productImages[p.id] = p.image.src;
+              productImages[p.id.toString()] = p.image.src;
             }
           });
         }
       }
     }
 
-    for (const order of fetchedOrders) {
+    for (const order of fetchedOrders as ShopifyOrder[]) {
 
       const customerName = order.customer ? `${order.customer.first_name || ''} ${order.customer.last_name || ''}`.trim() : null;
       const customerEmail = order.customer ? order.customer.email : null;
