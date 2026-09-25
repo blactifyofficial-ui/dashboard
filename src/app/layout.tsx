@@ -5,7 +5,8 @@ import Link from"next/link";
 import Image from"next/image";
 import SidebarNav from"@/components/SidebarNav";
 import LogoutButton from"@/components/LogoutButton";
-
+import SignOutLink from"@/components/SignOutLink";
+import { Toaster } from "react-hot-toast";
 const inter = Inter({
  variable:"--font-inter",
  subsets: ["latin"],
@@ -35,7 +36,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
  <html lang="en"className={`${inter.variable} h-full antialiased dark`}>
  <body className="min-h-full bg-black text-white flex flex-col items-center justify-center font-sans gap-4">
  <div className="text-xl">You are not authorized to view this dashboard.</div>
- <Link href="/api/auth/signout"className="text-blue-500 hover:underline">Sign Out</Link>
+ <SignOutLink />
+ <Toaster position="bottom-right" />
  </body>
  </html>
  );
@@ -53,7 +55,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
  <aside className="w-full md:w-64 shrink-0 border-b md:border-b-0 md:border-r border-white/10 bg-white/[0.02] backdrop-blur-xl md:h-screen md:sticky top-0 flex flex-col z-50">
  <div className="p-4 md:p-8 border-b border-white/5 hidden md:block">
  <Link href="/">
- <Image src="/blactify_logo_font.svg"alt="Blactify"width={150} height={32} className="h-8 object-contain"style={{ width:'auto'}} priority />
+ <Image src="/blactify_logo_font.svg"alt="Blactify"width={150} height={32} className="h-8 object-contain"style={{ width:'auto', height: 'auto'}} priority />
  </Link>
  </div>
  <nav className="flex md:flex-col md:flex-1 md: p-2 md:p-4 gap-2 md:gap-0 md:space-y-2 mt-0 md:mt-4 no-scrollbar items-center md:items-stretch">
@@ -73,6 +75,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
  {children}
  </div>
  </main>
+ <Toaster position="bottom-right" />
  </body>
  </html>
  );

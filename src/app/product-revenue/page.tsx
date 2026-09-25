@@ -1,7 +1,7 @@
 import { db } from'@/db';
 import { orderItems } from'@/db/schema';
 import { sql, desc, ilike } from'drizzle-orm';
-import { ShoppingBag } from'lucide-react';
+import { ShoppingBag, ArrowUpRight } from'lucide-react';
 import SearchInput from'@/components/SearchInput';
 import Link from'next/link';
 
@@ -29,6 +29,7 @@ export default async function ProductRevenuePage(props: {
 
  const productData = await db.select({
  title: orderItems.title,
+ imageUrl: sql<string>`MAX(${orderItems.imageUrl})`,
  revenue: sql<number>`COALESCE(SUM(CAST(${orderItems.price} AS NUMERIC) * CAST(${orderItems.quantity} AS NUMERIC)), 0)`,
  unitsSold: sql<number>`COALESCE(SUM(CAST(${orderItems.quantity} AS NUMERIC)), 0)`
  })
@@ -82,10 +83,18 @@ export default async function ProductRevenuePage(props: {
  <tr key={idx} className="hover:bg-white/[0.03] transition-colors duration-200 group">
  <td className="px-4 md:px-8 py-4 md:py-5 font-medium text-white group-hover:text-neutral-300 transition-colors">
  <div className="flex items-center gap-3">
+ {data.imageUrl ? (
+ /* eslint-disable-next-line @next/next/no-img-element */
+ <img src={data.imageUrl} alt={data.title || 'Product'} className="w-8 h-8 rounded-lg object-cover bg-white/5 border border-white/10 shrink-0" />
+ ) : (
  <div className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-white shrink-0">
  {data.title ? data.title.charAt(0).toUpperCase() :'?'}
  </div>
- <span className="truncate">{data.title ||'Unknown Product'}</span>
+ )}
+ <Link href={`https://fvprhj-0y.myshopify.com/products/${data.title?.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '')}`} target="_blank" rel="noopener noreferrer" className="truncate hover:underline text-white flex items-center gap-1 group/link">
+ {data.title ||'Unknown Product'}
+ <ArrowUpRight size={14} className="opacity-50 group-hover/link:opacity-100 transition-opacity shrink-0" />
+ </Link>
  </div>
  </td>
  <td className="px-4 md:px-8 py-4 md:py-5 text-white text-center">

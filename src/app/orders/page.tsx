@@ -75,8 +75,13 @@ export default async function OrdersPage(props: {
  </tr>
  ) : (
  allOrders.map((order) => (
- <tr key={order.id} className="hover:bg-white/[0.03] transition-colors duration-200 group">
- <td className="px-4 md:px-8 py-4 md:py-5 font-medium text-white group-hover:text-neutral-300 transition-colors">#{order.orderNumber || order.id.substring(0,6)}</td>
+ <tr 
+ key={order.id} 
+ className="hover:bg-white/[0.03] transition-colors duration-200 group"
+ >
+ <td className="px-4 md:px-8 py-4 md:py-5 font-medium text-white group-hover:text-neutral-300 transition-colors">
+   <Link href={`/orders/${order.id}`} className="hover:underline">#{order.orderNumber || order.id.substring(0,6)}</Link>
+ </td>
  <td className="px-4 md:px-8 py-4 md:py-5">
  <div className="text-white font-medium">{order.customerName ||'Guest'}</div>
  <div className="text-xs text-neutral-400 mt-1">{order.customerEmail ||'No email provided'}</div>

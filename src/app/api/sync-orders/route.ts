@@ -25,10 +25,45 @@ export async function GET() {
       throw new Error(`Shopify API error: ${response.status} - ${errorText}`);
     }
 
+    
     const data = await response.json();
     const fetchedOrders = data.orders || [];
 
+    // Extract unique product IDs
+    const productIds = new Set();
+    fetchedOrders.forEach(order => {
+      if (order.line_items) {
+        order.line_items.forEach(item => {
+          if (item.product_id) productIds.add(item.product_id);
+        });
+      }
+    });
+
+    // Fetch product images
+    const productImages = {};
+    if (productIds.size > 0) {
+      const pIds = Array.from(productIds);
+      // Shopify allows up to 250 ids per request, we can just do one chunk if it's less
+      const pResponse = await fetch(`https://${shop}/admin/api/2024-01/products.json?ids=${pIds.join(',')}&fields=id,image`, {
+        headers: {
+          'X-Shopify-Access-Token': token,
+          'Content-Type': 'application/json',
+        }
+      });
+      if (pResponse.ok) {
+        const pData = await pResponse.json();
+        if (pData.products) {
+          pData.products.forEach(p => {
+            if (p.image && p.image.src) {
+              productImages[p.id] = p.image.src;
+            }
+          });
+        }
+      }
+    }
+
     for (const order of fetchedOrders) {
+
       const customerName = order.customer ? `${order.customer.first_name || ''} ${order.customer.last_name || ''}`.trim() : null;
       const customerEmail = order.customer ? order.customer.email : null;
 
@@ -58,19 +93,21 @@ export async function GET() {
 
       if (order.line_items && order.line_items.length > 0) {
         for (const item of order.line_items) {
-          await db.insert(orderItems).values({
+await db.insert(orderItems).values({
             id: item.id.toString(),
             orderId: order.id.toString(),
             shopifyProductId: item.product_id?.toString() || null,
             title: item.title,
             quantity: item.quantity?.toString() || '0',
             price: item.price,
+            imageUrl: item.product_id ? productImages[item.product_id] || null : null,
           }).onConflictDoUpdate({
             target: orderItems.id,
             set: {
               title: item.title,
               quantity: item.quantity?.toString() || '0',
               price: item.price,
+              imageUrl: item.product_id ? productImages[item.product_id] || null : null,
             }
           });
         }

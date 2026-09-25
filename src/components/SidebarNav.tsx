@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, ClipboardList, ShoppingBag, CalendarDays } from 'lucide-react';
+import { LayoutDashboard, ClipboardList, ShoppingBag, CalendarDays, AlertCircle, Settings } from 'lucide-react';
 import Image from 'next/image';
 
 const NAV_LINKS = [
@@ -10,6 +10,8 @@ const NAV_LINKS = [
   { href: '/orders', label: 'Orders', icon: ClipboardList },
   { href: '/product-revenue', label: 'Products', icon: ShoppingBag },
   { href: '/revenue', label: 'Monthly', icon: CalendarDays },
+  { href: '/order-issues', label: 'Issues', icon: AlertCircle },
+  { href: '/settings', label: 'Settings', icon: Settings },
 ];
 
 export default function SidebarNav() {
@@ -19,7 +21,7 @@ export default function SidebarNav() {
     <>
       <div className="md:hidden px-4 mb-2">
         <Link href="/">
-          <Image src="/blactify_logo_font.svg" alt="Blactify" width={120} height={24} className="h-6 object-contain" style={{ width: 'auto' }} priority />
+          <Image src="/blactify_logo_font.svg" alt="Blactify" width={120} height={24} className="h-6 object-contain" style={{ width: 'auto', height: 'auto' }} priority />
         </Link>
       </div>
       {NAV_LINKS.map((link) => {
