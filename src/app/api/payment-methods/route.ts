@@ -9,7 +9,7 @@ export async function GET() {
     if (authResult.error) {
       return NextResponse.json({ error: authResult.error }, { status: authResult.status });
     }
-    const session = { user: authResult.user! };
+
 
     const data = await db.select().from(paymentMethods);
     return NextResponse.json(data);

@@ -10,7 +10,7 @@ export async function GET(req: Request) {
     if (authResult.error) {
       return NextResponse.json({ error: authResult.error }, { status: authResult.status });
     }
-    const session = { user: authResult.user! };
+
 
     const { searchParams } = new URL(req.url);
     const orderId = searchParams.get('orderId');

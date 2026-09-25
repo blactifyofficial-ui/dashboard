@@ -10,7 +10,7 @@ export async function GET(req: Request) {
     if (authResult.error) {
       return NextResponse.json({ error: authResult.error }, { status: authResult.status });
     }
-    const session = { user: authResult.user! };
+
 
     const { searchParams } = new URL(req.url);
     const page = parseInt(searchParams.get('page') || '1', 10);

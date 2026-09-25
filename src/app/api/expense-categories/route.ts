@@ -9,7 +9,7 @@ export async function GET() {
     if (authResult.error) {
       return NextResponse.json({ error: authResult.error }, { status: authResult.status });
     }
-    const session = { user: authResult.user! };
+
 
     const data = await db.select().from(expenseCategories);
     return NextResponse.json(data);
@@ -25,7 +25,7 @@ export async function POST(req: Request) {
     if (authResult.error) {
       return NextResponse.json({ error: authResult.error }, { status: authResult.status });
     }
-    const session = { user: authResult.user! };
+
 
     const body = await req.json();
     const { name, description } = body;

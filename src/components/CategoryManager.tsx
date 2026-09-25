@@ -26,7 +26,6 @@ export default function CategoryManager() {
 
   const fetchCategories = useCallback(async () => {
     try {
-      setIsLoadingCategories(true);
       const [expenseRes, issueRes] = await Promise.all([
         fetch('/api/expense-categories'),
         fetch('/api/issue-categories')
@@ -49,6 +48,7 @@ export default function CategoryManager() {
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchCategories();
   }, [fetchCategories]);
 

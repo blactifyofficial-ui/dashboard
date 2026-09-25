@@ -10,7 +10,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
     if (authResult.error) {
       return NextResponse.json({ error: authResult.error }, { status: authResult.status });
     }
-    const session = { user: authResult.user! };
+
     const { id } = await params;
     const [issue] = await db
       .select({
@@ -52,7 +52,7 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
     if (authResult.error) {
       return NextResponse.json({ error: authResult.error }, { status: authResult.status });
     }
-    const session = { user: authResult.user! };
+
     const { id } = await params;
     
     await db.batch([

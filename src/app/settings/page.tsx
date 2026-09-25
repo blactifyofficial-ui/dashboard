@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import SyncButton from '@/components/SyncButton';
 import CategoryManager from '@/components/CategoryManager';
+import InstallPWA from '@/components/InstallPWA';
 
 export const dynamic = "force-dynamic";
 
@@ -50,6 +51,17 @@ export default function SettingsPage() {
         
         {/* Category Management */}
         <CategoryManager />
+
+        {/* Install App Section */}
+        <div className="bg-[#1e1e1e] p-6 rounded-xl border border-white/10 shadow-sm text-white">
+          <h2 className="text-xl font-medium mb-4 border-b border-white/10 pb-2">Install App</h2>
+          <div className="space-y-4 text-sm text-gray-300">
+            <p>
+              Install the Blactify Dashboard as an application on your device for quick access and a better native experience.
+            </p>
+            <InstallPWA />
+          </div>
+        </div>
       </div>
     </div>
   );
