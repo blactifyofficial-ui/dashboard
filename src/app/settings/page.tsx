@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import SyncButton from '@/components/SyncButton';
+import CategoryManager from '@/components/CategoryManager';
 
 export const dynamic = "force-dynamic";
 
@@ -46,6 +47,9 @@ export default function SettingsPage() {
             </p>
           </div>
         </div>
+        
+        {/* Category Management */}
+        <CategoryManager />
       </div>
     </div>
   );

@@ -75,3 +75,61 @@ export const orderIssueActivities = pgTable('order_issue_activities', {
   remark: text('remark'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
+
+export const expenseCategories = pgTable('expense_categories', {
+  id: text('id').primaryKey(),
+  code: text('code').notNull().unique(),
+  name: text('name').notNull().unique(),
+  description: text('description'),
+  isActive: text('is_active').default('true'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+export const paymentMethods = pgTable('payment_methods', {
+  id: text('id').primaryKey(),
+  code: text('code').notNull().unique(),
+  name: text('name').notNull().unique(),
+  isActive: text('is_active').default('true'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+export const expenses = pgTable('expenses', {
+  id: text('id').primaryKey(),
+  categoryId: text('category_id').references(() => expenseCategories.id).notNull(),
+  paymentMethodId: text('payment_method_id').references(() => paymentMethods.id).notNull(),
+  title: text('title').notNull(),
+  description: text('description'),
+  amount: numeric('amount').notNull(),
+  expenseDate: timestamp('expense_date').notNull(),
+  referenceNumber: text('reference_number'),
+  createdById: text('created_by_id').references(() => users.id).notNull(),
+  updatedById: text('updated_by_id').references(() => users.id),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  deletedAt: timestamp('deleted_at'),
+  deletedById: text('deleted_by_id').references(() => users.id),
+});
+
+export const expenseAttachments = pgTable('expense_attachments', {
+  id: text('id').primaryKey(),
+  expenseId: text('expense_id').references(() => expenses.id).notNull(),
+  fileName: text('file_name').notNull(),
+  fileUrl: text('file_url').notNull(),
+  fileType: text('file_type').notNull(),
+  fileSize: numeric('file_size').notNull(),
+  uploadedById: text('uploaded_by_id').references(() => users.id).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+export const expenseActivities = pgTable('expense_activities', {
+  id: text('id').primaryKey(),
+  expenseId: text('expense_id').references(() => expenses.id).notNull(),
+  actorId: text('actor_id').references(() => users.id).notNull(),
+  activityType: text('activity_type').notNull(),
+  oldValue: text('old_value'),
+  newValue: text('new_value'),
+  remark: text('remark'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});

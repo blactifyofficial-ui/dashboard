@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, ClipboardList, ShoppingBag, CalendarDays, AlertCircle, Settings } from 'lucide-react';
+import { LayoutDashboard, ClipboardList, ShoppingBag, CalendarDays, AlertCircle, Settings, Wallet } from 'lucide-react';
 import Image from 'next/image';
 
 const NAV_LINKS = [
@@ -11,6 +11,7 @@ const NAV_LINKS = [
   { href: '/product-revenue', label: 'Products', icon: ShoppingBag },
   { href: '/revenue', label: 'Monthly', icon: CalendarDays },
   { href: '/order-issues', label: 'Issues', icon: AlertCircle },
+  { href: '/expenses', label: 'Expenses', icon: Wallet },
   { href: '/settings', label: 'Settings', icon: Settings },
 ];
 

@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/db';
-import { issueCategories } from '@/db/schema';
-import { eq } from 'drizzle-orm';
+import { expenseCategories } from '@/db/schema';
 import { auth } from '@/lib/auth/server';
 
 export async function GET() {
@@ -11,8 +10,8 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const categories = await db.select().from(issueCategories).where(eq(issueCategories.isActive, 'true'));
-    return NextResponse.json(categories);
+    const data = await db.select().from(expenseCategories);
+    return NextResponse.json(data);
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
@@ -34,7 +33,7 @@ export async function POST(req: Request) {
     }
 
     const newCatId = crypto.randomUUID();
-    const [category] = await db.insert(issueCategories).values({
+    const [category] = await db.insert(expenseCategories).values({
       id: newCatId,
       code: name.trim().toUpperCase().replace(/\s+/g, '_'),
       name: name.trim(),
@@ -44,10 +43,9 @@ export async function POST(req: Request) {
     return NextResponse.json(category, { status: 201 });
   } catch (error: unknown) {
     console.error(error);
-    if (error && typeof error === 'object' && 'code' in error && error.code === '23505') { // unique violation
+    if (error && typeof error === 'object' && 'code' in error && error.code === '23505') {
       return NextResponse.json({ error: 'Category with this name or code already exists' }, { status: 400 });
     }
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
-

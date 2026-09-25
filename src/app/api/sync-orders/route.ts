@@ -74,21 +74,25 @@ export async function GET() {
     const productImages: Record<string, string> = {};
     if (productIds.size > 0) {
       const pIds = Array.from(productIds);
-      // Shopify allows up to 250 ids per request, we can just do one chunk if it's less
-      const pResponse = await fetch(`https://${shop}/admin/api/2024-01/products.json?ids=${pIds.join(',')}&fields=id,image`, {
-        headers: {
-          'X-Shopify-Access-Token': token,
-          'Content-Type': 'application/json',
-        }
-      });
-      if (pResponse.ok) {
-        const pData = await pResponse.json();
-        if (pData.products) {
-          pData.products.forEach((p: ShopifyProduct) => {
-            if (p.image && p.image.src) {
-              productImages[p.id.toString()] = p.image.src;
-            }
-          });
+      // Shopify allows up to 250 ids per request
+      const chunkSize = 250;
+      for (let i = 0; i < pIds.length; i += chunkSize) {
+        const chunk = pIds.slice(i, i + chunkSize);
+        const pResponse = await fetch(`https://${shop}/admin/api/2024-01/products.json?ids=${chunk.join(',')}&fields=id,image`, {
+          headers: {
+            'X-Shopify-Access-Token': token,
+            'Content-Type': 'application/json',
+          }
+        });
+        if (pResponse.ok) {
+          const pData = await pResponse.json();
+          if (pData.products) {
+            pData.products.forEach((p: ShopifyProduct) => {
+              if (p.image && p.image.src) {
+                productImages[p.id.toString()] = p.image.src;
+              }
+            });
+          }
         }
       }
     }
