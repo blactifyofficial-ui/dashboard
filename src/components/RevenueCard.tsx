@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeClosed } from 'lucide-react';
 
 export default function RevenueCard({ totalSales }: { totalSales: number }) {
   const [isVisible, setIsVisible] = useState(false);
@@ -16,7 +16,7 @@ export default function RevenueCard({ totalSales }: { totalSales: number }) {
           className="text-neutral-400 hover:text-white transition-colors p-1"
           aria-label={isVisible ? "Hide revenue" : "Show revenue"}
         >
-          {isVisible ? <EyeOff size={18} /> : <Eye size={18} />}
+          {isVisible ? <EyeClosed size={18} /> : <Eye size={18} />}
         </button>
       </div>
       
