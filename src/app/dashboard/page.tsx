@@ -5,12 +5,7 @@ import Link from'next/link';
 import { Inbox } from'lucide-react';
 import SearchInput from'@/components/SearchInput';
 import RevenueCard from'@/components/RevenueCard';
-import dynamic from 'next/dynamic';
-
-const OrdersChart = dynamic(() => import('@/components/OrdersChart'), { 
-  ssr: false,
-  loading: () => <div className="w-full h-64 animate-pulse bg-white/5 rounded-xl"></div>
-});
+import DynamicOrdersChart from '@/components/DynamicOrdersChart';
 
 export const dynamic ="force-dynamic"; // Disable static rendering for this page
 
@@ -85,7 +80,7 @@ export default async function Dashboard(props: {
  <div className="relative z-10">
  <h2 className="text-lg md:text-xl font-semibold text-white tracking-tight mb-4 md:mb-6">Orders per Day</h2>
  {ordersPerDayResult.length > 0 ? (
- <OrdersChart data={ordersPerDayResult} />
+ <DynamicOrdersChart data={ordersPerDayResult} />
  ) : (
  <div className="flex flex-col items-center justify-center space-y-4 py-12">
  <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-2 shadow-inner border border-white/5">
