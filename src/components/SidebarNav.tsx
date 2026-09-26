@@ -16,7 +16,7 @@ const NAV_LINKS = [
   { href: '/settings', label: 'Settings', icon: Settings },
 ];
 
-export default function SidebarNav() {
+export default function SidebarNav({ onClose }: { onClose?: () => void }) {
   const pathname = usePathname();
 
   return (
@@ -28,7 +28,8 @@ export default function SidebarNav() {
         return (
           <Link 
             key={link.href}
-            href={link.href} 
+            href={link.href}
+            onClick={onClose}
             className={`flex items-center gap-2 md:gap-3 px-3 md:px-4 py-2 md:py-3 text-sm font-medium rounded-xl transition-all duration-200 whitespace-nowrap ${
               isActive 
                 ? 'bg-white/10 text-white' 

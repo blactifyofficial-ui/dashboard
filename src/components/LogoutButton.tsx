@@ -37,7 +37,7 @@ export default function LogoutButton() {
       </button>
 
       {showModal && mounted && createPortal(
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 ">
           <div className="bg-neutral-900 border border-white/10 p-6 rounded-2xl shadow-2xl max-w-sm w-full animate-in fade-in zoom-in-95 duration-200">
             <h2 className="text-xl font-semibold text-white mb-2">Sign Out</h2>
             <p className="text-neutral-400 text-sm mb-6">Are you sure you want to sign out? You will need to sign in again to access the dashboard.</p>

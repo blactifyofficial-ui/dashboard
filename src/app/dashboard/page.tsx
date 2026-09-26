@@ -4,8 +4,13 @@ import { desc, count, sql, ilike, or, and } from'drizzle-orm';
 import Link from'next/link';
 import { Inbox } from'lucide-react';
 import SearchInput from'@/components/SearchInput';
-import OrdersChart from'@/components/OrdersChart';
 import RevenueCard from'@/components/RevenueCard';
+import dynamic from 'next/dynamic';
+
+const OrdersChart = dynamic(() => import('@/components/OrdersChart'), { 
+  ssr: false,
+  loading: () => <div className="w-full h-64 animate-pulse bg-white/5 rounded-xl"></div>
+});
 
 export const dynamic ="force-dynamic"; // Disable static rendering for this page
 
@@ -58,12 +63,12 @@ export default async function Dashboard(props: {
  {/* Stats Row */}
  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
  <RevenueCard totalSales={totalSales} />
- <div className="group bg-white/[0.03] border border-white/5 rounded-3xl p-6 md:p-8 backdrop-blur-xl hover:bg-white/[0.06] transition-all duration-500 relative shadow-2xl">
+ <div className="group bg-white/[0.03] border border-white/5 rounded-3xl p-6 md:p-8  hover:bg-white/[0.06] transition-all duration-500 relative shadow-2xl">
  <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-white/5 rounded-full blur-2xl group-hover:bg-white/10 transition-all duration-500"></div>
  <h2 className="text-sm font-medium text-neutral-400 mb-2 md:mb-3 relative z-10">Total Orders (All Time)</h2>
  <p className="text-4xl md:text-5xl font-bold text-white tracking-tight relative z-10 truncate">{totalOrders.toLocaleString('en-IN')}</p>
  </div>
- <div className="group bg-neutral-900 border border-white/10 rounded-3xl p-6 md:p-8 backdrop-blur-xl shadow-2xl shadow-black/50 flex flex-col justify-center relative transform hover:-translate-y-1 transition-all duration-500">
+ <div className="group bg-neutral-900 border border-white/10 rounded-3xl p-6 md:p-8  shadow-2xl shadow-black/50 flex flex-col justify-center relative transform hover:-translate-y-1 transition-all duration-500">
  <div className="absolute inset-0 bg-black/10 opacity-20 mix-blend-overlay"></div>
  <h2 className="text-xs font-semibold text-white/80 mb-2 md:mb-3 relative z-10 uppercase tracking-wider">System Status</h2>
  <div className="flex items-center gap-3 relative z-10">
@@ -75,7 +80,7 @@ export default async function Dashboard(props: {
  </div>
  </div>
  {/* Chart Row */}
- <div className="bg-white/[0.02] border border-white/5 rounded-3xl p-4 md:p-8 backdrop-blur-xl shadow-2xl relative">
+ <div className="bg-white/[0.02] border border-white/5 rounded-3xl p-4 md:p-8  shadow-2xl relative">
  <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent pointer-events-none"></div>
  <div className="relative z-10">
  <h2 className="text-lg md:text-xl font-semibold text-white tracking-tight mb-4 md:mb-6">Orders per Day</h2>
@@ -93,7 +98,7 @@ export default async function Dashboard(props: {
  </div>
 
  {/* Orders Table */}
- <div className="bg-white/[0.02] border border-white/5 rounded-3xl backdrop-blur-xl shadow-2xl relative">
+ <div className="bg-white/[0.02] border border-white/5 rounded-3xl  shadow-2xl relative">
  <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent pointer-events-none"></div>
  <div className="p-4 md:px-8 md:py-6 border-b border-white/5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 relative z-10">
  <div className="flex items-center justify-between w-full md:w-auto gap-4">

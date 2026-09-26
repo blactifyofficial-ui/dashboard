@@ -51,7 +51,7 @@ export default function StocksPage() {
           <p className="text-neutral-400 text-sm md:text-base">Manage your inventory and stock levels</p>
         </div>
         {isMobile && (
-          <Link href="/stocks/new" className="inline-flex items-center justify-center px-6 py-3 border border-white/10 bg-white/5 text-white rounded-xl hover:bg-white/10 text-sm font-medium transition-all backdrop-blur-sm gap-2">
+          <Link href="/stocks/new" className="inline-flex items-center justify-center px-6 py-3 border border-white/10 bg-white/5 text-white rounded-xl hover:bg-white/10 text-sm font-medium transition-all  gap-2">
             <Plus size={16} />
             <span>Add Stock</span>
           </Link>
@@ -61,7 +61,7 @@ export default function StocksPage() {
       {loading ? (
         <div className="flex items-center justify-center py-20 text-neutral-400">Loading stock...</div>
       ) : (
-        <div className="bg-white/[0.02] border border-white/5 rounded-3xl backdrop-blur-xl shadow-2xl relative overflow-hidden">
+        <div className="bg-white/[0.02] border border-white/5 rounded-3xl  shadow-2xl relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent pointer-events-none"></div>
           <div className="p-4 md:px-8 md:py-6 border-b border-white/5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 relative z-10">
             <h2 className="text-xl font-semibold text-white tracking-tight">Stock Log</h2>
@@ -91,7 +91,7 @@ export default function StocksPage() {
                         </div>
                         <p className="text-lg font-medium text-white/80">No stock records found.</p>
                         {isMobile && (
-                          <Link href="/stocks/new" className="mt-4 inline-flex items-center justify-center px-5 py-2 border border-white/10 bg-white/5 text-white rounded-xl hover:bg-white/10 text-sm font-medium transition-all backdrop-blur-sm">
+                          <Link href="/stocks/new" className="mt-4 inline-flex items-center justify-center px-5 py-2 border border-white/10 bg-white/5 text-white rounded-xl hover:bg-white/10 text-sm font-medium transition-all ">
                             Add Stock
                           </Link>
                         )}
@@ -119,7 +119,7 @@ export default function StocksPage() {
                       <td className="px-4 md:px-8 py-4 md:py-5 text-right font-semibold text-green-400">₹{Number(stock.expectedReturn).toFixed(2)}</td>
                       <td className="px-4 md:px-8 py-4 md:py-5 text-right">
                         <div className="flex justify-end gap-2">
-                          <button className="px-3 py-1.5 border border-white/10 bg-white/5 text-white rounded-lg hover:bg-white/10 text-xs font-medium transition-all backdrop-blur-sm">Edit</button>
+                          <button className="px-3 py-1.5 border border-white/10 bg-white/5 text-white rounded-lg hover:bg-white/10 text-xs font-medium transition-all ">Edit</button>
                           <button 
                             onClick={async () => {
                               if(confirm("Delete Stock? This action cannot be undone.")) {
@@ -128,7 +128,7 @@ export default function StocksPage() {
                                 else alert("Failed to delete stock");
                               }
                             }} 
-                            className="px-3 py-1.5 border border-red-500/20 bg-red-500/10 text-red-400 rounded-lg hover:bg-red-500/20 text-xs font-medium transition-all backdrop-blur-sm"
+                            className="px-3 py-1.5 border border-red-500/20 bg-red-500/10 text-red-400 rounded-lg hover:bg-red-500/20 text-xs font-medium transition-all "
                           >
                             Delete
                           </button>

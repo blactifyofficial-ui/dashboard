@@ -101,8 +101,8 @@ export default function IssueDetail() {
         ← Back to Issues
       </button>
 
-      <div className="grid grid-cols-3 gap-8">
-        <div className="col-span-2 space-y-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-2 space-y-6">
           <div className="bg-[#1e1e1e] border border-white/10 rounded-2xl p-8 shadow-sm">
             <div className="flex items-center gap-3 mb-4">
               <span className="bg-blue-500/20 text-blue-400 px-3 py-1 rounded-full text-sm font-medium">{issue.category}</span>

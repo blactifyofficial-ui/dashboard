@@ -41,7 +41,7 @@ export default async function OrdersPage(props: {
  </header>
 
  {/* Orders Table */}
- <div className="bg-white/[0.02] border border-white/5 rounded-3xl backdrop-blur-xl shadow-2xl relative">
+ <div className="bg-white/[0.02] border border-white/5 rounded-3xl  shadow-2xl relative">
  <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent pointer-events-none"></div>
  <div className="p-4 md:px-8 md:py-6 border-b border-white/5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 relative z-10">
  <h2 className="text-xl font-semibold text-white tracking-tight">Order Log</h2>
@@ -126,7 +126,7 @@ export default async function OrdersPage(props: {
  {page > 1 ? (
  <Link
  href={`/orders?page=${page - 1}${q ? `&q=${encodeURIComponent(q)}` :''}`}
- className="px-5 py-2 border border-white/10 bg-white/5 text-white rounded-xl hover:bg-white/10 text-sm font-medium transition-all backdrop-blur-sm"
+ className="px-5 py-2 border border-white/10 bg-white/5 text-white rounded-xl hover:bg-white/10 text-sm font-medium transition-all "
  >
  Previous
  </Link>
@@ -139,7 +139,7 @@ export default async function OrdersPage(props: {
  {page < totalPages ? (
  <Link
  href={`/orders?page=${page + 1}${q ? `&q=${encodeURIComponent(q)}` :''}`}
- className="px-5 py-2 border border-white/10 bg-white/5 text-white rounded-xl hover:bg-white/10 text-sm font-medium transition-all backdrop-blur-sm"
+ className="px-5 py-2 border border-white/10 bg-white/5 text-white rounded-xl hover:bg-white/10 text-sm font-medium transition-all "
  >
  Next
  </Link>

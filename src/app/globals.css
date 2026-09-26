@@ -25,5 +25,5 @@ body {
 }
 
 html {
-  font-size: 85%; /* 1rem = 13.6px (default 16px). Scales down everything (fonts, spacing, sizes) proportionately */
+  /* Removed font-size: 85% to restore native mobile text scaling and touch target proportions */
 }

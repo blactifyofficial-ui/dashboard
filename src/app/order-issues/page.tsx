@@ -95,7 +95,7 @@ export default function OrderIssuesDashboard() {
         }}
       />
 
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
         <h1 className="text-3xl font-semibold tracking-tight text-white">Order Issues Dashboard</h1>
         <Link
           href="/order-issues/new"
@@ -106,7 +106,7 @@ export default function OrderIssuesDashboard() {
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <div className="bg-[#1e1e1e] p-6 rounded-xl border border-white/10 shadow-sm text-white">
           <p className="text-sm text-gray-400 mb-1">Open</p>
           <p className="text-3xl font-medium">{issues.filter(i => i.status === 'OPEN').length}</p>
@@ -125,7 +125,7 @@ export default function OrderIssuesDashboard() {
         </div>
       </div>
 
-      <div className="flex gap-4 mb-6">
+      <div className="flex flex-col sm:flex-row gap-4 mb-6">
         <input
           type="text"
           placeholder="Search issues, orders..."
@@ -134,7 +134,7 @@ export default function OrderIssuesDashboard() {
           onChange={(e) => setSearchTerm(e.target.value)}
         />
         <select
-          className="bg-[#1e1e1e] border border-white/10 rounded-lg p-2 text-white focus:outline-none focus:border-blue-500"
+          className="bg-[#1e1e1e] border border-white/10 rounded-lg p-2 text-white focus:outline-none focus:border-blue-500 w-full sm:w-auto"
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
         >

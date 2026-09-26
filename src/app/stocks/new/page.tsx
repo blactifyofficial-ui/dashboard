@@ -86,7 +86,7 @@ function PhoneCamera() {
   if (step === 'success') {
     return (
       <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-6 text-white">
-        <div className="bg-white/[0.02] border border-white/5 rounded-3xl p-8 backdrop-blur-xl flex flex-col items-center max-w-sm w-full">
+        <div className="bg-white/[0.02] border border-white/5 rounded-3xl p-8  flex flex-col items-center max-w-sm w-full">
           <div className="w-20 h-20 bg-green-500/20 text-green-400 rounded-full flex items-center justify-center mb-6 border border-green-500/30">
             <Check size={40} />
           </div>

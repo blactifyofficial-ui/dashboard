@@ -35,7 +35,7 @@ export default async function RevenuePage(props: {
  </div>
  </header>
 
- <div className="bg-white/[0.02] border border-white/5 rounded-3xl backdrop-blur-xl shadow-2xl relative">
+ <div className="bg-white/[0.02] border border-white/5 rounded-3xl  shadow-2xl relative">
  <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent pointer-events-none"></div>
  <div className="p-4 md:px-8 md:py-6 border-b border-white/5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 relative z-10">
  <h2 className="text-xl font-semibold text-white tracking-tight">Monthly Breakdown</h2>

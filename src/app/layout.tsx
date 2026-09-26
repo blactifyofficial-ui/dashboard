@@ -64,7 +64,7 @@ export const dynamic ='force-dynamic';
  lang="en"
  className={`${inter.variable} h-full antialiased dark`}
  >
- <body className="min-h-full bg-black text-neutral-100 flex flex-col md:flex-row relative selection:bg-white/30 font-sans overflow-x-hidden">
+ <body className="min-h-full bg-black text-neutral-100 flex flex-col md:flex-row relative selection:bg-white/30 font-sans">
  {/* Sidebar */}
  {session?.user && <ResponsiveSidebar />}
 
