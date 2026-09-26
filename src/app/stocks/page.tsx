@@ -17,8 +17,13 @@ interface Stock {
 export default function StocksPage() {
   const [stocks, setStocks] = useState<Stock[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
   
   useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
     fetch('/api/stocks')
       .then(res => res.json())
       .then(data => {
@@ -34,6 +39,8 @@ export default function StocksPage() {
         console.error(err);
         setLoading(false);
       });
+      
+    return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
   return (
@@ -43,10 +50,12 @@ export default function StocksPage() {
           <h1 className="text-4xl font-bold tracking-tight text-white">Stock Management</h1>
           <p className="text-neutral-400 text-sm md:text-base">Manage your inventory and stock levels</p>
         </div>
-        <Link href="/stocks/new" className="inline-flex items-center justify-center px-6 py-3 border border-white/10 bg-white/5 text-white rounded-xl hover:bg-white/10 text-sm font-medium transition-all backdrop-blur-sm gap-2">
-          <Plus size={16} />
-          <span>Add Stock</span>
-        </Link>
+        {isMobile && (
+          <Link href="/stocks/new" className="inline-flex items-center justify-center px-6 py-3 border border-white/10 bg-white/5 text-white rounded-xl hover:bg-white/10 text-sm font-medium transition-all backdrop-blur-sm gap-2">
+            <Plus size={16} />
+            <span>Add Stock</span>
+          </Link>
+        )}
       </header>
 
       {loading ? (
@@ -81,9 +90,11 @@ export default function StocksPage() {
                           <Inbox size={32} className="text-white/50"/>
                         </div>
                         <p className="text-lg font-medium text-white/80">No stock records found.</p>
-                        <Link href="/stocks/new" className="mt-4 inline-flex items-center justify-center px-5 py-2 border border-white/10 bg-white/5 text-white rounded-xl hover:bg-white/10 text-sm font-medium transition-all backdrop-blur-sm">
-                          Add Stock
-                        </Link>
+                        {isMobile && (
+                          <Link href="/stocks/new" className="mt-4 inline-flex items-center justify-center px-5 py-2 border border-white/10 bg-white/5 text-white rounded-xl hover:bg-white/10 text-sm font-medium transition-all backdrop-blur-sm">
+                            Add Stock
+                          </Link>
+                        )}
                       </div>
                     </td>
                   </tr>
