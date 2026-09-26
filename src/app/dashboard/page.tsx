@@ -5,6 +5,7 @@ import Link from'next/link';
 import { Inbox } from'lucide-react';
 import SearchInput from'@/components/SearchInput';
 import OrdersChart from'@/components/OrdersChart';
+import RevenueCard from'@/components/RevenueCard';
 
 export const dynamic ="force-dynamic"; // Disable static rendering for this page
 
@@ -56,11 +57,7 @@ export default async function Dashboard(props: {
 
  {/* Stats Row */}
  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
- <div className="group bg-white/[0.03] border border-white/5 rounded-3xl p-6 md:p-8 backdrop-blur-xl hover:bg-white/[0.06] transition-all duration-500 relative shadow-2xl">
- <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-white/5 rounded-full blur-2xl group-hover:bg-white/10 transition-all duration-500"></div>
- <h2 className="text-sm font-medium text-neutral-400 mb-2 md:mb-3 relative z-10">Total Revenue (All Time)</h2>
- <p className="text-4xl md:text-5xl font-bold text-white tracking-tight relative z-10 truncate">₹{totalSales.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
- </div>
+ <RevenueCard totalSales={totalSales} />
  <div className="group bg-white/[0.03] border border-white/5 rounded-3xl p-6 md:p-8 backdrop-blur-xl hover:bg-white/[0.06] transition-all duration-500 relative shadow-2xl">
  <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-white/5 rounded-full blur-2xl group-hover:bg-white/10 transition-all duration-500"></div>
  <h2 className="text-sm font-medium text-neutral-400 mb-2 md:mb-3 relative z-10">Total Orders (All Time)</h2>
