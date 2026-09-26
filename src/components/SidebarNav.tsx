@@ -6,7 +6,7 @@ import { LayoutDashboard, ClipboardList, ShoppingBag, CalendarDays, AlertCircle,
 
 
 const NAV_LINKS = [
-  { href: '/', label: 'Overview', icon: LayoutDashboard },
+  { href: '/dashboard', label: 'Overview', icon: LayoutDashboard },
   { href: '/orders', label: 'Orders', icon: ClipboardList },
   { href: '/product-revenue', label: 'Products', icon: ShoppingBag },
   { href: '/revenue', label: 'Monthly', icon: CalendarDays },

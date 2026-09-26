@@ -8,7 +8,7 @@ export default function ClientLogin() {
   const handleGoogleLogin = async () => {
     setLoading(true);
     try {
-      await authClient.signIn.social({ provider: "google", callbackURL: "/" });
+      await authClient.signIn.social({ provider: "google", callbackURL: "/dashboard" });
     } catch (e) {
       console.error(e);
       setLoading(false);
