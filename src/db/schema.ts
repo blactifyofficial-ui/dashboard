@@ -133,3 +133,18 @@ export const expenseActivities = pgTable('expense_activities', {
   remark: text('remark'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
+
+export const stocks = pgTable('stocks', {
+  id: text('id').primaryKey(),
+  productImage: text('product_image'),
+  buyingPrice: numeric('buying_price').notNull(),
+  stockCount: numeric('stock_count').notNull(),
+  sellingPrice: numeric('selling_price').notNull(),
+  productId: text('product_id'),
+  totalPurchaseAmount: numeric('total_purchase_amount').notNull(),
+  expectedReturn: numeric('expected_return').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  createdById: text('created_by_id').references(() => users.id).notNull(),
+  updatedById: text('updated_by_id').references(() => users.id),
+});

@@ -15,6 +15,7 @@
     "@neondatabase/auth-ui": "^0.3.0-beta",
     "@neondatabase/serverless": "^1.1.0",
     "chart.js": "^4.5.1",
+    "cloudinary": "^2.11.0",
     "dotenv-cli": "^11.0.0",
     "drizzle-orm": "^0.45.3",
     "lucide-react": "^1.48.0",
