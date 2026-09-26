@@ -9,6 +9,7 @@ import { auth } from"@/lib/auth/server";
 import { db } from"@/db";
 import { allowedUsers } from"@/db/schema";
 import { eq } from"drizzle-orm";
+import { headers } from "next/headers";
 
 const inter = Inter({
  variable:"--font-inter",
@@ -37,8 +38,10 @@ export const viewport: Viewport = {
 
 export const dynamic ='force-dynamic';
 
-export default async function RootLayout({ children }: { children: React.ReactNode }) {
- const { data: session } = await auth.getSession();
+ export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const { data: session } = await auth.getSession({
+    fetchOptions: { headers: await headers() }
+  });
  
  // Check if they are logged in but not allowed
  if (session?.user) {
