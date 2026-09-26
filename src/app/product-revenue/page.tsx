@@ -57,7 +57,7 @@ export default async function ProductRevenuePage(props: {
  <SearchInput initialQuery={q} />
  </div>
  </div>
- <div className="relative z-10 w-full">
+ <div className="relative z-10 w-full overflow-x-auto no-scrollbar">
  <table className="w-full text-sm text-left min-w-[600px]">
  <thead className="text-xs text-neutral-400 uppercase tracking-wider bg-white/[0.01] border-b border-white/5">
  <tr>

@@ -10,9 +10,10 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET 
 });
 
-export async function GET(req: Request, { params }: { params: { id: string } }) {
+export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const stock = await db.select().from(stocks).where(eq(stocks.id, params.id)).limit(1);
+    const { id } = await params;
+    const stock = await db.select().from(stocks).where(eq(stocks.id, id)).limit(1);
     if (!stock || stock.length === 0) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
@@ -22,8 +23,9 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
   }
 }
 
-export async function PATCH(req: Request, { params }: { params: { id: string } }) {
+export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { id } = await params;
     const body = await req.json();
     
     // Validation
@@ -37,7 +39,7 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
       return NextResponse.json({ error: "Invalid stock count" }, { status: 400 });
     }
 
-    const currentStock = await db.select().from(stocks).where(eq(stocks.id, params.id)).limit(1);
+    const currentStock = await db.select().from(stocks).where(eq(stocks.id, id)).limit(1);
     if (!currentStock || currentStock.length === 0) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
@@ -61,7 +63,7 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
         updatedAt: new Date(),
         updatedById: 'temp-user-id', // Placeholder
       })
-      .where(eq(stocks.id, params.id));
+      .where(eq(stocks.id, id));
 
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (error) {
@@ -70,9 +72,10 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
   }
 }
 
-export async function DELETE(req: Request, { params }: { params: { id: string } }) {
+export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const currentStock = await db.select().from(stocks).where(eq(stocks.id, params.id)).limit(1);
+    const { id } = await params;
+    const currentStock = await db.select().from(stocks).where(eq(stocks.id, id)).limit(1);
     if (!currentStock || currentStock.length === 0) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
@@ -92,7 +95,7 @@ export async function DELETE(req: Request, { params }: { params: { id: string } 
       }
     }
 
-    await db.delete(stocks).where(eq(stocks.id, params.id));
+    await db.delete(stocks).where(eq(stocks.id, id));
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (error) {
     console.error("Failed to delete stock:", error);

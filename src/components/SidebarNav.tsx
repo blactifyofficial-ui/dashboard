@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { LayoutDashboard, ClipboardList, ShoppingBag, CalendarDays, AlertCircle, Settings, Wallet, Package } from 'lucide-react';
-import Image from 'next/image';
+
 
 const NAV_LINKS = [
   { href: '/', label: 'Overview', icon: LayoutDashboard },
@@ -21,11 +21,6 @@ export default function SidebarNav() {
 
   return (
     <>
-      <div className="md:hidden px-4 mb-2">
-        <Link href="/">
-          <Image src="/blactify_logo_font.svg" alt="Blactify" width={120} height={24} className="h-6 object-contain" style={{ width: 'auto', height: 'auto' }} priority />
-        </Link>
-      </div>
       {NAV_LINKS.map((link) => {
         const isActive = pathname === link.href || (link.href !== '/' && pathname.startsWith(link.href));
         const Icon = link.icon;

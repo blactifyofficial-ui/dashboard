@@ -1,10 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from"next/font/google";
 import"./globals.css";
-import Link from"next/link";
-import Image from"next/image";
-import SidebarNav from"@/components/SidebarNav";
-import LogoutButton from"@/components/LogoutButton";
+import ResponsiveSidebar from "@/components/ResponsiveSidebar";
+import Breadcrumbs from "@/components/Breadcrumbs";
 import SignOutLink from"@/components/SignOutLink";
 import { Toaster } from "react-hot-toast";
 import { auth } from"@/lib/auth/server";
@@ -54,29 +52,14 @@ export default async function RootLayout({ children }: { children: React.ReactNo
  lang="en"
  className={`${inter.variable} h-full antialiased dark`}
  >
- <body className="min-h-full bg-black text-neutral-100 flex flex-col md:flex-row relative selection:bg-white/30 font-sans">
+ <body className="min-h-full bg-black text-neutral-100 flex flex-col md:flex-row relative selection:bg-white/30 font-sans overflow-x-hidden">
  {/* Sidebar */}
- {session?.user && (
- <aside className="w-full md:w-64 shrink-0 border-b md:border-b-0 md:border-r border-white/10 bg-white/[0.02] backdrop-blur-xl md:h-screen md:sticky top-0 flex flex-col z-50">
- <div className="p-4 md:p-8 border-b border-white/5 hidden md:block">
- <Link href="/">
- <Image src="/blactify_logo_font.svg"alt="Blactify"width={150} height={32} className="h-8 object-contain"style={{ width:'auto', height: 'auto'}} priority />
- </Link>
- </div>
- <nav className="flex md:flex-col md:flex-1 md: p-2 md:p-4 gap-2 md:gap-0 md:space-y-2 mt-0 md:mt-4 no-scrollbar items-center md:items-stretch">
- <SidebarNav />
- 
- <div className="md:mt-auto pt-4 border-t border-white/5 md:w-full mt-0 border-none md:border-solid md:border-t flex items-center md:block">
- <LogoutButton />
- </div>
- </nav>
-
- </aside>
- )}
+ {session?.user && <ResponsiveSidebar />}
 
  {/* Main Content */}
  <main className="flex-1 h-full z-10 relative min-w-0">
  <div className="p-4 sm:p-6 md:p-10 max-w-[1920px] mx-auto h-full w-full">
+ {session?.user && <Breadcrumbs />}
  {children}
  </div>
  </main>

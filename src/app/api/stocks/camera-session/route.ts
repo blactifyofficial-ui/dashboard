@@ -10,7 +10,7 @@ export async function POST(req: Request) {
     const { sessionId, url } = await req.json();
     if (!sessionId || !url) return Response.json({ error: 'Missing data' }, { status: 400 });
     
-    globalSessions.cameraSessions[sessionId] = url;
+    globalSessions.cameraSessions![sessionId] = url;
     return Response.json({ success: true });
   } catch {
     return Response.json({ error: 'Invalid request' }, { status: 400 });
@@ -22,6 +22,6 @@ export async function GET(req: Request) {
   const sessionId = url.searchParams.get('id');
   if (!sessionId) return Response.json({ error: 'Missing ID' }, { status: 400 });
   
-  const resultUrl = globalSessions.cameraSessions[sessionId] || null;
+  const resultUrl = globalSessions.cameraSessions?.[sessionId] || null;
   return Response.json({ url: resultUrl });
 }
