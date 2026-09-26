@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { Inbox, Plus } from 'lucide-react';
 
 interface Stock {
   id: string;
@@ -21,7 +22,12 @@ export default function StocksPage() {
     fetch('/api/stocks')
       .then(res => res.json())
       .then(data => {
-        setStocks(data);
+        if (Array.isArray(data)) {
+          setStocks(data);
+        } else {
+          console.error("API Error:", data);
+          setStocks([]);
+        }
         setLoading(false);
       })
       .catch(err => {
@@ -31,75 +37,98 @@ export default function StocksPage() {
   }, []);
 
   return (
-    <div className="max-w-6xl mx-auto p-4 md:p-8 text-white">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold">Stock Management</h1>
-        <Link href="/stocks/new" className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded font-medium">
-          Add Stock
+    <div className="space-y-12 relative z-10">
+      <header className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="space-y-2">
+          <h1 className="text-4xl font-bold tracking-tight text-white">Stock Management</h1>
+          <p className="text-neutral-400 text-sm md:text-base">Manage your inventory and stock levels</p>
+        </div>
+        <Link href="/stocks/new" className="inline-flex items-center justify-center px-6 py-3 border border-white/10 bg-white/5 text-white rounded-xl hover:bg-white/10 text-sm font-medium transition-all backdrop-blur-sm gap-2">
+          <Plus size={16} />
+          <span>Add Stock</span>
         </Link>
-      </div>
+      </header>
 
       {loading ? (
-        <p className="text-neutral-400">Loading stock...</p>
-      ) : stocks.length === 0 ? (
-        <div className="text-center bg-neutral-800 p-12 rounded-lg border border-neutral-700">
-          <p className="text-xl mb-4">No stock records found.</p>
-          <Link href="/stocks/new" className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded font-medium inline-block">
-            Add Stock
-          </Link>
-        </div>
+        <div className="flex items-center justify-center py-20 text-neutral-400">Loading stock...</div>
       ) : (
-        <div className="overflow-x-auto bg-neutral-800 rounded-lg border border-neutral-700">
-          <table className="w-full text-left">
-            <thead className="bg-neutral-900 border-b border-neutral-700">
-              <tr>
-                <th className="p-4 font-semibold text-sm">Image</th>
-                <th className="p-4 font-semibold text-sm">Product</th>
-                <th className="p-4 font-semibold text-sm text-right">Buying Price</th>
-                <th className="p-4 font-semibold text-sm text-right">Stock</th>
-                <th className="p-4 font-semibold text-sm text-right">Selling Price</th>
-                <th className="p-4 font-semibold text-sm text-right">Purchase Amount</th>
-                <th className="p-4 font-semibold text-sm text-right">Expected Return</th>
-                <th className="p-4 font-semibold text-sm text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {stocks.map(stock => (
-                <tr key={stock.id} className="border-b border-neutral-700 hover:bg-neutral-800/50">
-                  <td className="p-4">
-                    {stock.productImage ? (
-                      /* eslint-disable-next-line @next/next/no-img-element */
-                      <img src={stock.productImage} className="w-12 h-12 rounded object-cover" alt="Stock" />
-                    ) : (
-                      <div className="w-12 h-12 rounded bg-neutral-700 flex items-center justify-center text-xs text-neutral-500">No Img</div>
-                    )}
-                  </td>
-                  <td className="p-4">{stock.productId || '-'}</td>
-                  <td className="p-4 text-right">₹{Number(stock.buyingPrice).toFixed(2)}</td>
-                  <td className="p-4 text-right">{stock.stockCount}</td>
-                  <td className="p-4 text-right">₹{Number(stock.sellingPrice).toFixed(2)}</td>
-                  <td className="p-4 text-right text-neutral-400">₹{Number(stock.totalPurchaseAmount).toFixed(2)}</td>
-                  <td className="p-4 text-right text-green-400">₹{Number(stock.expectedReturn).toFixed(2)}</td>
-                  <td className="p-4 text-right flex justify-end gap-2">
-                    {/* Placeholder for View/Edit routes */}
-                    <button className="bg-neutral-700 hover:bg-neutral-600 px-3 py-1 rounded text-xs font-medium">Edit</button>
-                    <button 
-                      onClick={async () => {
-                        if(confirm("Delete Stock? This action cannot be undone.")) {
-                          const res = await fetch(`/api/stocks/${stock.id}`, { method: 'DELETE' });
-                          if (res.ok) setStocks(stocks.filter(s => s.id !== stock.id));
-                          else alert("Failed to delete stock");
-                        }
-                      }} 
-                      className="bg-red-600/80 hover:bg-red-600 px-3 py-1 rounded text-xs font-medium"
-                    >
-                      Delete
-                    </button>
-                  </td>
+        <div className="bg-white/[0.02] border border-white/5 rounded-3xl backdrop-blur-xl shadow-2xl relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent pointer-events-none"></div>
+          <div className="p-4 md:px-8 md:py-6 border-b border-white/5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 relative z-10">
+            <h2 className="text-xl font-semibold text-white tracking-tight">Stock Log</h2>
+          </div>
+          
+          <div className="relative z-10 w-full overflow-x-auto">
+            <table className="w-full text-sm text-left min-w-[900px]">
+              <thead className="text-xs text-neutral-400 uppercase tracking-wider bg-white/[0.01] border-b border-white/5">
+                <tr>
+                  <th className="px-4 md:px-8 py-4 md:py-5 font-semibold">Image</th>
+                  <th className="px-4 md:px-8 py-4 md:py-5 font-semibold">Product</th>
+                  <th className="px-4 md:px-8 py-4 md:py-5 font-semibold text-right">Buying Price</th>
+                  <th className="px-4 md:px-8 py-4 md:py-5 font-semibold text-right">Stock</th>
+                  <th className="px-4 md:px-8 py-4 md:py-5 font-semibold text-right">Selling Price</th>
+                  <th className="px-4 md:px-8 py-4 md:py-5 font-semibold text-right">Purchase Amount</th>
+                  <th className="px-4 md:px-8 py-4 md:py-5 font-semibold text-right">Expected Return</th>
+                  <th className="px-4 md:px-8 py-4 md:py-5 font-semibold text-right">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-white/5">
+                {stocks.length === 0 ? (
+                  <tr>
+                    <td colSpan={8} className="px-4 md:px-8 py-10 md:py-20 text-center text-neutral-400">
+                      <div className="flex flex-col items-center justify-center space-y-4">
+                        <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-2 shadow-inner border border-white/5">
+                          <Inbox size={32} className="text-white/50"/>
+                        </div>
+                        <p className="text-lg font-medium text-white/80">No stock records found.</p>
+                        <Link href="/stocks/new" className="mt-4 inline-flex items-center justify-center px-5 py-2 border border-white/10 bg-white/5 text-white rounded-xl hover:bg-white/10 text-sm font-medium transition-all backdrop-blur-sm">
+                          Add Stock
+                        </Link>
+                      </div>
+                    </td>
+                  </tr>
+                ) : (
+                  stocks.map(stock => (
+                    <tr key={stock.id} className="hover:bg-white/[0.03] transition-colors duration-200 group">
+                      <td className="px-4 md:px-8 py-4 md:py-5">
+                        {stock.productImage ? (
+                          /* eslint-disable-next-line @next/next/no-img-element */
+                          <img src={stock.productImage} className="w-12 h-12 rounded-xl object-cover border border-white/10 shadow-sm" alt="Stock" />
+                        ) : (
+                          <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/5 flex items-center justify-center text-xs text-neutral-500 shadow-inner">No Img</div>
+                        )}
+                      </td>
+                      <td className="px-4 md:px-8 py-4 md:py-5 font-medium text-white group-hover:text-neutral-300 transition-colors">
+                        {stock.productId || '-'}
+                      </td>
+                      <td className="px-4 md:px-8 py-4 md:py-5 text-right font-medium text-white">₹{Number(stock.buyingPrice).toFixed(2)}</td>
+                      <td className="px-4 md:px-8 py-4 md:py-5 text-right text-neutral-300">{stock.stockCount}</td>
+                      <td className="px-4 md:px-8 py-4 md:py-5 text-right text-neutral-300">₹{Number(stock.sellingPrice).toFixed(2)}</td>
+                      <td className="px-4 md:px-8 py-4 md:py-5 text-right text-neutral-400">₹{Number(stock.totalPurchaseAmount).toFixed(2)}</td>
+                      <td className="px-4 md:px-8 py-4 md:py-5 text-right font-semibold text-green-400">₹{Number(stock.expectedReturn).toFixed(2)}</td>
+                      <td className="px-4 md:px-8 py-4 md:py-5 text-right">
+                        <div className="flex justify-end gap-2">
+                          <button className="px-3 py-1.5 border border-white/10 bg-white/5 text-white rounded-lg hover:bg-white/10 text-xs font-medium transition-all backdrop-blur-sm">Edit</button>
+                          <button 
+                            onClick={async () => {
+                              if(confirm("Delete Stock? This action cannot be undone.")) {
+                                const res = await fetch(`/api/stocks/${stock.id}`, { method: 'DELETE' });
+                                if (res.ok) setStocks(stocks.filter(s => s.id !== stock.id));
+                                else alert("Failed to delete stock");
+                              }
+                            }} 
+                            className="px-3 py-1.5 border border-red-500/20 bg-red-500/10 text-red-400 rounded-lg hover:bg-red-500/20 text-xs font-medium transition-all backdrop-blur-sm"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </div>
