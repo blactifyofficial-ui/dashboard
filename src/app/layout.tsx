@@ -17,9 +17,18 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
- title:"Shopify Dashboard",
- description:"Real-time Shopify Sales Dashboard",
- manifest: "/manifest.json",
+  title: "Shopify Dashboard",
+  description: "Real-time Shopify Sales Dashboard",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    title: "Dashboard",
+    statusBarStyle: "black-translucent",
+  },
+  icons: {
+    icon: "/icon",
+    apple: "/apple-icon",
+  },
 };
 
 export const viewport: Viewport = {
