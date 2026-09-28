@@ -145,53 +145,53 @@ export default function OrderIssuesDashboard() {
         </div>
       </div>
 
-      <div className="flex-1 min-h-0 flex flex-col bg-white/[0.02] border border-white/5 rounded-3xl shadow-2xl relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent pointer-events-none"></div>
-        <div className="flex-none p-4 md:px-8 md:py-6 border-b border-white/5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 relative z-10 bg-black/50">
-          <h2 className="text-xl font-semibold text-white tracking-tight">Issues List</h2>
+      {loading ? (
+        <LoadingSpinner />
+      ) : (
+        <div className="flex-1 min-h-0 flex flex-col bg-white/[0.02] border border-white/5 rounded-3xl shadow-2xl relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent pointer-events-none"></div>
+          <div className="flex-none p-4 md:px-8 md:py-6 border-b border-white/5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 relative z-10 bg-black/50">
+            <h2 className="text-xl font-semibold text-white tracking-tight">Issues List</h2>
 
-          <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500 w-4 h-4" />
-              <input
-                type="text"
-                placeholder="Search issues..."
-                value={searchTerm}
+            <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500 w-4 h-4" />
+                <input
+                  type="text"
+                  placeholder="Search issues..."
+                  value={searchTerm}
+                  onChange={(e) => {
+                    setSearchTerm(e.target.value);
+                    setPage(1);
+                  }}
+                  className="pl-9 pr-4 py-2 w-full sm:w-64 bg-white/5 border border-white/10 rounded-xl text-sm text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-white/20 transition-all"
+                />
+              </div>
+              <select
+                value={statusFilter}
                 onChange={(e) => {
-                  setSearchTerm(e.target.value);
+                  setStatusFilter(e.target.value);
                   setPage(1);
                 }}
-                className="pl-9 pr-4 py-2 w-full sm:w-64 bg-white/5 border border-white/10 rounded-xl text-sm text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-white/20 transition-all"
-              />
+                className="px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:ring-2 focus:ring-white/20 transition-all appearance-none pr-10 relative cursor-pointer"
+                style={{
+                  backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgba(255, 255, 255, 0.5)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`,
+                  backgroundRepeat: 'no-repeat',
+                  backgroundPosition: 'right 0.5rem center',
+                  backgroundSize: '1em 1em'
+                }}
+              >
+                <option value="" className="bg-neutral-900">All Statuses</option>
+                <option value="OPEN" className="bg-neutral-900">Open</option>
+                <option value="IN_PROGRESS" className="bg-neutral-900">In Progress</option>
+                <option value="WAITING" className="bg-neutral-900">Waiting</option>
+                <option value="RESOLVED" className="bg-neutral-900">Resolved</option>
+                <option value="CLOSED" className="bg-neutral-900">Closed</option>
+                <option value="CANCELLED" className="bg-neutral-900">Cancelled</option>
+              </select>
             </div>
-            <select
-              value={statusFilter}
-              onChange={(e) => {
-                setStatusFilter(e.target.value);
-                setPage(1);
-              }}
-              className="px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:ring-2 focus:ring-white/20 transition-all appearance-none pr-10 relative cursor-pointer"
-              style={{
-                backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgba(255, 255, 255, 0.5)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`,
-                backgroundRepeat: 'no-repeat',
-                backgroundPosition: 'right 0.5rem center',
-                backgroundSize: '1em 1em'
-              }}
-            >
-              <option value="" className="bg-neutral-900">All Statuses</option>
-              <option value="OPEN" className="bg-neutral-900">Open</option>
-              <option value="IN_PROGRESS" className="bg-neutral-900">In Progress</option>
-              <option value="WAITING" className="bg-neutral-900">Waiting</option>
-              <option value="RESOLVED" className="bg-neutral-900">Resolved</option>
-              <option value="CLOSED" className="bg-neutral-900">Closed</option>
-              <option value="CANCELLED" className="bg-neutral-900">Cancelled</option>
-            </select>
           </div>
-        </div>
 
-        {loading ? (
-          <LoadingSpinner />
-        ) : (
           <div className={`flex-1 min-h-0 relative z-10 w-full overflow-auto no-scrollbar transition-opacity duration-200 ${isFetching ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
             <table className="w-full text-sm text-left min-w-[900px]">
               <thead className="sticky top-0 text-xs text-neutral-400 uppercase tracking-wider bg-neutral-950/80 backdrop-blur-md border-b border-white/5 z-20 shadow-sm">
@@ -257,11 +257,11 @@ export default function OrderIssuesDashboard() {
                         </button>
                       </td>
                     </tr>
-                  )))}
+                  ))
+                )}
               </tbody>
             </table>
           </div>
-        )}
 
         {totalPages > 1 && (
           <div className="flex-none p-4 md:px-8 py-4 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm bg-black/50">
@@ -287,6 +287,7 @@ export default function OrderIssuesDashboard() {
           </div>
         )}
       </div>
+      )}
 
     </div>
   );

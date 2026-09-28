@@ -75,22 +75,21 @@ export default function ExpensesPage() {
         </Link>
       </div>
 
-      <div className="flex-none grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white/5 border border-white/10 rounded-xl p-4">
-          <p className="text-sm text-white/60 mb-1">Total Expenses</p>
-          <p className="text-2xl font-bold">₹{calculateTotal()}</p>
-        </div>
-        <div className="bg-white/5 border border-white/10 rounded-xl p-4">
-          <p className="text-sm text-white/60 mb-1">Total Records</p>
-          <p className="text-2xl font-bold">{filteredExpenses.length}</p>
-        </div>
-      </div>
-
       {loading ? (
-        <div className="flex-1 min-h-0 bg-white/5 border border-white/10 rounded-xl flex items-center justify-center">
-          <LoadingSpinner />
-        </div>
+        <LoadingSpinner />
       ) : (
+        <>
+          <div className="flex-none grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="bg-white/5 border border-white/10 rounded-xl p-4">
+              <p className="text-sm text-white/60 mb-1">Total Expenses</p>
+              <p className="text-2xl font-bold">₹{calculateTotal()}</p>
+            </div>
+            <div className="bg-white/5 border border-white/10 rounded-xl p-4">
+              <p className="text-sm text-white/60 mb-1">Total Records</p>
+              <p className="text-2xl font-bold">{filteredExpenses.length}</p>
+            </div>
+          </div>
+
         <div className="flex-1 min-h-0 flex flex-col bg-white/5 border border-white/10 rounded-xl overflow-hidden">
           <div className="flex-none p-4 border-b border-white/10 flex flex-col sm:flex-row gap-4 justify-between bg-black/50">
             <div className="relative w-full sm:max-w-xs">
@@ -177,6 +176,7 @@ export default function ExpensesPage() {
             </table>
           </div>
         </div>
+        </>
       )}
     </div>
   );
