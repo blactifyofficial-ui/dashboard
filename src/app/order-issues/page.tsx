@@ -4,12 +4,15 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 import ConfirmModal from '@/components/ConfirmModal';
-import { Search, Plus } from 'lucide-react';
+import { Search, Plus, ChevronRight } from 'lucide-react';
 
 type Issue = {
   id: string;
   orderId: string;
   orderNumber?: string;
+  customerName?: string;
+  customerEmail?: string;
+  trackingId?: string;
   title: string;
   priority: string;
   status: string;
@@ -64,11 +67,6 @@ export default function OrderIssuesDashboard() {
     }, 300);
     return () => clearTimeout(delayDebounceFn);
   }, [fetchIssues]);
-
-  const initiateDelete = (id: string) => {
-    setIssueToDelete(id);
-    setDeleteModalOpen(true);
-  };
 
   const executeDelete = async () => {
     if (!issueToDelete || isDeleting) return;
@@ -196,7 +194,8 @@ export default function OrderIssuesDashboard() {
               <thead className="sticky top-0 text-xs text-neutral-400 uppercase tracking-wider bg-neutral-950/80 backdrop-blur-md border-b border-white/5 z-20 shadow-sm">
                 <tr>
                   <th className="px-4 md:px-8 py-4 md:py-5 font-semibold">Issue ID</th>
-                  <th className="px-4 md:px-8 py-4 md:py-5 font-semibold">Order</th>
+                  <th className="px-4 md:px-8 py-4 md:py-5 font-semibold">Order Details</th>
+                  <th className="px-4 md:px-8 py-4 md:py-5 font-semibold">Customer Details</th>
                   <th className="px-4 md:px-8 py-4 md:py-5 font-semibold">Title</th>
                   <th className="px-4 md:px-8 py-4 md:py-5 font-semibold text-center">Priority</th>
                   <th className="px-4 md:px-8 py-4 md:py-5 font-semibold text-center">Status</th>
@@ -218,7 +217,14 @@ export default function OrderIssuesDashboard() {
                       className="hover:bg-white/[0.03] transition-colors duration-200 group"
                     >
                       <td className="px-4 md:px-8 py-4 md:py-5 font-mono text-xs text-neutral-500">#{issue.id.slice(0, 8)}</td>
-                      <td className="px-4 md:px-8 py-4 md:py-5 font-medium text-white">{issue.orderNumber || issue.orderId}</td>
+                      <td className="px-4 md:px-8 py-4 md:py-5 font-medium text-white">
+                        <div>{issue.orderNumber || issue.orderId}</div>
+                        {issue.trackingId && <div className="text-xs text-neutral-400 mt-1 font-normal">Track: {issue.trackingId}</div>}
+                      </td>
+                      <td className="px-4 md:px-8 py-4 md:py-5 text-neutral-300">
+                        <div className="text-sm font-medium">{issue.customerName || 'N/A'}</div>
+                        <div className="text-xs text-neutral-500 mt-1">{issue.customerEmail || 'No email'}</div>
+                      </td>
                       <td className="px-4 md:px-8 py-4 md:py-5 text-neutral-300">{issue.title}</td>
                       <td className="px-4 md:px-8 py-4 md:py-5 text-center">
                         <span className={`px-2 py-1 rounded text-xs font-medium ${issue.priority === 'URGENT' ? 'bg-red-500/10 text-red-400 border border-red-500/20' :
@@ -240,20 +246,12 @@ export default function OrderIssuesDashboard() {
                         {new Date(issue.createdAt).toLocaleDateString()}
                       </td>
                       <td className="px-4 md:px-8 py-4 md:py-5 text-right">
-                        <div className="flex justify-end gap-2">
-                          <button
-                            onClick={() => router.push(`/order-issues/${issue.id}`)}
-                            className="px-3 py-1.5 border border-white/10 bg-white/5 text-white rounded-lg hover:bg-white/10 text-xs font-medium transition-all"
-                          >
-                            Update
-                          </button>
-                          <button
-                            onClick={() => initiateDelete(issue.id)}
-                            className="px-3 py-1.5 border border-red-500/20 bg-red-500/10 text-red-400 rounded-lg hover:bg-red-500/20 text-xs font-medium transition-all"
-                          >
-                            Delete
-                          </button>
-                        </div>
+                        <button
+                          onClick={() => router.push(`/order-issues/${issue.id}`)}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-white/10 bg-white/5 text-white rounded-lg hover:bg-white/10 text-xs font-medium transition-all"
+                        >
+                          View <ChevronRight size={14} />
+                        </button>
                       </td>
                     </tr>
                   )))}
