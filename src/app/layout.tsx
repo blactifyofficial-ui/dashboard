@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from "next";
 import { Inter } from"next/font/google";
 import"./globals.css";
 import ResponsiveSidebar from "@/components/ResponsiveSidebar";
-import Breadcrumbs from "@/components/Breadcrumbs";
 import SignOutLink from"@/components/SignOutLink";
 import { Toaster } from "react-hot-toast";
 import { auth } from"@/lib/auth/server";
@@ -67,16 +66,19 @@ export const dynamic ='force-dynamic';
         {session?.user && <ResponsiveSidebar />}
 
         {/* Main Content */}
-        <main className="flex-1 w-full min-w-0 px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 lg:pt-8 pb-0 z-10 relative h-full flex flex-col overflow-y-auto">
-          <div className="mx-auto w-full max-w-7xl h-full flex flex-col min-h-0">
-            <div className="flex-none">
-              {session?.user && <Breadcrumbs />}
+        {session?.user ? (
+          <main className="flex-1 w-full min-w-0 px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 lg:pt-8 pb-0 z-10 relative h-full flex flex-col overflow-y-auto">
+            <div className="mx-auto w-full max-w-7xl h-full flex flex-col min-h-0">
+              <div className="flex-1 min-h-0 pb-4 sm:pb-6 lg:pb-8 flex flex-col">
+                {children}
+              </div>
             </div>
-            <div className="flex-1 min-h-0 pb-4 sm:pb-6 lg:pb-8 flex flex-col">
-              {children}
-            </div>
-          </div>
-        </main>
+          </main>
+        ) : (
+          <main className="flex-1 w-full h-full bg-black">
+            {children}
+          </main>
+        )}
         <Toaster position="bottom-right" />
       </body>
     </html>

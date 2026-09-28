@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { ArrowLeft, Loader2, Pencil, Trash2, Save, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 import ConfirmModal from '@/components/ConfirmModal';
+import LoadingSpinner from '@/components/LoadingSpinner';
 
 type Activity = {
   id: string;
@@ -176,11 +177,7 @@ export default function ExpenseDetailPage() {
   };
 
   if (loading) {
-    return (
-      <div className="flex h-[50vh] items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-white/50" />
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
   if (!expense) {

@@ -16,7 +16,7 @@ export default function ClientLogin() {
   };
 
   return (
-    <div className="flex min-h-screen w-full items-center justify-center bg-black relative">
+    <div className="flex h-full w-full items-center justify-center bg-black relative">
       <div className="z-10 flex flex-col items-center max-w-sm w-full px-6">
         <h1 className="text-3xl font-semibold tracking-tight text-white mb-2 uppercase">Blactify</h1>
         <p className="text-sm text-neutral-400 mb-8 text-center">Admin Dashboard Access</p>

@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 import ConfirmModal from '@/components/ConfirmModal';
+import LoadingSpinner from '@/components/LoadingSpinner';
 import { Search, Plus, ChevronRight } from 'lucide-react';
 
 type Issue = {
@@ -23,6 +24,7 @@ export default function OrderIssuesDashboard() {
   const router = useRouter();
   const [issues, setIssues] = useState<Issue[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isFetching, setIsFetching] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -32,7 +34,7 @@ export default function OrderIssuesDashboard() {
   const [totalPages, setTotalPages] = useState(1);
 
   const fetchIssues = useCallback(async () => {
-    setLoading(true);
+    setIsFetching(true);
     try {
       const query = new URLSearchParams();
       if (searchTerm) query.set('q', searchTerm);
@@ -58,6 +60,7 @@ export default function OrderIssuesDashboard() {
       setIssues([]);
     } finally {
       setLoading(false);
+      setIsFetching(false);
     }
   }, [searchTerm, statusFilter, page]);
 
@@ -146,7 +149,7 @@ export default function OrderIssuesDashboard() {
         <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent pointer-events-none"></div>
         <div className="flex-none p-4 md:px-8 md:py-6 border-b border-white/5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 relative z-10 bg-black/50">
           <h2 className="text-xl font-semibold text-white tracking-tight">Issues List</h2>
-          
+
           <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500 w-4 h-4" />
@@ -187,9 +190,9 @@ export default function OrderIssuesDashboard() {
         </div>
 
         {loading ? (
-          <div className="flex items-center justify-center py-20 text-neutral-400">Loading issues...</div>
+          <LoadingSpinner />
         ) : (
-          <div className="flex-1 min-h-0 relative z-10 w-full overflow-auto no-scrollbar">
+          <div className={`flex-1 min-h-0 relative z-10 w-full overflow-auto no-scrollbar transition-opacity duration-200 ${isFetching ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
             <table className="w-full text-sm text-left min-w-[900px]">
               <thead className="sticky top-0 text-xs text-neutral-400 uppercase tracking-wider bg-neutral-950/80 backdrop-blur-md border-b border-white/5 z-20 shadow-sm">
                 <tr>

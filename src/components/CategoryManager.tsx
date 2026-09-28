@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import toast from 'react-hot-toast';
 import { Loader2, List } from 'lucide-react';
+import LoadingSpinner from '@/components/LoadingSpinner';
 
 interface Category {
   id: string;
@@ -23,8 +24,10 @@ export default function CategoryManager() {
   const [expenseCategories, setExpenseCategories] = useState<Category[]>([]);
   const [issueCategories, setIssueCategories] = useState<Category[]>([]);
   const [isLoadingCategories, setIsLoadingCategories] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
-  const fetchCategories = useCallback(async () => {
+  const fetchCategories = useCallback(async (refresh = false) => {
+    if (refresh) setIsRefreshing(true);
     try {
       const [expenseRes, issueRes] = await Promise.all([
         fetch('/api/expense-categories'),
@@ -44,6 +47,7 @@ export default function CategoryManager() {
       toast.error('Failed to fetch categories');
     } finally {
       setIsLoadingCategories(false);
+      if (refresh) setIsRefreshing(false);
     }
   }, []);
 
@@ -68,7 +72,7 @@ export default function CategoryManager() {
       toast.success('Expense category added successfully');
       setExpenseName('');
       setExpenseDesc('');
-      fetchCategories(); // Refresh list
+      fetchCategories(true); // Refresh list
     } catch (error: unknown) {
       if (error instanceof Error) {
         toast.error(error.message);
@@ -96,7 +100,7 @@ export default function CategoryManager() {
       toast.success('Issue category added successfully');
       setIssueName('');
       setIssueDesc('');
-      fetchCategories(); // Refresh list
+      fetchCategories(true); // Refresh list
     } catch (error: unknown) {
       if (error instanceof Error) {
         toast.error(error.message);
@@ -149,11 +153,11 @@ export default function CategoryManager() {
         <div>
           <h3 className="text-lg font-medium mb-3 flex items-center gap-2"><List size={18} /> Current Expense Categories</h3>
           {isLoadingCategories ? (
-            <div className="flex justify-center p-4"><Loader2 size={24} className="animate-spin text-gray-400" /></div>
+            <LoadingSpinner size="small" />
           ) : expenseCategories.length === 0 ? (
             <p className="text-gray-400 text-sm italic">No expense categories added yet.</p>
           ) : (
-            <ul className="space-y-2 max-h-64 overflow-y-auto pr-2 custom-scrollbar">
+            <ul className={`space-y-2 max-h-64 overflow-y-auto pr-2 custom-scrollbar transition-opacity duration-200 ${isRefreshing ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
               {expenseCategories.map(cat => (
                 <li key={cat.id} className="bg-white/5 border border-white/10 rounded-lg p-3">
                   <p className="font-medium">{cat.name}</p>
@@ -204,11 +208,11 @@ export default function CategoryManager() {
         <div>
           <h3 className="text-lg font-medium mb-3 flex items-center gap-2"><List size={18} /> Current Issue Categories</h3>
           {isLoadingCategories ? (
-            <div className="flex justify-center p-4"><Loader2 size={24} className="animate-spin text-gray-400" /></div>
+            <LoadingSpinner size="small" />
           ) : issueCategories.length === 0 ? (
             <p className="text-gray-400 text-sm italic">No issue categories added yet.</p>
           ) : (
-            <ul className="space-y-2 max-h-64 overflow-y-auto pr-2 custom-scrollbar">
+            <ul className={`space-y-2 max-h-64 overflow-y-auto pr-2 custom-scrollbar transition-opacity duration-200 ${isRefreshing ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
               {issueCategories.map(cat => (
                 <li key={cat.id} className="bg-white/5 border border-white/10 rounded-lg p-3">
                   <p className="font-medium">{cat.name}</p>

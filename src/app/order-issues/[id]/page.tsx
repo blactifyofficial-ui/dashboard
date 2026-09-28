@@ -5,7 +5,8 @@ import { useParams, useRouter } from 'next/navigation';
 import { useCallback } from 'react';
 import toast from 'react-hot-toast';
 import ConfirmModal from '@/components/ConfirmModal';
-import { Trash2, X, Phone, MessageCircle, Mail, ArrowLeft, ExternalLink, Clock, User, Tag, Hash, ChevronRight } from 'lucide-react';
+import { Trash2, X, Phone, MessageCircle, Mail, ExternalLink, Clock, User, Tag, Hash } from 'lucide-react';
+import LoadingSpinner from '@/components/LoadingSpinner';
 
 type Activity = {
   id: string;
@@ -213,14 +214,7 @@ export default function IssueDetail() {
     }
   };
 
-  if (loading) return (
-    <div className="flex items-center justify-center min-h-[60vh]">
-      <div className="flex flex-col items-center gap-3">
-        <div className="w-8 h-8 border-2 border-white/10 border-t-white/60 rounded-full animate-spin" />
-        <p className="text-gray-500 text-sm">Loading issue...</p>
-      </div>
-    </div>
-  );
+  if (loading) return <LoadingSpinner />;
   if (!issue) return (
     <div className="flex items-center justify-center min-h-[60vh]">
       <p className="text-gray-400">Issue not found.</p>
@@ -257,10 +251,7 @@ export default function IssueDetail() {
             </div>
             <div className="p-4 sm:p-6 overflow-y-auto flex-1">
               {loadingOrder ? (
-                <div className="flex flex-col items-center justify-center py-12 gap-3">
-                  <div className="w-6 h-6 border-2 border-white/10 border-t-white/60 rounded-full animate-spin" />
-                  <p className="text-sm text-gray-500">Fetching order from Shopify...</p>
-                </div>
+                <LoadingSpinner size="small" />
               ) : shopifyOrder ? (
                 <div className="space-y-5">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -400,48 +391,35 @@ export default function IssueDetail() {
         </div>
       )}
 
-      {/* Top nav bar */}
-      <div className="border-b border-white/6 bg-[#0f0f0f]/80 backdrop-blur-sm sticky top-0 z-10">
-        <div className="max-w-6xl mx-auto px-3 sm:px-6 py-3 flex items-center justify-between gap-2">
-          <button
-            onClick={() => router.push('/order-issues')}
-            className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-white transition-colors min-w-0"
-          >
-            <ArrowLeft size={15} className="shrink-0" />
-            <span className="hidden sm:inline">Order Issues</span>
-            <ChevronRight size={13} className="text-gray-600 hidden sm:inline" />
-            <span className="text-white font-mono text-xs truncate">{issue.id.slice(0, 8)}</span>
-          </button>
-          <button
-            onClick={() => setDeleteModalOpen(true)}
-            className="flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 border border-red-500/20 bg-red-500/8 text-red-400 rounded-lg hover:bg-red-500/15 text-xs font-medium transition-all shrink-0"
-          >
-            <Trash2 size={13} />
-            <span className="hidden sm:inline">Delete Issue</span>
-            <span className="sm:hidden">Delete</span>
-          </button>
-        </div>
-      </div>
-
       <div className="max-w-6xl mx-auto px-3 sm:px-6 py-5 sm:py-8">
         {/* Hero header */}
-        <div className="mb-6 sm:mb-8">
-          <div className="flex flex-wrap items-center gap-2 mb-3">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-blue-500/12 text-blue-400 border border-blue-500/20">
-              <Tag size={11} />
-              {issue.category}
-            </span>
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-white/5 text-gray-300 border border-white/8">
-              <PriorityDot priority={issue.priority} />
-              {issue.priority}
-            </span>
-            <StatusBadge status={issue.status} />
+        <div className="mb-6 sm:mb-8 flex flex-wrap sm:flex-nowrap items-start justify-between gap-4">
+          <div>
+            <div className="flex flex-wrap items-center gap-2 mb-3">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-blue-500/12 text-blue-400 border border-blue-500/20">
+                <Tag size={11} />
+                {issue.category}
+              </span>
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-white/5 text-gray-300 border border-white/8">
+                <PriorityDot priority={issue.priority} />
+                {issue.priority}
+              </span>
+              <StatusBadge status={issue.status} />
+            </div>
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-white mb-1.5">{issue.title}</h1>
+            <p className="text-sm text-gray-500 font-mono flex items-center gap-2">
+              <Hash size={13} />
+              {issue.id.slice(0, 8)}
+            </p>
           </div>
-          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-white mb-1.5">{issue.title}</h1>
-          <p className="text-sm text-gray-500 font-mono flex items-center gap-2">
-            <Hash size={13} />
-            {issue.id.slice(0, 8)}
-          </p>
+          
+          <button
+            onClick={() => setDeleteModalOpen(true)}
+            className="flex items-center gap-1.5 px-3.5 py-2 border border-red-500/20 bg-red-500/8 text-red-400 rounded-lg hover:bg-red-500/15 text-sm font-medium transition-all shrink-0"
+          >
+            <Trash2 size={14} />
+            <span>Delete Issue</span>
+          </button>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">

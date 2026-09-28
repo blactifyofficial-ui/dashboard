@@ -4,6 +4,8 @@ import { sql, desc, ilike } from 'drizzle-orm';
 import { CalendarDays, ShoppingBag, ArrowUpRight } from 'lucide-react';
 import SearchInput from '@/components/SearchInput';
 import Link from 'next/link';
+import { Suspense } from 'react';
+import LoadingSpinner from '@/components/LoadingSpinner';
 
 export const dynamic = "force-dynamic";
 
@@ -13,11 +15,44 @@ export default async function RevenuePage(props: {
   const searchParams = await props.searchParams;
   const tab = (searchParams.tab as string) || 'monthly';
   const q = (searchParams.q as string) || '';
+
+  return (
+    <div className="flex flex-col h-full space-y-6 relative z-10">
+      <header className="flex-none flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="space-y-2">
+          <h1 className="text-4xl font-bold tracking-tight text-white">Revenue</h1>
+          <p className="text-neutral-400 text-sm md:text-base">Breakdown of sales, orders, and product performance</p>
+        </div>
+      </header>
+
+      <div className="flex-none flex gap-2 bg-white/[0.02] p-1.5 rounded-2xl border border-white/5 w-fit">
+        <Link 
+          href="/revenue?tab=monthly" 
+          className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-medium transition-all duration-300 ${tab === 'monthly' ? 'bg-white/10 text-white shadow-sm' : 'text-neutral-400 hover:text-white hover:bg-white/5'}`}
+        >
+          <CalendarDays size={18} />
+          Monthly Breakdown
+        </Link>
+        <Link 
+          href="/revenue?tab=products" 
+          className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-medium transition-all duration-300 ${tab === 'products' ? 'bg-white/10 text-white shadow-sm' : 'text-neutral-400 hover:text-white hover:bg-white/5'}`}
+        >
+          <ShoppingBag size={18} />
+          Product Performance
+        </Link>
+      </div>
+
+      <Suspense fallback={<LoadingSpinner />} key={`${tab}-${q}-${searchParams.page}`}>
+        <RevenueContent searchParams={searchParams} tab={tab} q={q} />
+      </Suspense>
+    </div>
+  );
+}
+
+async function RevenueContent({ searchParams, tab, q }: { searchParams: { [key: string]: string | string[] | undefined }, tab: string, q: string }) {
   const page = parseInt((searchParams.page as string) || '1', 10);
   const pageSize = 15;
   const offset = (page - 1) * pageSize;
-
-  let content;
 
   if (tab === 'monthly') {
     const whereClause = q ? ilike(sql<string>`to_char(${orders.createdAt}, 'FMMonth YYYY')`, `%${q}%`) : undefined;
@@ -34,7 +69,7 @@ export default async function RevenuePage(props: {
 
     const maxRevenue = Math.max(...monthlyData.map(d => Number(d.revenue)), 0);
 
-    content = (
+    return (
       <div className="flex-1 min-h-0 flex flex-col bg-white/[0.02] border border-white/5 rounded-3xl shadow-2xl relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent pointer-events-none"></div>
         <div className="flex-none p-4 md:px-8 md:py-6 border-b border-white/5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 relative z-10 bg-black/50">
@@ -123,7 +158,7 @@ export default async function RevenuePage(props: {
     .limit(pageSize)
     .offset(offset);
 
-    content = (
+    return (
       <div className="flex-1 min-h-0 flex flex-col bg-white/[0.02] border border-white/5 rounded-3xl shadow-2xl relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent pointer-events-none"></div>
         <div className="flex-none p-4 md:px-8 md:py-6 border-b border-white/5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 relative z-10 bg-black/50">
@@ -224,34 +259,4 @@ export default async function RevenuePage(props: {
       </div>
     );
   }
-
-  return (
-    <div className="flex flex-col h-full space-y-6 relative z-10">
-      <header className="flex-none flex flex-col md:flex-row md:items-center justify-between gap-6">
-        <div className="space-y-2">
-          <h1 className="text-4xl font-bold tracking-tight text-white">Revenue</h1>
-          <p className="text-neutral-400 text-sm md:text-base">Breakdown of sales, orders, and product performance</p>
-        </div>
-      </header>
-
-      <div className="flex-none flex gap-2 bg-white/[0.02] p-1.5 rounded-2xl border border-white/5 w-fit">
-        <Link 
-          href="/revenue?tab=monthly" 
-          className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-medium transition-all duration-300 ${tab === 'monthly' ? 'bg-white/10 text-white shadow-sm' : 'text-neutral-400 hover:text-white hover:bg-white/5'}`}
-        >
-          <CalendarDays size={18} />
-          Monthly Breakdown
-        </Link>
-        <Link 
-          href="/revenue?tab=products" 
-          className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-medium transition-all duration-300 ${tab === 'products' ? 'bg-white/10 text-white shadow-sm' : 'text-neutral-400 hover:text-white hover:bg-white/5'}`}
-        >
-          <ShoppingBag size={18} />
-          Product Performance
-        </Link>
-      </div>
-
-      {content}
-    </div>
-  );
 }

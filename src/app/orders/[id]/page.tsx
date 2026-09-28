@@ -4,6 +4,8 @@ import { eq, desc } from 'drizzle-orm';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ArrowUpRight } from 'lucide-react';
+import { Suspense } from 'react';
+import LoadingSpinner from '@/components/LoadingSpinner';
 
 export const dynamic = "force-dynamic";
 
@@ -13,6 +15,26 @@ export default async function OrderDetailPage(props: {
   const params = await props.params;
   const orderId = params.id;
 
+  return (
+    <div className="p-8 max-w-7xl mx-auto text-black">
+      <Link href="/orders" className="text-gray-400 hover:text-white mb-6 inline-block">
+        &larr; Back to Orders
+      </Link>
+      
+      <div className="flex items-center justify-between mb-8">
+        <h1 className="text-3xl font-semibold tracking-tight text-white">
+          Order Details
+        </h1>
+      </div>
+
+      <Suspense fallback={<LoadingSpinner />}>
+        <OrderDetailContent orderId={orderId} />
+      </Suspense>
+    </div>
+  );
+}
+
+async function OrderDetailContent({ orderId }: { orderId: string }) {
   const orderResult = await db.select().from(orders).where(eq(orders.id, orderId)).limit(1);
   if (orderResult.length === 0) {
     notFound();
@@ -35,17 +57,12 @@ export default async function OrderDetailPage(props: {
     .orderBy(desc(orderIssues.createdAt));
 
   return (
-    <div className="p-8 max-w-7xl mx-auto text-black">
-      <Link href="/orders" className="text-gray-400 hover:text-white mb-6 inline-block">
-        &larr; Back to Orders
-      </Link>
-      
-      <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-semibold tracking-tight text-white">
+    <>
+      <div className="mb-4">
+        <p className="text-xl font-medium tracking-tight text-white/80">
           Order #{order.orderNumber || order.id.substring(0,6)}
-        </h1>
+        </p>
       </div>
-
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         <div className="md:col-span-2 space-y-8">
           
@@ -171,6 +188,6 @@ export default async function OrderDetailPage(props: {
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

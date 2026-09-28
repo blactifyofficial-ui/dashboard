@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { Inbox, Search } from 'lucide-react';
+import LoadingSpinner from '@/components/LoadingSpinner';
 
 interface InventoryItem {
   id: string;
@@ -14,6 +15,7 @@ interface InventoryItem {
 export default function InventoryPage() {
   const [items, setItems] = useState<InventoryItem[]>([]);
   const [invLoading, setInvLoading] = useState(true);
+  const [isFetching, setIsFetching] = useState(false);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [search, setSearch] = useState('');
@@ -21,6 +23,7 @@ export default function InventoryPage() {
   const pageSize = 15;
 
   const fetchInventory = (currentPage: number = page, currentSearch: string = search, currentStatus: string = statusFilter) => {
+    setIsFetching(true);
     fetch(`/api/inventory?page=${currentPage}&pageSize=${pageSize}&search=${encodeURIComponent(currentSearch)}&status=${encodeURIComponent(currentStatus)}`)
       .then(res => res.json())
       .then(data => {
@@ -33,14 +36,17 @@ export default function InventoryPage() {
           console.error("API Error:", data);
         }
         setInvLoading(false);
+        setIsFetching(false);
       })
       .catch(err => {
         console.error(err);
         setInvLoading(false);
+        setIsFetching(false);
       });
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchInventory(page, search, statusFilter);
 
     const interval = setInterval(() => {
@@ -63,6 +69,7 @@ export default function InventoryPage() {
       <InventoryTab 
         items={items} 
         loading={invLoading} 
+        isFetching={isFetching}
         search={search}
         setSearch={setSearch}
         statusFilter={statusFilter}
@@ -75,8 +82,8 @@ export default function InventoryPage() {
   );
 }
 
-function InventoryTab({ items, loading, search, setSearch, statusFilter, setStatusFilter, page, setPage, totalPages }: { items: InventoryItem[], loading: boolean, search: string, setSearch: (s: string) => void, statusFilter: string, setStatusFilter: (s: string) => void, page: number, setPage: (p: number | ((prev: number) => number)) => void, totalPages: number }) {
-  if (loading) return <div className="flex items-center justify-center py-20 text-neutral-400">Loading inventory...</div>;
+function InventoryTab({ items, loading, isFetching, search, setSearch, statusFilter, setStatusFilter, page, setPage, totalPages }: { items: InventoryItem[], loading: boolean, isFetching: boolean, search: string, setSearch: (s: string) => void, statusFilter: string, setStatusFilter: (s: string) => void, page: number, setPage: (p: number | ((prev: number) => number)) => void, totalPages: number }) {
+  if (loading) return <LoadingSpinner />;
 
   return (
     <div className="flex-1 min-h-0 flex flex-col bg-white/[0.02] border border-white/5 rounded-3xl shadow-2xl relative overflow-hidden">
@@ -114,7 +121,8 @@ function InventoryTab({ items, loading, search, setSearch, statusFilter, setStat
         </div>
       </div>
       
-      <div className="flex-1 min-h-0 relative z-10 w-full overflow-auto no-scrollbar">
+      
+      <div className={`flex-1 min-h-0 relative z-10 w-full overflow-auto no-scrollbar transition-opacity duration-200 ${isFetching ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
         <table className="w-full text-sm text-left min-w-[900px]">
           <thead className="sticky top-0 text-xs text-neutral-400 uppercase tracking-wider bg-neutral-950/80 backdrop-blur-md border-b border-white/5 z-20 shadow-sm">
             <tr>

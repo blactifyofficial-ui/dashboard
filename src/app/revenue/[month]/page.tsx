@@ -4,6 +4,8 @@ import { desc, and, gte, lt } from 'drizzle-orm';
 import { CalendarDays, Inbox, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import RevenueChart from '@/components/RevenueChart';
+import { Suspense } from 'react';
+import LoadingSpinner from '@/components/LoadingSpinner';
 
 export const dynamic = "force-dynamic";
 
@@ -30,6 +32,35 @@ export default async function MonthRevenuePage(props: {
   
   const monthDisplay = startDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 
+  return (
+    <div className="space-y-8 relative z-10">
+      <header className="flex items-center gap-4">
+        <Link href="/revenue" className="p-2 rounded-full bg-white/5 hover:bg-white/10 transition-colors border border-white/10">
+          <ArrowLeft size={20} className="text-white" />
+        </Link>
+        <div className="space-y-1">
+          <h1 className="text-3xl font-bold tracking-tight text-white">{monthDisplay} Revenue</h1>
+          <p className="text-neutral-400 text-sm">Overview and orders for this month</p>
+        </div>
+      </header>
+
+      <Suspense fallback={<LoadingSpinner />} key={`${monthParam}-${page}`}>
+        <MonthRevenueContent year={year} month={month} monthParam={monthParam} page={page} pageSize={pageSize} monthDisplay={monthDisplay} startDate={startDate} endDate={endDate} />
+      </Suspense>
+    </div>
+  );
+}
+
+async function MonthRevenueContent({ year, month, monthParam, page, pageSize, monthDisplay, startDate, endDate }: {
+  year: number;
+  month: number;
+  monthParam: string;
+  page: number;
+  pageSize: number;
+  monthDisplay: string;
+  startDate: Date;
+  endDate: Date;
+}) {
   // Get orders for this month
   const monthOrders = await db.select()
     .from(orders)
@@ -52,7 +83,7 @@ export default async function MonthRevenuePage(props: {
   
   let totalRevenue = 0;
   
-  monthOrders.forEach(order => {
+  monthOrders.forEach((order: typeof monthOrders[0]) => {
     if (order.createdAt && order.totalPrice) {
       const day = new Date(order.createdAt).getDate();
       const revenue = parseFloat(order.totalPrice);
@@ -67,17 +98,7 @@ export default async function MonthRevenuePage(props: {
   }));
 
   return (
-    <div className="space-y-8 relative z-10">
-      <header className="flex items-center gap-4">
-        <Link href="/revenue" className="p-2 rounded-full bg-white/5 hover:bg-white/10 transition-colors border border-white/10">
-          <ArrowLeft size={20} className="text-white" />
-        </Link>
-        <div className="space-y-1">
-          <h1 className="text-3xl font-bold tracking-tight text-white">{monthDisplay} Revenue</h1>
-          <p className="text-neutral-400 text-sm">Overview and orders for this month</p>
-        </div>
-      </header>
-
+    <>
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="bg-white/[0.02] border border-white/5 rounded-3xl p-6 shadow-xl relative overflow-hidden">
@@ -137,7 +158,7 @@ export default async function MonthRevenuePage(props: {
                   </td>
                 </tr>
               ) : (
-                monthOrders.slice((page - 1) * pageSize, page * pageSize).map((order) => (
+                monthOrders.slice((page - 1) * pageSize, page * pageSize).map((order: typeof monthOrders[0]) => (
                   <tr key={order.id} className="hover:bg-white/[0.03] transition-colors group">
                     <td className="px-6 py-4 font-medium text-white group-hover:text-neutral-300">
                       <Link href={`/orders/${order.id}`} className="hover:underline">
@@ -211,6 +232,6 @@ export default async function MonthRevenuePage(props: {
           )}
         </div>
       </div>
-    </div>
+    </>
   );
 }
