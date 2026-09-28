@@ -47,14 +47,14 @@ export default function ConfirmModal({
         <div className="bg-black/20 p-4 border-t border-white/5 flex items-center justify-end gap-3">
           <button
             onClick={onCancel}
-            className="px-4 py-2 rounded text-sm font-medium text-gray-300 hover:text-white hover:bg-white/5 transition-colors"
+            className="h-11 px-4 flex items-center justify-center rounded-lg text-sm font-medium text-gray-300 hover:text-white hover:bg-white/5 transition-colors"
           >
             {cancelText}
           </button>
           <button
             onClick={onConfirm}
             disabled={isLoading}
-            className="px-4 py-2 rounded text-sm font-medium bg-red-500 hover:bg-red-600 text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="h-11 px-4 flex items-center justify-center rounded-lg text-sm font-medium bg-red-500 hover:bg-red-600 text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isLoading ? 'Processing...' : confirmText}
           </button>

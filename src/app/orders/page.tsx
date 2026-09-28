@@ -32,8 +32,8 @@ export default async function OrdersPage(props: {
  const allOrders = await db.select().from(orders).where(whereClause).orderBy(desc(orders.createdAt)).limit(pageSize).offset(offset);
  
  return (
- <div className="space-y-12 relative z-10">
- <header className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+ <div className="flex flex-col h-full space-y-6 relative z-10">
+ <header className="flex-none flex flex-col md:flex-row md:items-center justify-between gap-6">
  <div className="space-y-2">
  <h1 className="text-4xl font-bold tracking-tight text-white">All Orders</h1>
  <p className="text-neutral-400 text-sm md:text-base">Complete history of all transactions</p>
@@ -41,17 +41,17 @@ export default async function OrdersPage(props: {
  </header>
 
  {/* Orders Table */}
- <div className="bg-white/[0.02] border border-white/5 rounded-3xl  shadow-2xl relative">
+ <div className="flex-1 min-h-0 flex flex-col bg-white/[0.02] border border-white/5 rounded-3xl shadow-2xl relative overflow-hidden">
  <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent pointer-events-none"></div>
- <div className="p-4 md:px-8 md:py-6 border-b border-white/5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 relative z-10">
+ <div className="flex-none p-4 md:px-8 md:py-6 border-b border-white/5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 relative z-10 bg-black/50">
  <h2 className="text-xl font-semibold text-white tracking-tight">Order Log</h2>
  <div className="w-full md:w-auto">
  <SearchInput initialQuery={q} />
  </div>
  </div>
- <div className="relative z-10 w-full overflow-x-auto no-scrollbar">
+ <div className="flex-1 min-h-0 relative z-10 w-full overflow-auto no-scrollbar">
  <table className="w-full text-sm text-left min-w-[800px]">
- <thead className="text-xs text-neutral-400 uppercase tracking-wider bg-white/[0.01] border-b border-white/5">
+ <thead className="sticky top-0 text-xs text-neutral-400 uppercase tracking-wider bg-neutral-950/80 backdrop-blur-md border-b border-white/5 z-20 shadow-sm">
  <tr>
  <th className="px-4 md:px-8 py-4 md:py-5 font-semibold">Order</th>
  <th className="px-4 md:px-8 py-4 md:py-5 font-semibold">Customer</th>
@@ -118,7 +118,7 @@ export default async function OrdersPage(props: {
  </div>
  
  {totalPages > 1 && (
- <div className="p-4 md:px-8 md:py-5 border-t border-white/5 flex flex-col sm:flex-row justify-between items-center gap-4 bg-white/[0.01] relative z-10">
+ <div className="flex-none p-4 md:px-8 md:py-5 border-t border-white/5 flex flex-col sm:flex-row justify-between items-center gap-4 bg-white/[0.01] relative z-10">
  <div className="text-sm text-neutral-400">
  Showing <span className="font-medium text-white">{offset + 1}</span> to <span className="font-medium text-white">{Math.min(offset + pageSize, totalOrders)}</span> of <span className="font-medium text-white">{totalOrders}</span> orders
  </div>

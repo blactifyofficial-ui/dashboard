@@ -243,14 +243,14 @@ export default function AddExpensePage() {
           <div className="flex gap-3 justify-end pt-4 border-t border-white/10">
             <Link
               href="/expenses"
-              className="px-4 py-2 text-sm font-medium text-white/60 hover:text-white transition-colors"
+              className="px-6 h-11 flex items-center justify-center text-sm font-medium text-white/60 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
             >
               Cancel
             </Link>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="bg-white text-black px-4 py-2 rounded-lg text-sm font-medium hover:bg-white/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="h-11 flex items-center justify-center bg-white text-black px-6 rounded-lg text-sm font-medium hover:bg-white/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSubmitting ? 'Saving...' : 'Save Expense'}
             </button>

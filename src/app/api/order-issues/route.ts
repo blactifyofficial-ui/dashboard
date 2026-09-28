@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/db';
 import { orderIssues, orderIssueActivities, users, orders } from '@/db/schema';
-import { eq, desc, and, ilike, or } from 'drizzle-orm';
+import { eq, desc, and, ilike, or, sql } from 'drizzle-orm';
 import { requireAuth } from '@/lib/auth-utils';
 
 export async function GET(req: Request) {
@@ -48,12 +48,20 @@ export async function GET(req: Request) {
       .limit(pageSize)
       .offset(offset);
 
+    const totalCountResult = await db
+      .select({ count: sql`count(*)` })
+      .from(orderIssues)
+      .where(whereClause);
+      
+    const totalCount = Number(totalCountResult[0].count);
+    const totalPages = Math.ceil(totalCount / pageSize);
+
     const issues = rawIssues.map(row => ({
       ...row.issue,
       orderNumber: row.orderNumber,
     }));
 
-    return NextResponse.json(issues);
+    return NextResponse.json({ issues, totalPages, totalCount });
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

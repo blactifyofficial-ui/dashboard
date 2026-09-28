@@ -148,3 +148,15 @@ export const stocks = pgTable('stocks', {
   createdById: text('created_by_id').references(() => users.id).notNull(),
   updatedById: text('updated_by_id').references(() => users.id),
 });
+
+export const inventory = pgTable('inventory', {
+  id: text('id').primaryKey(),
+  shopifyProductId: text('shopify_product_id').notNull().unique(),
+  title: text('title').notNull(),
+  sku: text('sku'),
+  inventoryQuantity: numeric('inventory_quantity').notNull().default('0'),
+  price: numeric('price'),
+  imageUrl: text('image_url'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});

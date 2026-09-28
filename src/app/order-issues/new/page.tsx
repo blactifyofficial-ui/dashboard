@@ -125,24 +125,28 @@ export default function CreateIssuePage() {
   };
 
   return (
-    <div className="p-8 max-w-3xl mx-auto text-white">
-      <div className="mb-8">
-        <Link href="/order-issues" className="inline-flex items-center text-sm text-gray-400 hover:text-white transition-colors mb-4">
+    <div className="flex flex-col min-h-full pb-8 space-y-6 relative z-10 max-w-4xl mx-auto w-full">
+      <header className="flex-none flex flex-col gap-4">
+        <Link href="/order-issues" className="inline-flex items-center text-sm text-neutral-400 hover:text-white transition-colors w-fit">
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Issues
         </Link>
-        <h1 className="text-3xl font-semibold tracking-tight">Create Order Issue</h1>
-      </div>
+        <div className="space-y-2">
+          <h1 className="text-4xl font-bold tracking-tight text-white">Create Order Issue</h1>
+          <p className="text-neutral-400 text-sm md:text-base">File a new issue for a customer order</p>
+        </div>
+      </header>
 
-      <div className="bg-[#1e1e1e] border border-white/10 rounded-2xl p-6 sm:p-8 shadow-2xl">
-        <form onSubmit={handleSubmit} className="space-y-5">
+      <div className="flex-1 bg-white/[0.02] border border-white/5 rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent pointer-events-none"></div>
+        <form onSubmit={handleSubmit} className="space-y-5 relative z-10">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div className="relative">
-              <label className="block text-sm font-medium text-gray-300 mb-1.5">Order Search (ID or Name)</label>
+              <label className="block text-sm font-medium text-neutral-400 mb-2">Order Search (ID or Name)</label>
               <input 
                 type="text" 
                 placeholder="Search orders..."
-                className={`w-full bg-[#2a2a2a] border ${errors.orderId ? 'border-red-500' : 'border-white/10'} rounded-lg p-3 text-white focus:outline-none focus:border-white/30 transition-colors`}
+                className={`w-full bg-white/5 border ${errors.orderId ? 'border-red-500' : 'border-white/10'} rounded-xl px-4 py-3 text-base sm:text-sm text-white focus:outline-none focus:border-blue-500 transition-colors`}
                 value={orderSearchQuery}
                 onFocus={() => setShowOrderDropdown(true)}
                 onBlur={() => setTimeout(() => setShowOrderDropdown(false), 200)}
@@ -178,7 +182,7 @@ export default function CreateIssuePage() {
               />
               {errors.orderId && <p className="text-red-500 text-xs mt-1.5">{errors.orderId}</p>}
               {showOrderDropdown && orderSuggestions.length > 0 && (
-                <div className="absolute z-10 w-full mt-1 bg-[#2a2a2a] border border-white/10 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                <div className="absolute z-20 w-full mt-1 bg-[#0f0f0f]/90 backdrop-blur-xl border border-white/10 rounded-xl shadow-lg max-h-60 overflow-y-auto">
                   {orderSuggestions.map((order, index) => (
                     <div 
                       key={order.id}
@@ -210,27 +214,33 @@ export default function CreateIssuePage() {
               )}
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1.5">Issue Category</label>
+              <label className="block text-sm font-medium text-neutral-400 mb-2">Issue Category</label>
               <select 
-                className={`w-full bg-[#2a2a2a] border ${errors.categoryId ? 'border-red-500' : 'border-white/10'} rounded-lg p-3 text-white focus:outline-none focus:border-white/30 transition-colors`}
+                className={`w-full bg-white/5 border ${errors.categoryId ? 'border-red-500' : 'border-white/10'} rounded-xl px-4 py-3 text-base sm:text-sm text-white focus:outline-none focus:border-blue-500 transition-colors appearance-none pr-10`}
+                style={{
+                  backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgba(255, 255, 255, 0.5)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`,
+                  backgroundRepeat: 'no-repeat',
+                  backgroundPosition: 'right 1rem center',
+                  backgroundSize: '1em 1em'
+                }}
                 value={formData.categoryId}
                 onChange={e => {
                   setFormData({...formData, categoryId: e.target.value});
                   if (errors.categoryId) setErrors({ ...errors, categoryId: '' });
                 }}
               >
-                <option value="">Select Category</option>
+                <option value="" className="bg-neutral-900">Select Category</option>
                 {categories.map(cat => (
-                  <option key={cat.id} value={cat.id}>{cat.name}</option>
+                  <option key={cat.id} value={cat.id} className="bg-neutral-900">{cat.name}</option>
                 ))}
               </select>
               {categories.find(c => c.id === formData.categoryId)?.name.toLowerCase() === 'other' && (
                 <div className="mt-3">
-                  <label className="block text-sm font-medium text-gray-400 mb-1.5">Please specify</label>
+                  <label className="block text-sm font-medium text-neutral-400 mb-2">Please specify</label>
                   <input 
                     type="text" 
                     placeholder="Specify the category..."
-                    className={`w-full bg-[#2a2a2a] border ${errors.otherCategoryText ? 'border-red-500' : 'border-white/10'} rounded-lg p-3 text-white focus:outline-none focus:border-white/30 transition-colors`}
+                    className={`w-full bg-white/5 border ${errors.otherCategoryText ? 'border-red-500' : 'border-white/10'} rounded-xl px-4 py-3 text-base sm:text-sm text-white focus:outline-none focus:border-blue-500 transition-colors`}
                     value={otherCategoryText}
                     onChange={e => {
                       setOtherCategoryText(e.target.value);
@@ -244,11 +254,11 @@ export default function CreateIssuePage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1.5">Title</label>
+            <label className="block text-sm font-medium text-neutral-400 mb-2">Title</label>
             <input 
               type="text" 
               placeholder="Short issue title"
-              className={`w-full bg-[#2a2a2a] border ${errors.title ? 'border-red-500' : 'border-white/10'} rounded-lg p-3 text-white focus:outline-none focus:border-white/30 transition-colors`}
+              className={`w-full bg-white/5 border ${errors.title ? 'border-red-500' : 'border-white/10'} rounded-xl px-4 py-3 text-base sm:text-sm text-white focus:outline-none focus:border-blue-500 transition-colors`}
               value={formData.title}
               onChange={e => {
                 setFormData({...formData, title: e.target.value});
@@ -259,25 +269,31 @@ export default function CreateIssuePage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1.5">Priority</label>
+            <label className="block text-sm font-medium text-neutral-400 mb-2">Priority</label>
             <select 
-              className="w-full bg-[#2a2a2a] border border-white/10 rounded-lg p-3 text-white focus:outline-none focus:border-white/30 transition-colors"
+              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-base sm:text-sm text-white focus:outline-none focus:border-blue-500 transition-colors appearance-none pr-10"
+              style={{
+                backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgba(255, 255, 255, 0.5)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`,
+                backgroundRepeat: 'no-repeat',
+                backgroundPosition: 'right 1rem center',
+                backgroundSize: '1em 1em'
+              }}
               value={formData.priority}
               onChange={e => setFormData({...formData, priority: e.target.value})}
             >
-              <option value="LOW">Low</option>
-              <option value="MEDIUM">Medium</option>
-              <option value="HIGH">High</option>
-              <option value="URGENT">Urgent</option>
+              <option value="LOW" className="bg-neutral-900">Low</option>
+              <option value="MEDIUM" className="bg-neutral-900">Medium</option>
+              <option value="HIGH" className="bg-neutral-900">High</option>
+              <option value="URGENT" className="bg-neutral-900">Urgent</option>
             </select>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1.5">Description</label>
+            <label className="block text-sm font-medium text-neutral-400 mb-2">Description</label>
             <textarea 
               rows={4}
               placeholder="Describe the issue..."
-              className={`w-full bg-[#2a2a2a] border ${errors.description ? 'border-red-500' : 'border-white/10'} rounded-lg p-3 text-white focus:outline-none focus:border-white/30 transition-colors resize-y`}
+              className={`w-full bg-white/5 border ${errors.description ? 'border-red-500' : 'border-white/10'} rounded-xl p-4 text-white focus:outline-none focus:border-blue-500 transition-colors resize-y`}
               value={formData.description}
               onChange={e => {
                 setFormData({...formData, description: e.target.value});
@@ -288,28 +304,28 @@ export default function CreateIssuePage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1.5">Initial Remark (Optional)</label>
+            <label className="block text-sm font-medium text-neutral-400 mb-2">Initial Remark (Optional)</label>
             <textarea 
               rows={3}
               placeholder="Add an initial remark..."
-              className="w-full bg-[#2a2a2a] border border-white/10 rounded-lg p-3 text-white focus:outline-none focus:border-white/30 transition-colors resize-y"
+              className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white focus:outline-none focus:border-blue-500 transition-colors resize-y"
               value={formData.initialRemark}
               onChange={e => setFormData({...formData, initialRemark: e.target.value})}
             ></textarea>
           </div>
 
-          <div className="flex items-center justify-end gap-3 pt-4 mt-6 border-t border-white/5">
+          <div className="flex justify-end gap-3 pt-4 mt-6 border-t border-white/5">
             <button 
               type="button" 
               onClick={() => router.push('/order-issues')}
-              className="px-5 py-2.5 text-sm font-medium text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
+              className="py-3 px-6 bg-white/5 hover:bg-white/10 rounded-xl font-medium text-neutral-300 transition-colors"
             >
               Cancel
             </button>
             <button 
               type="submit" 
               disabled={loading}
-              className="bg-white text-black px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors disabled:opacity-50"
+              className="py-3 px-6 bg-blue-600 hover:bg-blue-700 rounded-xl font-bold flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
             >
               {loading ? 'Creating...' : 'Create Issue'}
             </button>

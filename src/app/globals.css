@@ -27,3 +27,7 @@ body {
 html {
   /* Removed font-size: 85% to restore native mobile text scaling and touch target proportions */
 }
+
+* {
+  border-radius: .4rem !important;
+}

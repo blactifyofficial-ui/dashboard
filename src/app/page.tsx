@@ -1,11 +1,10 @@
 import { auth } from '@/lib/auth/server';
 import { redirect } from 'next/navigation';
-import { headers } from "next/headers";
 
 export default async function Home() {
-  const { data: session } = await auth.getSession({
-    fetchOptions: { headers: await headers() }
-  });
+  const result = await auth.getSession();
+  console.log("Home session result:", result);
+  const { data: session } = result;
   
   if (session?.user) {
     redirect('/dashboard');
