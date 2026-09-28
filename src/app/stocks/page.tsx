@@ -18,6 +18,7 @@ export default function StocksPage() {
   const [stocks, setStocks] = useState<Stock[]>([]);
   const [loading, setLoading] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
@@ -121,14 +122,22 @@ export default function StocksPage() {
                         <div className="flex justify-end gap-2">
                           <button className="px-3 py-1.5 border border-white/10 bg-white/5 text-white rounded-lg hover:bg-white/10 text-xs font-medium transition-all ">Edit</button>
                           <button 
+                            disabled={deletingId === stock.id}
                             onClick={async () => {
+                              if (deletingId) return;
                               if(confirm("Delete Stock? This action cannot be undone.")) {
-                                const res = await fetch(`/api/stocks/${stock.id}`, { method: 'DELETE' });
-                                if (res.ok) setStocks(stocks.filter(s => s.id !== stock.id));
-                                else alert("Failed to delete stock");
+                                setDeletingId(stock.id);
+                                console.log('[Stocks] delete fired for', stock.id);
+                                try {
+                                  const res = await fetch(`/api/stocks/${stock.id}`, { method: 'DELETE' });
+                                  if (res.ok) setStocks(stocks.filter(s => s.id !== stock.id));
+                                  else alert("Failed to delete stock");
+                                } finally {
+                                  setDeletingId(null);
+                                }
                               }
                             }} 
-                            className="px-3 py-1.5 border border-red-500/20 bg-red-500/10 text-red-400 rounded-lg hover:bg-red-500/20 text-xs font-medium transition-all "
+                            className="px-3 py-1.5 border border-red-500/20 bg-red-500/10 text-red-400 rounded-lg hover:bg-red-500/20 text-xs font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                           >
                             Delete
                           </button>

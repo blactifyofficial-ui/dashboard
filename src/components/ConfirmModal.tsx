@@ -9,6 +9,7 @@ type ConfirmModalProps = {
   onCancel: () => void;
   confirmText?: string;
   cancelText?: string;
+  isLoading?: boolean;
 };
 
 export default function ConfirmModal({ 
@@ -18,7 +19,8 @@ export default function ConfirmModal({
   onConfirm, 
   onCancel,
   confirmText = 'Confirm',
-  cancelText = 'Cancel'
+  cancelText = 'Cancel',
+  isLoading = false
 }: ConfirmModalProps) {
   useEffect(() => {
     if (isOpen) {
@@ -51,9 +53,10 @@ export default function ConfirmModal({
           </button>
           <button
             onClick={onConfirm}
-            className="px-4 py-2 rounded text-sm font-medium bg-red-500 hover:bg-red-600 text-white transition-colors"
+            disabled={isLoading}
+            className="px-4 py-2 rounded text-sm font-medium bg-red-500 hover:bg-red-600 text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {confirmText}
+            {isLoading ? 'Processing...' : confirmText}
           </button>
         </div>
       </div>

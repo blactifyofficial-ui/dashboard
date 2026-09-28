@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, Loader2 } from 'lucide-react';
 import Link from 'next/link';
@@ -21,6 +21,8 @@ export default function AddExpensePage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const submitLockRef = useRef(false);
   
   const [formData, setFormData] = useState({
     categoryId: '',
@@ -64,6 +66,10 @@ export default function AddExpensePage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (submitLockRef.current) return;
+    submitLockRef.current = true;
+    setIsSubmitting(true);
+    console.log('[AddExpense] handleSubmit fired');
     try {
       const res = await fetch('/api/expenses', {
         method: 'POST',
@@ -85,6 +91,9 @@ export default function AddExpensePage() {
       } else {
         toast.error('An error occurred');
       }
+    } finally {
+      setIsSubmitting(false);
+      submitLockRef.current = false;
     }
   };
 
@@ -240,9 +249,10 @@ export default function AddExpensePage() {
             </Link>
             <button
               type="submit"
-              className="bg-white text-black px-4 py-2 rounded-lg text-sm font-medium hover:bg-white/90 transition-colors"
+              disabled={isSubmitting}
+              className="bg-white text-black px-4 py-2 rounded-lg text-sm font-medium hover:bg-white/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Save Expense
+              {isSubmitting ? 'Saving...' : 'Save Expense'}
             </button>
           </div>
         </form>

@@ -3,13 +3,15 @@
 import { LogOut } from 'lucide-react';
 import { authClient } from '@/lib/auth/client';
 import { useRouter } from 'next/navigation';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 
 export default function LogoutButton() {
   const router = useRouter();
   const [showModal, setShowModal] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const logoutLockRef = useRef(false);
 
   useEffect(() => {
     // eslint-disable-next-line
@@ -17,6 +19,10 @@ export default function LogoutButton() {
   }, []);
 
   const handleLogout = async () => {
+    if (logoutLockRef.current) return;
+    logoutLockRef.current = true;
+    setIsLoggingOut(true);
+    console.log('[LogoutButton] handleLogout fired');
     await authClient.signOut({
       fetchOptions: {
         onSuccess: () => {
@@ -51,9 +57,10 @@ export default function LogoutButton() {
               </button>
               <button
                 onClick={handleLogout}
-                className="flex-1 bg-white hover:bg-neutral-200 text-black py-2.5 px-4 rounded-xl text-sm font-medium transition-all"
+                disabled={isLoggingOut}
+                className="flex-1 bg-white hover:bg-neutral-200 text-black py-2.5 px-4 rounded-xl text-sm font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Sign Out
+                {isLoggingOut ? 'Signing Out...' : 'Sign Out'}
               </button>
             </div>
           </div>

@@ -23,6 +23,7 @@ export default function OrderIssuesDashboard() {
   const [statusFilter, setStatusFilter] = useState('');
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [issueToDelete, setIssueToDelete] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const fetchIssues = useCallback(async () => {
     setLoading(true);
@@ -60,8 +61,9 @@ export default function OrderIssuesDashboard() {
   };
 
   const executeDelete = async () => {
-    if (!issueToDelete) return;
-    setDeleteModalOpen(false);
+    if (!issueToDelete || isDeleting) return;
+    setIsDeleting(true);
+    console.log('[OrderIssues] executeDelete fired for', issueToDelete);
 
     try {
       const res = await fetch(`/api/order-issues/${issueToDelete}`, {
@@ -69,6 +71,7 @@ export default function OrderIssuesDashboard() {
       });
       if (res.ok) {
         toast.success('Issue deleted successfully');
+        setDeleteModalOpen(false);
         fetchIssues();
       } else {
         toast.error('Failed to delete issue');
@@ -78,6 +81,7 @@ export default function OrderIssuesDashboard() {
       toast.error('An error occurred');
     } finally {
       setIssueToDelete(null);
+      setIsDeleting(false);
     }
   };
 
@@ -88,6 +92,7 @@ export default function OrderIssuesDashboard() {
         title="Delete Order Issue"
         message="Are you sure you want to delete this order issue? This action cannot be undone."
         confirmText="Delete"
+        isLoading={isDeleting}
         onConfirm={executeDelete}
         onCancel={() => {
           setDeleteModalOpen(false);
