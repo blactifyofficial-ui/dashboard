@@ -10,7 +10,8 @@ export const orders = pgTable('orders', {
   currency: text('currency'),
   createdAt: timestamp('created_at').defaultNow(),
   financialStatus: text('financial_status'),
-  fulfillmentStatus: text('fulfillment_status')
+  fulfillmentStatus: text('fulfillment_status'),
+  trackingId: text('tracking_id')
 });
 
 export const orderItems = pgTable('order_items', {

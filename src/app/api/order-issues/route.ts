@@ -40,6 +40,9 @@ export async function GET(req: Request) {
       .select({
         issue: orderIssues,
         orderNumber: orders.orderNumber,
+        customerName: orders.customerName,
+        customerEmail: orders.customerEmail,
+        trackingId: orders.trackingId,
       })
       .from(orderIssues)
       .leftJoin(orders, eq(orderIssues.orderId, orders.id))
@@ -59,6 +62,9 @@ export async function GET(req: Request) {
     const issues = rawIssues.map(row => ({
       ...row.issue,
       orderNumber: row.orderNumber,
+      customerName: row.customerName,
+      customerEmail: row.customerEmail,
+      trackingId: row.trackingId,
     }));
 
     return NextResponse.json({ issues, totalPages, totalCount });

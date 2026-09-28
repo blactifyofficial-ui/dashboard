@@ -42,6 +42,7 @@ type ShopifyLineItem = {
   name?: string;
   quantity: number;
   price: string | number;
+  sku?: string | null;
 };
 
 type ShopifyOrder = {

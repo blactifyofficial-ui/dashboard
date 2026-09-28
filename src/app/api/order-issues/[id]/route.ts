@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/db';
-import { orderIssues, orderIssueActivities, issueCategories } from '@/db/schema';
+import { orderIssues, orderIssueActivities, issueCategories, orders } from '@/db/schema';
 import { eq, desc } from 'drizzle-orm';
 import { requireAuth } from '@/lib/auth-utils';
 
@@ -24,9 +24,15 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
         updatedAt: orderIssues.updatedAt,
         assignedToId: orderIssues.assignedToId,
         category: issueCategories.name,
+        orderNumber: orders.orderNumber,
+        customerName: orders.customerName,
+        customerEmail: orders.customerEmail,
+        totalPrice: orders.totalPrice,
+        currency: orders.currency,
       })
       .from(orderIssues)
       .leftJoin(issueCategories, eq(orderIssues.categoryId, issueCategories.id))
+      .leftJoin(orders, eq(orderIssues.orderId, orders.id))
       .where(eq(orderIssues.id, id));
 
     if (!issue) {
