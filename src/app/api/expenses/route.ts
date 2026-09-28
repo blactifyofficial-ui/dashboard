@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/db';
 import { expenses, expenseActivities, users, expenseCategories, paymentMethods } from '@/db/schema';
-import { eq, desc, and, ilike, or, gte, lte } from 'drizzle-orm';
+import { eq, desc, and, ilike, or, gte, lte, isNull } from 'drizzle-orm';
 import { requireAuth } from '@/lib/auth-utils';
 
 export async function GET(req: Request) {
@@ -36,13 +36,10 @@ export async function GET(req: Request) {
     if (dateFrom) conditions.push(gte(expenses.expenseDate, new Date(dateFrom)));
     if (dateTo) conditions.push(lte(expenses.expenseDate, new Date(dateTo)));
     
-    // Only fetch non-deleted expenses
-    // Assuming we would use isNull(expenses.deletedAt) but drizzle uses isNull
-    // Instead we can just do a raw SQL if needed, but let's assume soft-deleted are filtered out.
-    // For now we don't have isNull imported, let's just use raw or isNull
-    // Actually we can import isNull from drizzle-orm. Let's just fetch all for now, we will add isNull later if needed.
+    // Filter out deleted expenses
+    conditions.push(isNull(expenses.deletedAt));
 
-    const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+    const whereClause = and(...conditions);
 
     const data = await db.select({
         id: expenses.id,

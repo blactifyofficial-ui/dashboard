@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/db';
 import { expenses, expenseActivities, expenseCategories, paymentMethods, users } from '@/db/schema';
-import { eq, desc } from 'drizzle-orm';
+import { eq, desc, and, isNull } from 'drizzle-orm';
 import { requireAuth } from '@/lib/auth-utils';
 
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -30,7 +30,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
       .from(expenses)
       .leftJoin(expenseCategories, eq(expenses.categoryId, expenseCategories.id))
       .leftJoin(paymentMethods, eq(expenses.paymentMethodId, paymentMethods.id))
-      .where(eq(expenses.id, id));
+      .where(and(eq(expenses.id, id), isNull(expenses.deletedAt)));
 
     if (!expense) {
       return NextResponse.json({ error: 'Expense not found' }, { status: 404 });
@@ -71,7 +71,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     const { categoryId, paymentMethodId, title, description, amount, expenseDate, referenceNumber, remark } = body;
 
     // Verify expense exists
-    const [existing] = await db.select().from(expenses).where(eq(expenses.id, id));
+    const [existing] = await db.select().from(expenses).where(and(eq(expenses.id, id), isNull(expenses.deletedAt)));
     if (!existing) {
       return NextResponse.json({ error: 'Expense not found' }, { status: 404 });
     }
@@ -137,7 +137,7 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
 
     const { id } = await params;
 
-    const [existing] = await db.select().from(expenses).where(eq(expenses.id, id));
+    const [existing] = await db.select().from(expenses).where(and(eq(expenses.id, id), isNull(expenses.deletedAt)));
     if (!existing) {
       return NextResponse.json({ error: 'Expense not found' }, { status: 404 });
     }
