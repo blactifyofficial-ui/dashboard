@@ -128,9 +128,9 @@ export default function ExpensesPage() {
                     <td className="px-6 py-4 text-right font-medium">₹{parseFloat(expense.amount).toFixed(2)}</td>
                     <td className="px-6 py-4">{expense.paymentMethod || 'N/A'}</td>
                     <td className="px-6 py-4 text-right">
-                      <button className="text-white/40 hover:text-white transition-colors">
+                      <Link href={`/expenses/${expense.id}`} className="text-white/40 hover:text-white transition-colors">
                         <ArrowRight size={16} />
-                      </button>
+                      </Link>
                     </td>
                   </tr>
                 ))
