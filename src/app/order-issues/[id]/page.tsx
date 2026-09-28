@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useCallback } from 'react';
 import toast from 'react-hot-toast';
 import ConfirmModal from '@/components/ConfirmModal';
-import { Trash2, X, Phone, MessageCircle, Mail } from 'lucide-react';
+import { Trash2, X, Phone, MessageCircle, Mail, ArrowLeft, ExternalLink, Clock, User, Tag, Hash, ChevronRight } from 'lucide-react';
 
 type Activity = {
   id: string;
@@ -71,6 +71,32 @@ type ShopifyOrder = {
   current_total_price?: string | number;
   currency?: string;
 };
+
+function StatusBadge({ status }: { status: string }) {
+  const map: Record<string, string> = {
+    OPEN: 'bg-blue-500/15 text-blue-400 border border-blue-500/20',
+    IN_PROGRESS: 'bg-yellow-500/15 text-yellow-400 border border-yellow-500/20',
+    WAITING: 'bg-purple-500/15 text-purple-400 border border-purple-500/20',
+    RESOLVED: 'bg-green-500/15 text-green-400 border border-green-500/20',
+    CLOSED: 'bg-gray-500/15 text-gray-400 border border-gray-500/20',
+    CANCELLED: 'bg-red-500/15 text-red-400 border border-red-500/20',
+  };
+  return (
+    <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold tracking-wide ${map[status] || map.OPEN}`}>
+      {status.replace('_', ' ')}
+    </span>
+  );
+}
+
+function PriorityDot({ priority }: { priority: string }) {
+  const map: Record<string, string> = {
+    URGENT: 'bg-red-500',
+    HIGH: 'bg-orange-500',
+    MEDIUM: 'bg-yellow-500',
+    LOW: 'bg-gray-500',
+  };
+  return <span className={`inline-block w-2 h-2 rounded-full ${map[priority] || 'bg-gray-500'}`} />;
+}
 
 export default function IssueDetail() {
   const { id } = useParams();
@@ -187,11 +213,22 @@ export default function IssueDetail() {
     }
   };
 
-  if (loading) return <div className="p-8 text-white">Loading issue...</div>;
-  if (!issue) return <div className="p-8 text-white">Issue not found.</div>;
+  if (loading) return (
+    <div className="flex items-center justify-center min-h-[60vh]">
+      <div className="flex flex-col items-center gap-3">
+        <div className="w-8 h-8 border-2 border-white/10 border-t-white/60 rounded-full animate-spin" />
+        <p className="text-gray-500 text-sm">Loading issue...</p>
+      </div>
+    </div>
+  );
+  if (!issue) return (
+    <div className="flex items-center justify-center min-h-[60vh]">
+      <p className="text-gray-400">Issue not found.</p>
+    </div>
+  );
 
   return (
-    <div className="p-8 max-w-5xl mx-auto text-white">
+    <div className="min-h-screen text-white">
       <ConfirmModal
         isOpen={deleteModalOpen}
         title="Delete Order Issue"
@@ -202,119 +239,131 @@ export default function IssueDetail() {
         onCancel={() => setDeleteModalOpen(false)}
       />
 
-      <div className="flex justify-between items-center mb-6">
-        <button onClick={() => router.push('/order-issues')} className="text-gray-400 hover:text-white flex items-center gap-2">
-          ← Back to Issues
-        </button>
-        <button
-          onClick={() => setDeleteModalOpen(true)}
-          className="flex items-center gap-2 px-4 py-2 border border-red-500/20 bg-red-500/10 text-red-400 rounded-lg hover:bg-red-500/20 text-sm font-medium transition-all"
-        >
-          <Trash2 size={16} /> Delete Issue
-        </button>
-      </div>
-
+      {/* Order Modal */}
       {isOrderModalOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-4">
-          <div className="bg-[#1e1e1e] border border-white/10 rounded-xl w-full max-w-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
-            <div className="p-6 border-b border-white/10 flex justify-between items-center shrink-0">
-              <h2 className="text-xl font-semibold text-white">Full Order Details</h2>
-              <button onClick={() => setIsOrderModalOpen(false)} className="text-gray-400 hover:text-white">
-                <X size={20} />
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm p-3 sm:p-4">
+          <div className="bg-[#141414] border border-white/8 rounded-2xl w-full max-w-2xl shadow-2xl overflow-hidden flex flex-col max-h-[95vh] sm:max-h-[90vh]">
+            <div className="px-4 py-4 sm:px-6 sm:py-5 border-b border-white/8 flex justify-between items-center shrink-0">
+              <div>
+                <h2 className="text-base sm:text-lg font-semibold text-white">Order Details</h2>
+                <p className="text-xs text-gray-500 mt-0.5">Full Shopify order information</p>
+              </div>
+              <button
+                onClick={() => setIsOrderModalOpen(false)}
+                className="w-8 h-8 flex items-center justify-center rounded-lg bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-all"
+              >
+                <X size={16} />
               </button>
             </div>
-            <div className="p-6 overflow-y-auto">
+            <div className="p-4 sm:p-6 overflow-y-auto flex-1">
               {loadingOrder ? (
-                <div className="text-center py-8 text-gray-400">Loading order details...</div>
+                <div className="flex flex-col items-center justify-center py-12 gap-3">
+                  <div className="w-6 h-6 border-2 border-white/10 border-t-white/60 rounded-full animate-spin" />
+                  <p className="text-sm text-gray-500">Fetching order from Shopify...</p>
+                </div>
               ) : shopifyOrder ? (
-                <div className="space-y-6">
-                  <div className="grid grid-cols-2 gap-6">
-                    <div>
-                      <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">Order Info</h3>
-                      <div className="bg-[#2a2a2a] p-4 rounded-lg border border-white/5 space-y-3">
-                        <div><span className="text-gray-400 text-xs">Number:</span> <div className="text-sm">{shopifyOrder.order_number || shopifyOrder.name}</div></div>
-                        <div><span className="text-gray-400 text-xs">Date:</span> <div className="text-sm">{new Date(shopifyOrder.created_at).toLocaleString()}</div></div>
-                        <div><span className="text-gray-400 text-xs">Financial Status:</span> <div className="text-sm uppercase">{shopifyOrder.financial_status}</div></div>
-                        <div><span className="text-gray-400 text-xs">Fulfillment Status:</span> <div className="text-sm uppercase">{shopifyOrder.fulfillment_status || 'UNFULFILLED'}</div></div>
+                <div className="space-y-5">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="bg-white/3 border border-white/6 rounded-xl p-4 space-y-3">
+                      <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-widest">Order Info</p>
+                      <div className="space-y-2.5">
+                        <div className="flex justify-between items-start">
+                          <span className="text-xs text-gray-500">Number</span>
+                          <span className="text-sm font-medium">{shopifyOrder.order_number || shopifyOrder.name}</span>
+                        </div>
+                        <div className="flex justify-between items-start">
+                          <span className="text-xs text-gray-500">Date</span>
+                          <span className="text-xs text-gray-300 text-right">{new Date(shopifyOrder.created_at).toLocaleString()}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-xs text-gray-500">Payment</span>
+                          <span className="text-xs font-semibold px-2 py-0.5 rounded bg-green-500/15 text-green-400 border border-green-500/20 uppercase">
+                            {shopifyOrder.financial_status}
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-xs text-gray-500">Fulfillment</span>
+                          <span className="text-xs font-semibold px-2 py-0.5 rounded bg-blue-500/15 text-blue-400 border border-blue-500/20 uppercase">
+                            {shopifyOrder.fulfillment_status || 'UNFULFILLED'}
+                          </span>
+                        </div>
                       </div>
                     </div>
-                    <div>
-                      <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">Customer & Shipping</h3>
-                      <div className="bg-[#2a2a2a] p-4 rounded-lg border border-white/5 space-y-3">
+                    <div className="bg-white/3 border border-white/6 rounded-xl p-4 space-y-3">
+                      <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-widest">Customer & Shipping</p>
+                      <div>
+                        <span className="text-xs text-gray-500">Customer</span>
+                        <div className="text-sm font-medium mt-1">
+                          {shopifyOrder.customer ? `${shopifyOrder.customer.first_name || ''} ${shopifyOrder.customer.last_name || ''}` : 'N/A'}
+                        </div>
+                        {shopifyOrder.customer?.email && (
+                          <div className="flex items-center gap-2 text-xs text-gray-400 mt-1">
+                            <span className="truncate">{shopifyOrder.customer.email}</span>
+                            <a href={`mailto:${shopifyOrder.customer.email}`} className="text-blue-400 hover:text-blue-300 shrink-0" title="Mail">
+                              <Mail size={12} />
+                            </a>
+                          </div>
+                        )}
+                        {shopifyOrder.customer?.phone && (
+                          <div className="flex items-center gap-2 text-xs text-gray-400 mt-1">
+                            <span>{shopifyOrder.customer.phone}</span>
+                            <a href={`tel:${shopifyOrder.customer.phone}`} className="text-green-400 hover:text-green-300" title="Call">
+                              <Phone size={12} />
+                            </a>
+                            <a href={`https://wa.me/${shopifyOrder.customer.phone.replace(/[^0-9]/g, '')}`} target="_blank" rel="noopener noreferrer" className="text-green-500 hover:text-green-400" title="WhatsApp">
+                              <MessageCircle size={12} />
+                            </a>
+                          </div>
+                        )}
+                      </div>
+                      {shopifyOrder.shipping_address && (
                         <div>
-                          <span className="text-gray-400 text-xs">Customer:</span>
-                          <div className="text-sm">
-                            {shopifyOrder.customer ? `${shopifyOrder.customer.first_name || ''} ${shopifyOrder.customer.last_name || ''}` : 'N/A'}
-                            {shopifyOrder.customer?.email && (
-                              <div className="flex items-center gap-2 text-xs text-gray-400 mt-1">
-                                <span>{shopifyOrder.customer.email}</span>
-                                <a href={`mailto:${shopifyOrder.customer.email}`} className="text-blue-400 hover:text-blue-300 transition-colors" title="Mail">
-                                  <Mail size={14} />
+                          <span className="text-xs text-gray-500">Shipping Address</span>
+                          <div className="text-xs text-gray-300 mt-1 leading-5">
+                            {shopifyOrder.shipping_address.name}<br/>
+                            {shopifyOrder.shipping_address.address1}<br/>
+                            {shopifyOrder.shipping_address.address2 && <>{shopifyOrder.shipping_address.address2}<br/></>}
+                            {shopifyOrder.shipping_address.city}, {shopifyOrder.shipping_address.province} {shopifyOrder.shipping_address.zip}<br/>
+                            {shopifyOrder.shipping_address.country}
+                            {shopifyOrder.shipping_address.phone && (
+                              <div className="mt-1.5 flex items-center gap-2 text-gray-400">
+                                <span>Phone: {shopifyOrder.shipping_address.phone}</span>
+                                <a href={`tel:${shopifyOrder.shipping_address.phone}`} className="text-green-400 hover:text-green-300" title="Call">
+                                  <Phone size={12} />
                                 </a>
-                              </div>
-                            )}
-                            {shopifyOrder.customer?.phone && (
-                              <div className="flex items-center gap-2 text-xs text-gray-400 mt-1">
-                                <span>{shopifyOrder.customer.phone}</span>
-                                <a href={`tel:${shopifyOrder.customer.phone}`} className="text-green-400 hover:text-green-300 transition-colors" title="Call">
-                                  <Phone size={14} />
-                                </a>
-                                <a href={`https://wa.me/${shopifyOrder.customer.phone.replace(/[^0-9]/g, '')}`} target="_blank" rel="noopener noreferrer" className="text-green-500 hover:text-green-400 transition-colors" title="WhatsApp">
-                                  <MessageCircle size={14} />
+                                <a href={`https://wa.me/${shopifyOrder.shipping_address.phone.replace(/[^0-9]/g, '')}`} target="_blank" rel="noopener noreferrer" className="text-green-500 hover:text-green-400" title="WhatsApp">
+                                  <MessageCircle size={12} />
                                 </a>
                               </div>
                             )}
                           </div>
                         </div>
-                        {shopifyOrder.shipping_address && (
-                          <div>
-                            <span className="text-gray-400 text-xs">Shipping Address:</span>
-                            <div className="text-sm mt-1 text-gray-300">
-                              {shopifyOrder.shipping_address.name}<br/>
-                              {shopifyOrder.shipping_address.address1}<br/>
-                              {shopifyOrder.shipping_address.address2 && <>{shopifyOrder.shipping_address.address2}<br/></>}
-                              {shopifyOrder.shipping_address.city}, {shopifyOrder.shipping_address.province} {shopifyOrder.shipping_address.zip}<br/>
-                              {shopifyOrder.shipping_address.country}
-                              {shopifyOrder.shipping_address.phone && (
-                                <div className="mt-2 flex items-center gap-2 text-xs text-gray-400">
-                                  <span>Phone: {shopifyOrder.shipping_address.phone}</span>
-                                  <a href={`tel:${shopifyOrder.shipping_address.phone}`} className="text-green-400 hover:text-green-300 transition-colors" title="Call">
-                                    <Phone size={14} />
-                                  </a>
-                                  <a href={`https://wa.me/${shopifyOrder.shipping_address.phone.replace(/[^0-9]/g, '')}`} target="_blank" rel="noopener noreferrer" className="text-green-500 hover:text-green-400 transition-colors" title="WhatsApp">
-                                    <MessageCircle size={14} />
-                                  </a>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        )}
-                      </div>
+                      )}
                     </div>
                   </div>
 
                   <div>
-                    <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">Line Items</h3>
-                    <div className="bg-[#2a2a2a] rounded-lg border border-white/5 overflow-hidden">
-                      <table className="w-full text-sm text-left">
-                        <thead className="bg-[#1e1e1e] text-gray-400 text-xs">
+                    <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-widest mb-3">Line Items</p>
+                    <div className="border border-white/6 rounded-xl overflow-x-auto">
+                      <table className="w-full min-w-[360px] text-sm text-left">
+                        <thead className="bg-white/3">
                           <tr>
-                            <th className="px-4 py-3 font-medium">Product</th>
-                            <th className="px-4 py-3 font-medium">SKU</th>
-                            <th className="px-4 py-3 font-medium text-right">Qty</th>
-                            <th className="px-4 py-3 font-medium text-right">Total</th>
+                            <th className="px-4 py-2.5 text-xs font-medium text-gray-500">Product</th>
+                            <th className="px-4 py-2.5 text-xs font-medium text-gray-500">SKU</th>
+                            <th className="px-4 py-2.5 text-xs font-medium text-gray-500 text-right">Qty</th>
+                            <th className="px-4 py-2.5 text-xs font-medium text-gray-500 text-right">Total</th>
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-white/5">
+                        <tbody className="divide-y divide-white/4">
                           {shopifyOrder.line_items?.map((item: ShopifyLineItem) => (
-                            <tr key={item.id}>
+                            <tr key={item.id} className="hover:bg-white/2 transition-colors">
                               <td className="px-4 py-3">
-                                <div>{item.title}</div>
-                                {item.variant_title && <div className="text-xs text-gray-400">{item.variant_title}</div>}
+                                <div className="text-sm">{item.title}</div>
+                                {item.variant_title && <div className="text-xs text-gray-500 mt-0.5">{item.variant_title}</div>}
                               </td>
-                              <td className="px-4 py-3 text-gray-400">{item.sku || '-'}</td>
-                              <td className="px-4 py-3 text-right">{item.quantity}</td>
-                              <td className="px-4 py-3 text-right">
+                              <td className="px-4 py-3 text-xs text-gray-500 font-mono">{item.sku || '—'}</td>
+                              <td className="px-4 py-3 text-right text-sm">{item.quantity}</td>
+                              <td className="px-4 py-3 text-right text-sm font-medium">
                                 {(Number(item.price) * item.quantity).toLocaleString('en-US', { style: 'currency', currency: shopifyOrder.currency || 'USD' })}
                               </td>
                             </tr>
@@ -323,24 +372,26 @@ export default function IssueDetail() {
                       </table>
                     </div>
                   </div>
-                  
-                  <div className="flex justify-end pt-4 border-t border-white/10">
+
+                  <div className="flex justify-end items-center gap-4 pt-1">
                     <div className="text-right">
-                      <div className="text-sm text-gray-400">Total Price</div>
-                      <div className="text-2xl font-bold">
+                      <div className="text-xs text-gray-500 mb-0.5">Total Price</div>
+                      <div className="text-2xl font-bold tracking-tight">
                         {Number(shopifyOrder.current_total_price).toLocaleString('en-US', { style: 'currency', currency: shopifyOrder.currency || 'USD' })}
                       </div>
                     </div>
                   </div>
                 </div>
               ) : (
-                <div className="text-center py-8 text-gray-400">Order not found in Shopify.</div>
+                <div className="flex flex-col items-center justify-center py-12 gap-2">
+                  <p className="text-gray-400">Order not found in Shopify.</p>
+                </div>
               )}
             </div>
-            <div className="p-4 border-t border-white/10 flex justify-end shrink-0 bg-black/20">
+            <div className="px-4 py-3 sm:px-6 sm:py-4 border-t border-white/8 flex justify-end shrink-0">
               <button
                 onClick={() => setIsOrderModalOpen(false)}
-                className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors text-sm font-medium"
+                className="px-5 py-2 bg-white/8 hover:bg-white/12 text-white rounded-lg transition-colors text-sm font-medium border border-white/8"
               >
                 Close
               </button>
@@ -349,144 +400,232 @@ export default function IssueDetail() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 space-y-6">
-          <div className="bg-[#1e1e1e] border border-white/10 rounded-2xl p-8 shadow-sm">
-            <div className="flex items-center gap-3 mb-4">
-              <span className="bg-blue-500/20 text-blue-400 px-3 py-1 rounded-full text-sm font-medium">{issue.category}</span>
-              <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                issue.priority === 'URGENT' ? 'bg-red-500/20 text-red-400' :
-                issue.priority === 'HIGH' ? 'bg-orange-500/20 text-orange-400' :
-                'bg-gray-500/20 text-gray-400'
-              }`}>{issue.priority}</span>
-            </div>
-            
-            <h1 className="text-2xl font-semibold mb-2">{issue.title}</h1>
-            <p className="text-gray-400 font-mono text-sm mb-6">Issue #{issue.id.slice(0, 8)}</p>
+      {/* Top nav bar */}
+      <div className="border-b border-white/6 bg-[#0f0f0f]/80 backdrop-blur-sm sticky top-0 z-10">
+        <div className="max-w-6xl mx-auto px-3 sm:px-6 py-3 flex items-center justify-between gap-2">
+          <button
+            onClick={() => router.push('/order-issues')}
+            className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-white transition-colors min-w-0"
+          >
+            <ArrowLeft size={15} className="shrink-0" />
+            <span className="hidden sm:inline">Order Issues</span>
+            <ChevronRight size={13} className="text-gray-600 hidden sm:inline" />
+            <span className="text-white font-mono text-xs truncate">{issue.id.slice(0, 8)}</span>
+          </button>
+          <button
+            onClick={() => setDeleteModalOpen(true)}
+            className="flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 border border-red-500/20 bg-red-500/8 text-red-400 rounded-lg hover:bg-red-500/15 text-xs font-medium transition-all shrink-0"
+          >
+            <Trash2 size={13} />
+            <span className="hidden sm:inline">Delete Issue</span>
+            <span className="sm:hidden">Delete</span>
+          </button>
+        </div>
+      </div>
 
-            <div className="bg-[#2a2a2a] p-4 rounded-xl border border-white/5">
-              <h3 className="text-sm font-medium text-gray-300 mb-2">Description</h3>
-              <p className="text-gray-200 whitespace-pre-wrap leading-relaxed">{issue.description}</p>
-            </div>
+      <div className="max-w-6xl mx-auto px-3 sm:px-6 py-5 sm:py-8">
+        {/* Hero header */}
+        <div className="mb-6 sm:mb-8">
+          <div className="flex flex-wrap items-center gap-2 mb-3">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-blue-500/12 text-blue-400 border border-blue-500/20">
+              <Tag size={11} />
+              {issue.category}
+            </span>
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-white/5 text-gray-300 border border-white/8">
+              <PriorityDot priority={issue.priority} />
+              {issue.priority}
+            </span>
+            <StatusBadge status={issue.status} />
           </div>
-
-          <div className="bg-[#1e1e1e] border border-white/10 rounded-2xl p-8 shadow-sm">
-            <h2 className="text-xl font-semibold mb-6">Activity Timeline</h2>
-            <div className="space-y-6">
-              {issue.activities.map((activity) => (
-                <div key={activity.id} className="flex gap-4">
-                  <div className="flex flex-col items-center">
-                    <div className="w-2.5 h-2.5 bg-blue-500 rounded-full mt-2"></div>
-                    <div className="w-0.5 h-full bg-white/10 mt-2"></div>
-                  </div>
-                  <div className="flex-1 pb-6">
-                    <p className="text-sm text-gray-400 mb-1">
-                      {new Date(activity.createdAt).toLocaleString()} • {activity.actorId === 'unassigned' ? 'System' : 'Staff'}
-                    </p>
-                    {activity.activityType === 'CREATED' && (
-                      <p className="font-medium text-gray-200">Issue created and marked as {activity.newStatus}</p>
-                    )}
-                    {activity.activityType === 'STATUS_CHANGED' && (
-                      <p className="font-medium text-gray-200">
-                        Status changed: <span className="text-gray-400 line-through mr-1">{activity.oldStatus}</span> → <span className="text-white">{activity.newStatus}</span>
-                      </p>
-                    )}
-                    {activity.activityType === 'REMARK_ADDED' && (
-                      <div className="mt-2 bg-[#2a2a2a] p-3 rounded-lg border border-white/5 text-gray-200">
-                        &quot;{activity.remark}&quot;
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-4 pt-6 border-t border-white/10">
-              <h3 className="text-sm font-medium text-gray-300 mb-2">Add Remark</h3>
-              <textarea 
-                rows={3} 
-                className="w-full bg-[#2a2a2a] border border-white/10 rounded-xl p-3 text-white focus:outline-none focus:border-blue-500 mb-3"
-                placeholder="Type your remark here..."
-                value={newRemark}
-                onChange={e => setNewRemark(e.target.value)}
-              />
-              <button 
-                onClick={handleAddRemark}
-                disabled={isSubmitting || !newRemark.trim()}
-                className="bg-white text-black px-4 py-2 rounded-lg font-medium hover:bg-gray-200 disabled:opacity-50 transition-colors"
-              >
-                {isSubmitting ? 'Adding...' : 'Add Remark'}
-              </button>
-            </div>
-          </div>
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-white mb-1.5">{issue.title}</h1>
+          <p className="text-sm text-gray-500 font-mono flex items-center gap-2">
+            <Hash size={13} />
+            {issue.id.slice(0, 8)}
+          </p>
         </div>
 
-        <div className="col-span-1 space-y-6">
-          <div className="bg-[#1e1e1e] border border-white/10 rounded-2xl p-6 shadow-sm">
-            <h3 className="text-sm font-medium text-gray-400 uppercase tracking-wider mb-4">Properties</h3>
-            
-            <div className="mb-6">
-              <label className="block text-sm text-gray-400 mb-2">Status</label>
-              <select 
-                className="w-full bg-[#2a2a2a] border border-white/10 rounded-lg p-2.5 text-white focus:outline-none focus:border-blue-500"
-                value={issue.status}
-                onChange={e => handleStatusChange(e.target.value)}
-                disabled={isSubmitting || issue.status === 'CLOSED'}
-              >
-                <option value="OPEN">Open</option>
-                <option value="IN_PROGRESS">In Progress</option>
-                <option value="WAITING">Waiting</option>
-                <option value="RESOLVED">Resolved</option>
-                <option value="CLOSED">Closed</option>
-                <option value="CANCELLED">Cancelled</option>
-              </select>
-            </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+          {/* Main content — 2/3 */}
+          <div className="lg:col-span-2 space-y-4 sm:space-y-5">
 
-            <div className="mb-4">
-              <label className="block text-sm text-gray-400 mb-2">Assigned To</label>
-              <div className="w-full bg-[#2a2a2a] border border-white/10 rounded-lg p-2.5 text-white cursor-not-allowed opacity-70">
-                {issue.assignedToId ? 'Staff Assigned' : 'Unassigned'}
+            {/* Description */}
+            <section className="bg-[#141414] border border-white/8 rounded-2xl overflow-hidden">
+              <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-white/6">
+                <h2 className="text-sm font-semibold text-gray-200">Description</h2>
               </div>
-            </div>
-          </div>
+              <div className="px-4 sm:px-6 py-4 sm:py-5">
+                <p className="text-gray-300 whitespace-pre-wrap leading-relaxed text-sm">{issue.description}</p>
+              </div>
+            </section>
 
-          <div className="bg-[#1e1e1e] border border-white/10 rounded-2xl p-6 shadow-sm">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-sm font-medium text-gray-400 uppercase tracking-wider">Order Details</h3>
-              <button 
-                onClick={handleOpenOrderModal}
-                className="text-xs text-blue-400 hover:text-blue-300 transition-colors"
-              >
-                View full order →
-              </button>
-            </div>
-            
-            <div className="space-y-4">
-              <div>
-                <label className="block text-xs text-gray-400 mb-1">Order Number</label>
-                <div className="text-sm text-gray-200">{issue.orderNumber || issue.orderId}</div>
+            {/* Activity timeline */}
+            <section className="bg-[#141414] border border-white/8 rounded-2xl overflow-hidden">
+              <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-white/6">
+                <h2 className="text-sm font-semibold text-gray-200">Activity</h2>
               </div>
-              
-              {issue.customerName && (
-                <div>
-                  <label className="block text-xs text-gray-400 mb-1">Customer</label>
-                  <div className="text-sm text-gray-200">{issue.customerName}</div>
-                  {issue.customerEmail && <div className="text-xs text-gray-400 mt-0.5">{issue.customerEmail}</div>}
-                </div>
-              )}
-              
-              {issue.totalPrice && (
-                <div>
-                  <label className="block text-xs text-gray-400 mb-1">Total</label>
-                  <div className="text-sm text-gray-200">
-                    {Number(issue.totalPrice).toLocaleString('en-US', {
-                      style: 'currency',
-                      currency: issue.currency || 'USD'
-                    })}
+              <div className="px-4 sm:px-6 py-4 sm:py-5">
+                <div className="relative">
+                  {/* Vertical line */}
+                  <div className="absolute left-[7px] top-2 bottom-0 w-px bg-white/6" />
+
+                  <div className="space-y-0">
+                    {issue.activities.map((activity, idx) => (
+                      <div key={activity.id} className="flex gap-4 relative pb-6 last:pb-0">
+                        {/* Dot */}
+                        <div className="relative z-10 shrink-0 mt-1">
+                          {activity.activityType === 'CREATED' && (
+                            <div className="w-3.5 h-3.5 rounded-full bg-blue-500 ring-4 ring-[#141414]" />
+                          )}
+                          {activity.activityType === 'STATUS_CHANGED' && (
+                            <div className="w-3.5 h-3.5 rounded-full bg-purple-500 ring-4 ring-[#141414]" />
+                          )}
+                          {activity.activityType === 'REMARK_ADDED' && (
+                            <div className="w-3.5 h-3.5 rounded-full bg-gray-500 ring-4 ring-[#141414]" />
+                          )}
+                          {!['CREATED', 'STATUS_CHANGED', 'REMARK_ADDED'].includes(activity.activityType) && (
+                            <div className="w-3.5 h-3.5 rounded-full bg-gray-600 ring-4 ring-[#141414]" />
+                          )}
+                        </div>
+
+                        <div className="flex-1 min-w-0" style={{ marginTop: idx === 0 ? 0 : undefined }}>
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="text-xs text-gray-500">
+                              {new Date(activity.createdAt).toLocaleString()}
+                            </span>
+                            <span className="text-gray-700">·</span>
+                            <span className="text-xs text-gray-500 flex items-center gap-1">
+                              <User size={11} />
+                              {activity.actorId === 'unassigned' ? 'System' : 'Staff'}
+                            </span>
+                          </div>
+
+                          {activity.activityType === 'CREATED' && (
+                            <p className="text-sm text-gray-200">
+                              Issue created and marked as <span className="text-blue-400 font-medium">{activity.newStatus}</span>
+                            </p>
+                          )}
+                          {activity.activityType === 'STATUS_CHANGED' && (
+                            <p className="text-sm text-gray-200 flex items-center gap-2 flex-wrap">
+                              Status changed
+                              <span className="text-gray-500 line-through text-xs">{activity.oldStatus}</span>
+                              <span className="text-gray-400">→</span>
+                              <StatusBadge status={activity.newStatus || ''} />
+                            </p>
+                          )}
+                          {activity.activityType === 'REMARK_ADDED' && (
+                            <div className="mt-1.5 bg-white/4 border border-white/6 rounded-xl px-4 py-3 text-sm text-gray-300 leading-relaxed">
+                              &quot;{activity.remark}&quot;
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
-              )}
-            </div>
+
+                {/* Add remark */}
+                <div className="mt-6 pt-6 border-t border-white/6">
+                  <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Add Remark</h3>
+                  <textarea
+                    rows={3}
+                    className="w-full bg-white/4 border border-white/8 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 resize-none transition-all mb-3"
+                    placeholder="Leave a note on this issue..."
+                    value={newRemark}
+                    onChange={e => setNewRemark(e.target.value)}
+                  />
+                  <button
+                    onClick={handleAddRemark}
+                    disabled={isSubmitting || !newRemark.trim()}
+                    className="px-4 py-2 bg-white text-black rounded-lg text-sm font-semibold hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                  >
+                    {isSubmitting ? 'Posting...' : 'Post Remark'}
+                  </button>
+                </div>
+              </div>
+            </section>
+          </div>
+
+          {/* Sidebar — 1/3 */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-4 sm:gap-5 lg:gap-5">
+            {/* Properties */}
+            <section className="bg-[#141414] border border-white/8 rounded-2xl overflow-hidden">
+              <div className="px-4 sm:px-5 py-3 sm:py-4 border-b border-white/6">
+                <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Properties</h3>
+              </div>
+              <div className="px-4 sm:px-5 py-4 space-y-4">
+                <div>
+                  <label className="block text-xs text-gray-500 mb-2">Status</label>
+                  <select
+                    className="w-full bg-white/4 border border-white/8 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    value={issue.status}
+                    onChange={e => handleStatusChange(e.target.value)}
+                    disabled={isSubmitting || issue.status === 'CLOSED'}
+                  >
+                    <option value="OPEN">Open</option>
+                    <option value="IN_PROGRESS">In Progress</option>
+                    <option value="WAITING">Waiting</option>
+                    <option value="RESOLVED">Resolved</option>
+                    <option value="CLOSED">Closed</option>
+                    <option value="CANCELLED">Cancelled</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs text-gray-500 mb-2">Assigned To</label>
+                  <div className="flex items-center gap-2 px-3 py-2 bg-white/4 border border-white/8 rounded-lg opacity-60">
+                    <User size={13} className="text-gray-500 shrink-0" />
+                    <span className="text-sm text-gray-300">{issue.assignedToId ? 'Staff Assigned' : 'Unassigned'}</span>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs text-gray-500 mb-2">Last Updated</label>
+                  <div className="flex items-center gap-2 text-sm text-gray-300">
+                    <Clock size={13} className="text-gray-500 shrink-0" />
+                    <span className="text-xs">{new Date(issue.updatedAt).toLocaleString()}</span>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* Order Details */}
+            <section className="bg-[#141414] border border-white/8 rounded-2xl overflow-hidden">
+              <div className="px-4 sm:px-5 py-3 sm:py-4 border-b border-white/6 flex justify-between items-center">
+                <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Order</h3>
+                <button
+                  onClick={handleOpenOrderModal}
+                  className="flex items-center gap-1 text-xs text-blue-400 hover:text-blue-300 transition-colors"
+                >
+                  View full <ExternalLink size={11} />
+                </button>
+              </div>
+              <div className="px-4 sm:px-5 py-4 space-y-4">
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">Order Number</label>
+                  <div className="text-sm font-mono text-gray-200">{issue.orderNumber || issue.orderId}</div>
+                </div>
+
+                {issue.customerName && (
+                  <div>
+                    <label className="block text-xs text-gray-500 mb-1">Customer</label>
+                    <div className="text-sm text-gray-200">{issue.customerName}</div>
+                    {issue.customerEmail && <div className="text-xs text-gray-500 mt-0.5">{issue.customerEmail}</div>}
+                  </div>
+                )}
+
+                {issue.totalPrice && (
+                  <div>
+                    <label className="block text-xs text-gray-500 mb-1">Total</label>
+                    <div className="text-sm font-semibold text-gray-200">
+                      {Number(issue.totalPrice).toLocaleString('en-US', {
+                        style: 'currency',
+                        currency: issue.currency || 'USD'
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </section>
           </div>
         </div>
       </div>
