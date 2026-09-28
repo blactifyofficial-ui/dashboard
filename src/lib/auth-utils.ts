@@ -20,7 +20,3 @@ export async function requireAuth() {
   return { user: session.user as NonNullable<typeof session.user> };
 }
 
-export async function requireAdmin() {
-  return requireAuth();
-}
-

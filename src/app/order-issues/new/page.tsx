@@ -125,7 +125,7 @@ export default function CreateIssuePage() {
   };
 
   return (
-    <div className="flex flex-col min-h-full pb-8 space-y-6 relative z-10 max-w-4xl mx-auto w-full">
+    <div className="flex flex-col min-h-full pb-20 space-y-6 relative z-10 max-w-4xl mx-auto w-full">
       <header className="flex-none flex flex-col gap-4">
         <Link href="/order-issues" className="inline-flex items-center text-sm text-neutral-400 hover:text-white transition-colors w-fit">
           <ArrowLeft className="w-4 h-4 mr-2" />
@@ -137,8 +137,8 @@ export default function CreateIssuePage() {
         </div>
       </header>
 
-      <div className="flex-1 bg-white/[0.02] border border-white/5 rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent pointer-events-none"></div>
+      <div className="flex-1 shrink-0 bg-white/[0.02] border border-white/5 rounded-3xl p-6 sm:p-8 shadow-2xl relative">
+        <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent pointer-events-none rounded-3xl"></div>
         <form onSubmit={handleSubmit} className="space-y-5 relative z-10">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div className="relative">

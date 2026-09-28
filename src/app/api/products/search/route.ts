@@ -17,6 +17,7 @@ export async function GET(req: Request) {
     const products = await db.selectDistinct({
       id: orderItems.shopifyProductId,
       title: orderItems.title,
+      imageUrl: orderItems.imageUrl,
     })
     .from(orderItems)
     .where(ilike(orderItems.title, `%${q}%`))
