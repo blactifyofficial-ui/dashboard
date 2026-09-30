@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Loader2, Pencil, Trash2, Save, X } from 'lucide-react';
+import { ArrowLeft, Loader2, Pencil, Trash2, Save, X, ExternalLink } from 'lucide-react';
 import toast from 'react-hot-toast';
 import ConfirmModal from '@/components/ConfirmModal';
 import LoadingSpinner from '@/components/LoadingSpinner';
@@ -350,9 +350,18 @@ export default function ExpenseDetailPage() {
           ) : (
             /* ── Read-only Detail ── */
             <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
-              <div className="flex items-center gap-3 mb-5">
+              <div className="flex flex-wrap items-center gap-3 mb-5">
                 <span className="bg-white/10 px-3 py-1 rounded-full text-xs font-medium">{expense.category}</span>
                 <span className="bg-white/10 px-3 py-1 rounded-full text-xs font-medium">{expense.paymentMethod}</span>
+                {expense.category?.toLowerCase().includes('meta') && (
+                  <Link
+                    href="/meta-ads"
+                    className="bg-blue-500/10 border border-blue-500/20 text-blue-400 px-3 py-1 rounded-full text-xs font-medium hover:bg-blue-500/20 transition-colors flex items-center gap-1.5"
+                  >
+                    <span>Meta Ads Tracker</span>
+                    <ExternalLink size={12} />
+                  </Link>
+                )}
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">

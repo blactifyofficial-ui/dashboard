@@ -134,6 +134,15 @@ export const expenseActivities = pgTable('expense_activities', {
   remark: text('remark'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
+export const expenseDateNotes = pgTable('expense_date_notes', {
+  id: text('id').primaryKey(),
+  date: text('date').notNull().unique(),
+  note: text('note').notNull(),
+  createdById: text('created_by_id').references(() => users.id),
+  updatedById: text('updated_by_id').references(() => users.id),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
 
 
 export const inventory = pgTable('inventory', {
@@ -151,6 +160,35 @@ export const inventory = pgTable('inventory', {
 export const appSettings = pgTable('app_settings', {
   key: text('key').primaryKey(),
   value: text('value').notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+export const metaAdsSettings = pgTable('meta_ads_settings', {
+  id: text('id').primaryKey(),
+  dailyBudget: numeric('daily_budget').notNull().default('0'),
+  days: numeric('days').default('7').notNull(),
+  weeklyBudget: numeric('weekly_budget').notNull().default('0'),
+  currency: text('currency').default('INR').notNull(),
+  notes: text('notes'),
+  updatedById: text('updated_by_id').references(() => users.id),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+export const metaAdsTransactions = pgTable('meta_ads_transactions', {
+  id: text('id').primaryKey(),
+  weekStartDate: timestamp('week_start_date').notNull(),
+  weekEndDate: timestamp('week_end_date').notNull(),
+  dailyBudget: numeric('daily_budget').notNull(),
+  calculatedWeeklyBudget: numeric('calculated_weekly_budget').notNull(),
+  amountPaid: numeric('amount_paid').notNull(),
+  paymentDate: timestamp('payment_date').notNull(),
+  paymentMethodId: text('payment_method_id').references(() => paymentMethods.id).notNull(),
+  status: text('status').notNull().default('PAID'),
+  referenceNumber: text('reference_number'),
+  notes: text('notes'),
+  expenseId: text('expense_id').references(() => expenses.id),
+  createdById: text('created_by_id').references(() => users.id).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 

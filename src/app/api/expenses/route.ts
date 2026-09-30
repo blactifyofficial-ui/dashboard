@@ -14,7 +14,7 @@ export async function GET(req: Request) {
 
     const { searchParams } = new URL(req.url);
     const page = parseInt(searchParams.get('page') || '1', 10);
-    const pageSize = parseInt(searchParams.get('pageSize') || '20', 10);
+    const pageSize = parseInt(searchParams.get('pageSize') || '100', 10);
     const categoryId = searchParams.get('categoryId');
     const paymentMethodId = searchParams.get('paymentMethodId');
     const q = searchParams.get('q');
@@ -54,7 +54,7 @@ export async function GET(req: Request) {
       .leftJoin(expenseCategories, eq(expenses.categoryId, expenseCategories.id))
       .leftJoin(paymentMethods, eq(expenses.paymentMethodId, paymentMethods.id))
       .where(whereClause)
-      .orderBy(desc(expenses.expenseDate))
+      .orderBy(desc(expenses.expenseDate), desc(expenses.createdAt))
       .limit(pageSize)
       .offset(offset);
 
