@@ -192,3 +192,33 @@ export const metaAdsTransactions = pgTable('meta_ads_transactions', {
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
+export const partners = pgTable('partners', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull(),
+  email: text('email'),
+  phone: text('phone'),
+  equityPercentage: numeric('equity_percentage').default('0').notNull(),
+  status: text('status').default('ACTIVE').notNull(), // 'ACTIVE', 'INACTIVE'
+  joinedDate: timestamp('joined_date').defaultNow(),
+  notes: text('notes'),
+  createdById: text('created_by_id').references(() => users.id),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+export const partnerTransactions = pgTable('partner_transactions', {
+  id: text('id').primaryKey(),
+  partnerId: text('partner_id').references(() => partners.id).notNull(),
+  type: text('type').notNull(), // 'INVESTMENT', 'WITHDRAWAL', 'PROFIT_SHARE', 'PAYOUT'
+  amount: numeric('amount').notNull(),
+  transactionDate: timestamp('transaction_date').notNull(),
+  paymentMethodId: text('payment_method_id').references(() => paymentMethods.id),
+  status: text('status').default('COMPLETED').notNull(), // 'COMPLETED', 'PENDING', 'CANCELLED'
+  referenceNumber: text('reference_number'),
+  notes: text('notes'),
+  createdById: text('created_by_id').references(() => users.id).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+
