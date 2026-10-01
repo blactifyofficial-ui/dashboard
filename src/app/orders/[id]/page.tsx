@@ -17,8 +17,8 @@ export default async function OrderDetailPage(props: {
 
   return (
     <div className="p-8 max-w-7xl mx-auto text-black">
-      <Link href="/orders" className="text-gray-400 hover:text-white mb-6 inline-block">
-        &larr; Back to Orders
+      <Link href="/dashboard" className="text-gray-400 hover:text-white mb-6 inline-block">
+        &larr; Back to Dashboard
       </Link>
       
       <div className="flex items-center justify-between mb-8">

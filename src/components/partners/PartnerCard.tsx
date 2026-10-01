@@ -1,6 +1,6 @@
 'use client';
 
-import { Plus, ArrowDownLeft, Pencil, Trash2, Mail, Phone, History } from 'lucide-react';
+import { Plus, ArrowDownLeft, Banknote, Pencil, Trash2, Mail, Phone, History } from 'lucide-react';
 import { Partner } from './types';
 import { formatCurrency, formatDisplayDate } from './utils';
 
@@ -9,6 +9,7 @@ interface PartnerCardProps {
   totalFund: number;
   onAddInvestment: (partnerId: string) => void;
   onAddWithdrawal: (partnerId: string) => void;
+  onAddPayout: (partnerId: string) => void;
   onViewLedger: (partner: Partner) => void;
   onEdit: (partner: Partner) => void;
   onDelete: (partner: Partner) => void;
@@ -19,6 +20,7 @@ export default function PartnerCard({
   totalFund,
   onAddInvestment,
   onAddWithdrawal,
+  onAddPayout,
   onViewLedger,
   onEdit,
   onDelete,
@@ -70,7 +72,7 @@ export default function PartnerCard({
           </div>
         </div>
 
-        {/* Capital Metrics Grid */}
+        {/* Capital & Payout Metrics Grid */}
         <div className="grid grid-cols-2 gap-2 mt-4 p-3 rounded-lg bg-black/40 border border-white/5">
           <div>
             <span className="text-[11px] text-white/50 font-medium block">Total Invested</span>
@@ -79,13 +81,13 @@ export default function PartnerCard({
             </span>
           </div>
           <div>
-            <span className="text-[11px] text-white/50 font-medium block">Withdrawn</span>
-            <span className="text-sm font-bold text-white/80 font-mono">
-              {formatCurrency(partner.totalWithdrawn)}
+            <span className="text-[11px] text-emerald-400/80 font-medium block">Payouts Taken</span>
+            <span className="text-sm font-bold text-emerald-400 font-mono">
+              {formatCurrency(partner.totalPayout || 0)}
             </span>
           </div>
-          <div className="col-span-2 pt-2 border-t border-white/5 flex items-center justify-between">
-            <span className="text-xs text-white/50">Net Capital Pool</span>
+          <div className="col-span-2 pt-2 border-t border-white/5 flex items-center justify-between text-xs">
+            <span className="text-white/50">Net Capital Pool:</span>
             <span className="text-sm font-bold text-white font-mono">
               {formatCurrency(partner.netCapital)}
             </span>
@@ -106,8 +108,16 @@ export default function PartnerCard({
       </div>
 
       {/* Quick Action Buttons */}
-      <div className="mt-4 pt-3.5 border-t border-white/5 flex items-center justify-between gap-2">
-        <div className="flex items-center gap-1.5">
+      <div className="mt-4 pt-3.5 border-t border-white/5 flex flex-wrap items-center justify-between gap-2">
+        <div className="flex items-center gap-1.5 flex-wrap">
+          <button
+            onClick={() => onAddPayout(partner.id)}
+            className="px-2.5 py-1 text-xs font-semibold text-white bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 rounded-lg transition-colors flex items-center gap-1 shadow-sm"
+            title="Record Partner Payout"
+          >
+            <Banknote size={13} className="text-emerald-400" />
+            <span>Payout</span>
+          </button>
           <button
             onClick={() => onAddInvestment(partner.id)}
             className="px-2.5 py-1 text-xs font-medium text-white/90 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-colors flex items-center gap-1"

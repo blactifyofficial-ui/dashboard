@@ -48,7 +48,9 @@ export default function TransactionModal({
               <Landmark size={16} />
             </div>
             <h3 className="text-base font-bold text-white">
-              {editingTxn ? 'Edit Capital Transaction' : 'Record Capital Transaction'}
+              {editingTxn 
+                ? (formData.type === 'PAYOUT' ? 'Edit Partner Payout' : 'Edit Capital Transaction')
+                : (formData.type === 'PAYOUT' ? 'Record Partner Payout' : 'Record Capital Transaction')}
             </h3>
           </div>
           <button
@@ -89,10 +91,10 @@ export default function TransactionModal({
                 onChange={(e) => onChange({ ...formData, type: e.target.value as TransactionType })}
                 className="w-full h-10 px-3 bg-white/5 border border-white/10 rounded-xl text-xs sm:text-sm text-white focus:outline-none focus:border-white/20 transition-colors"
               >
+                <option value="PAYOUT" className="bg-neutral-900 text-emerald-400 font-semibold">Partner Payout</option>
                 <option value="INVESTMENT" className="bg-neutral-900 text-white">Capital Investment (In)</option>
                 <option value="WITHDRAWAL" className="bg-neutral-900 text-white">Capital Withdrawal (Out)</option>
                 <option value="PROFIT_SHARE" className="bg-neutral-900 text-white">Profit Share</option>
-                <option value="PAYOUT" className="bg-neutral-900 text-white">Dividend / Payout</option>
               </select>
             </div>
 
@@ -157,7 +159,7 @@ export default function TransactionModal({
             <label className="block text-xs font-semibold text-neutral-300 mb-1.5">Notes & Description</label>
             <textarea
               rows={2}
-              placeholder="e.g. Initial seed capital contribution or monthly dividend payout..."
+              placeholder="e.g. Partner monthly payout / dividend transfer..."
               value={formData.notes}
               onChange={(e) => onChange({ ...formData, notes: e.target.value })}
               className="w-full p-3 bg-white/5 border border-white/10 rounded-xl text-xs sm:text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:border-white/20 resize-none transition-colors"
@@ -178,7 +180,11 @@ export default function TransactionModal({
               className="px-4 py-2 bg-white hover:bg-neutral-200 text-black text-xs font-semibold rounded-xl flex items-center gap-1.5 transition-all shadow-sm disabled:opacity-50"
             >
               {isSubmitting ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
-              <span>{editingTxn ? 'Save Changes' : 'Record Transaction'}</span>
+              <span>
+                {editingTxn 
+                  ? 'Save Changes' 
+                  : (formData.type === 'PAYOUT' ? 'Record Payout' : 'Record Transaction')}
+              </span>
             </button>
           </div>
         </form>

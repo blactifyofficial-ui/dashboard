@@ -22,7 +22,7 @@ const PARTNER_COLORS = [
 export default function PartnerSummaryCards({ summary, partners }: PartnerSummaryCardsProps) {
   const totalFund = summary?.totalInvested || 0;
   const netCapital = summary?.netActiveCapitalPool || 0;
-  const totalWithdrawn = summary?.totalWithdrawn || 0;
+  const totalPayouts = summary?.totalPayouts || 0;
   const allocatedEquity = summary?.totalAllocatedEquity || 0;
 
   return (
@@ -31,7 +31,7 @@ export default function PartnerSummaryCards({ summary, partners }: PartnerSummar
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {/* Card 1: Total Invested */}
         <div className="bg-white/5 border border-white/10 rounded-xl p-4 sm:p-5">
-          <p className="text-xs font-medium text-white/60 mb-1 uppercase tracking-wider">Total Planned / In</p>
+          <p className="text-xs font-medium text-white/60 mb-1 uppercase tracking-wider">Total Capital In</p>
           <p className="text-xl sm:text-2xl font-bold font-mono text-white tracking-tight">
             {formatCurrency(totalFund)}
           </p>
@@ -40,7 +40,18 @@ export default function PartnerSummaryCards({ summary, partners }: PartnerSummar
           </p>
         </div>
 
-        {/* Card 2: Net Active Capital */}
+        {/* Card 2: Total Payouts Taken */}
+        <div className="bg-white/5 border border-white/10 rounded-xl p-4 sm:p-5">
+          <p className="text-xs font-medium text-emerald-400/80 mb-1 uppercase tracking-wider">Total Payouts Taken</p>
+          <p className="text-xl sm:text-2xl font-bold font-mono text-emerald-400 tracking-tight">
+            {formatCurrency(totalPayouts)}
+          </p>
+          <p className="mt-1 text-xs text-white/40">
+            Distributed to partners
+          </p>
+        </div>
+
+        {/* Card 3: Net Active Capital */}
         <div className="bg-white/5 border border-white/10 rounded-xl p-4 sm:p-5">
           <p className="text-xs font-medium text-white/60 mb-1 uppercase tracking-wider">Net Capital Pool</p>
           <p className="text-xl sm:text-2xl font-bold font-mono text-white tracking-tight">
@@ -48,17 +59,6 @@ export default function PartnerSummaryCards({ summary, partners }: PartnerSummar
           </p>
           <p className="mt-1 text-xs text-white/40">
             {summary?.activePartnerCount || 0} active {summary?.activePartnerCount === 1 ? 'contributor' : 'contributors'}
-          </p>
-        </div>
-
-        {/* Card 3: Total Withdrawals */}
-        <div className="bg-white/5 border border-white/10 rounded-xl p-4 sm:p-5">
-          <p className="text-xs font-medium text-white/60 mb-1 uppercase tracking-wider">Total Drawings</p>
-          <p className="text-xl sm:text-2xl font-bold font-mono text-white tracking-tight">
-            {formatCurrency(totalWithdrawn)}
-          </p>
-          <p className="mt-1 text-xs text-white/40">
-            Payouts & returned capital
           </p>
         </div>
 

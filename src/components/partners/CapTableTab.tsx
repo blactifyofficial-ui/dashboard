@@ -31,6 +31,7 @@ export default function CapTableTab({ partners, summary }: CapTableTabProps) {
                 <th className="py-3 px-4">Status</th>
                 <th className="py-3 px-4">Equity Stake (%)</th>
                 <th className="py-3 px-4">Total Invested</th>
+                <th className="py-3 px-4">Payouts Taken</th>
                 <th className="py-3 px-4">Withdrawn</th>
                 <th className="py-3 px-4">Net Capital Balance</th>
                 <th className="py-3 px-4">Share of Capital Fund</th>
@@ -63,6 +64,9 @@ export default function CapTableTab({ partners, summary }: CapTableTabProps) {
                     <td className="py-3.5 px-4 text-white font-mono font-medium">
                       {formatCurrency(partner.totalInvested)}
                     </td>
+                    <td className="py-3.5 px-4 text-emerald-400 font-mono font-semibold">
+                      {formatCurrency(partner.totalPayout || 0)}
+                    </td>
                     <td className="py-3.5 px-4 text-white/80 font-mono">
                       {formatCurrency(partner.totalWithdrawn)}
                     </td>
@@ -81,6 +85,7 @@ export default function CapTableTab({ partners, summary }: CapTableTabProps) {
                 <td className="py-3.5 px-4 font-sans font-normal text-neutral-400">—</td>
                 <td className="py-3.5 px-4 text-white">{summary?.totalAllocatedEquity || 0}%</td>
                 <td className="py-3.5 px-4 text-white">{formatCurrency(summary?.totalInvested || 0)}</td>
+                <td className="py-3.5 px-4 text-emerald-400">{formatCurrency(summary?.totalPayouts || 0)}</td>
                 <td className="py-3.5 px-4 text-white/80">{formatCurrency(summary?.totalWithdrawn || 0)}</td>
                 <td className="py-3.5 px-4 text-white">{formatCurrency(summary?.netActiveCapitalPool || 0)}</td>
                 <td className="py-3.5 px-4 text-white">100%</td>

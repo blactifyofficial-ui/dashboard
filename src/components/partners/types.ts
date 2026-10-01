@@ -9,6 +9,7 @@ export interface Partner {
   notes?: string | null;
   totalInvested: number;
   totalWithdrawn: number;
+  totalPayout: number;
   totalProfitShare: number;
   netCapital: number;
   transactionCount: number;
@@ -44,6 +45,7 @@ export interface PartnerTransaction {
 export interface SummaryData {
   totalInvested: number;
   totalWithdrawn: number;
+  totalPayouts: number;
   totalProfitShare: number;
   netActiveCapitalPool: number;
   totalAllocatedEquity: number;

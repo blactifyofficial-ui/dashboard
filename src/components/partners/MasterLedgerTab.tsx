@@ -69,15 +69,18 @@ export default function MasterLedgerTab({
             ) : (
               transactions.map((txn) => {
                 const isPositive = txn.type === 'INVESTMENT';
-                const isWithdrawal = txn.type === 'WITHDRAWAL' || txn.type === 'PAYOUT';
+                const isPayout = txn.type === 'PAYOUT';
+                const isWithdrawal = txn.type === 'WITHDRAWAL';
 
-                const typeBadgeStyles = 'bg-white/10 text-white/80 border-white/15';
+                const typeBadgeStyles = isPayout
+                  ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                  : 'bg-white/10 text-white/80 border-white/15';
 
                 const typeLabels = {
                   INVESTMENT: 'Capital In',
                   WITHDRAWAL: 'Withdrawal',
                   PROFIT_SHARE: 'Profit Share',
-                  PAYOUT: 'Payout',
+                  PAYOUT: 'Partner Payout',
                 }[txn.type] || txn.type;
 
                 return (
@@ -94,10 +97,11 @@ export default function MasterLedgerTab({
                       >
                         {isPositive && <ArrowUpRight size={11} />}
                         {isWithdrawal && <ArrowDownLeft size={11} />}
+                        {isPayout && <ArrowDownLeft size={11} className="text-emerald-400" />}
                         {typeLabels}
                       </span>
                     </td>
-                    <td className="py-3.5 px-4 font-bold font-mono whitespace-nowrap text-white">
+                    <td className={`py-3.5 px-4 font-bold font-mono whitespace-nowrap ${isPayout ? 'text-emerald-400' : 'text-white'}`}>
                       {isPositive ? '+' : '-'} {formatCurrency(txn.amount)}
                     </td>
                     <td className="py-3.5 px-4 text-neutral-300 whitespace-nowrap text-xs">

@@ -62,6 +62,7 @@ export async function GET() {
     // 4. Compute partner aggregates
     let totalInvestedAll = 0;
     let totalWithdrawnAll = 0;
+    let totalPayoutsAll = 0;
     let totalProfitShareAll = 0;
 
     const partnersWithStats = allPartners.map((partner) => {
@@ -71,24 +72,31 @@ export async function GET() {
         .filter((t) => t.type === 'INVESTMENT')
         .reduce((sum, t) => sum + parseFloat(t.amount || '0'), 0);
 
+      const totalPayout = pTxns
+        .filter((t) => t.type === 'PAYOUT')
+        .reduce((sum, t) => sum + parseFloat(t.amount || '0'), 0);
+
       const totalWithdrawn = pTxns
-        .filter((t) => t.type === 'WITHDRAWAL' || t.type === 'PAYOUT')
+        .filter((t) => t.type === 'WITHDRAWAL')
         .reduce((sum, t) => sum + parseFloat(t.amount || '0'), 0);
 
       const totalProfitShare = pTxns
         .filter((t) => t.type === 'PROFIT_SHARE')
         .reduce((sum, t) => sum + parseFloat(t.amount || '0'), 0);
 
-      const netCapital = totalInvested - totalWithdrawn;
+      // Net capital pool remaining = Total Invested - (Withdrawals + Payouts)
+      const netCapital = totalInvested - (totalWithdrawn + totalPayout);
 
       totalInvestedAll += totalInvested;
       totalWithdrawnAll += totalWithdrawn;
+      totalPayoutsAll += totalPayout;
       totalProfitShareAll += totalProfitShare;
 
       return {
         ...partner,
         totalInvested,
         totalWithdrawn,
+        totalPayout,
         totalProfitShare,
         netCapital,
         transactionCount: pTxns.length,
@@ -96,7 +104,7 @@ export async function GET() {
       };
     });
 
-    const netActiveCapitalPool = totalInvestedAll - totalWithdrawnAll;
+    const netActiveCapitalPool = totalInvestedAll - (totalWithdrawnAll + totalPayoutsAll);
     const totalAllocatedEquity = allPartners.reduce(
       (sum, p) => sum + parseFloat(p.equityPercentage || '0'),
       0
@@ -109,6 +117,7 @@ export async function GET() {
       summary: {
         totalInvested: totalInvestedAll,
         totalWithdrawn: totalWithdrawnAll,
+        totalPayouts: totalPayoutsAll,
         totalProfitShare: totalProfitShareAll,
         netActiveCapitalPool,
         totalAllocatedEquity,

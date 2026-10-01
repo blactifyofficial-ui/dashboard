@@ -11,6 +11,7 @@ interface PartnersOverviewTabProps {
   onOpenAddPartner: () => void;
   onAddInvestment: (partnerId: string) => void;
   onAddWithdrawal: (partnerId: string) => void;
+  onAddPayout: (partnerId: string) => void;
   onViewLedger: (partner: Partner) => void;
   onEditPartner: (partner: Partner) => void;
   onDeletePartner: (partner: Partner) => void;
@@ -23,6 +24,7 @@ export default function PartnersOverviewTab({
   onOpenAddPartner,
   onAddInvestment,
   onAddWithdrawal,
+  onAddPayout,
   onViewLedger,
   onEditPartner,
   onDeletePartner,
@@ -61,6 +63,7 @@ export default function PartnersOverviewTab({
           totalFund={totalFund}
           onAddInvestment={onAddInvestment}
           onAddWithdrawal={onAddWithdrawal}
+          onAddPayout={onAddPayout}
           onViewLedger={onViewLedger}
           onEdit={onEditPartner}
           onDelete={onDeletePartner}

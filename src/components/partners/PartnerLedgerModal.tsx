@@ -8,7 +8,7 @@ interface PartnerLedgerModalProps {
   partner: Partner | null;
   transactions: PartnerTransaction[];
   onClose: () => void;
-  onAddTransaction: (partnerId: string) => void;
+  onAddTransaction: (partnerId: string, defaultType?: 'INVESTMENT' | 'WITHDRAWAL' | 'PAYOUT') => void;
 }
 
 export default function PartnerLedgerModal({
@@ -45,22 +45,28 @@ export default function PartnerLedgerModal({
         </div>
 
         {/* Quick Metrics Bar in Modal */}
-        <div className="grid grid-cols-3 gap-3 p-4 bg-black/40 border-b border-white/5 text-center">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-4 bg-black/40 border-b border-white/5 text-center">
           <div>
             <span className="text-[11px] text-white/50 font-medium block">Total Invested</span>
-            <span className="text-base font-bold text-white font-mono">
+            <span className="text-sm sm:text-base font-bold text-white font-mono">
               {formatCurrency(partner.totalInvested)}
             </span>
           </div>
           <div>
-            <span className="text-[11px] text-white/50 font-medium block">Total Withdrawn</span>
-            <span className="text-base font-bold text-white/80 font-mono">
+            <span className="text-[11px] text-emerald-400/80 font-medium block">Payouts Taken</span>
+            <span className="text-sm sm:text-base font-bold text-emerald-400 font-mono">
+              {formatCurrency(partner.totalPayout || 0)}
+            </span>
+          </div>
+          <div>
+            <span className="text-[11px] text-white/50 font-medium block">Withdrawn</span>
+            <span className="text-sm sm:text-base font-bold text-white/80 font-mono">
               {formatCurrency(partner.totalWithdrawn)}
             </span>
           </div>
           <div>
-            <span className="text-[11px] text-white/50 font-medium block">Net Capital Balance</span>
-            <span className="text-base font-bold text-white font-mono">
+            <span className="text-[11px] text-white/50 font-medium block">Net Balance</span>
+            <span className="text-sm sm:text-base font-bold text-white font-mono">
               {formatCurrency(partner.netCapital)}
             </span>
           </div>
@@ -75,6 +81,8 @@ export default function PartnerLedgerModal({
           ) : (
             partnerTransactions.map((txn) => {
               const isPositive = txn.type === 'INVESTMENT';
+              const isPayout = txn.type === 'PAYOUT';
+
               return (
                 <div
                   key={txn.id}
@@ -82,7 +90,13 @@ export default function PartnerLedgerModal({
                 >
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full uppercase bg-white/10 text-white/80 border border-white/15">
+                      <span
+                        className={`text-[10px] font-semibold px-2 py-0.5 rounded-full uppercase border ${
+                          isPayout
+                            ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                            : 'bg-white/10 text-white/80 border-white/15'
+                        }`}
+                      >
                         {txn.type}
                       </span>
                       <span className="text-xs text-neutral-400 font-mono">{formatDisplayDate(txn.transactionDate)}</span>
@@ -102,7 +116,11 @@ export default function PartnerLedgerModal({
                   </div>
 
                   <div className="text-right shrink-0">
-                    <span className="text-sm font-bold font-mono text-white">
+                    <span
+                      className={`text-sm font-bold font-mono ${
+                        isPayout ? 'text-emerald-400' : 'text-white'
+                      }`}
+                    >
                       {isPositive ? '+' : '-'} {formatCurrency(txn.amount)}
                     </span>
                   </div>
@@ -112,18 +130,31 @@ export default function PartnerLedgerModal({
           )}
         </div>
 
-        <div className="p-4 border-t border-white/10 bg-white/[0.02] flex items-center justify-between">
-          <button
-            onClick={() => {
-              const pid = partner.id;
-              onClose();
-              onAddTransaction(pid);
-            }}
-            className="px-3.5 py-1.5 bg-white hover:bg-neutral-200 text-black rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shadow-sm"
-          >
-            <Plus size={14} />
-            <span>Record Transaction for Partner</span>
-          </button>
+        <div className="p-4 border-t border-white/10 bg-white/[0.02] flex flex-wrap items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => {
+                const pid = partner.id;
+                onClose();
+                onAddTransaction(pid, 'PAYOUT');
+              }}
+              className="px-3.5 py-1.5 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shadow-sm"
+            >
+              <Plus size={14} />
+              <span>Record Payout</span>
+            </button>
+            <button
+              onClick={() => {
+                const pid = partner.id;
+                onClose();
+                onAddTransaction(pid, 'INVESTMENT');
+              }}
+              className="px-3.5 py-1.5 bg-white hover:bg-neutral-200 text-black rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shadow-sm"
+            >
+              <Plus size={14} />
+              <span>Record Transaction</span>
+            </button>
+          </div>
           <button
             onClick={onClose}
             className="px-3.5 py-1.5 bg-white/5 hover:bg-white/10 border border-white/10 text-neutral-300 rounded-xl text-xs font-medium transition-colors"

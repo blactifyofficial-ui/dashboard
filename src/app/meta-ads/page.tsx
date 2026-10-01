@@ -396,7 +396,7 @@ export default function MetaAdsPage() {
 
   return (
     <div className="space-y-8 relative z-10 pb-12">
-      {/* Header - Matches Dashboard, Revenue, Inventory header style */}
+      {/* Header - Matches Dashboard and Revenue header style */}
       <header className="flex-none flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div className="space-y-2">
           <h1 className="text-4xl font-bold tracking-tight text-white">Meta Ads</h1>
@@ -571,7 +571,7 @@ export default function MetaAdsPage() {
 
           </div>
 
-          {/* Bottom Row: Transactions & Payment History Table - Matches Orders / Inventory table container */}
+          {/* Bottom Row: Transactions & Payment History Table - Matches Orders table container */}
           <div className="bg-white/[0.02] border border-white/5 rounded-3xl shadow-2xl relative overflow-hidden min-h-[480px] flex flex-col">
             <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent pointer-events-none"></div>
             

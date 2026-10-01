@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { db } from '@/db';
-import { orders, inventory } from '@/db/schema';
-import { eq, sql } from 'drizzle-orm';
+import { orders } from '@/db/schema';
 
 export async function POST(req: Request) {
   try {
@@ -28,7 +27,7 @@ export async function POST(req: Request) {
     // Check webhook topic
     const topic = req.headers.get('X-Shopify-Topic');
     if (topic === 'orders/create' || topic === 'orders/updated') {
-      const { id, order_number, customer, current_total_price, currency, financial_status, fulfillment_status, line_items } = payload;
+      const { id, order_number, customer, current_total_price, currency, financial_status, fulfillment_status } = payload;
       
       const customerName = customer ? `${customer.first_name || ''} ${customer.last_name || ''}`.trim() : null;
       const customerEmail = customer ? customer.email : null;
@@ -52,43 +51,6 @@ export async function POST(req: Request) {
           currency,
           financialStatus: financial_status,
           fulfillmentStatus: fulfillment_status,
-        }
-      });
-
-      if (topic === 'orders/create' && line_items && Array.isArray(line_items)) {
-        for (const item of line_items) {
-          if (item.product_id) {
-            await db.update(inventory)
-              .set({ inventoryQuantity: sql`${inventory.inventoryQuantity} - ${item.quantity || 1}` })
-              .where(eq(inventory.shopifyProductId, item.product_id.toString()));
-          }
-        }
-      }
-    }
-
-    if (topic === 'products/create' || topic === 'products/update') {
-      const { id, title, variants, image } = payload;
-      const sku = variants?.[0]?.sku || null;
-      const inventoryQuantity = variants?.[0]?.inventory_quantity || 0;
-      const price = variants?.[0]?.price || 0;
-      const imageUrl = image?.src || null;
-
-      await db.insert(inventory).values({
-        id: id.toString(),
-        shopifyProductId: id.toString(),
-        title,
-        sku,
-        inventoryQuantity: String(inventoryQuantity),
-        price: String(price),
-        imageUrl
-      }).onConflictDoUpdate({
-        target: inventory.shopifyProductId,
-        set: {
-          title,
-          sku,
-          inventoryQuantity: String(inventoryQuantity),
-          price: String(price),
-          imageUrl
         }
       });
     }

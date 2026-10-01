@@ -2,19 +2,18 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, ClipboardList, AlertCircle, Settings, Wallet, Archive, BarChart3, Megaphone, Handshake, CalendarCheck } from 'lucide-react';
+import { LayoutDashboard, AlertCircle, Settings, Wallet, BarChart3, Megaphone, Handshake, CalendarCheck, Banknote } from 'lucide-react';
 
 
 const NAV_LINKS = [
   { href: '/dashboard', label: 'Overview', icon: LayoutDashboard },
-  { href: '/orders', label: 'Orders', icon: ClipboardList },
   { href: '/revenue', label: 'Revenue', icon: BarChart3 },
   { href: '/meta-ads', label: 'Meta Ads', icon: Megaphone },
   { href: '/partners', label: 'Partners & Capital', icon: Handshake },
+  { href: '/payouts', label: 'Payouts', icon: Banknote },
   { href: '/order-issues', label: 'Issues', icon: AlertCircle },
   { href: '/expenses', label: 'Expenses', icon: Wallet },
   { href: '/monthly-expenses', label: 'Monthly Bills', icon: CalendarCheck },
-  { href: '/inventory', label: 'Inventory & Stocks', icon: Archive },
   { href: '/settings', label: 'Settings', icon: Settings },
 ];
 

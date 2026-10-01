@@ -10,14 +10,15 @@ import {
   PieChart,
   Lock,
   KeyRound,
-  Loader2
+  Loader2,
+  Banknote
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import ConfirmModal from '@/components/ConfirmModal';
 import { verifyRevenuePin } from '@/app/actions/revenuePin';
 
-import { Partner, PartnerTransaction, PaymentMethod, SummaryData } from '@/components/partners/types';
+import { Partner, PartnerTransaction, PaymentMethod, SummaryData, TransactionType } from '@/components/partners/types';
 import { formatInputDate, formatCurrency } from '@/components/partners/utils';
 import PartnerSummaryCards from '@/components/partners/PartnerSummaryCards';
 import PartnersOverviewTab from '@/components/partners/PartnersOverviewTab';
@@ -241,7 +242,7 @@ export default function PartnersPage() {
   };
 
   // Open Add Transaction Modal
-  const handleOpenAddTxn = (defaultPartnerId?: string, defaultType: 'INVESTMENT' | 'WITHDRAWAL' = 'INVESTMENT') => {
+  const handleOpenAddTxn = (defaultPartnerId?: string, defaultType: TransactionType = 'INVESTMENT') => {
     setEditingTxn(null);
     setTxnFormData({
       partnerId: defaultPartnerId || (partners.length > 0 ? partners[0].id : ''),
@@ -469,6 +470,14 @@ export default function PartnersPage() {
           </button>
 
           <button
+            onClick={() => handleOpenAddTxn(undefined, 'PAYOUT')}
+            className="px-3.5 py-2 text-xs font-semibold text-emerald-300 bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/30 rounded-xl transition-all shadow-sm flex items-center gap-1.5"
+          >
+            <Banknote size={14} />
+            <span>Record Payout</span>
+          </button>
+
+          <button
             onClick={() => handleOpenAddTxn()}
             className="px-4 py-2 text-xs font-semibold text-black bg-white hover:bg-neutral-200 rounded-xl transition-all shadow-sm flex items-center gap-1.5"
           >
@@ -566,10 +575,10 @@ export default function PartnersPage() {
                 className="bg-white/5 border border-white/10 rounded-xl px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-white/20 transition-colors"
               >
                 <option value="ALL" className="bg-neutral-900 text-white">All Types</option>
+                <option value="PAYOUT" className="bg-neutral-900 text-white">Partner Payout</option>
                 <option value="INVESTMENT" className="bg-neutral-900 text-white">Capital In</option>
                 <option value="WITHDRAWAL" className="bg-neutral-900 text-white">Withdrawal</option>
                 <option value="PROFIT_SHARE" className="bg-neutral-900 text-white">Profit Share</option>
-                <option value="PAYOUT" className="bg-neutral-900 text-white">Payout</option>
               </select>
             </div>
           )}
@@ -585,6 +594,7 @@ export default function PartnersPage() {
           onOpenAddPartner={handleOpenAddPartner}
           onAddInvestment={(partnerId) => handleOpenAddTxn(partnerId, 'INVESTMENT')}
           onAddWithdrawal={(partnerId) => handleOpenAddTxn(partnerId, 'WITHDRAWAL')}
+          onAddPayout={(partnerId) => handleOpenAddTxn(partnerId, 'PAYOUT')}
           onViewLedger={(partner) => setSelectedPartnerForLedger(partner)}
           onEditPartner={handleOpenEditPartner}
           onDeletePartner={(partner) => {
@@ -627,7 +637,7 @@ export default function PartnersPage() {
         partner={selectedPartnerForLedger}
         transactions={transactions}
         onClose={() => setSelectedPartnerForLedger(null)}
-        onAddTransaction={(partnerId) => handleOpenAddTxn(partnerId)}
+        onAddTransaction={(partnerId, defaultType) => handleOpenAddTxn(partnerId, defaultType)}
       />
 
       {/* Add / Edit Partner Modal */}
