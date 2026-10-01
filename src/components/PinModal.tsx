@@ -7,6 +7,8 @@ type PinModalProps = {
   onCancel: () => void;
   isLoading?: boolean;
   error?: string;
+  title?: string;
+  description?: string;
 };
 
 export default function PinModal({ 
@@ -14,7 +16,9 @@ export default function PinModal({
   onConfirm, 
   onCancel,
   isLoading = false,
-  error
+  error,
+  title = "Enter PIN",
+  description = "Please enter your PIN to view revenue details."
 }: PinModalProps) {
   const [pin, setPin] = useState('');
 
@@ -37,8 +41,8 @@ export default function PinModal({
         className="bg-[#1e1e1e] border border-white/10 rounded-xl w-full max-w-sm shadow-2xl overflow-hidden"
       >
         <div className="p-6">
-          <h2 className="text-xl font-semibold text-white mb-2">Enter PIN</h2>
-          <p className="text-gray-400 text-sm mb-4">Please enter your PIN to view revenue details.</p>
+          <h2 className="text-xl font-semibold text-white mb-2">{title}</h2>
+          <p className="text-gray-400 text-sm mb-4">{description}</p>
           
           <input
             type="password"

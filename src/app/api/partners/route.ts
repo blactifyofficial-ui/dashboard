@@ -33,6 +33,8 @@ export async function GET() {
       .select({
         id: partnerTransactions.id,
         partnerId: partnerTransactions.partnerId,
+        partnerName: partners.name,
+        partnerEmail: partners.email,
         type: partnerTransactions.type,
         amount: partnerTransactions.amount,
         transactionDate: partnerTransactions.transactionDate,
@@ -46,6 +48,7 @@ export async function GET() {
         createdAt: partnerTransactions.createdAt,
       })
       .from(partnerTransactions)
+      .leftJoin(partners, eq(partnerTransactions.partnerId, partners.id))
       .leftJoin(paymentMethods, eq(partnerTransactions.paymentMethodId, paymentMethods.id))
       .leftJoin(users, eq(partnerTransactions.createdById, users.id))
       .orderBy(desc(partnerTransactions.transactionDate), desc(partnerTransactions.createdAt));

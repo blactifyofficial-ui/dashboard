@@ -24,21 +24,22 @@ export default function PartnerCard({
   onDelete,
 }: PartnerCardProps) {
   const shareOfFund = totalFund > 0 ? ((partner.totalInvested / totalFund) * 100).toFixed(1) : '0.0';
+  const isActive = partner.status === 'ACTIVE';
 
   return (
-    <div className="bg-white/[0.03] border border-white/10 hover:border-white/20 rounded-2xl p-5 flex flex-col justify-between transition-all group">
+    <div className="bg-white/5 border border-white/10 hover:border-white/20 rounded-xl p-4 sm:p-5 flex flex-col justify-between transition-all duration-200 group relative">
       <div>
         {/* Card Header */}
         <div className="flex items-start justify-between gap-3">
-          <div>
-            <div className="flex items-center gap-2">
-              <h3 className="text-base font-bold text-white group-hover:text-white/90 transition-colors">
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-2">
+              <h3 className="text-base font-bold text-white truncate">
                 {partner.name}
               </h3>
               <span
                 className={`text-[10px] font-semibold px-2 py-0.5 rounded-full uppercase tracking-wider ${
-                  partner.status === 'ACTIVE'
-                    ? 'bg-white/10 text-white border border-white/15'
+                  isActive
+                    ? 'bg-white/10 text-white/80 border border-white/15'
                     : 'bg-white/5 text-white/40 border border-white/5'
                 }`}
               >
@@ -46,46 +47,46 @@ export default function PartnerCard({
               </span>
             </div>
 
-            <div className="mt-1.5 space-y-0.5 text-xs text-white/50">
+            <div className="mt-1.5 space-y-0.5 text-xs text-neutral-400">
               {partner.email && (
                 <div className="flex items-center gap-1.5 truncate">
                   <Mail size={12} className="text-white/40 shrink-0" />
-                  <span className="truncate">{partner.email}</span>
+                  <span className="truncate text-white/70">{partner.email}</span>
                 </div>
               )}
               {partner.phone && (
                 <div className="flex items-center gap-1.5">
                   <Phone size={12} className="text-white/40 shrink-0" />
-                  <span>{partner.phone}</span>
+                  <span className="text-white/70">{partner.phone}</span>
                 </div>
               )}
             </div>
           </div>
 
           {/* Equity Badge */}
-          <div className="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-white text-xs font-semibold text-right shrink-0">
-            <div>{partner.equityPercentage}%</div>
-            <div className="text-[10px] text-white/50 font-normal">Equity</div>
+          <div className="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-right shrink-0">
+            <div className="font-mono text-sm font-bold text-white">{partner.equityPercentage}%</div>
+            <div className="text-[10px] text-white/50 font-medium">Equity</div>
           </div>
         </div>
 
         {/* Capital Metrics Grid */}
-        <div className="grid grid-cols-2 gap-2 mt-4 p-3 rounded-xl bg-black/40 border border-white/5">
+        <div className="grid grid-cols-2 gap-2 mt-4 p-3 rounded-lg bg-black/40 border border-white/5">
           <div>
-            <span className="text-[11px] text-white/50 block">Total Invested</span>
-            <span className="text-sm font-semibold text-white">
+            <span className="text-[11px] text-white/50 font-medium block">Total Invested</span>
+            <span className="text-sm font-bold text-white font-mono">
               {formatCurrency(partner.totalInvested)}
             </span>
           </div>
           <div>
-            <span className="text-[11px] text-white/50 block">Withdrawn</span>
-            <span className="text-sm font-semibold text-white/70">
+            <span className="text-[11px] text-white/50 font-medium block">Withdrawn</span>
+            <span className="text-sm font-bold text-white/80 font-mono">
               {formatCurrency(partner.totalWithdrawn)}
             </span>
           </div>
           <div className="col-span-2 pt-2 border-t border-white/5 flex items-center justify-between">
-            <span className="text-xs text-white/50">Net Capital Balance</span>
-            <span className="text-sm font-bold text-white">
+            <span className="text-xs text-white/50">Net Capital Pool</span>
+            <span className="text-sm font-bold text-white font-mono">
               {formatCurrency(partner.netCapital)}
             </span>
           </div>
@@ -93,8 +94,8 @@ export default function PartnerCard({
 
         {/* Capital Share & Joined Date */}
         <div className="mt-3 flex items-center justify-between text-xs text-white/50 px-0.5">
-          <span>Fund Share: <span className="text-white font-medium">{shareOfFund}%</span></span>
-          <span>Joined: <span className="text-white/80">{formatDisplayDate(partner.joinedDate)}</span></span>
+          <span>Pool Share: <span className="text-white font-medium font-mono">{shareOfFund}%</span></span>
+          <span>Joined: <span className="text-white/70">{formatDisplayDate(partner.joinedDate)}</span></span>
         </div>
 
         {partner.notes && (
@@ -109,18 +110,18 @@ export default function PartnerCard({
         <div className="flex items-center gap-1.5">
           <button
             onClick={() => onAddInvestment(partner.id)}
-            className="px-2.5 py-1 bg-white/10 hover:bg-white/15 text-white border border-white/10 rounded-lg text-xs font-medium transition-colors flex items-center gap-1"
-            title="Add Investment"
+            className="px-2.5 py-1 text-xs font-medium text-white/90 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-colors flex items-center gap-1"
+            title="Add Capital Investment"
           >
-            <Plus size={13} />
+            <Plus size={13} className="text-white/60" />
             <span>Invest</span>
           </button>
           <button
             onClick={() => onAddWithdrawal(partner.id)}
-            className="px-2.5 py-1 bg-white/5 hover:bg-white/10 text-white/80 border border-white/10 rounded-lg text-xs font-medium transition-colors flex items-center gap-1"
-            title="Record Withdrawal"
+            className="px-2.5 py-1 text-xs font-medium text-white/90 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-colors flex items-center gap-1"
+            title="Record Capital Withdrawal"
           >
-            <ArrowDownLeft size={13} />
+            <ArrowDownLeft size={13} className="text-white/60" />
             <span>Withdraw</span>
           </button>
         </div>
@@ -128,24 +129,24 @@ export default function PartnerCard({
         <div className="flex items-center gap-1">
           <button
             onClick={() => onViewLedger(partner)}
-            className="p-1.5 text-white/40 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+            className="p-1.5 text-white/50 hover:text-white rounded-lg hover:bg-white/10 transition-colors"
             title="View Partner History"
           >
-            <History size={15} />
+            <History size={14} />
           </button>
           <button
             onClick={() => onEdit(partner)}
-            className="p-1.5 text-white/40 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+            className="p-1.5 text-white/50 hover:text-white rounded-lg hover:bg-white/10 transition-colors"
             title="Edit Partner Profile"
           >
-            <Pencil size={15} />
+            <Pencil size={14} />
           </button>
           <button
             onClick={() => onDelete(partner)}
-            className="p-1.5 text-white/40 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
+            className="p-1.5 text-white/50 hover:text-rose-400 rounded-lg hover:bg-rose-500/10 transition-colors"
             title="Delete Partner"
           >
-            <Trash2 size={15} />
+            <Trash2 size={14} />
           </button>
         </div>
       </div>

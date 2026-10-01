@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, ClipboardList, AlertCircle, Settings, Wallet, Archive, BarChart3, Megaphone, Handshake } from 'lucide-react';
+import { LayoutDashboard, ClipboardList, AlertCircle, Settings, Wallet, Archive, BarChart3, Megaphone, Handshake, CalendarCheck } from 'lucide-react';
 
 
 const NAV_LINKS = [
@@ -13,6 +13,7 @@ const NAV_LINKS = [
   { href: '/partners', label: 'Partners & Capital', icon: Handshake },
   { href: '/order-issues', label: 'Issues', icon: AlertCircle },
   { href: '/expenses', label: 'Expenses', icon: Wallet },
+  { href: '/monthly-expenses', label: 'Monthly Bills', icon: CalendarCheck },
   { href: '/inventory', label: 'Inventory & Stocks', icon: Archive },
   { href: '/settings', label: 'Settings', icon: Settings },
 ];

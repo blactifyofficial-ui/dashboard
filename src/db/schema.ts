@@ -220,5 +220,46 @@ export const partnerTransactions = pgTable('partner_transactions', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
+export const monthlyExpenseTemplates = pgTable('monthly_expense_templates', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull(),
+  defaultAmount: numeric('default_amount').default('0').notNull(),
+  dueDay: numeric('due_day').default('5').notNull(),
+  category: text('category').default('OPERATIONAL').notNull(),
+  paymentMethodId: text('payment_method_id').references(() => paymentMethods.id),
+  notes: text('notes'),
+  isActive: text('is_active').default('true').notNull(),
+  displayOrder: numeric('display_order').default('0').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
 
+export const monthlyExpenseEntries = pgTable('monthly_expense_entries', {
+  id: text('id').primaryKey(),
+  month: text('month').notNull(), // 'YYYY-MM', e.g. '2026-03'
+  templateId: text('template_id').references(() => monthlyExpenseTemplates.id),
+  name: text('name').notNull(),
+  category: text('category').default('OPERATIONAL').notNull(),
+  expectedAmount: numeric('expected_amount').default('0').notNull(),
+  actualAmount: numeric('actual_amount').default('0'),
+  dueDay: numeric('due_day'),
+  status: text('status').default('PENDING').notNull(), // 'PENDING', 'PAID', 'SKIPPED'
+  paidDate: timestamp('paid_date'),
+  paymentMethodId: text('payment_method_id').references(() => paymentMethods.id),
+  referenceNumber: text('reference_number'),
+  notes: text('notes'),
+  expenseId: text('expense_id').references(() => expenses.id),
+  paidById: text('paid_by_id').references(() => users.id),
+  createdById: text('created_by_id').references(() => users.id),
+  displayOrder: numeric('display_order').default('0').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
 
+export const monthlyExpenseMonthSettings = pgTable('monthly_expense_month_settings', {
+  month: text('month').primaryKey(), // 'YYYY-MM', e.g. '2026-03'
+  budgetLimit: numeric('budget_limit'),
+  notes: text('notes'),
+  isUnlockedManual: text('is_unlocked_manual').default('false'),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});

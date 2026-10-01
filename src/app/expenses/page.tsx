@@ -40,6 +40,16 @@ interface DateNote {
   updatedAt: string;
 }
 
+interface MonthGroup {
+  monthKey: string;
+  monthLabel: string;
+  isCurrent: boolean;
+  totalAmount: number;
+  totalRecords: number;
+  dateKeys: string[];
+  daysCount: number;
+}
+
 // Format date into a canonical key YYYY-MM-DD
 function parseDateKey(dateStr: string): string {
   if (!dateStr) return '';
@@ -52,6 +62,30 @@ function parseDateKey(dateStr: string): string {
   const month = String(d.getMonth() + 1).padStart(2, '0');
   const day = String(d.getDate()).padStart(2, '0');
   return `${year}-${month}-${day}`;
+}
+
+// Extract month key YYYY-MM from dateKey YYYY-MM-DD
+function parseMonthKeyFromDate(dateKey: string): string {
+  if (!dateKey || dateKey.length < 7) return 'unknown';
+  return dateKey.substring(0, 7);
+}
+
+// Format month key into display label and check if current month
+function formatDisplayMonth(monthKey: string): { label: string; isCurrent: boolean } {
+  if (!monthKey || monthKey === 'unknown') return { label: 'Uncategorized Month', isCurrent: false };
+  const [yearStr, monthStr] = monthKey.split('-');
+  const year = parseInt(yearStr, 10);
+  const month = parseInt(monthStr, 10);
+  if (isNaN(year) || isNaN(month)) return { label: monthKey, isCurrent: false };
+  
+  const d = new Date(year, month - 1, 1);
+  const label = d.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }); // e.g. "October 2026", "March 2026"
+
+  const now = new Date();
+  const currentMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+  const isCurrent = monthKey === currentMonthKey;
+
+  return { label, isCurrent };
 }
 
 // Format date key into user-friendly display string
@@ -98,8 +132,9 @@ export default function ExpensesPage() {
   const [showFilter, setShowFilter] = useState(false);
   const [timeSortOrder, setTimeSortOrder] = useState<'desc' | 'asc'>('desc'); // 'desc' = newest added first
 
-  // Collapsed dates state
-  const [collapsedDates, setCollapsedDates] = useState<Record<string, boolean>>({});
+  // Collapsed / Expanded state - default is collapsed (empty object)
+  const [expandedMonths, setExpandedMonths] = useState<Record<string, boolean>>({});
+  const [expandedDates, setExpandedDates] = useState<Record<string, boolean>>({});
 
   // Editing state for daily notes
   const [editingDate, setEditingDate] = useState<string | null>(null);
@@ -144,8 +179,10 @@ export default function ExpensesPage() {
   }, []);
 
   const handleStartEditNote = (dateKey: string) => {
-    // Automatically ensure the date section is expanded when editing its note
-    setCollapsedDates(prev => ({ ...prev, [dateKey]: false }));
+    const monthKey = parseMonthKeyFromDate(dateKey);
+    // Ensure both the month and the date sections are expanded when editing note
+    setExpandedMonths(prev => ({ ...prev, [monthKey]: true }));
+    setExpandedDates(prev => ({ ...prev, [dateKey]: true }));
     setEditingDate(dateKey);
     setTempNote(dateNotes[dateKey] || '');
   };
@@ -186,8 +223,15 @@ export default function ExpensesPage() {
     }
   };
 
-  const toggleCollapseDate = (dateKey: string) => {
-    setCollapsedDates(prev => ({
+  const toggleExpandMonth = (monthKey: string) => {
+    setExpandedMonths(prev => ({
+      ...prev,
+      [monthKey]: !prev[monthKey]
+    }));
+  };
+
+  const toggleExpandDate = (dateKey: string) => {
+    setExpandedDates(prev => ({
       ...prev,
       [dateKey]: !prev[dateKey]
     }));
@@ -207,43 +251,304 @@ export default function ExpensesPage() {
   });
 
   // Group filtered expenses by date
-  const groupedExpenses: Record<string, Expense[]> = {};
+  const dateGroupedExpenses: Record<string, Expense[]> = {};
   for (const exp of filteredExpenses) {
     const dateKey = parseDateKey(exp.expenseDate);
-    if (!groupedExpenses[dateKey]) {
-      groupedExpenses[dateKey] = [];
+    if (!dateGroupedExpenses[dateKey]) {
+      dateGroupedExpenses[dateKey] = [];
     }
-    groupedExpenses[dateKey].push(exp);
+    dateGroupedExpenses[dateKey].push(exp);
   }
 
-  // Sort groups by date descending (latest date first)
-  const sortedDateKeys = Object.keys(groupedExpenses).sort((a, b) => b.localeCompare(a));
-
-  // Within each group, sort expenses by adding time (createdAt)
-  for (const dateKey of sortedDateKeys) {
-    groupedExpenses[dateKey].sort((a, b) => {
+  // Within each date group, sort expenses by adding time (createdAt)
+  for (const dateKey of Object.keys(dateGroupedExpenses)) {
+    dateGroupedExpenses[dateKey].sort((a, b) => {
       const timeA = new Date(a.createdAt || 0).getTime();
       const timeB = new Date(b.createdAt || 0).getTime();
       return timeSortOrder === 'desc' ? timeB - timeA : timeA - timeB;
     });
   }
 
-  const areAllCollapsed = sortedDateKeys.length > 0 && sortedDateKeys.every(k => collapsedDates[k]);
+  // Group dates into months
+  const monthGroupsMap: Record<string, MonthGroup> = {};
+  for (const dateKey of Object.keys(dateGroupedExpenses)) {
+    const monthKey = parseMonthKeyFromDate(dateKey);
+    const items = dateGroupedExpenses[dateKey];
+    const daySum = items.reduce((sum, item) => sum + parseFloat(item.amount || '0'), 0);
+
+    if (!monthGroupsMap[monthKey]) {
+      const { label, isCurrent } = formatDisplayMonth(monthKey);
+      monthGroupsMap[monthKey] = {
+        monthKey,
+        monthLabel: label,
+        isCurrent,
+        totalAmount: 0,
+        totalRecords: 0,
+        dateKeys: [],
+        daysCount: 0
+      };
+    }
+
+    monthGroupsMap[monthKey].totalAmount += daySum;
+    monthGroupsMap[monthKey].totalRecords += items.length;
+    monthGroupsMap[monthKey].dateKeys.push(dateKey);
+  }
+
+  // Sort months descending (latest month first)
+  const sortedMonthKeys = Object.keys(monthGroupsMap).sort((a, b) => b.localeCompare(a));
+
+  // Sort dates within each month descending (latest day first)
+  for (const mKey of sortedMonthKeys) {
+    monthGroupsMap[mKey].dateKeys.sort((a, b) => b.localeCompare(a));
+    monthGroupsMap[mKey].daysCount = monthGroupsMap[mKey].dateKeys.length;
+  }
+
+  // Determine current month key YYYY-MM
+  const now = new Date();
+  const currentMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+
+  // Current month date keys (ungrouped, listed directly)
+  const currentMonthDateKeys = monthGroupsMap[currentMonthKey]?.dateKeys || [];
+
+  // Ended / Past month keys (grouped by month)
+  const pastMonthKeys = sortedMonthKeys.filter(mKey => mKey !== currentMonthKey);
+
+  const areAnyExpanded = 
+    Object.values(expandedMonths).some(Boolean) || 
+    Object.values(expandedDates).some(Boolean);
 
   const toggleCollapseAll = () => {
-    if (areAllCollapsed) {
-      setCollapsedDates({});
+    if (areAnyExpanded) {
+      setExpandedMonths({});
+      setExpandedDates({});
     } else {
-      const nextCollapsed: Record<string, boolean> = {};
-      sortedDateKeys.forEach(k => {
-        nextCollapsed[k] = true;
-      });
-      setCollapsedDates(nextCollapsed);
+      const allMonths: Record<string, boolean> = {};
+      pastMonthKeys.forEach(m => { allMonths[m] = true; });
+      const allDates: Record<string, boolean> = {};
+      for (const m of sortedMonthKeys) {
+        monthGroupsMap[m].dateKeys.forEach(d => { allDates[d] = true; });
+      }
+      setExpandedMonths(allMonths);
+      setExpandedDates(allDates);
     }
   };
 
   const calculateTotal = () => {
     return filteredExpenses.reduce((sum, exp) => sum + parseFloat(exp.amount || '0'), 0).toFixed(2);
+  };
+
+  const totalDaysTracked = Object.keys(dateGroupedExpenses).length;
+
+  // Reusable Date Card Component
+  const renderDateCard = (dateKey: string) => {
+    const items = dateGroupedExpenses[dateKey];
+    if (!items || items.length === 0) return null;
+    const { main: displayDate, relative } = formatDisplayDate(dateKey);
+    const dayTotal = items.reduce((sum, item) => sum + parseFloat(item.amount || '0'), 0).toFixed(2);
+    const currentNote = dateNotes[dateKey];
+    const isEditingThisNote = editingDate === dateKey;
+    const isSavingThisNote = savingNoteDate === dateKey;
+    const isDateExpanded = Boolean(expandedDates[dateKey]);
+
+    return (
+      <div 
+        key={dateKey} 
+        className="bg-zinc-900/60 border border-white/10 rounded-xl overflow-hidden shadow-sm transition-all"
+      >
+        {/* Date Group Header (Clickable to Toggle Collapse) */}
+        <div 
+          onClick={() => toggleExpandDate(dateKey)}
+          className={`p-3.5 sm:p-4 bg-zinc-900/90 flex flex-col sm:flex-row sm:items-center justify-between gap-3 cursor-pointer hover:bg-zinc-800/80 transition-colors select-none ${
+            isDateExpanded ? 'border-b border-white/10' : ''
+          }`}
+        >
+          <div className="flex items-center flex-wrap gap-2.5">
+            {/* Date chevron indicator */}
+            <div className="text-white/50 hover:text-white transition-colors">
+              {isDateExpanded ? (
+                <ChevronDown size={17} />
+              ) : (
+                <ChevronRight size={17} />
+              )}
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Calendar size={16} className="text-white/60" />
+              <span className="font-semibold text-sm sm:text-base text-white">{displayDate}</span>
+            </div>
+
+            {relative && (
+              <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-blue-500/20 text-blue-300 border border-blue-500/30">
+                {relative}
+              </span>
+            )}
+
+            <span className="text-xs text-white/40">
+              • {items.length} {items.length === 1 ? 'record' : 'records'}
+            </span>
+
+            {/* When collapsed, if a note exists, show a mini preview pill */}
+            {!isDateExpanded && currentNote && (
+              <span 
+                className="hidden sm:inline-flex items-center gap-1.5 text-xs text-amber-300/80 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20 max-w-xs truncate"
+                title={currentNote}
+              >
+                <FileText size={12} className="shrink-0 text-amber-400" />
+                <span className="truncate">{currentNote}</span>
+              </span>
+            )}
+          </div>
+
+          {/* Right: Daily total and Note edit action */}
+          <div className="flex items-center gap-3">
+            <div className="text-right">
+              <span className="text-xs text-white/40 block">Daily Total</span>
+              <span className="font-bold text-sm sm:text-base text-white">₹{dayTotal}</span>
+            </div>
+
+            {!isEditingThisNote && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleStartEditNote(dateKey);
+                }}
+                className={`flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-lg border transition-colors ${
+                  currentNote 
+                    ? 'bg-amber-500/10 border-amber-500/30 text-amber-300 hover:bg-amber-500/20' 
+                    : 'bg-white/5 border-white/10 text-white/60 hover:text-white hover:bg-white/10'
+                }`}
+                title={currentNote ? 'Edit note for this date' : 'Add note for this date'}
+              >
+                <FileText size={13} />
+                <span>{currentNote ? 'Edit Note' : '+ Note'}</span>
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Content Area: Collapsible Date Table & Notes */}
+        {isDateExpanded && (
+          <div>
+            {/* Daily Note Display / Editor Section */}
+            {isEditingThisNote ? (
+              <div className="p-3 bg-amber-500/5 border-b border-amber-500/20 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-medium text-amber-300 flex items-center gap-1.5">
+                    <FileText size={14} /> Note for {displayDate}
+                  </span>
+                  <span className="text-[11px] text-white/40">Visible to team</span>
+                </div>
+                <textarea
+                  value={tempNote}
+                  onChange={(e) => setTempNote(e.target.value)}
+                  placeholder="Add overall notes for this date (e.g., Shoot in Calicut, travel expenses, client dinner)..."
+                  rows={2}
+                  autoFocus
+                  className="w-full bg-black/60 border border-amber-500/30 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-amber-400 placeholder-white/30 resize-none transition-colors"
+                />
+                <div className="flex justify-end items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={handleCancelEditNote}
+                    disabled={isSavingThisNote}
+                    className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs text-white/60 hover:text-white bg-white/5 border border-white/10 transition-colors"
+                  >
+                    <X size={13} /> Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleSaveNote(dateKey)}
+                    disabled={isSavingThisNote}
+                    className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium text-black bg-amber-400 hover:bg-amber-300 transition-colors"
+                  >
+                    {isSavingThisNote ? (
+                      <>
+                        <Loader2 size={13} className="animate-spin" /> Saving...
+                      </>
+                    ) : (
+                      <>
+                        <Check size={13} /> Save Note
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            ) : currentNote ? (
+              <div className="p-3 bg-amber-500/5 border-b border-white/5 flex items-start justify-between gap-3 text-sm">
+                <div className="flex items-start gap-2 text-amber-200/90">
+                  <FileText size={15} className="mt-0.5 flex-shrink-0 text-amber-400" />
+                  <p className="whitespace-pre-wrap leading-relaxed text-xs sm:text-sm">
+                    {currentNote}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => handleStartEditNote(dateKey)}
+                  className="text-white/40 hover:text-amber-300 transition-colors p-1"
+                  title="Edit date note"
+                >
+                  <Pencil size={13} />
+                </button>
+              </div>
+            ) : null}
+
+            {/* Expenses Table for this Date */}
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-sm whitespace-nowrap">
+                <thead className="bg-white/[0.02] text-white/50 text-xs border-b border-white/5">
+                  <tr>
+                    <th className="px-6 py-2.5 font-medium flex items-center gap-1">
+                      <Clock size={12} />
+                      Adding Time
+                    </th>
+                    <th className="px-6 py-2.5 font-medium">Category</th>
+                    <th className="px-6 py-2.5 font-medium">Title</th>
+                    <th className="px-6 py-2.5 font-medium text-right">Amount</th>
+                    <th className="px-6 py-2.5 font-medium">Payment</th>
+                    <th className="px-6 py-2.5 font-medium text-right">Action</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/5">
+                  {items.map(expense => (
+                    <tr 
+                      key={expense.id} 
+                      className="hover:bg-white/[0.03] transition-colors group"
+                    >
+                      <td className="px-6 py-3.5 text-white/70 font-mono text-xs">
+                        {formatAddedTime(expense.createdAt)}
+                      </td>
+                      <td className="px-6 py-3.5">
+                        <span className="bg-white/10 px-2 py-0.5 rounded text-xs text-white/80">
+                          {expense.category || 'N/A'}
+                        </span>
+                      </td>
+                      <td className="px-6 py-3.5">
+                        <span className="font-medium text-white">{expense.title}</span>
+                      </td>
+                      <td className="px-6 py-3.5 text-right font-medium text-white">
+                        ₹{parseFloat(expense.amount || '0').toFixed(2)}
+                      </td>
+                      <td className="px-6 py-3.5 text-white/70 text-xs">
+                        {expense.paymentMethod || 'N/A'}
+                      </td>
+                      <td className="px-6 py-3.5 text-right">
+                        <Link 
+                          href={`/expenses/${expense.id}`} 
+                          className="inline-flex items-center justify-center text-white/40 group-hover:text-white transition-colors"
+                        >
+                          <ArrowRight size={16} />
+                        </Link>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+      </div>
+    );
   };
 
   return (
@@ -288,11 +593,11 @@ export default function ExpensesPage() {
             </div>
             <div className="bg-white/5 border border-white/10 rounded-xl p-4">
               <p className="text-sm text-white/60 mb-1">Days Tracked</p>
-              <p className="text-2xl font-bold">{sortedDateKeys.length}</p>
+              <p className="text-2xl font-bold">{totalDaysTracked}</p>
             </div>
           </div>
 
-          {/* Main Card with Controls & Date-Grouped Expenses */}
+          {/* Main Card with Controls & Expenses */}
           <div className="flex-1 min-h-0 flex flex-col bg-white/5 border border-white/10 rounded-xl overflow-hidden">
             {/* Filter & Search Bar */}
             <div className="flex-none p-4 border-b border-white/10 flex flex-col sm:flex-row gap-3 justify-between bg-black/50">
@@ -308,15 +613,15 @@ export default function ExpensesPage() {
               </div>
               
               <div className="flex items-center flex-wrap gap-2">
-                {/* Collapse / Expand All Dates Toggle */}
-                {sortedDateKeys.length > 0 && (
+                {/* Collapse / Expand All Toggle */}
+                {totalDaysTracked > 0 && (
                   <button
                     onClick={toggleCollapseAll}
-                    title={areAllCollapsed ? 'Expand all dates' : 'Collapse all dates'}
+                    title={areAnyExpanded ? 'Collapse all' : 'Expand all'}
                     className="flex items-center gap-1.5 text-sm px-3 py-2 rounded-lg border bg-white/5 border-white/10 text-white/80 hover:text-white hover:bg-white/10 transition-colors"
                   >
                     <ChevronsUpDown size={15} />
-                    <span>{areAllCollapsed ? 'Expand All' : 'Collapse All'}</span>
+                    <span>{areAnyExpanded ? 'Collapse All' : 'Expand All'}</span>
                   </button>
                 )}
 
@@ -362,222 +667,80 @@ export default function ExpensesPage() {
 
             {/* Scrollable Grouped Content */}
             <div className="flex-1 min-h-0 overflow-y-auto p-4 space-y-4">
-              {sortedDateKeys.length === 0 ? (
+              {totalDaysTracked === 0 ? (
                 <div className="py-16 text-center text-white/40">
                   <Calendar className="mx-auto mb-3 opacity-40" size={32} />
                   <p>No expenses found.</p>
                   <p className="text-xs text-white/30 mt-1">Try adjusting your search or click &apos;Add Expense&apos; to create one.</p>
                 </div>
               ) : (
-                sortedDateKeys.map(dateKey => {
-                  const items = groupedExpenses[dateKey];
-                  const { main: displayDate, relative } = formatDisplayDate(dateKey);
-                  const dayTotal = items.reduce((sum, item) => sum + parseFloat(item.amount || '0'), 0).toFixed(2);
-                  const currentNote = dateNotes[dateKey];
-                  const isEditingThisNote = editingDate === dateKey;
-                  const isSavingThisNote = savingNoteDate === dateKey;
-                  const isCollapsed = Boolean(collapsedDates[dateKey]);
+                <>
+                  {/* 1. Current Month Dates (Direct date cards, collapsed by default, not wrapped in a month box) */}
+                  {currentMonthDateKeys.map(dateKey => renderDateCard(dateKey))}
 
-                  return (
-                    <div 
-                      key={dateKey} 
-                      className="bg-black/40 border border-white/10 rounded-xl overflow-hidden shadow-sm transition-all"
-                    >
-                      {/* Date Group Header (Clickable to Toggle Collapse) */}
-                      <div 
-                        onClick={() => toggleCollapseDate(dateKey)}
-                        className={`p-4 bg-zinc-900/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3 cursor-pointer hover:bg-zinc-900/80 transition-colors select-none ${
-                          isCollapsed ? '' : 'border-b border-white/10'
-                        }`}
-                      >
-                        <div className="flex items-center flex-wrap gap-2.5">
-                          {/* Collapse indicator chevron */}
-                          <div className="text-white/50 hover:text-white transition-colors">
-                            {isCollapsed ? (
-                              <ChevronRight size={18} />
-                            ) : (
-                              <ChevronDown size={18} />
-                            )}
-                          </div>
-
-                          <div className="flex items-center gap-2">
-                            <Calendar size={17} className="text-white/60" />
-                            <span className="font-semibold text-base text-white">{displayDate}</span>
-                          </div>
-
-                          {relative && (
-                            <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-blue-500/20 text-blue-300 border border-blue-500/30">
-                              {relative}
-                            </span>
-                          )}
-
-                          <span className="text-xs text-white/40">
-                            • {items.length} {items.length === 1 ? 'record' : 'records'}
-                          </span>
-
-                          {/* When collapsed, if a note exists, show a mini preview pill */}
-                          {isCollapsed && currentNote && (
-                            <span 
-                              className="hidden sm:inline-flex items-center gap-1.5 text-xs text-amber-300/80 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20 max-w-xs truncate"
-                              title={currentNote}
-                            >
-                              <FileText size={12} className="shrink-0 text-amber-400" />
-                              <span className="truncate">{currentNote}</span>
-                            </span>
-                          )}
-                        </div>
-
-                        {/* Right: Daily total and Note edit action */}
-                        <div className="flex items-center gap-3">
-                          <div className="text-right">
-                            <span className="text-xs text-white/40 block">Daily Total</span>
-                            <span className="font-bold text-base text-white">₹{dayTotal}</span>
-                          </div>
-
-                          {!isEditingThisNote && (
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleStartEditNote(dateKey);
-                              }}
-                              className={`flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-lg border transition-colors ${
-                                currentNote 
-                                  ? 'bg-amber-500/10 border-amber-500/30 text-amber-300 hover:bg-amber-500/20' 
-                                  : 'bg-white/5 border-white/10 text-white/60 hover:text-white hover:bg-white/10'
-                              }`}
-                              title={currentNote ? 'Edit note for this date' : 'Add note for this date'}
-                            >
-                              <FileText size={13} />
-                              <span>{currentNote ? 'Edit Note' : '+ Note'}</span>
-                            </button>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Content Area: Collapsible */}
-                      {!isCollapsed && (
-                        <div>
-                          {/* Daily Note Display / Editor Section */}
-                          {isEditingThisNote ? (
-                            <div className="p-3 bg-amber-500/5 border-b border-amber-500/20 space-y-2">
-                              <div className="flex items-center justify-between">
-                                <span className="text-xs font-medium text-amber-300 flex items-center gap-1.5">
-                                  <FileText size={14} /> Note for {displayDate}
-                                </span>
-                                <span className="text-[11px] text-white/40">Visible to team</span>
-                              </div>
-                              <textarea
-                                value={tempNote}
-                                onChange={(e) => setTempNote(e.target.value)}
-                                placeholder="Add overall notes for this date (e.g., Shoot in Calicut, travel expenses, client dinner)..."
-                                rows={2}
-                                autoFocus
-                                className="w-full bg-black/60 border border-amber-500/30 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-amber-400 placeholder-white/30 resize-none transition-colors"
-                              />
-                              <div className="flex justify-end items-center gap-2">
-                                <button
-                                  type="button"
-                                  onClick={handleCancelEditNote}
-                                  disabled={isSavingThisNote}
-                                  className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs text-white/60 hover:text-white bg-white/5 border border-white/10 transition-colors"
-                                >
-                                  <X size={13} /> Cancel
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => handleSaveNote(dateKey)}
-                                  disabled={isSavingThisNote}
-                                  className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium text-black bg-amber-400 hover:bg-amber-300 transition-colors"
-                                >
-                                  {isSavingThisNote ? (
-                                    <>
-                                      <Loader2 size={13} className="animate-spin" /> Saving...
-                                    </>
-                                  ) : (
-                                    <>
-                                      <Check size={13} /> Save Note
-                                    </>
-                                  )}
-                                </button>
-                              </div>
-                            </div>
-                          ) : currentNote ? (
-                            <div className="p-3 bg-amber-500/5 border-b border-white/5 flex items-start justify-between gap-3 text-sm">
-                              <div className="flex items-start gap-2 text-amber-200/90">
-                                <FileText size={15} className="mt-0.5 flex-shrink-0 text-amber-400" />
-                                <p className="whitespace-pre-wrap leading-relaxed text-xs sm:text-sm">
-                                  {currentNote}
-                                </p>
-                              </div>
-                              <button
-                                type="button"
-                                onClick={() => handleStartEditNote(dateKey)}
-                                className="text-white/40 hover:text-amber-300 transition-colors p-1"
-                                title="Edit date note"
-                              >
-                                <Pencil size={13} />
-                              </button>
-                            </div>
-                          ) : null}
-
-                          {/* Expenses Table for this Date */}
-                          <div className="overflow-x-auto">
-                            <table className="w-full text-left text-sm whitespace-nowrap">
-                              <thead className="bg-white/[0.02] text-white/50 text-xs border-b border-white/5">
-                                <tr>
-                                  <th className="px-6 py-2.5 font-medium flex items-center gap-1">
-                                    <Clock size={12} />
-                                    Adding Time
-                                  </th>
-                                  <th className="px-6 py-2.5 font-medium">Category</th>
-                                  <th className="px-6 py-2.5 font-medium">Title</th>
-                                  <th className="px-6 py-2.5 font-medium text-right">Amount</th>
-                                  <th className="px-6 py-2.5 font-medium">Payment</th>
-                                  <th className="px-6 py-2.5 font-medium text-right">Action</th>
-                                </tr>
-                              </thead>
-                              <tbody className="divide-y divide-white/5">
-                                {items.map(expense => (
-                                  <tr 
-                                    key={expense.id} 
-                                    className="hover:bg-white/[0.03] transition-colors group"
-                                  >
-                                    <td className="px-6 py-3.5 text-white/70 font-mono text-xs">
-                                      {formatAddedTime(expense.createdAt)}
-                                    </td>
-                                    <td className="px-6 py-3.5">
-                                      <span className="bg-white/10 px-2 py-0.5 rounded text-xs text-white/80">
-                                        {expense.category || 'N/A'}
-                                      </span>
-                                    </td>
-                                    <td className="px-6 py-3.5">
-                                      <span className="font-medium text-white">{expense.title}</span>
-                                    </td>
-                                    <td className="px-6 py-3.5 text-right font-medium text-white">
-                                      ₹{parseFloat(expense.amount || '0').toFixed(2)}
-                                    </td>
-                                    <td className="px-6 py-3.5 text-white/70 text-xs">
-                                      {expense.paymentMethod || 'N/A'}
-                                    </td>
-                                    <td className="px-6 py-3.5 text-right">
-                                      <Link 
-                                        href={`/expenses/${expense.id}`} 
-                                        className="inline-flex items-center justify-center text-white/40 group-hover:text-white transition-colors"
-                                      >
-                                        <ArrowRight size={16} />
-                                      </Link>
-                                    </td>
-                                  </tr>
-                                ))}
-                              </tbody>
-                            </table>
-                          </div>
-                        </div>
-                      )}
+                  {/* Divider if both current month dates and past months exist */}
+                  {currentMonthDateKeys.length > 0 && pastMonthKeys.length > 0 && (
+                    <div className="pt-2 pb-1 flex items-center gap-3">
+                      <span className="text-xs font-semibold uppercase tracking-wider text-white/40">Ended Months</span>
+                      <div className="flex-1 h-px bg-white/10" />
                     </div>
-                  );
-                })
+                  )}
+
+                  {/* 2. Ended/Past Months (Grouped by month accordion, collapsed by default) */}
+                  {pastMonthKeys.map(monthKey => {
+                    const monthGroup = monthGroupsMap[monthKey];
+                    const isMonthExpanded = Boolean(expandedMonths[monthKey]);
+
+                    return (
+                      <div 
+                        key={monthKey}
+                        className="bg-zinc-950/70 border border-white/10 rounded-2xl overflow-hidden shadow-lg transition-all"
+                      >
+                        {/* Month Header (Clickable to Toggle Month Expansion) */}
+                        <div
+                          onClick={() => toggleExpandMonth(monthKey)}
+                          className={`p-4 sm:p-4.5 bg-gradient-to-r from-zinc-900 via-zinc-900/80 to-zinc-900/50 hover:bg-zinc-800/80 cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3 select-none transition-colors ${
+                            isMonthExpanded ? 'border-b border-white/10' : ''
+                          }`}
+                        >
+                          <div className="flex items-center flex-wrap gap-2.5">
+                            <div className="text-white/60 hover:text-white transition-colors">
+                              {isMonthExpanded ? (
+                                <ChevronDown size={20} />
+                              ) : (
+                                <ChevronRight size={20} />
+                              )}
+                            </div>
+
+                            <div className="flex items-center gap-2">
+                              <Calendar size={18} className="text-blue-400" />
+                              <span className="font-bold text-lg text-white">{monthGroup.monthLabel}</span>
+                            </div>
+
+                            <span className="text-xs text-white/50 bg-white/5 px-2.5 py-0.5 rounded-md border border-white/5">
+                              {monthGroup.totalRecords} {monthGroup.totalRecords === 1 ? 'record' : 'records'} • {monthGroup.daysCount} {monthGroup.daysCount === 1 ? 'day' : 'days'}
+                            </span>
+                          </div>
+
+                          {/* Monthly total */}
+                          <div className="flex items-center gap-3">
+                            <div className="text-right">
+                              <span className="text-xs text-white/40 block">Monthly Total</span>
+                              <span className="font-bold text-lg text-emerald-400">₹{monthGroup.totalAmount.toFixed(2)}</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Month Content: List of Dates in this Past Month (when expanded) */}
+                        {isMonthExpanded && (
+                          <div className="p-3 sm:p-4 space-y-3.5 bg-black/40">
+                            {monthGroup.dateKeys.map(dateKey => renderDateCard(dateKey))}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </>
               )}
             </div>
           </div>
@@ -586,3 +749,4 @@ export default function ExpensesPage() {
     </div>
   );
 }
+

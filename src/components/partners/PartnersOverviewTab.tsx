@@ -29,22 +29,22 @@ export default function PartnersOverviewTab({
 }: PartnersOverviewTabProps) {
   if (partners.length === 0) {
     return (
-      <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-12 text-center">
-        <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center mx-auto text-white/50 mb-4">
+      <div className="bg-white/5 border border-white/10 rounded-xl p-12 text-center">
+        <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center mx-auto text-neutral-400 mb-4">
           <Users size={22} />
         </div>
         <h3 className="text-base font-semibold text-white">No partners found</h3>
-        <p className="text-sm text-white/60 mt-1 max-w-md mx-auto">
+        <p className="text-xs sm:text-sm text-neutral-400 mt-1 max-w-md mx-auto">
           {searchQuery
             ? 'No partners match your search query.'
-            : 'Start by adding your business partners to track their invested capital and equity stakes.'}
+            : 'Start by registering business partners to manage their invested capital, equity allocations, and drawings.'}
         </p>
         {!searchQuery && (
           <button
             onClick={onOpenAddPartner}
-            className="mt-5 inline-flex items-center gap-2 px-4 py-2 bg-white text-black hover:bg-white/90 text-sm font-medium rounded-lg transition-colors shadow-sm"
+            className="mt-5 inline-flex items-center gap-2 px-4 py-2 bg-white hover:bg-neutral-200 text-black text-xs font-semibold rounded-xl transition-all shadow-sm"
           >
-            <Plus size={16} />
+            <Plus size={15} />
             <span>Add First Partner</span>
           </button>
         )}
@@ -53,7 +53,7 @@ export default function PartnersOverviewTab({
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
       {partners.map((partner) => (
         <PartnerCard
           key={partner.id}

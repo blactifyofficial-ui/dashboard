@@ -1,6 +1,6 @@
 'use client';
 
-import { X, Check, Loader2 } from 'lucide-react';
+import { X, Check, Loader2, Landmark } from 'lucide-react';
 import { Partner, PartnerTransaction, PaymentMethod, TransactionType } from './types';
 
 export interface TransactionFormData {
@@ -40,32 +40,37 @@ export default function TransactionModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 overflow-y-auto">
       <div className="bg-[#18181b] border border-white/10 rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden my-8">
-        <div className="p-5 border-b border-white/10 flex items-center justify-between bg-black/30">
-          <h3 className="text-lg font-bold text-white">
-            {editingTxn ? 'Edit Capital Transaction' : 'Record Capital Transaction'}
-          </h3>
+        <div className="p-4 sm:p-5 border-b border-white/10 flex items-center justify-between bg-white/[0.02]">
+          <div className="flex items-center gap-2.5">
+            <div className="p-2 rounded-xl bg-white/5 text-white/70 border border-white/10">
+              <Landmark size={16} />
+            </div>
+            <h3 className="text-base font-bold text-white">
+              {editingTxn ? 'Edit Capital Transaction' : 'Record Capital Transaction'}
+            </h3>
+          </div>
           <button
             onClick={onClose}
-            className="p-1.5 text-white/40 hover:text-white rounded-lg hover:bg-white/10 transition-colors"
+            className="p-1.5 text-neutral-400 hover:text-white rounded-lg hover:bg-white/10 transition-colors"
           >
-            <X size={18} />
+            <X size={16} />
           </button>
         </div>
 
-        <form onSubmit={onSubmit} className="p-5 space-y-4">
+        <form onSubmit={onSubmit} className="p-4 sm:p-5 space-y-4">
           <div>
-            <label className="block text-xs font-medium text-white/70 mb-1.5">
-              Select Partner <span className="text-red-400">*</span>
+            <label className="block text-xs font-semibold text-neutral-300 mb-1.5">
+              Select Partner <span className="text-rose-400">*</span>
             </label>
             <select
               required
               value={formData.partnerId}
               onChange={(e) => onChange({ ...formData, partnerId: e.target.value })}
-              className="w-full h-10 px-3 bg-white/5 border border-white/10 rounded-lg text-sm text-white focus:outline-none focus:border-white/25 transition-colors"
+              className="w-full h-10 px-3 bg-white/5 border border-white/10 rounded-xl text-xs sm:text-sm text-white focus:outline-none focus:border-white/20 transition-colors"
             >
-              <option value="" disabled className="bg-neutral-900 text-white/40">Select a partner</option>
+              <option value="" disabled className="bg-neutral-900 text-neutral-500">Select a partner</option>
               {partners.map((p) => (
                 <option key={p.id} value={p.id} className="bg-neutral-900 text-white">
                   {p.name} ({p.equityPercentage}% Equity)
@@ -76,13 +81,13 @@ export default function TransactionModal({
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-medium text-white/70 mb-1.5">
-                Transaction Type <span className="text-red-400">*</span>
+              <label className="block text-xs font-semibold text-neutral-300 mb-1.5">
+                Transaction Type <span className="text-rose-400">*</span>
               </label>
               <select
                 value={formData.type}
                 onChange={(e) => onChange({ ...formData, type: e.target.value as TransactionType })}
-                className="w-full h-10 px-3 bg-white/5 border border-white/10 rounded-lg text-sm text-white focus:outline-none focus:border-white/25 transition-colors"
+                className="w-full h-10 px-3 bg-white/5 border border-white/10 rounded-xl text-xs sm:text-sm text-white focus:outline-none focus:border-white/20 transition-colors"
               >
                 <option value="INVESTMENT" className="bg-neutral-900 text-white">Capital Investment (In)</option>
                 <option value="WITHDRAWAL" className="bg-neutral-900 text-white">Capital Withdrawal (Out)</option>
@@ -92,8 +97,8 @@ export default function TransactionModal({
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-white/70 mb-1.5">
-                Amount (₹) <span className="text-red-400">*</span>
+              <label className="block text-xs font-semibold text-neutral-300 mb-1.5">
+                Amount (₹) <span className="text-rose-400">*</span>
               </label>
               <input
                 type="number"
@@ -103,29 +108,29 @@ export default function TransactionModal({
                 placeholder="e.g. 50000"
                 value={formData.amount}
                 onChange={(e) => onChange({ ...formData, amount: e.target.value })}
-                className="w-full h-10 px-3.5 bg-white/5 border border-white/10 rounded-lg text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-white/25 transition-colors font-mono"
+                className="w-full h-10 px-3.5 bg-white/5 border border-white/10 rounded-xl text-xs sm:text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:border-white/20 transition-colors font-mono"
               />
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-medium text-white/70 mb-1.5">Transaction Date</label>
+              <label className="block text-xs font-semibold text-neutral-300 mb-1.5">Transaction Date</label>
               <input
                 type="date"
                 required
                 value={formData.transactionDate}
                 onChange={(e) => onChange({ ...formData, transactionDate: e.target.value })}
-                className="w-full h-10 px-3.5 bg-white/5 border border-white/10 rounded-lg text-sm text-white focus:outline-none focus:border-white/25 transition-colors"
+                className="w-full h-10 px-3.5 bg-white/5 border border-white/10 rounded-xl text-xs sm:text-sm text-white focus:outline-none focus:border-white/20 transition-colors"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-white/70 mb-1.5">Payment Method</label>
+              <label className="block text-xs font-semibold text-neutral-300 mb-1.5">Payment Method</label>
               <select
                 value={formData.paymentMethodId}
                 onChange={(e) => onChange({ ...formData, paymentMethodId: e.target.value })}
-                className="w-full h-10 px-3 bg-white/5 border border-white/10 rounded-lg text-sm text-white focus:outline-none focus:border-white/25 transition-colors"
+                className="w-full h-10 px-3 bg-white/5 border border-white/10 rounded-xl text-xs sm:text-sm text-white focus:outline-none focus:border-white/20 transition-colors"
               >
                 <option value="" className="bg-neutral-900 text-white">None / Cash</option>
                 {paymentMethods.map((pm) => (
@@ -138,24 +143,24 @@ export default function TransactionModal({
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-white/70 mb-1.5">Reference Number / UTR / Txn ID</label>
+            <label className="block text-xs font-semibold text-neutral-300 mb-1.5">Reference Number / UTR / Txn ID</label>
             <input
               type="text"
               placeholder="e.g. UPI/2026/09/123456 or Bank Transfer Ref"
               value={formData.referenceNumber}
               onChange={(e) => onChange({ ...formData, referenceNumber: e.target.value })}
-              className="w-full h-10 px-3.5 bg-white/5 border border-white/10 rounded-lg text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-white/25 font-mono text-xs transition-colors"
+              className="w-full h-10 px-3.5 bg-white/5 border border-white/10 rounded-xl text-xs sm:text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:border-white/20 font-mono transition-colors"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-white/70 mb-1.5">Notes & Description</label>
+            <label className="block text-xs font-semibold text-neutral-300 mb-1.5">Notes & Description</label>
             <textarea
               rows={2}
               placeholder="e.g. Initial seed capital contribution or monthly dividend payout..."
               value={formData.notes}
               onChange={(e) => onChange({ ...formData, notes: e.target.value })}
-              className="w-full p-3 bg-white/5 border border-white/10 rounded-lg text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-white/25 resize-none transition-colors"
+              className="w-full p-3 bg-white/5 border border-white/10 rounded-xl text-xs sm:text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:border-white/20 resize-none transition-colors"
             />
           </div>
 
@@ -163,16 +168,16 @@ export default function TransactionModal({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded-lg text-sm text-white/70 hover:text-white hover:bg-white/5 transition-colors font-medium"
+              className="px-3.5 py-2 rounded-xl text-xs font-medium text-neutral-300 bg-white/5 hover:bg-white/10 border border-white/10 transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-4 py-2 bg-white text-black hover:bg-neutral-200 text-sm font-medium rounded-lg flex items-center gap-1.5 transition-colors disabled:opacity-50 shadow-sm"
+              className="px-4 py-2 bg-white hover:bg-neutral-200 text-black text-xs font-semibold rounded-xl flex items-center gap-1.5 transition-all shadow-sm disabled:opacity-50"
             >
-              {isSubmitting ? <Loader2 size={16} className="animate-spin" /> : <Check size={16} />}
+              {isSubmitting ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
               <span>{editingTxn ? 'Save Changes' : 'Record Transaction'}</span>
             </button>
           </div>
