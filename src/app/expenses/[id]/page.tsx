@@ -189,7 +189,7 @@ export default function ExpenseDetailPage() {
   }
 
   return (
-    <div className="space-y-6 max-w-5xl mx-auto">
+    <div className="space-y-6 max-w-5xl mx-auto p-4 sm:p-6">
       <ConfirmModal
         isOpen={showDeleteModal}
         title="Delete Expense"
@@ -201,33 +201,33 @@ export default function ExpenseDetailPage() {
       />
 
       {/* Header */}
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-center gap-3 sm:gap-4">
           <Link
             href="/expenses"
-            className="p-2 hover:bg-white/10 rounded-lg transition-colors text-white/60 hover:text-white"
+            className="w-11 h-11 flex items-center justify-center hover:bg-white/10 rounded-lg transition-colors text-white/60 hover:text-white shrink-0"
           >
             <ArrowLeft size={20} />
           </Link>
-          <div>
-            <h1 className="text-2xl font-bold">{isEditing ? 'Edit Expense' : expense.title}</h1>
-            <p className="text-sm text-white/60">
+          <div className="min-w-0">
+            <h1 className="text-xl sm:text-2xl font-bold truncate">{isEditing ? 'Edit Expense' : expense.title}</h1>
+            <p className="text-xs sm:text-sm text-white/60 truncate">
               {isEditing ? 'Modify expense details below' : `Created ${new Date(expense.createdAt).toLocaleDateString()}`}
             </p>
           </div>
         </div>
 
         {!isEditing && (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 self-start sm:self-auto">
             <button
               onClick={() => setIsEditing(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg text-sm font-medium transition-colors"
+              className="flex items-center justify-center gap-2 px-4 h-11 min-h-[44px] bg-white/10 hover:bg-white/20 text-white rounded-lg text-sm font-medium transition-colors"
             >
               <Pencil size={16} /> Edit
             </button>
             <button
               onClick={() => setShowDeleteModal(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg text-sm font-medium transition-colors"
+              className="flex items-center justify-center gap-2 px-4 h-11 min-h-[44px] bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg text-sm font-medium transition-colors"
             >
               <Trash2 size={16} /> Delete
             </button>
@@ -240,7 +240,7 @@ export default function ExpenseDetailPage() {
         <div className="lg:col-span-2 space-y-6">
           {isEditing ? (
             /* ── Edit Form ── */
-            <div className="bg-white/5 border border-white/10 rounded-2xl p-6 space-y-5">
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-4 sm:p-6 space-y-5">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-white/60">Title</label>
@@ -249,7 +249,7 @@ export default function ExpenseDetailPage() {
                     type="text"
                     value={formData.title}
                     onChange={e => setFormData({ ...formData, title: e.target.value })}
-                    className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-white/30"
+                    className="w-full bg-white/5 border border-white/10 rounded-lg px-3.5 py-2.5 min-h-[44px] text-base md:text-sm focus:outline-none focus:border-white/30"
                   />
                 </div>
                 <div className="space-y-2">
@@ -261,7 +261,7 @@ export default function ExpenseDetailPage() {
                     min="0"
                     value={formData.amount}
                     onChange={e => setFormData({ ...formData, amount: e.target.value })}
-                    className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-white/30"
+                    className="w-full bg-white/5 border border-white/10 rounded-lg px-3.5 py-2.5 min-h-[44px] text-base md:text-sm focus:outline-none focus:border-white/30"
                   />
                 </div>
               </div>
@@ -273,11 +273,11 @@ export default function ExpenseDetailPage() {
                     required
                     value={formData.categoryId}
                     onChange={e => setFormData({ ...formData, categoryId: e.target.value })}
-                    className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-white/30"
+                    className="w-full bg-white/5 border border-white/10 rounded-lg px-3.5 py-2.5 min-h-[44px] text-base md:text-sm focus:outline-none focus:border-white/30"
                   >
-                    <option value="">Select Category</option>
+                    <option value="" className="bg-[#121212] text-white">Select Category</option>
                     {categories.map(c => (
-                      <option key={c.id} value={c.id}>{c.name}</option>
+                      <option key={c.id} value={c.id} className="bg-[#121212] text-white">{c.name}</option>
                     ))}
                   </select>
                 </div>
@@ -287,11 +287,11 @@ export default function ExpenseDetailPage() {
                     required
                     value={formData.paymentMethodId}
                     onChange={e => setFormData({ ...formData, paymentMethodId: e.target.value })}
-                    className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-white/30"
+                    className="w-full bg-white/5 border border-white/10 rounded-lg px-3.5 py-2.5 min-h-[44px] text-base md:text-sm focus:outline-none focus:border-white/30"
                   >
-                    <option value="">Select Payment</option>
+                    <option value="" className="bg-[#121212] text-white">Select Payment</option>
                     {paymentMethods.map(p => (
-                      <option key={p.id} value={p.id}>{p.name}</option>
+                      <option key={p.id} value={p.id} className="bg-[#121212] text-white">{p.name}</option>
                     ))}
                   </select>
                 </div>
@@ -304,7 +304,7 @@ export default function ExpenseDetailPage() {
                   type="date"
                   value={formData.expenseDate}
                   onChange={e => setFormData({ ...formData, expenseDate: e.target.value })}
-                  className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-white/30"
+                  className="w-full bg-white/5 border border-white/10 rounded-lg px-3.5 py-2.5 min-h-[44px] text-base md:text-sm focus:outline-none focus:border-white/30"
                 />
               </div>
 
@@ -313,7 +313,7 @@ export default function ExpenseDetailPage() {
                 <textarea
                   value={formData.description}
                   onChange={e => setFormData({ ...formData, description: e.target.value })}
-                  className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-white/30 h-20 resize-none"
+                  className="w-full bg-white/5 border border-white/10 rounded-lg px-3.5 py-2.5 text-base md:text-sm focus:outline-none focus:border-white/30 h-24 resize-none"
                 />
               </div>
 
@@ -323,21 +323,21 @@ export default function ExpenseDetailPage() {
                   type="text"
                   value={formData.referenceNumber}
                   onChange={e => setFormData({ ...formData, referenceNumber: e.target.value })}
-                  className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-white/30"
+                  className="w-full bg-white/5 border border-white/10 rounded-lg px-3.5 py-2.5 min-h-[44px] text-base md:text-sm focus:outline-none focus:border-white/30"
                 />
               </div>
 
-              <div className="flex gap-3 justify-end pt-4 border-t border-white/10">
+              <div className="flex flex-col-reverse sm:flex-row gap-3 sm:justify-end pt-4 border-t border-white/10">
                 <button
                   onClick={cancelEdit}
-                  className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white/60 hover:text-white transition-colors"
+                  className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 h-11 min-h-[44px] text-sm font-medium text-white/60 hover:text-white transition-colors"
                 >
                   <X size={16} /> Cancel
                 </button>
                 <button
                   onClick={handleSave}
                   disabled={isSubmitting}
-                  className="flex items-center gap-2 bg-white text-black px-4 py-2 rounded-lg text-sm font-medium hover:bg-white/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full sm:w-auto flex items-center justify-center gap-2 bg-white text-black px-5 h-11 min-h-[44px] rounded-lg text-sm font-medium hover:bg-white/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isSubmitting ? (
                     <><Loader2 size={16} className="animate-spin" /> Saving...</>

@@ -556,23 +556,23 @@ export default function ExpensesPage() {
       {/* Header */}
       <div className="flex-none flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold">Expenses</h1>
-          <p className="text-sm text-white/60">Manage and track your business expenses grouped by date</p>
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-white">Expenses</h1>
+          <p className="text-xs sm:text-sm text-white/60 mt-1">Manage and track your business expenses grouped by date</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5 w-full sm:w-auto">
           <Link
             href="/meta-ads"
-            className="flex items-center gap-2 bg-blue-500/10 border border-blue-500/20 text-blue-400 px-4 py-2 rounded-lg font-medium hover:bg-blue-500/20 transition-colors"
+            className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 bg-blue-500/10 border border-blue-500/20 text-blue-400 px-4 py-2.5 min-h-[44px] rounded-xl font-medium hover:bg-blue-500/20 transition-colors text-xs sm:text-sm"
           >
-            <Megaphone size={18} />
-            Meta Ads
+            <Megaphone size={16} />
+            <span>Meta Ads</span>
           </Link>
           <Link
             href="/expenses/add"
-            className="flex items-center gap-2 bg-white text-black px-4 py-2 rounded-lg font-medium hover:bg-white/90 transition-colors"
+            className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 bg-white text-black px-4 py-2.5 min-h-[44px] rounded-xl font-medium hover:bg-white/90 transition-colors text-xs sm:text-sm shadow-sm"
           >
-            <Plus size={18} />
-            Add Expense
+            <Plus size={16} />
+            <span>Add Expense</span>
           </Link>
         </div>
       </div>
@@ -582,33 +582,33 @@ export default function ExpensesPage() {
       ) : (
         <>
           {/* Top Metrics Cards */}
-          <div className="flex-none grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="bg-white/5 border border-white/10 rounded-xl p-4">
-              <p className="text-sm text-white/60 mb-1">Total Expenses</p>
-              <p className="text-2xl font-bold">₹{calculateTotal()}</p>
+          <div className="flex-none grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-4 sm:p-5">
+              <p className="text-xs sm:text-sm text-white/60 mb-1">Total Expenses</p>
+              <p className="text-xl sm:text-2xl font-bold">₹{calculateTotal()}</p>
             </div>
-            <div className="bg-white/5 border border-white/10 rounded-xl p-4">
-              <p className="text-sm text-white/60 mb-1">Total Records</p>
-              <p className="text-2xl font-bold">{filteredExpenses.length}</p>
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-4 sm:p-5">
+              <p className="text-xs sm:text-sm text-white/60 mb-1">Total Records</p>
+              <p className="text-xl sm:text-2xl font-bold">{filteredExpenses.length}</p>
             </div>
-            <div className="bg-white/5 border border-white/10 rounded-xl p-4">
-              <p className="text-sm text-white/60 mb-1">Days Tracked</p>
-              <p className="text-2xl font-bold">{totalDaysTracked}</p>
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-4 sm:p-5">
+              <p className="text-xs sm:text-sm text-white/60 mb-1">Days Tracked</p>
+              <p className="text-xl sm:text-2xl font-bold">{totalDaysTracked}</p>
             </div>
           </div>
 
           {/* Main Card with Controls & Expenses */}
-          <div className="flex-1 min-h-0 flex flex-col bg-white/5 border border-white/10 rounded-xl overflow-hidden">
+          <div className="flex-1 min-h-0 flex flex-col bg-white/5 border border-white/10 rounded-2xl overflow-hidden">
             {/* Filter & Search Bar */}
-            <div className="flex-none p-4 border-b border-white/10 flex flex-col sm:flex-row gap-3 justify-between bg-black/50">
+            <div className="flex-none p-3 sm:p-4 border-b border-white/10 flex flex-col sm:flex-row gap-2.5 sm:gap-3 justify-between bg-black/50">
               <div className="relative w-full sm:max-w-xs">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40" size={16} />
+                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/40" size={16} />
                 <input 
                   type="text" 
                   placeholder="Search expenses..." 
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-white/5 border border-white/10 rounded-lg pl-9 pr-4 py-2 text-sm focus:outline-none focus:border-white/20 transition-colors"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-2.5 min-h-[44px] text-base md:text-sm text-white focus:outline-none focus:border-white/20 transition-colors"
                 />
               </div>
               
@@ -618,7 +618,7 @@ export default function ExpensesPage() {
                   <button
                     onClick={toggleCollapseAll}
                     title={areAnyExpanded ? 'Collapse all' : 'Expand all'}
-                    className="flex items-center gap-1.5 text-sm px-3 py-2 rounded-lg border bg-white/5 border-white/10 text-white/80 hover:text-white hover:bg-white/10 transition-colors"
+                    className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 text-xs sm:text-sm px-3 py-2 min-h-[40px] rounded-xl border bg-white/5 border-white/10 text-white/80 hover:text-white hover:bg-white/10 transition-colors"
                   >
                     <ChevronsUpDown size={15} />
                     <span>{areAnyExpanded ? 'Collapse All' : 'Expand All'}</span>
@@ -629,24 +629,24 @@ export default function ExpensesPage() {
                 <button
                   onClick={() => setTimeSortOrder(prev => prev === 'desc' ? 'asc' : 'desc')}
                   title="Toggle order by adding time"
-                  className="flex items-center gap-2 text-sm px-3 py-2 rounded-lg border bg-white/5 border-white/10 text-white/80 hover:text-white hover:bg-white/10 transition-colors"
+                  className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 text-xs sm:text-sm px-3 py-2 min-h-[40px] rounded-xl border bg-white/5 border-white/10 text-white/80 hover:text-white hover:bg-white/10 transition-colors"
                 >
                   <ArrowUpDown size={15} />
                   <span>Time: {timeSortOrder === 'desc' ? 'Newest' : 'Oldest'}</span>
                 </button>
 
                 {/* Category Filter Dropdown */}
-                <div className="relative">
+                <div className="relative flex-1 sm:flex-initial">
                   <button 
                     onClick={() => setShowFilter(!showFilter)}
-                    className={`flex items-center gap-2 text-sm px-3 py-2 rounded-lg border transition-colors ${showFilter || selectedCategory !== 'All' ? 'bg-white/10 border-white/20 text-white' : 'text-white/60 hover:text-white bg-white/5 border-white/10'}`}
+                    className={`w-full sm:w-auto inline-flex items-center justify-center gap-2 text-xs sm:text-sm px-3 py-2 min-h-[40px] rounded-xl border transition-colors ${showFilter || selectedCategory !== 'All' ? 'bg-white/10 border-white/20 text-white' : 'text-white/60 hover:text-white bg-white/5 border-white/10'}`}
                   >
-                    <Filter size={16} />
-                    {selectedCategory !== 'All' ? selectedCategory : 'Category'}
+                    <Filter size={15} />
+                    <span>{selectedCategory !== 'All' ? selectedCategory : 'Category'}</span>
                   </button>
 
                   {showFilter && (
-                    <div className="absolute right-0 top-full mt-2 w-48 bg-zinc-900 border border-white/10 rounded-lg shadow-xl z-30 py-1">
+                    <div className="absolute right-0 top-full mt-2 w-48 bg-zinc-900 border border-white/10 rounded-xl shadow-xl z-30 py-1 max-h-60 overflow-y-auto">
                       {categories.map(category => (
                         <button
                           key={category as string}
@@ -654,7 +654,7 @@ export default function ExpensesPage() {
                             setSelectedCategory(category as string);
                             setShowFilter(false);
                           }}
-                          className={`w-full text-left px-4 py-2 text-sm hover:bg-white/5 transition-colors ${selectedCategory === category ? 'text-white bg-white/5 font-medium' : 'text-white/70'}`}
+                          className={`w-full text-left px-4 py-2.5 min-h-[38px] text-xs sm:text-sm hover:bg-white/5 transition-colors ${selectedCategory === category ? 'text-white bg-white/5 font-medium' : 'text-white/70'}`}
                         >
                           {category as string}
                         </button>

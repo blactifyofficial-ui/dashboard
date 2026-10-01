@@ -49,13 +49,13 @@ export default function MonthSelector({
         <button
           onClick={handlePrev}
           disabled={activeIndex <= 0}
-          className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/70 hover:text-white disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
+          className="w-10 h-10 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg bg-white/5 hover:bg-white/10 text-white/70 hover:text-white disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
           title="Previous Month"
         >
-          <ChevronLeft size={16} />
+          <ChevronLeft size={18} />
         </button>
 
-        <div className="flex items-center gap-2 px-3 py-1 bg-white/5 border border-white/10 rounded-lg">
+        <div className="flex items-center gap-2 px-3 h-10 sm:h-8 bg-white/5 border border-white/10 rounded-lg">
           <Calendar size={14} className="text-white/60" />
           <span className="text-sm font-semibold text-white">
             {months.find((m) => m.month === activeMonth)?.label || activeMonth}
@@ -65,15 +65,15 @@ export default function MonthSelector({
         <button
           onClick={handleNext}
           disabled={activeIndex >= months.length - 1}
-          className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/70 hover:text-white disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
+          className="w-10 h-10 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg bg-white/5 hover:bg-white/10 text-white/70 hover:text-white disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
           title="Next Month"
         >
-          <ChevronRight size={16} />
+          <ChevronRight size={18} />
         </button>
       </div>
 
       {/* Quick Month Filter Pills */}
-      <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
+      <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 touch-pan-x no-scrollbar">
         {months.map((m) => {
           const isSelected = m.month === activeMonth;
           const isLocked = !m.isUnlocked;
@@ -88,7 +88,7 @@ export default function MonthSelector({
                   onSelectMonth(m.month);
                 }
               }}
-              className={`flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+              className={`flex-shrink-0 px-3.5 py-2 sm:py-1.5 min-h-[36px] flex items-center justify-center rounded-lg text-xs font-medium transition-all ${
                 isSelected
                   ? 'bg-white text-black shadow-sm font-semibold'
                   : isLocked

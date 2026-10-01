@@ -118,25 +118,25 @@ export default function MonthlyExpenseList({
   return (
     <div className="flex-1 min-h-0 flex flex-col bg-white/5 border border-white/10 rounded-xl overflow-hidden shadow-sm">
       {/* Search & Filter Toolbar */}
-      <div className="flex-none p-4 border-b border-white/10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-black/40">
-        <div className="flex items-center gap-3 w-full sm:w-auto">
+      <div className="flex-none p-3 sm:p-4 border-b border-white/10 flex flex-col md:flex-row justify-between items-stretch md:items-center gap-3 bg-black/40">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
           {/* Search Box */}
           <div className="relative flex-1 sm:w-64">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40 w-4 h-4" />
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/40 w-4 h-4 pointer-events-none" />
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search expenses..."
-              className="w-full pl-9 pr-3 py-1.5 bg-white/5 border border-white/10 rounded-lg text-sm text-white placeholder:text-white/40 focus:outline-none focus:border-white/20 transition-colors"
+              className="w-full pl-10 pr-3.5 py-2.5 min-h-[44px] bg-white/5 border border-white/10 rounded-lg text-base md:text-sm text-white placeholder:text-white/40 focus:outline-none focus:border-white/20 transition-colors"
             />
           </div>
 
           {/* Filter Pills */}
-          <div className="flex items-center bg-white/5 border border-white/10 p-0.5 rounded-lg">
+          <div className="flex items-center bg-white/5 border border-white/10 p-1 rounded-lg overflow-x-auto no-scrollbar">
             <button
               onClick={() => setFilter('ALL')}
-              className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${
+              className={`flex-1 sm:flex-none px-3 py-2 sm:py-1.5 min-h-[36px] text-xs font-medium rounded-md transition-colors whitespace-nowrap ${
                 filter === 'ALL'
                   ? 'bg-white/15 text-white shadow-sm'
                   : 'text-white/60 hover:text-white'
@@ -146,7 +146,7 @@ export default function MonthlyExpenseList({
             </button>
             <button
               onClick={() => setFilter('PENDING')}
-              className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${
+              className={`flex-1 sm:flex-none px-3 py-2 sm:py-1.5 min-h-[36px] text-xs font-medium rounded-md transition-colors whitespace-nowrap ${
                 filter === 'PENDING'
                   ? 'bg-white/15 text-white shadow-sm'
                   : 'text-white/60 hover:text-white'
@@ -156,7 +156,7 @@ export default function MonthlyExpenseList({
             </button>
             <button
               onClick={() => setFilter('PAID')}
-              className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${
+              className={`flex-1 sm:flex-none px-3 py-2 sm:py-1.5 min-h-[36px] text-xs font-medium rounded-md transition-colors whitespace-nowrap ${
                 filter === 'PAID'
                   ? 'bg-white/15 text-white shadow-sm'
                   : 'text-white/60 hover:text-white'
@@ -168,29 +168,29 @@ export default function MonthlyExpenseList({
         </div>
 
         {/* Right Actions */}
-        <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+        <div className="flex items-center gap-2 w-full md:w-auto justify-end">
           <button
             onClick={onOpenTemplates}
-            className="px-3 py-1.5 text-xs font-medium text-white/70 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-colors flex items-center gap-1.5"
+            className="flex-1 sm:flex-none px-3.5 h-10 min-h-[40px] text-xs font-medium text-white/70 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-colors flex items-center justify-center gap-1.5"
           >
-            <SlidersHorizontal size={13} />
+            <SlidersHorizontal size={14} />
             <span>Templates</span>
           </button>
 
           <button
             onClick={onAddClick}
-            className="px-3.5 py-1.5 text-xs font-medium text-black bg-white hover:bg-neutral-200 rounded-lg transition-all shadow-sm flex items-center gap-1.5"
+            className="flex-1 sm:flex-none px-4 h-10 min-h-[40px] text-xs font-medium text-black bg-white hover:bg-neutral-200 rounded-lg transition-all shadow-sm flex items-center justify-center gap-1.5"
           >
-            <Plus size={14} />
+            <Plus size={15} />
             <span>Add Bill</span>
           </button>
         </div>
       </div>
 
       {/* Table Content */}
-      <div className="flex-1 overflow-y-auto min-h-0">
+      <div className="flex-1 overflow-x-auto min-h-0">
         {filteredEntries.length === 0 ? (
-          <div className="py-20 text-center text-white/40 space-y-3">
+          <div className="py-20 text-center text-white/40 space-y-3 px-4">
             <div className="w-12 h-12 mx-auto rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/40">
               <FileText size={20} />
             </div>
@@ -201,13 +201,13 @@ export default function MonthlyExpenseList({
               <div className="flex items-center justify-center gap-2 pt-2">
                 <button
                   onClick={onAddClick}
-                  className="px-3 py-1.5 text-xs font-medium text-black bg-white hover:bg-neutral-200 rounded-lg transition-all shadow-sm flex items-center gap-1.5"
+                  className="px-4 py-2 min-h-[40px] text-xs font-medium text-black bg-white hover:bg-neutral-200 rounded-lg transition-all shadow-sm flex items-center gap-1.5"
                 >
                   <Plus size={14} /> Add Bill
                 </button>
                 <button
                   onClick={onOpenTemplates}
-                  className="px-3 py-1.5 text-xs font-medium text-white/70 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-colors"
+                  className="px-4 py-2 min-h-[40px] text-xs font-medium text-white/70 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-colors"
                 >
                   Configure Templates
                 </button>
@@ -215,7 +215,7 @@ export default function MonthlyExpenseList({
             )}
           </div>
         ) : (
-          <table className="w-full text-sm text-left">
+          <table className="w-full text-sm text-left min-w-[700px]">
             <thead className="sticky top-0 bg-neutral-950/90 backdrop-blur-md text-xs text-white/50 uppercase tracking-wider border-b border-white/10 z-10">
               <tr>
                 <th className="w-12 px-4 py-3 text-center">Status</th>
@@ -251,14 +251,14 @@ export default function MonthlyExpenseList({
                             onMarkPaidClick(entry);
                           }
                         }}
-                        className={`p-1.5 rounded-md border transition-all ${
+                        className={`w-9 h-9 flex items-center justify-center mx-auto rounded-lg border transition-all ${
                           isPaid
                             ? 'bg-white text-black border-white hover:bg-neutral-200'
                             : 'bg-white/5 border-white/20 text-white/40 hover:text-white hover:border-white/40'
                         }`}
                         title={isPaid ? 'Click to mark as pending' : 'Click to mark as paid'}
                       >
-                        {isPaid ? <Check size={13} className="stroke-[3]" /> : <Circle size={13} />}
+                        {isPaid ? <Check size={14} className="stroke-[3]" /> : <Circle size={14} />}
                       </button>
                     </td>
 
@@ -269,7 +269,7 @@ export default function MonthlyExpenseList({
                           {entry.name}
                         </span>
                         {entry.notes && (
-                          <span className="text-xs text-white/40 truncate max-w-sm" title={entry.notes}>
+                          <span className="text-xs text-white/40 truncate max-w-xs sm:max-w-sm" title={entry.notes}>
                             {entry.notes}
                           </span>
                         )}
@@ -340,14 +340,14 @@ export default function MonthlyExpenseList({
                         {!isPaid ? (
                           <button
                             onClick={() => onMarkPaidClick(entry)}
-                            className="px-2.5 py-1 text-xs font-medium text-white bg-white/10 hover:bg-white/20 border border-white/15 rounded-md transition-colors"
+                            className="px-3 h-8 min-h-[32px] text-xs font-medium text-white bg-white/10 hover:bg-white/20 border border-white/15 rounded-md transition-colors"
                           >
                             Mark Paid
                           </button>
                         ) : (
                           <button
                             onClick={() => onMarkPaidClick(entry)}
-                            className="px-2 py-1 text-xs text-white/50 hover:text-white rounded-md hover:bg-white/10 transition-colors"
+                            className="px-2.5 h-8 min-h-[32px] text-xs text-white/50 hover:text-white rounded-md hover:bg-white/10 transition-colors"
                             title="Edit payment"
                           >
                             Edit Payment
@@ -356,7 +356,7 @@ export default function MonthlyExpenseList({
 
                         <button
                           onClick={() => onEditClick(entry)}
-                          className="p-1.5 text-white/40 hover:text-white rounded-md hover:bg-white/10 transition-colors"
+                          className="w-8 h-8 flex items-center justify-center text-white/40 hover:text-white rounded-md hover:bg-white/10 transition-colors"
                           title="Edit bill"
                         >
                           <Pencil size={14} />
@@ -368,7 +368,7 @@ export default function MonthlyExpenseList({
                               onDeleteEntry(entry.id);
                             }
                           }}
-                          className="p-1.5 text-white/40 hover:text-rose-400 rounded-md hover:bg-rose-500/10 transition-colors"
+                          className="w-8 h-8 flex items-center justify-center text-white/40 hover:text-rose-400 rounded-md hover:bg-rose-500/10 transition-colors"
                           title="Delete bill"
                         >
                           <Trash2 size={14} />

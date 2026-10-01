@@ -31,12 +31,12 @@ export default function SidebarNav({ onClose }: { onClose?: () => void }) {
             key={link.href}
             href={link.href}
             onClick={onClose}
-            className={`flex items-center gap-2 md:gap-3 px-3 md:px-4 py-2 md:py-3 text-sm font-medium rounded-xl transition-all duration-200 whitespace-nowrap ${isActive
+            className={`flex items-center gap-3 px-3.5 py-2.5 min-h-[44px] text-sm font-medium rounded-xl transition-all duration-200 whitespace-nowrap ${isActive
               ? 'bg-white/10 text-white'
-              : 'text-white/80 hover:bg-white/10 hover:text-white'
+              : 'text-white/80 hover:bg-white/10 hover:text-white active:bg-white/15'
               }`}
           >
-            <Icon size={18} className={`md:w-5 md:h-5 ${isActive ? 'text-white' : 'text-white/60'}`} />
+            <Icon size={19} className={`shrink-0 ${isActive ? 'text-white' : 'text-white/60'}`} />
             <span>{link.label}</span>
           </Link>
         );

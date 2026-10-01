@@ -103,21 +103,21 @@ export default function AddExpensePage() {
   }
 
   return (
-    <div className="space-y-6 max-w-2xl mx-auto">
-      <div className="flex items-center gap-4">
+    <div className="space-y-6 max-w-2xl mx-auto p-4 sm:p-6">
+      <div className="flex items-center gap-3 sm:gap-4">
         <Link 
           href="/expenses" 
-          className="p-2 hover:bg-white/10 rounded-lg transition-colors text-white/60 hover:text-white"
+          className="w-11 h-11 flex items-center justify-center hover:bg-white/10 rounded-lg transition-colors text-white/60 hover:text-white shrink-0"
         >
           <ArrowLeft size={20} />
         </Link>
-        <div>
-          <h1 className="text-2xl font-bold">Add Expense</h1>
-          <p className="text-sm text-white/60">Create a new business expense record</p>
+        <div className="min-w-0">
+          <h1 className="text-xl sm:text-2xl font-bold truncate">Add Expense</h1>
+          <p className="text-xs sm:text-sm text-white/60">Create a new business expense record</p>
         </div>
       </div>
 
-      <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
+      <div className="bg-white/5 border border-white/10 rounded-2xl p-4 sm:p-6">
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -127,11 +127,11 @@ export default function AddExpensePage() {
                   required
                   value={formData.categoryId}
                   onChange={e => setFormData({ ...formData, categoryId: e.target.value })}
-                  className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-white/30"
+                  className="w-full bg-white/5 border border-white/10 rounded-lg px-3.5 py-2.5 min-h-[44px] text-base md:text-sm focus:outline-none focus:border-white/30"
                 >
-                  <option value="">Select Category</option>
+                  <option value="" className="bg-[#121212] text-white">Select Category</option>
                   {categories.map(c => (
-                    <option key={c.id} value={c.id}>{c.name}</option>
+                    <option key={c.id} value={c.id} className="bg-[#121212] text-white">{c.name}</option>
                   ))}
                 </select>
               </div>
@@ -145,7 +145,7 @@ export default function AddExpensePage() {
                     placeholder="E.g., Software Subscriptions"
                     value={formData.customCategoryName}
                     onChange={e => setFormData({ ...formData, customCategoryName: e.target.value })}
-                    className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-white/30"
+                    className="w-full bg-white/5 border border-white/10 rounded-lg px-3.5 py-2.5 min-h-[44px] text-base md:text-sm focus:outline-none focus:border-white/30"
                   />
                 </div>
               )}
@@ -157,7 +157,7 @@ export default function AddExpensePage() {
                   type="date"
                   value={formData.expenseDate}
                   onChange={e => setFormData({ ...formData, expenseDate: e.target.value })}
-                  className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-white/30"
+                  className="w-full bg-white/5 border border-white/10 rounded-lg px-3.5 py-2.5 min-h-[44px] text-base md:text-sm focus:outline-none focus:border-white/30"
                 />
               </div>
             </div>
@@ -170,7 +170,7 @@ export default function AddExpensePage() {
                 placeholder="E.g., Petrol for delivery"
                 value={formData.title}
                 onChange={e => setFormData({ ...formData, title: e.target.value })}
-                className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-white/30"
+                className="w-full bg-white/5 border border-white/10 rounded-lg px-3.5 py-2.5 min-h-[44px] text-base md:text-sm focus:outline-none focus:border-white/30"
               />
             </div>
 
@@ -185,7 +185,7 @@ export default function AddExpensePage() {
                   placeholder="0.00"
                   value={formData.amount}
                   onChange={e => setFormData({ ...formData, amount: e.target.value })}
-                  className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-white/30"
+                  className="w-full bg-white/5 border border-white/10 rounded-lg px-3.5 py-2.5 min-h-[44px] text-base md:text-sm focus:outline-none focus:border-white/30"
                 />
               </div>
               <div className="space-y-2">
@@ -194,11 +194,11 @@ export default function AddExpensePage() {
                   required
                   value={formData.paymentMethodId}
                   onChange={e => setFormData({ ...formData, paymentMethodId: e.target.value })}
-                  className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-white/30"
+                  className="w-full bg-white/5 border border-white/10 rounded-lg px-3.5 py-2.5 min-h-[44px] text-base md:text-sm focus:outline-none focus:border-white/30"
                 >
-                  <option value="">Select Payment</option>
+                  <option value="" className="bg-[#121212] text-white">Select Payment</option>
                   {paymentMethods.map(p => (
-                    <option key={p.id} value={p.id}>{p.name}</option>
+                    <option key={p.id} value={p.id} className="bg-[#121212] text-white">{p.name}</option>
                   ))}
                 </select>
               </div>
@@ -210,7 +210,7 @@ export default function AddExpensePage() {
                 placeholder="Enter additional details..."
                 value={formData.description}
                 onChange={e => setFormData({ ...formData, description: e.target.value })}
-                className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-white/30 h-20 resize-none"
+                className="w-full bg-white/5 border border-white/10 rounded-lg px-3.5 py-2.5 text-base md:text-sm focus:outline-none focus:border-white/30 h-24 resize-none"
               />
             </div>
             
@@ -221,7 +221,7 @@ export default function AddExpensePage() {
                 placeholder="E.g., Added via web portal"
                 value={formData.initialRemark}
                 onChange={e => setFormData({ ...formData, initialRemark: e.target.value })}
-                className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-white/30"
+                className="w-full bg-white/5 border border-white/10 rounded-lg px-3.5 py-2.5 min-h-[44px] text-base md:text-sm focus:outline-none focus:border-white/30"
               />
             </div>
             
@@ -232,22 +232,22 @@ export default function AddExpensePage() {
                 placeholder="E.g., UPI123456789"
                 value={formData.referenceNumber}
                 onChange={e => setFormData({ ...formData, referenceNumber: e.target.value })}
-                className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-white/30"
+                className="w-full bg-white/5 border border-white/10 rounded-lg px-3.5 py-2.5 min-h-[44px] text-base md:text-sm focus:outline-none focus:border-white/30"
               />
             </div>
           </div>
 
-          <div className="flex gap-3 justify-end pt-4 border-t border-white/10">
+          <div className="flex flex-col-reverse sm:flex-row gap-3 sm:justify-end pt-4 border-t border-white/10">
             <Link
               href="/expenses"
-              className="px-6 h-11 flex items-center justify-center text-sm font-medium text-white/60 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
+              className="w-full sm:w-auto px-6 h-11 min-h-[44px] flex items-center justify-center text-sm font-medium text-white/60 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
             >
               Cancel
             </Link>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="h-11 flex items-center justify-center bg-white text-black px-6 rounded-lg text-sm font-medium hover:bg-white/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full sm:w-auto h-11 min-h-[44px] flex items-center justify-center bg-white text-black px-6 rounded-lg text-sm font-medium hover:bg-white/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSubmitting ? 'Saving...' : 'Save Expense'}
             </button>

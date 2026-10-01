@@ -29,14 +29,18 @@ export default async function MonthRevenuePage(props: {
   const monthDisplay = startDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 
   return (
-    <div className="space-y-8 relative z-10">
-      <header className="flex items-center gap-4">
-        <Link href="/revenue" className="p-2 rounded-full bg-white/5 hover:bg-white/10 transition-colors border border-white/10">
+    <div className="space-y-6 sm:space-y-8 relative z-10">
+      <header className="flex items-center gap-3 sm:gap-4">
+        <Link 
+          href="/revenue" 
+          aria-label="Back to Revenue"
+          className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-xl bg-white/5 hover:bg-white/10 active:bg-white/15 transition-colors border border-white/10 shrink-0"
+        >
           <ArrowLeft size={20} className="text-white" />
         </Link>
-        <div className="space-y-1">
-          <h1 className="text-3xl font-bold tracking-tight text-white">{monthDisplay} Revenue</h1>
-          <p className="text-neutral-400 text-sm">Overview and revenue breakdown for this month</p>
+        <div className="space-y-0.5 sm:space-y-1">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">{monthDisplay} Revenue</h1>
+          <p className="text-neutral-400 text-xs sm:text-sm">Overview and revenue breakdown for this month</p>
         </div>
       </header>
 
@@ -94,26 +98,26 @@ async function MonthRevenueContent({ year, month, startDate, endDate }: {
   return (
     <>
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-white/[0.02] border border-white/5 rounded-3xl p-6 shadow-xl relative overflow-hidden">
-          <div className="absolute top-0 right-0 p-4 opacity-10">
-            <CalendarDays size={100} />
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+        <div className="bg-white/[0.02] border border-white/5 rounded-3xl p-5 sm:p-6 shadow-xl relative overflow-hidden">
+          <div className="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
+            <CalendarDays size={90} />
           </div>
-          <div className="relative z-10 space-y-2">
-            <p className="text-sm font-medium text-neutral-400 uppercase tracking-wider">Total Revenue</p>
-            <p className="text-4xl font-bold text-white tracking-tight">
+          <div className="relative z-10 space-y-1.5">
+            <p className="text-xs font-medium text-neutral-400 uppercase tracking-wider">Total Revenue</p>
+            <p className="text-3xl sm:text-4xl font-bold text-white tracking-tight">
               ₹{totalRevenue.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </p>
           </div>
         </div>
         
-        <div className="bg-white/[0.02] border border-white/5 rounded-3xl p-6 shadow-xl relative overflow-hidden">
-          <div className="absolute top-0 right-0 p-4 opacity-10">
-            <Inbox size={100} />
+        <div className="bg-white/[0.02] border border-white/5 rounded-3xl p-5 sm:p-6 shadow-xl relative overflow-hidden">
+          <div className="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
+            <Inbox size={90} />
           </div>
-          <div className="relative z-10 space-y-2">
-            <p className="text-sm font-medium text-neutral-400 uppercase tracking-wider">Total Orders</p>
-            <p className="text-4xl font-bold text-white tracking-tight">
+          <div className="relative z-10 space-y-1.5">
+            <p className="text-xs font-medium text-neutral-400 uppercase tracking-wider">Total Orders</p>
+            <p className="text-3xl sm:text-4xl font-bold text-white tracking-tight">
               {monthOrders.length}
             </p>
           </div>
@@ -121,8 +125,8 @@ async function MonthRevenueContent({ year, month, startDate, endDate }: {
       </div>
 
       {/* Chart Section */}
-      <div className="bg-white/[0.02] border border-white/5 rounded-3xl p-6 shadow-2xl relative">
-        <h2 className="text-xl font-semibold text-white tracking-tight mb-6">Daily Revenue</h2>
+      <div className="bg-white/[0.02] border border-white/5 rounded-3xl p-4 sm:p-6 md:p-8 shadow-2xl relative overflow-hidden">
+        <h2 className="text-base sm:text-lg md:text-xl font-semibold text-white tracking-tight mb-4 sm:mb-6">Daily Revenue</h2>
         <RevenueChart data={chartData} />
       </div>
     </>

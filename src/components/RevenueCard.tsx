@@ -60,14 +60,14 @@ export default function RevenueCard({ totalSales }: { totalSales: number }) {
           <h2 className="text-sm font-medium text-neutral-400">Total Revenue (All Time)</h2>
           <button
             onClick={toggleVisibility}
-            className="text-neutral-400 hover:text-white transition-colors p-1"
+            className="text-neutral-400 hover:text-white active:text-white min-h-[44px] min-w-[44px] flex items-center justify-center -mr-2 rounded-lg hover:bg-white/5 active:bg-white/10 transition-colors"
             aria-label={isVisible ? "Hide revenue" : "Show revenue"}
           >
-            {isVisible ? <Eye size={18} /> : <EyeClosed size={18} />}
+            {isVisible ? <Eye size={19} /> : <EyeClosed size={19} />}
           </button>
         </div>
 
-        <p className="text-4xl md:text-5xl font-bold text-white tracking-tight relative z-10 truncate mt-auto">
+        <p className="text-3xl sm:text-4xl md:text-5xl font-bold text-white tracking-tight relative z-10 truncate mt-auto">
           {isVisible
             ? `₹${totalSales.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
             : '₹••••••••'}

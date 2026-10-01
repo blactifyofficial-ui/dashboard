@@ -364,9 +364,9 @@ export default function PayoutsPage() {
   }
 
   return (
-    <div className="flex-1 flex flex-col min-h-0 space-y-4">
+    <div className="flex-1 flex flex-col min-h-0 space-y-4 sm:space-y-6">
       {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 flex-shrink-0">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 flex-shrink-0">
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white flex items-center gap-2.5">
@@ -385,7 +385,7 @@ export default function PayoutsPage() {
         <div className="flex items-center gap-2">
           <button
             onClick={handleLock}
-            className="p-2 text-xs font-medium text-neutral-400 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 rounded-xl transition-colors flex items-center gap-1.5 shadow-sm"
+            className="p-2.5 min-h-[40px] min-w-[40px] text-xs font-medium text-neutral-400 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 rounded-xl transition-colors flex items-center justify-center gap-1.5 shadow-sm"
             title="Lock Page"
           >
             <Lock size={15} />
@@ -393,7 +393,7 @@ export default function PayoutsPage() {
 
           <button
             onClick={() => handleOpenAddPayout()}
-            className="px-4 py-2 text-xs font-semibold text-black bg-white hover:bg-neutral-200 rounded-xl transition-all shadow-sm flex items-center gap-1.5"
+            className="px-4 py-2 min-h-[40px] text-xs font-semibold text-black bg-white hover:bg-neutral-200 rounded-xl transition-all shadow-sm flex items-center gap-1.5"
           >
             <Plus size={15} />
             <span>Record Payout</span>
@@ -497,7 +497,7 @@ export default function PayoutsPage() {
                 <div className="mt-3 pt-2.5 border-t border-white/5 flex items-center justify-end">
                   <button
                     onClick={() => handleOpenAddPayout(partner.id)}
-                    className="w-full py-1.5 px-3 text-xs font-medium text-white/90 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-colors flex items-center justify-center gap-1.5 shadow-sm"
+                    className="w-full py-2 min-h-[38px] px-3 text-xs font-medium text-white/90 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-colors flex items-center justify-center gap-1.5 shadow-sm"
                   >
                     <Banknote size={13} className="text-white/60" />
                     <span>Record Payout</span>
@@ -510,55 +510,57 @@ export default function PayoutsPage() {
       </div>
 
       {/* Search & Filter Controls */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 flex-shrink-0">
-        <div className="flex items-center gap-2">
+      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 flex-shrink-0">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
           <div className="relative flex-1 sm:w-64">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500 w-3.5 h-3.5" />
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-500 w-3.5 h-3.5" />
             <input
               type="text"
               placeholder="Search by partner, UTR, notes..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-8 pr-8 py-1.5 bg-white/5 border border-white/10 rounded-xl text-xs text-white placeholder:text-neutral-500 focus:outline-none focus:border-white/20 transition-colors"
+              className="w-full pl-9 pr-8 py-2 min-h-[40px] bg-white/5 border border-white/10 rounded-xl text-base md:text-xs text-white placeholder:text-neutral-500 focus:outline-none focus:border-white/20 transition-colors"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery('')}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-white"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-white p-1"
               >
-                <X size={12} />
+                <X size={14} />
               </button>
             )}
           </div>
 
-          <select
-            value={partnerFilter}
-            onChange={(e) => setPartnerFilter(e.target.value)}
-            className="bg-white/5 border border-white/10 rounded-xl px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-white/20 transition-colors"
-          >
-            <option value="ALL" className="bg-neutral-900 text-white">All Partners</option>
-            {partners.map((p) => (
-              <option key={p.id} value={p.id} className="bg-neutral-900 text-white">
-                {p.name}
-              </option>
-            ))}
-          </select>
+          <div className="flex items-center gap-2">
+            <select
+              value={partnerFilter}
+              onChange={(e) => setPartnerFilter(e.target.value)}
+              className="flex-1 sm:flex-initial bg-white/5 border border-white/10 rounded-xl px-2.5 py-2 min-h-[40px] text-base md:text-xs text-white focus:outline-none focus:border-white/20 transition-colors"
+            >
+              <option value="ALL" className="bg-neutral-900 text-white">All Partners</option>
+              {partners.map((p) => (
+                <option key={p.id} value={p.id} className="bg-neutral-900 text-white">
+                  {p.name}
+                </option>
+              ))}
+            </select>
 
-          <select
-            value={paymentMethodFilter}
-            onChange={(e) => setPaymentMethodFilter(e.target.value)}
-            className="bg-white/5 border border-white/10 rounded-xl px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-white/20 transition-colors"
-          >
-            <option value="ALL" className="bg-neutral-900 text-white">All Payment Methods</option>
-            {paymentMethods.map((pm) => (
-              <option key={pm.id} value={pm.id} className="bg-neutral-900 text-white">
-                {pm.name}
-              </option>
-            ))}
-          </select>
+            <select
+              value={paymentMethodFilter}
+              onChange={(e) => setPaymentMethodFilter(e.target.value)}
+              className="flex-1 sm:flex-initial bg-white/5 border border-white/10 rounded-xl px-2.5 py-2 min-h-[40px] text-base md:text-xs text-white focus:outline-none focus:border-white/20 transition-colors"
+            >
+              <option value="ALL" className="bg-neutral-900 text-white">All Payment Methods</option>
+              {paymentMethods.map((pm) => (
+                <option key={pm.id} value={pm.id} className="bg-neutral-900 text-white">
+                  {pm.name}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
-        <span className="text-xs text-neutral-400 self-end sm:self-center font-mono">
+        <span className="text-xs text-neutral-400 self-end md:self-center font-mono">
           Showing {filteredPayouts.length} {filteredPayouts.length === 1 ? 'payout' : 'payouts'}
         </span>
       </div>
@@ -577,7 +579,7 @@ export default function PayoutsPage() {
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs sm:text-sm border-collapse">
+          <table className="w-full text-left text-xs sm:text-sm border-collapse min-w-[700px]">
             <thead>
               <tr className="border-b border-white/10 bg-white/[0.02] text-[11px] font-semibold text-neutral-400 uppercase tracking-wider">
                 <th className="py-3 px-4">Date</th>
@@ -604,7 +606,7 @@ export default function PayoutsPage() {
                     </p>
                     <button
                       onClick={() => handleOpenAddPayout()}
-                      className="mt-2 inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-white hover:bg-neutral-200 text-black rounded-xl text-xs font-semibold transition-all shadow-sm"
+                      className="mt-2 inline-flex items-center justify-center gap-1.5 px-4 py-2 min-h-[44px] bg-white hover:bg-neutral-200 text-black rounded-xl text-xs font-semibold transition-all shadow-sm"
                     >
                       <Plus size={14} />
                       <span>Record First Payout</span>
@@ -650,7 +652,7 @@ export default function PayoutsPage() {
                       <div className="flex items-center justify-end gap-1">
                         <button
                           onClick={() => handleOpenEditPayout(txn)}
-                          className="p-1.5 text-neutral-400 hover:text-white rounded-lg hover:bg-white/10 transition-colors"
+                          className="p-2 min-h-[36px] min-w-[36px] flex items-center justify-center text-neutral-400 hover:text-white rounded-lg hover:bg-white/10 transition-colors"
                           title="Edit payout"
                         >
                           <Pencil size={14} />
@@ -664,7 +666,7 @@ export default function PayoutsPage() {
                               partnerName: txn.partnerName || 'Partner',
                             });
                           }}
-                          className="p-1.5 text-neutral-400 hover:text-rose-400 rounded-lg hover:bg-rose-500/10 transition-colors"
+                          className="p-2 min-h-[36px] min-w-[36px] flex items-center justify-center text-neutral-400 hover:text-rose-400 rounded-lg hover:bg-rose-500/10 transition-colors"
                           title="Delete payout"
                         >
                           <Trash2 size={14} />
@@ -681,9 +683,9 @@ export default function PayoutsPage() {
 
       {/* Record / Edit Payout Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 overflow-y-auto">
-          <div className="bg-[#18181b] border border-white/10 rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden my-8">
-            <div className="p-4 sm:p-5 border-b border-white/10 flex items-center justify-between bg-white/[0.02]">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-3 sm:p-4 overflow-y-auto">
+          <div className="bg-[#18181b] border border-white/10 rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden my-auto max-h-[90dvh] flex flex-col">
+            <div className="p-4 sm:p-5 border-b border-white/10 flex items-center justify-between bg-white/[0.02] flex-shrink-0">
               <div className="flex items-center gap-2.5">
                 <div className="p-2 rounded-xl bg-white/5 text-white/70 border border-white/10">
                   <Banknote size={16} />
@@ -694,13 +696,13 @@ export default function PayoutsPage() {
               </div>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="p-1.5 text-neutral-400 hover:text-white rounded-lg hover:bg-white/10 transition-colors"
+                className="p-2 min-h-[40px] min-w-[40px] flex items-center justify-center text-neutral-400 hover:text-white rounded-lg hover:bg-white/10 transition-colors"
               >
                 <X size={16} />
               </button>
             </div>
 
-            <form onSubmit={handleSubmitPayout} className="p-4 sm:p-5 space-y-4">
+            <form onSubmit={handleSubmitPayout} className="p-4 sm:p-5 space-y-4 overflow-y-auto flex-1">
               <div>
                 <label className="block text-xs font-semibold text-neutral-300 mb-1.5">
                   Select Partner <span className="text-rose-400">*</span>
@@ -709,7 +711,7 @@ export default function PayoutsPage() {
                   required
                   value={formData.partnerId}
                   onChange={(e) => setFormData({ ...formData, partnerId: e.target.value })}
-                  className="w-full h-10 px-3 bg-white/5 border border-white/10 rounded-xl text-xs sm:text-sm text-white focus:outline-none focus:border-white/20 transition-colors"
+                  className="w-full min-h-[44px] px-3 bg-[#2a2a2a] border border-white/10 rounded-xl text-base sm:text-sm text-white focus:outline-none focus:border-white/20 transition-colors"
                 >
                   <option value="" disabled className="bg-neutral-900 text-neutral-500">Select a partner</option>
                   {partners.map((p) => (
@@ -727,13 +729,14 @@ export default function PayoutsPage() {
                   </label>
                   <input
                     type="number"
+                    inputMode="decimal"
                     step="0.01"
                     min="1"
                     required
                     placeholder="e.g. 50000"
                     value={formData.amount}
                     onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                    className="w-full h-10 px-3.5 bg-white/5 border border-white/10 rounded-xl text-xs sm:text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:border-white/20 transition-colors font-mono"
+                    className="w-full min-h-[44px] px-3.5 bg-white/5 border border-white/10 rounded-xl text-base sm:text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:border-white/20 transition-colors font-mono"
                   />
                 </div>
 
@@ -744,7 +747,7 @@ export default function PayoutsPage() {
                     required
                     value={formData.transactionDate}
                     onChange={(e) => setFormData({ ...formData, transactionDate: e.target.value })}
-                    className="w-full h-10 px-3.5 bg-white/5 border border-white/10 rounded-xl text-xs sm:text-sm text-white focus:outline-none focus:border-white/20 transition-colors"
+                    className="w-full min-h-[44px] px-3.5 bg-white/5 border border-white/10 rounded-xl text-base sm:text-sm text-white focus:outline-none focus:border-white/20 transition-colors"
                   />
                 </div>
               </div>
@@ -754,7 +757,7 @@ export default function PayoutsPage() {
                 <select
                   value={formData.paymentMethodId}
                   onChange={(e) => setFormData({ ...formData, paymentMethodId: e.target.value })}
-                  className="w-full h-10 px-3 bg-white/5 border border-white/10 rounded-xl text-xs sm:text-sm text-white focus:outline-none focus:border-white/20 transition-colors"
+                  className="w-full min-h-[44px] px-3 bg-[#2a2a2a] border border-white/10 rounded-xl text-base sm:text-sm text-white focus:outline-none focus:border-white/20 transition-colors"
                 >
                   <option value="" className="bg-neutral-900 text-white">None / Cash</option>
                   {paymentMethods.map((pm) => (
@@ -772,33 +775,33 @@ export default function PayoutsPage() {
                   placeholder="e.g. UPI/2026/10/123456 or Bank Ref"
                   value={formData.referenceNumber}
                   onChange={(e) => setFormData({ ...formData, referenceNumber: e.target.value })}
-                  className="w-full h-10 px-3.5 bg-white/5 border border-white/10 rounded-xl text-xs sm:text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:border-white/20 font-mono transition-colors"
+                  className="w-full min-h-[44px] px-3.5 bg-white/5 border border-white/10 rounded-xl text-base sm:text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:border-white/20 font-mono transition-colors"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-neutral-300 mb-1.5">Notes & Remarks</label>
+                <label className="block text-xs font-semibold text-neutral-300 mb-1.5">Notes &amp; Remarks</label>
                 <textarea
                   rows={2}
                   placeholder="e.g. Monthly dividend transfer / profit payout..."
                   value={formData.notes}
                   onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                  className="w-full p-3 bg-white/5 border border-white/10 rounded-xl text-xs sm:text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:border-white/20 resize-none transition-colors"
+                  className="w-full p-3 bg-white/5 border border-white/10 rounded-xl text-base sm:text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:border-white/20 resize-none transition-colors"
                 />
               </div>
 
-              <div className="pt-3 border-t border-white/10 flex items-center justify-end gap-2.5">
+              <div className="pt-3 border-t border-white/10 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2.5">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-3.5 py-2 rounded-xl text-xs font-medium text-neutral-300 bg-white/5 hover:bg-white/10 border border-white/10 transition-colors"
+                  className="px-4 py-2.5 min-h-[44px] rounded-xl text-xs font-medium text-neutral-300 bg-white/5 hover:bg-white/10 border border-white/10 transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="px-4 py-2 bg-white hover:bg-neutral-200 text-black text-xs font-semibold rounded-xl flex items-center gap-1.5 transition-all shadow-sm disabled:opacity-50"
+                  className="px-4 py-2.5 min-h-[44px] bg-white hover:bg-neutral-200 text-black text-xs font-semibold rounded-xl flex items-center justify-center gap-1.5 transition-all shadow-sm disabled:opacity-50"
                 >
                   {isSubmitting ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
                   <span>{editingPayout ? 'Save Changes' : 'Record Payout'}</span>

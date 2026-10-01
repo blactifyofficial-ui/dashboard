@@ -33,11 +33,11 @@ export default function UnlockMonthModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-neutral-900 border border-white/10 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl">
+      <div className="bg-neutral-900 border border-white/10 rounded-2xl w-full max-w-md max-h-[90dvh] flex flex-col overflow-hidden shadow-2xl">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-white/5">
+        <div className="flex items-center justify-between px-5 sm:px-6 py-4 border-b border-white/10 bg-white/5 shrink-0">
           <div className="flex items-center gap-2">
-            <div className="p-2 rounded-xl bg-white/5 text-neutral-400 border border-white/10">
+            <div className="p-2 rounded-xl bg-white/5 text-neutral-400 border border-white/10 shrink-0">
               <Lock size={16} />
             </div>
             <div>
@@ -47,14 +47,14 @@ export default function UnlockMonthModal({
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 text-neutral-400 hover:text-white rounded-lg hover:bg-white/10 transition-colors"
+            className="w-10 h-10 flex items-center justify-center text-neutral-400 hover:text-white rounded-lg hover:bg-white/10 transition-colors shrink-0"
           >
             <X size={18} />
           </button>
         </div>
 
         {/* Content */}
-        <div className="p-6 space-y-4 text-center">
+        <div className="p-5 sm:p-6 space-y-4 text-center overflow-y-auto flex-1">
           <div className="w-14 h-14 mx-auto rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-neutral-400">
             <Clock size={28} />
           </div>
@@ -76,11 +76,11 @@ export default function UnlockMonthModal({
           </div>
 
           {/* Action buttons */}
-          <div className="pt-2 flex items-center justify-end gap-2">
+          <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-2 border-t border-white/10">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-xs font-medium text-neutral-400 hover:text-white rounded-xl hover:bg-white/10 transition-colors"
+              className="px-4 h-11 min-h-[44px] text-xs font-medium text-neutral-400 hover:text-white rounded-xl hover:bg-white/10 transition-colors flex items-center justify-center"
             >
               Wait for 30th
             </button>
@@ -88,7 +88,7 @@ export default function UnlockMonthModal({
               type="button"
               onClick={handleUnlock}
               disabled={isUnlocking}
-              className="px-4 py-2 text-xs font-semibold text-black bg-white hover:bg-neutral-200 disabled:opacity-50 rounded-xl transition-all shadow-sm flex items-center gap-1.5"
+              className="px-5 h-11 min-h-[44px] text-xs font-semibold text-black bg-white hover:bg-neutral-200 disabled:opacity-50 rounded-xl transition-all shadow-sm flex items-center justify-center gap-1.5"
             >
               <Unlock size={14} />
               {isUnlocking ? 'Unlocking...' : 'Unlock Early Now'}

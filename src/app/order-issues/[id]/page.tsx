@@ -236,7 +236,7 @@ export default function IssueDetail() {
       {/* Order Modal */}
       {isOrderModalOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm p-3 sm:p-4">
-          <div className="bg-[#141414] border border-white/8 rounded-2xl w-full max-w-2xl shadow-2xl overflow-hidden flex flex-col max-h-[95vh] sm:max-h-[90vh]">
+          <div className="bg-[#141414] border border-white/8 rounded-2xl w-full max-w-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90dvh]">
             <div className="px-4 py-4 sm:px-6 sm:py-5 border-b border-white/8 flex justify-between items-center shrink-0">
               <div>
                 <h2 className="text-base sm:text-lg font-semibold text-white">Order Details</h2>
@@ -244,7 +244,7 @@ export default function IssueDetail() {
               </div>
               <button
                 onClick={() => setIsOrderModalOpen(false)}
-                className="w-8 h-8 flex items-center justify-center rounded-lg bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-all"
+                className="w-10 h-10 min-h-[40px] min-w-[40px] flex items-center justify-center rounded-lg bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-all"
               >
                 <X size={16} />
               </button>
@@ -290,19 +290,19 @@ export default function IssueDetail() {
                         {shopifyOrder.customer?.email && (
                           <div className="flex items-center gap-2 text-xs text-gray-400 mt-1">
                             <span className="truncate">{shopifyOrder.customer.email}</span>
-                            <a href={`mailto:${shopifyOrder.customer.email}`} className="text-blue-400 hover:text-blue-300 shrink-0" title="Mail">
-                              <Mail size={12} />
+                            <a href={`mailto:${shopifyOrder.customer.email}`} className="p-1 min-h-[32px] min-w-[32px] flex items-center justify-center text-blue-400 hover:text-blue-300 shrink-0" title="Mail">
+                              <Mail size={14} />
                             </a>
                           </div>
                         )}
                         {shopifyOrder.customer?.phone && (
                           <div className="flex items-center gap-2 text-xs text-gray-400 mt-1">
                             <span>{shopifyOrder.customer.phone}</span>
-                            <a href={`tel:${shopifyOrder.customer.phone}`} className="text-green-400 hover:text-green-300" title="Call">
-                              <Phone size={12} />
+                            <a href={`tel:${shopifyOrder.customer.phone}`} className="p-1 min-h-[32px] min-w-[32px] flex items-center justify-center text-green-400 hover:text-green-300" title="Call">
+                              <Phone size={14} />
                             </a>
-                            <a href={`https://wa.me/${shopifyOrder.customer.phone.replace(/[^0-9]/g, '')}`} target="_blank" rel="noopener noreferrer" className="text-green-500 hover:text-green-400" title="WhatsApp">
-                              <MessageCircle size={12} />
+                            <a href={`https://wa.me/${shopifyOrder.customer.phone.replace(/[^0-9]/g, '')}`} target="_blank" rel="noopener noreferrer" className="p-1 min-h-[32px] min-w-[32px] flex items-center justify-center text-green-500 hover:text-green-400" title="WhatsApp">
+                              <MessageCircle size={14} />
                             </a>
                           </div>
                         )}
@@ -319,11 +319,11 @@ export default function IssueDetail() {
                             {shopifyOrder.shipping_address.phone && (
                               <div className="mt-1.5 flex items-center gap-2 text-gray-400">
                                 <span>Phone: {shopifyOrder.shipping_address.phone}</span>
-                                <a href={`tel:${shopifyOrder.shipping_address.phone}`} className="text-green-400 hover:text-green-300" title="Call">
-                                  <Phone size={12} />
+                                <a href={`tel:${shopifyOrder.shipping_address.phone}`} className="p-1 min-h-[32px] min-w-[32px] flex items-center justify-center text-green-400 hover:text-green-300" title="Call">
+                                  <Phone size={14} />
                                 </a>
-                                <a href={`https://wa.me/${shopifyOrder.shipping_address.phone.replace(/[^0-9]/g, '')}`} target="_blank" rel="noopener noreferrer" className="text-green-500 hover:text-green-400" title="WhatsApp">
-                                  <MessageCircle size={12} />
+                                <a href={`https://wa.me/${shopifyOrder.shipping_address.phone.replace(/[^0-9]/g, '')}`} target="_blank" rel="noopener noreferrer" className="p-1 min-h-[32px] min-w-[32px] flex items-center justify-center text-green-500 hover:text-green-400" title="WhatsApp">
+                                  <MessageCircle size={14} />
                                 </a>
                               </div>
                             )}
@@ -382,7 +382,7 @@ export default function IssueDetail() {
             <div className="px-4 py-3 sm:px-6 sm:py-4 border-t border-white/8 flex justify-end shrink-0">
               <button
                 onClick={() => setIsOrderModalOpen(false)}
-                className="px-5 py-2 bg-white/8 hover:bg-white/12 text-white rounded-lg transition-colors text-sm font-medium border border-white/8"
+                className="px-5 py-2.5 min-h-[44px] bg-white/8 hover:bg-white/12 text-white rounded-xl transition-colors text-sm font-medium border border-white/8"
               >
                 Close
               </button>
@@ -393,7 +393,7 @@ export default function IssueDetail() {
 
       <div className="max-w-6xl mx-auto px-3 sm:px-6 py-5 sm:py-8">
         {/* Hero header */}
-        <div className="mb-6 sm:mb-8 flex flex-wrap sm:flex-nowrap items-start justify-between gap-4">
+        <div className="mb-6 sm:mb-8 flex flex-col sm:flex-row sm:items-start justify-between gap-4">
           <div>
             <div className="flex flex-wrap items-center gap-2 mb-3">
               <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-blue-500/12 text-blue-400 border border-blue-500/20">
@@ -415,7 +415,7 @@ export default function IssueDetail() {
           
           <button
             onClick={() => setDeleteModalOpen(true)}
-            className="flex items-center gap-1.5 px-3.5 py-2 border border-red-500/20 bg-red-500/8 text-red-400 rounded-lg hover:bg-red-500/15 text-sm font-medium transition-all shrink-0"
+            className="flex items-center justify-center gap-1.5 px-4 py-2.5 min-h-[44px] border border-red-500/20 bg-red-500/8 text-red-400 rounded-xl hover:bg-red-500/15 text-sm font-medium transition-all shrink-0 w-full sm:w-auto"
           >
             <Trash2 size={14} />
             <span>Delete Issue</span>
@@ -506,7 +506,7 @@ export default function IssueDetail() {
                   <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Add Remark</h3>
                   <textarea
                     rows={3}
-                    className="w-full bg-white/4 border border-white/8 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 resize-none transition-all mb-3"
+                    className="w-full bg-white/4 border border-white/8 rounded-xl px-4 py-3 text-base md:text-sm text-white placeholder-gray-600 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 resize-none transition-all mb-3"
                     placeholder="Leave a note on this issue..."
                     value={newRemark}
                     onChange={e => setNewRemark(e.target.value)}
@@ -514,7 +514,7 @@ export default function IssueDetail() {
                   <button
                     onClick={handleAddRemark}
                     disabled={isSubmitting || !newRemark.trim()}
-                    className="px-4 py-2 bg-white text-black rounded-lg text-sm font-semibold hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                    className="px-5 py-2.5 min-h-[44px] bg-white text-black rounded-xl text-sm font-semibold hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
                   >
                     {isSubmitting ? 'Posting...' : 'Post Remark'}
                   </button>
@@ -534,23 +534,23 @@ export default function IssueDetail() {
                 <div>
                   <label className="block text-xs text-gray-500 mb-2">Status</label>
                   <select
-                    className="w-full bg-white/4 border border-white/8 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full min-h-[44px] bg-[#2a2a2a] border border-white/8 rounded-xl px-3 py-2.5 text-base md:text-sm text-white focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     value={issue.status}
                     onChange={e => handleStatusChange(e.target.value)}
                     disabled={isSubmitting || issue.status === 'CLOSED'}
                   >
-                    <option value="OPEN">Open</option>
-                    <option value="IN_PROGRESS">In Progress</option>
-                    <option value="WAITING">Waiting</option>
-                    <option value="RESOLVED">Resolved</option>
-                    <option value="CLOSED">Closed</option>
-                    <option value="CANCELLED">Cancelled</option>
+                    <option value="OPEN" className="bg-neutral-900">Open</option>
+                    <option value="IN_PROGRESS" className="bg-neutral-900">In Progress</option>
+                    <option value="WAITING" className="bg-neutral-900">Waiting</option>
+                    <option value="RESOLVED" className="bg-neutral-900">Resolved</option>
+                    <option value="CLOSED" className="bg-neutral-900">Closed</option>
+                    <option value="CANCELLED" className="bg-neutral-900">Cancelled</option>
                   </select>
                 </div>
 
                 <div>
                   <label className="block text-xs text-gray-500 mb-2">Assigned To</label>
-                  <div className="flex items-center gap-2 px-3 py-2 bg-white/4 border border-white/8 rounded-lg opacity-60">
+                  <div className="flex items-center gap-2 px-3 py-2.5 min-h-[44px] bg-white/4 border border-white/8 rounded-xl opacity-60">
                     <User size={13} className="text-gray-500 shrink-0" />
                     <span className="text-sm text-gray-300">{issue.assignedToId ? 'Staff Assigned' : 'Unassigned'}</span>
                   </div>
@@ -558,7 +558,7 @@ export default function IssueDetail() {
 
                 <div>
                   <label className="block text-xs text-gray-500 mb-2">Last Updated</label>
-                  <div className="flex items-center gap-2 text-sm text-gray-300">
+                  <div className="flex items-center gap-2 text-sm text-gray-300 min-h-[40px]">
                     <Clock size={13} className="text-gray-500 shrink-0" />
                     <span className="text-xs">{new Date(issue.updatedAt).toLocaleString()}</span>
                   </div>
@@ -572,9 +572,10 @@ export default function IssueDetail() {
                 <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Order</h3>
                 <button
                   onClick={handleOpenOrderModal}
-                  className="flex items-center gap-1 text-xs text-blue-400 hover:text-blue-300 transition-colors"
+                  className="flex items-center gap-1.5 text-xs text-blue-400 hover:text-blue-300 transition-colors p-1.5 min-h-[36px]"
                 >
-                  View full <ExternalLink size={11} />
+                  <span>View full</span>
+                  <ExternalLink size={12} />
                 </button>
               </div>
               <div className="px-4 sm:px-5 py-4 space-y-4">

@@ -49,10 +49,10 @@ export default function InstallPWA() {
   return (
     <button
       onClick={handleInstallClick}
-      className="inline-flex items-center gap-2 bg-white text-black px-6 py-2 rounded-lg font-medium hover:bg-gray-200 transition-colors mt-4"
+      className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-white text-black px-6 py-3 min-h-[44px] rounded-xl font-semibold text-sm hover:bg-neutral-200 active:bg-neutral-300 transition-colors mt-4 shadow-sm"
     >
-      <Download size={18} />
-      Install App
+      <Download size={18} className="shrink-0" />
+      <span>Install App</span>
     </button>
   );
 }

@@ -25,9 +25,10 @@ body {
 }
 
 html {
-  /* Removed font-size: 85% to restore native mobile text scaling and touch target proportions */
+  -webkit-tap-highlight-color: transparent;
 }
 
-* {
-  border-radius: .4rem !important;
+/* Ensure smooth touch scrolling on iOS */
+.overflow-x-auto, .overflow-y-auto {
+  -webkit-overflow-scrolling: touch;
 }

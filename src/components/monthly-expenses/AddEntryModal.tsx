@@ -79,9 +79,9 @@ export default function AddEntryModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-neutral-900 border border-white/10 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl">
+      <div className="bg-neutral-900 border border-white/10 rounded-2xl w-full max-w-md max-h-[90dvh] flex flex-col overflow-hidden shadow-2xl">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-white/5">
+        <div className="flex items-center justify-between px-5 sm:px-6 py-4 border-b border-white/10 bg-white/5 shrink-0">
           <div>
             <h3 className="text-base font-semibold text-white flex items-center gap-2">
               <Plus size={16} className="text-white" />
@@ -91,14 +91,14 @@ export default function AddEntryModal({
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 text-neutral-400 hover:text-white rounded-lg hover:bg-white/10 transition-colors"
+            className="w-10 h-10 flex items-center justify-center text-neutral-400 hover:text-white rounded-lg hover:bg-white/10 transition-colors"
           >
             <X size={18} />
           </button>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="p-5 sm:p-6 space-y-4 overflow-y-auto flex-1">
           {/* Bill Name */}
           <div>
             <label className="block text-xs font-medium text-neutral-300 mb-1.5">
@@ -110,25 +110,25 @@ export default function AddEntryModal({
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. Warehouse Rent, Generator Diesel, Accountant Retainer"
-              className="w-full px-3.5 py-2.5 bg-neutral-950/60 border border-white/10 rounded-xl text-white placeholder:text-neutral-600 focus:outline-none focus:border-white/30 transition-colors text-sm"
+              className="w-full px-3.5 py-2.5 min-h-[44px] bg-neutral-950/60 border border-white/10 rounded-xl text-white placeholder:text-neutral-600 focus:outline-none focus:border-white/30 transition-colors text-base md:text-sm"
             />
           </div>
 
           {/* Amount & Due Day */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-medium text-neutral-300 mb-1.5">
                 Expected Amount (₹)
               </label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 font-mono text-xs">₹</span>
+                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400 font-mono text-base md:text-xs">₹</span>
                 <input
                   type="number"
                   step="0.01"
                   value={expectedAmount}
                   onChange={(e) => setExpectedAmount(e.target.value)}
                   placeholder="0.00"
-                  className="w-full pl-7 pr-3 py-2.5 bg-neutral-950/60 border border-white/10 rounded-xl text-white font-mono placeholder:text-neutral-600 focus:outline-none focus:border-white/30 transition-colors text-xs"
+                  className="w-full pl-8 pr-3.5 py-2.5 min-h-[44px] bg-neutral-950/60 border border-white/10 rounded-xl text-white font-mono placeholder:text-neutral-600 focus:outline-none focus:border-white/30 transition-colors text-base md:text-xs"
                 />
               </div>
             </div>
@@ -144,13 +144,13 @@ export default function AddEntryModal({
                 value={dueDay}
                 onChange={(e) => setDueDay(e.target.value)}
                 placeholder="e.g. 5"
-                className="w-full px-3 py-2.5 bg-neutral-950/60 border border-white/10 rounded-xl text-white font-mono placeholder:text-neutral-600 focus:outline-none focus:border-white/30 transition-colors text-xs"
+                className="w-full px-3.5 py-2.5 min-h-[44px] bg-neutral-950/60 border border-white/10 rounded-xl text-white font-mono placeholder:text-neutral-600 focus:outline-none focus:border-white/30 transition-colors text-base md:text-xs"
               />
             </div>
           </div>
 
           {/* Category & Payment Method */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-medium text-neutral-300 mb-1.5">
                 Category
@@ -158,10 +158,10 @@ export default function AddEntryModal({
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="w-full px-3 py-2.5 bg-neutral-950/60 border border-white/10 rounded-xl text-white text-xs focus:outline-none focus:border-white/30 transition-colors"
+                className="w-full px-3.5 py-2.5 min-h-[44px] bg-neutral-950/60 border border-white/10 rounded-xl text-white text-base md:text-xs focus:outline-none focus:border-white/30 transition-colors"
               >
                 {EXPENSE_CATEGORIES.map((c) => (
-                  <option key={c.value} value={c.value}>
+                  <option key={c.value} value={c.value} className="bg-[#121212] text-white">
                     {c.label}
                   </option>
                 ))}
@@ -175,11 +175,11 @@ export default function AddEntryModal({
               <select
                 value={paymentMethodId}
                 onChange={(e) => setPaymentMethodId(e.target.value)}
-                className="w-full px-3 py-2.5 bg-neutral-950/60 border border-white/10 rounded-xl text-white text-xs focus:outline-none focus:border-white/30 transition-colors"
+                className="w-full px-3.5 py-2.5 min-h-[44px] bg-neutral-950/60 border border-white/10 rounded-xl text-white text-base md:text-xs focus:outline-none focus:border-white/30 transition-colors"
               >
-                <option value="">Default / Unspecified</option>
+                <option value="" className="bg-[#121212] text-white">Default / Unspecified</option>
                 {paymentMethods.map((pm) => (
-                  <option key={pm.id} value={pm.id}>
+                  <option key={pm.id} value={pm.id} className="bg-[#121212] text-white">
                     {pm.name}
                   </option>
                 ))}
@@ -197,18 +197,18 @@ export default function AddEntryModal({
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="e.g. Consumer ID, Account details"
-              className="w-full px-3 py-2 bg-neutral-950/60 border border-white/10 rounded-xl text-white placeholder:text-neutral-600 focus:outline-none focus:border-white/30 transition-colors text-xs"
+              className="w-full px-3.5 py-2.5 min-h-[44px] bg-neutral-950/60 border border-white/10 rounded-xl text-white placeholder:text-neutral-600 focus:outline-none focus:border-white/30 transition-colors text-base md:text-xs"
             />
           </div>
 
           {/* Save to master template checkbox */}
           <div className="pt-2 border-t border-white/10">
-            <label className="flex items-start gap-2.5 cursor-pointer text-xs text-neutral-300 group">
+            <label className="flex items-start gap-2.5 cursor-pointer text-xs text-neutral-300 group py-1">
               <input
                 type="checkbox"
                 checked={saveToTemplate}
                 onChange={(e) => setSaveToTemplate(e.target.checked)}
-                className="mt-0.5 rounded border-white/20 bg-neutral-950 text-white focus:ring-white/20 focus:ring-offset-0"
+                className="mt-0.5 w-4 h-4 rounded border-white/20 bg-neutral-950 text-white focus:ring-white/20 focus:ring-offset-0"
               />
               <div>
                 <span className="font-medium text-white group-hover:text-white transition-colors">
@@ -222,18 +222,18 @@ export default function AddEntryModal({
           </div>
 
           {/* Actions */}
-          <div className="flex items-center justify-end gap-2 pt-3">
+          <div className="flex items-center justify-end gap-2 pt-3 border-t border-white/10">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-xs font-medium text-neutral-400 hover:text-white rounded-xl hover:bg-white/10 transition-colors"
+              className="px-4 h-11 min-h-[44px] text-xs font-medium text-neutral-400 hover:text-white rounded-xl hover:bg-white/10 transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-5 py-2 text-xs font-semibold text-black bg-white hover:bg-neutral-200 disabled:opacity-50 rounded-xl transition-all shadow-sm flex items-center gap-1.5"
+              className="px-5 h-11 min-h-[44px] text-xs font-semibold text-black bg-white hover:bg-neutral-200 disabled:opacity-50 rounded-xl transition-all shadow-sm flex items-center gap-1.5"
             >
               <Plus size={14} />
               {isSubmitting ? 'Adding...' : 'Add Bill'}

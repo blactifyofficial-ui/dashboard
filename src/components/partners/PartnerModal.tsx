@@ -35,9 +35,9 @@ export default function PartnerModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 overflow-y-auto">
-      <div className="bg-[#18181b] border border-white/10 rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden my-8">
-        <div className="p-4 sm:p-5 border-b border-white/10 flex items-center justify-between bg-white/[0.02]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-3 sm:p-4 overflow-y-auto">
+      <div className="bg-[#18181b] border border-white/10 rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden my-auto max-h-[90dvh] flex flex-col">
+        <div className="p-4 sm:p-5 border-b border-white/10 flex items-center justify-between bg-white/[0.02] flex-shrink-0">
           <div className="flex items-center gap-2.5">
             <div className="p-2 rounded-xl bg-white/5 text-white/70 border border-white/10">
               <Users size={16} />
@@ -48,13 +48,13 @@ export default function PartnerModal({
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 text-neutral-400 hover:text-white rounded-lg hover:bg-white/10 transition-colors"
+            className="p-2 min-h-[40px] min-w-[40px] flex items-center justify-center text-neutral-400 hover:text-white rounded-lg hover:bg-white/10 transition-colors"
           >
             <X size={16} />
           </button>
         </div>
 
-        <form onSubmit={onSubmit} className="p-4 sm:p-5 space-y-4">
+        <form onSubmit={onSubmit} className="p-4 sm:p-5 space-y-4 overflow-y-auto flex-1">
           <div>
             <label className="block text-xs font-semibold text-neutral-300 mb-1.5">
               Partner Full Name <span className="text-rose-400">*</span>
@@ -65,7 +65,7 @@ export default function PartnerModal({
               placeholder="e.g. Rahul Sharma"
               value={formData.name}
               onChange={(e) => onChange({ ...formData, name: e.target.value })}
-              className="w-full h-10 px-3.5 bg-white/5 border border-white/10 rounded-xl text-xs sm:text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:border-white/20 transition-colors"
+              className="w-full min-h-[44px] px-3.5 bg-white/5 border border-white/10 rounded-xl text-base sm:text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:border-white/20 transition-colors"
             />
           </div>
 
@@ -77,7 +77,7 @@ export default function PartnerModal({
                 placeholder="partner@example.com"
                 value={formData.email}
                 onChange={(e) => onChange({ ...formData, email: e.target.value })}
-                className="w-full h-10 px-3.5 bg-white/5 border border-white/10 rounded-xl text-xs sm:text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:border-white/20 transition-colors"
+                className="w-full min-h-[44px] px-3.5 bg-white/5 border border-white/10 rounded-xl text-base sm:text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:border-white/20 transition-colors"
               />
             </div>
             <div>
@@ -87,7 +87,7 @@ export default function PartnerModal({
                 placeholder="+91 9876543210"
                 value={formData.phone}
                 onChange={(e) => onChange({ ...formData, phone: e.target.value })}
-                className="w-full h-10 px-3.5 bg-white/5 border border-white/10 rounded-xl text-xs sm:text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:border-white/20 transition-colors"
+                className="w-full min-h-[44px] px-3.5 bg-white/5 border border-white/10 rounded-xl text-base sm:text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:border-white/20 transition-colors"
               />
             </div>
           </div>
@@ -98,13 +98,14 @@ export default function PartnerModal({
               <div className="relative">
                 <input
                   type="number"
+                  inputMode="decimal"
                   step="0.01"
                   min="0"
                   max="100"
                   placeholder="e.g. 25"
                   value={formData.equityPercentage}
                   onChange={(e) => onChange({ ...formData, equityPercentage: e.target.value })}
-                  className="w-full h-10 pl-3.5 pr-8 bg-white/5 border border-white/10 rounded-xl text-xs sm:text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:border-white/20 transition-colors font-mono"
+                  className="w-full min-h-[44px] pl-3.5 pr-8 bg-white/5 border border-white/10 rounded-xl text-base sm:text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:border-white/20 transition-colors font-mono"
                 />
                 <Percent size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500" />
               </div>
@@ -115,7 +116,7 @@ export default function PartnerModal({
               <select
                 value={formData.status}
                 onChange={(e) => onChange({ ...formData, status: e.target.value })}
-                className="w-full h-10 px-3 bg-white/5 border border-white/10 rounded-xl text-xs sm:text-sm text-white focus:outline-none focus:border-white/20 transition-colors"
+                className="w-full min-h-[44px] px-3 bg-[#2a2a2a] border border-white/10 rounded-xl text-base sm:text-sm text-white focus:outline-none focus:border-white/20 transition-colors"
               >
                 <option value="ACTIVE" className="bg-neutral-900 text-white">ACTIVE</option>
                 <option value="INACTIVE" className="bg-neutral-900 text-white">INACTIVE</option>
@@ -129,7 +130,7 @@ export default function PartnerModal({
               type="date"
               value={formData.joinedDate}
               onChange={(e) => onChange({ ...formData, joinedDate: e.target.value })}
-              className="w-full h-10 px-3.5 bg-white/5 border border-white/10 rounded-xl text-xs sm:text-sm text-white focus:outline-none focus:border-white/20 transition-colors"
+              className="w-full min-h-[44px] px-3.5 bg-white/5 border border-white/10 rounded-xl text-base sm:text-sm text-white focus:outline-none focus:border-white/20 transition-colors"
             />
           </div>
 
@@ -140,22 +141,22 @@ export default function PartnerModal({
               placeholder="Terms, capital agreement details, notes..."
               value={formData.notes}
               onChange={(e) => onChange({ ...formData, notes: e.target.value })}
-              className="w-full p-3 bg-white/5 border border-white/10 rounded-xl text-xs sm:text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:border-white/20 resize-none transition-colors"
+              className="w-full p-3 bg-white/5 border border-white/10 rounded-xl text-base sm:text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:border-white/20 resize-none transition-colors"
             />
           </div>
 
-          <div className="pt-3 border-t border-white/10 flex items-center justify-end gap-2.5">
+          <div className="pt-3 border-t border-white/10 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2.5">
             <button
               type="button"
               onClick={onClose}
-              className="px-3.5 py-2 rounded-xl text-xs font-medium text-neutral-300 bg-white/5 hover:bg-white/10 border border-white/10 transition-colors"
+              className="px-4 py-2.5 min-h-[44px] rounded-xl text-xs font-medium text-neutral-300 bg-white/5 hover:bg-white/10 border border-white/10 transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-4 py-2 bg-white hover:bg-neutral-200 text-black text-xs font-semibold rounded-xl flex items-center gap-1.5 transition-all shadow-sm disabled:opacity-50"
+              className="px-4 py-2.5 min-h-[44px] bg-white hover:bg-neutral-200 text-black text-xs font-semibold rounded-xl flex items-center justify-center gap-1.5 transition-all shadow-sm disabled:opacity-50"
             >
               {isSubmitting ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
               <span>{editingPartner ? 'Save Changes' : 'Create Partner'}</span>

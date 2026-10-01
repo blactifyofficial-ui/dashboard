@@ -125,28 +125,28 @@ export default function CreateIssuePage() {
   };
 
   return (
-    <div className="flex flex-col min-h-full pb-20 space-y-6 relative z-10 max-w-4xl mx-auto w-full">
-      <header className="flex-none flex flex-col gap-4">
-        <Link href="/order-issues" className="inline-flex items-center text-sm text-neutral-400 hover:text-white transition-colors w-fit">
+    <div className="flex flex-col min-h-full pb-12 sm:pb-20 space-y-4 sm:space-y-6 relative z-10 max-w-4xl mx-auto w-full">
+      <header className="flex-none flex flex-col gap-3 sm:gap-4">
+        <Link href="/order-issues" className="inline-flex items-center text-xs sm:text-sm text-neutral-400 hover:text-white transition-colors w-fit p-1 min-h-[36px]">
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Issues
         </Link>
-        <div className="space-y-2">
-          <h1 className="text-4xl font-bold tracking-tight text-white">Create Order Issue</h1>
-          <p className="text-neutral-400 text-sm md:text-base">File a new issue for a customer order</p>
+        <div className="space-y-1 sm:space-y-2">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-white">Create Order Issue</h1>
+          <p className="text-neutral-400 text-xs sm:text-sm md:text-base">File a new issue for a customer order</p>
         </div>
       </header>
 
-      <div className="flex-1 shrink-0 bg-white/[0.02] border border-white/5 rounded-3xl p-6 sm:p-8 shadow-2xl relative">
+      <div className="flex-1 shrink-0 bg-white/[0.02] border border-white/5 rounded-3xl p-4 sm:p-6 md:p-8 shadow-2xl relative">
         <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent pointer-events-none rounded-3xl"></div>
-        <form onSubmit={handleSubmit} className="space-y-5 relative z-10">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5 relative z-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
             <div className="relative">
-              <label className="block text-sm font-medium text-neutral-400 mb-2">Order Search (ID or Name)</label>
+              <label className="block text-xs sm:text-sm font-medium text-neutral-400 mb-1.5 sm:mb-2">Order Search (ID or Name)</label>
               <input 
                 type="text" 
                 placeholder="Search orders..."
-                className={`w-full bg-white/5 border ${errors.orderId ? 'border-red-500' : 'border-white/10'} rounded-xl px-4 py-3 text-base sm:text-sm text-white focus:outline-none focus:border-blue-500 transition-colors`}
+                className={`w-full bg-white/5 border ${errors.orderId ? 'border-red-500' : 'border-white/10'} rounded-xl px-4 py-2.5 min-h-[44px] text-base md:text-sm text-white focus:outline-none focus:border-blue-500 transition-colors`}
                 value={orderSearchQuery}
                 onFocus={() => setShowOrderDropdown(true)}
                 onBlur={() => setTimeout(() => setShowOrderDropdown(false), 200)}
@@ -214,9 +214,9 @@ export default function CreateIssuePage() {
               )}
             </div>
             <div>
-              <label className="block text-sm font-medium text-neutral-400 mb-2">Issue Category</label>
+              <label className="block text-xs sm:text-sm font-medium text-neutral-400 mb-1.5 sm:mb-2">Issue Category</label>
               <select 
-                className={`w-full bg-white/5 border ${errors.categoryId ? 'border-red-500' : 'border-white/10'} rounded-xl px-4 py-3 text-base sm:text-sm text-white focus:outline-none focus:border-blue-500 transition-colors appearance-none pr-10`}
+                className={`w-full bg-[#2a2a2a] border ${errors.categoryId ? 'border-red-500' : 'border-white/10'} rounded-xl px-4 py-2.5 min-h-[44px] text-base md:text-sm text-white focus:outline-none focus:border-blue-500 transition-colors appearance-none pr-10`}
                 style={{
                   backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgba(255, 255, 255, 0.5)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`,
                   backgroundRepeat: 'no-repeat',
@@ -236,11 +236,11 @@ export default function CreateIssuePage() {
               </select>
               {categories.find(c => c.id === formData.categoryId)?.name.toLowerCase() === 'other' && (
                 <div className="mt-3">
-                  <label className="block text-sm font-medium text-neutral-400 mb-2">Please specify</label>
+                  <label className="block text-xs sm:text-sm font-medium text-neutral-400 mb-1.5 sm:mb-2">Please specify</label>
                   <input 
                     type="text" 
                     placeholder="Specify the category..."
-                    className={`w-full bg-white/5 border ${errors.otherCategoryText ? 'border-red-500' : 'border-white/10'} rounded-xl px-4 py-3 text-base sm:text-sm text-white focus:outline-none focus:border-blue-500 transition-colors`}
+                    className={`w-full bg-white/5 border ${errors.otherCategoryText ? 'border-red-500' : 'border-white/10'} rounded-xl px-4 py-2.5 min-h-[44px] text-base md:text-sm text-white focus:outline-none focus:border-blue-500 transition-colors`}
                     value={otherCategoryText}
                     onChange={e => {
                       setOtherCategoryText(e.target.value);
@@ -254,11 +254,11 @@ export default function CreateIssuePage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-neutral-400 mb-2">Title</label>
+            <label className="block text-xs sm:text-sm font-medium text-neutral-400 mb-1.5 sm:mb-2">Title</label>
             <input 
               type="text" 
               placeholder="Short issue title"
-              className={`w-full bg-white/5 border ${errors.title ? 'border-red-500' : 'border-white/10'} rounded-xl px-4 py-3 text-base sm:text-sm text-white focus:outline-none focus:border-blue-500 transition-colors`}
+              className={`w-full bg-white/5 border ${errors.title ? 'border-red-500' : 'border-white/10'} rounded-xl px-4 py-2.5 min-h-[44px] text-base md:text-sm text-white focus:outline-none focus:border-blue-500 transition-colors`}
               value={formData.title}
               onChange={e => {
                 setFormData({...formData, title: e.target.value});
@@ -269,9 +269,9 @@ export default function CreateIssuePage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-neutral-400 mb-2">Priority</label>
+            <label className="block text-xs sm:text-sm font-medium text-neutral-400 mb-1.5 sm:mb-2">Priority</label>
             <select 
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-base sm:text-sm text-white focus:outline-none focus:border-blue-500 transition-colors appearance-none pr-10"
+              className="w-full bg-[#2a2a2a] border border-white/10 rounded-xl px-4 py-2.5 min-h-[44px] text-base md:text-sm text-white focus:outline-none focus:border-blue-500 transition-colors appearance-none pr-10"
               style={{
                 backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgba(255, 255, 255, 0.5)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`,
                 backgroundRepeat: 'no-repeat',
@@ -289,11 +289,11 @@ export default function CreateIssuePage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-neutral-400 mb-2">Description</label>
+            <label className="block text-xs sm:text-sm font-medium text-neutral-400 mb-1.5 sm:mb-2">Description</label>
             <textarea 
               rows={4}
               placeholder="Describe the issue..."
-              className={`w-full bg-white/5 border ${errors.description ? 'border-red-500' : 'border-white/10'} rounded-xl p-4 text-white focus:outline-none focus:border-blue-500 transition-colors resize-y`}
+              className={`w-full bg-white/5 border ${errors.description ? 'border-red-500' : 'border-white/10'} rounded-xl p-4 text-base md:text-sm text-white focus:outline-none focus:border-blue-500 transition-colors resize-y`}
               value={formData.description}
               onChange={e => {
                 setFormData({...formData, description: e.target.value});
@@ -304,28 +304,28 @@ export default function CreateIssuePage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-neutral-400 mb-2">Initial Remark (Optional)</label>
+            <label className="block text-xs sm:text-sm font-medium text-neutral-400 mb-1.5 sm:mb-2">Initial Remark (Optional)</label>
             <textarea 
               rows={3}
               placeholder="Add an initial remark..."
-              className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white focus:outline-none focus:border-blue-500 transition-colors resize-y"
+              className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-base md:text-sm text-white focus:outline-none focus:border-blue-500 transition-colors resize-y"
               value={formData.initialRemark}
               onChange={e => setFormData({...formData, initialRemark: e.target.value})}
             ></textarea>
           </div>
 
-          <div className="flex justify-end gap-3 pt-4 mt-6 border-t border-white/5">
+          <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-3 pt-4 mt-6 border-t border-white/5">
             <button 
               type="button" 
               onClick={() => router.push('/order-issues')}
-              className="py-3 px-6 bg-white/5 hover:bg-white/10 rounded-xl font-medium text-neutral-300 transition-colors"
+              className="py-3 px-6 min-h-[44px] bg-white/5 hover:bg-white/10 rounded-xl font-medium text-neutral-300 transition-colors text-center"
             >
               Cancel
             </button>
             <button 
               type="submit" 
               disabled={loading}
-              className="py-3 px-6 bg-blue-600 hover:bg-blue-700 rounded-xl font-bold flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
+              className="py-3 px-6 min-h-[44px] bg-blue-600 hover:bg-blue-700 rounded-xl font-bold flex items-center justify-center gap-2 transition-colors disabled:opacity-50 text-white shadow-md"
             >
               {loading ? 'Creating...' : 'Create Issue'}
             </button>

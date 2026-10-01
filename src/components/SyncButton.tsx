@@ -28,14 +28,14 @@ export default function SyncButton() {
   };
 
   return (
-    <div className="flex flex-wrap gap-4">
+    <div className="flex flex-wrap gap-4 w-full sm:w-auto">
       <button
         onClick={handleSync}
         disabled={isSyncing}
-        className="inline-flex items-center justify-center gap-2 bg-white text-black px-6 py-2 rounded-lg font-medium hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-white text-black px-6 py-3 min-h-[44px] rounded-xl font-semibold text-sm hover:bg-neutral-200 active:bg-neutral-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
       >
-        <RefreshCw size={18} className={isSyncing ? 'animate-spin' : ''} />
-        {isSyncing ? 'Syncing Orders...' : 'Sync Orders & Products Now'}
+        <RefreshCw size={18} className={`shrink-0 ${isSyncing ? 'animate-spin' : ''}`} />
+        <span>{isSyncing ? 'Syncing Orders...' : 'Sync Orders & Products Now'}</span>
       </button>
     </div>
   );

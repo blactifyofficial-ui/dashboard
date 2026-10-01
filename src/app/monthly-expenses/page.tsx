@@ -290,25 +290,25 @@ export default function MonthlyExpensesPage() {
   }
 
   return (
-    <div className="flex-1 flex flex-col min-h-0 space-y-4">
+    <div className="flex-1 flex flex-col min-h-0 space-y-4 p-4 sm:p-6 md:p-8">
       {/* Top Header */}
       <div className="flex-none flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold">Monthly Expenses</h1>
-          <p className="text-sm text-white/60">Manage recurring bills, salaries, rent, and overheads</p>
+          <h1 className="text-xl sm:text-2xl font-bold">Monthly Expenses</h1>
+          <p className="text-xs sm:text-sm text-white/60">Manage recurring bills, salaries, rent, and overheads</p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5 sm:gap-3 w-full sm:w-auto">
           <button
             onClick={() => setIsTemplateModalOpen(true)}
-            className="flex items-center gap-2 bg-white/5 border border-white/10 text-white/80 hover:text-white px-4 py-2 rounded-lg font-medium hover:bg-white/10 transition-colors text-sm"
+            className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-white/5 border border-white/10 text-white/80 hover:text-white px-4 h-11 min-h-[44px] rounded-lg font-medium hover:bg-white/10 transition-colors text-sm"
           >
             <Layers size={16} />
             Templates
           </button>
           <button
             onClick={() => setIsAddModalOpen(true)}
-            className="flex items-center gap-2 bg-white text-black px-4 py-2 rounded-lg font-medium hover:bg-white/90 transition-colors text-sm shadow-sm"
+            className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-white text-black px-4 h-11 min-h-[44px] rounded-lg font-medium hover:bg-white/90 transition-colors text-sm shadow-sm"
           >
             <Plus size={16} />
             Add Bill

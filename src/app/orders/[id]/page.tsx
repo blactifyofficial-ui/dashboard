@@ -16,13 +16,16 @@ export default async function OrderDetailPage(props: {
   const orderId = params.id;
 
   return (
-    <div className="p-8 max-w-7xl mx-auto text-black">
-      <Link href="/dashboard" className="text-gray-400 hover:text-white mb-6 inline-block">
+    <div className="p-4 sm:p-6 md:p-8 max-w-7xl mx-auto text-black">
+      <Link 
+        href="/dashboard" 
+        className="text-gray-400 hover:text-white mb-6 inline-flex items-center min-h-[44px] transition-colors"
+      >
         &larr; Back to Dashboard
       </Link>
       
-      <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-semibold tracking-tight text-white">
+      <div className="flex items-center justify-between mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-white">
           Order Details
         </h1>
       </div>
