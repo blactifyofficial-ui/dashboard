@@ -250,3 +250,20 @@ export const monthlyExpenseMonthSettings = pgTable('monthly_expense_month_settin
   isUnlockedManual: text('is_unlocked_manual').default('false'),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
+
+export const googleSheetsSyncQueue = pgTable('google_sheets_sync_queue', {
+  id: text('id').primaryKey(),
+  entity: text('entity').notNull(),
+  databaseId: text('database_id').notNull(),
+  operation: text('operation').notNull(), // 'CREATE', 'UPDATE', 'DELETE', 'FULL_SYNC'
+  payload: text('payload'),
+  status: text('status').notNull().default('PENDING'), // 'PENDING', 'SYNCING', 'SUCCESS', 'FAILED'
+  attempts: numeric('attempts').notNull().default('0'),
+  maxAttempts: numeric('max_attempts').notNull().default('5'),
+  lastAttemptAt: timestamp('last_attempt_at'),
+  nextRetryAt: timestamp('next_retry_at'),
+  errorMessage: text('error_message'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+

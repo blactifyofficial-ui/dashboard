@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { db } from '@/db';
 import { orders } from '@/db/schema';
+import { enqueueSyncJob } from '@/lib/google-sheets';
 
 export async function POST(req: Request) {
   try {
@@ -53,6 +54,13 @@ export async function POST(req: Request) {
           fulfillmentStatus: fulfillment_status,
         }
       });
+
+      // Automatically sync order to Google Sheets
+      void enqueueSyncJob({
+        entity: 'orders',
+        databaseId: id.toString(),
+        operation: 'UPDATE',
+      });
     }
 
     return NextResponse.json({ success: true }, { status: 200 });
@@ -61,3 +69,4 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
+

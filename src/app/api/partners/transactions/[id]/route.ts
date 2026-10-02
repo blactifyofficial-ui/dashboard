@@ -3,6 +3,7 @@ import { db } from '@/db';
 import { partnerTransactions } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { requireAuth } from '@/lib/auth-utils';
+import { enqueueSyncJob } from '@/lib/google-sheets';
 
 export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -42,6 +43,21 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
       return NextResponse.json({ error: 'Transaction not found' }, { status: 404 });
     }
 
+    // Automatically sync partner transaction to Google Sheets
+    void enqueueSyncJob({
+      entity: 'partner_transactions',
+      databaseId: id,
+      operation: 'UPDATE',
+    });
+
+    if (updated.type === 'PAYOUT') {
+      void enqueueSyncJob({
+        entity: 'payouts',
+        databaseId: id,
+        operation: 'UPDATE',
+      });
+    }
+
     return NextResponse.json({ success: true, transaction: updated });
   } catch (error) {
     console.error('Error updating transaction:', error);
@@ -67,9 +83,25 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
       return NextResponse.json({ error: 'Transaction not found' }, { status: 404 });
     }
 
+    // Automatically sync partner transaction deletion to Google Sheets
+    void enqueueSyncJob({
+      entity: 'partner_transactions',
+      databaseId: id,
+      operation: 'DELETE',
+    });
+
+    if (deleted.type === 'PAYOUT') {
+      void enqueueSyncJob({
+        entity: 'payouts',
+        databaseId: id,
+        operation: 'DELETE',
+      });
+    }
+
     return NextResponse.json({ success: true, deletedId: id });
   } catch (error) {
     console.error('Error deleting transaction:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+

@@ -3,6 +3,7 @@ import { db } from '@/db';
 import { metaAdsTransactions, expenses, expenseActivities, users } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { requireAuth } from '@/lib/auth-utils';
+import { enqueueSyncJob } from '@/lib/google-sheets';
 
 export async function DELETE(
   req: Request, 
@@ -59,6 +60,21 @@ export async function DELETE(
 
     // Delete transaction
     await db.delete(metaAdsTransactions).where(eq(metaAdsTransactions.id, id));
+
+    // Automatically sync deletions to Google Sheets
+    void enqueueSyncJob({
+      entity: 'meta_ads',
+      databaseId: id,
+      operation: 'DELETE',
+    });
+
+    if (existing.expenseId) {
+      void enqueueSyncJob({
+        entity: 'expenses',
+        databaseId: existing.expenseId,
+        operation: 'DELETE',
+      });
+    }
 
     return NextResponse.json({ success: true, message: 'Transaction and linked expense removed' });
   } catch (error) {
@@ -140,7 +156,20 @@ export async function PATCH(
         newValue: amountPaid ? String(amountPaid) : existing.amountPaid,
         remark: 'Synchronized from Meta Ads transaction update',
       });
+
+      void enqueueSyncJob({
+        entity: 'expenses',
+        databaseId: existing.expenseId,
+        operation: 'UPDATE',
+      });
     }
+
+    // Automatically sync updated Meta Ads transaction to Google Sheets
+    void enqueueSyncJob({
+      entity: 'meta_ads',
+      databaseId: id,
+      operation: 'UPDATE',
+    });
 
     return NextResponse.json({ success: true, transaction: updatedTx });
   } catch (error) {
@@ -148,3 +177,4 @@ export async function PATCH(
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+

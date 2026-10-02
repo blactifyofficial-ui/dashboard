@@ -3,6 +3,7 @@ import { db } from '@/db';
 import { partnerTransactions, partners, paymentMethods, users } from '@/db/schema';
 import { eq, desc } from 'drizzle-orm';
 import { requireAuth } from '@/lib/auth-utils';
+import { enqueueSyncJob } from '@/lib/google-sheets';
 
 export async function GET(req: Request) {
   try {
@@ -121,9 +122,25 @@ export async function POST(req: Request) {
       })
       .returning();
 
+    // Automatically sync partner transaction to Google Sheets
+    void enqueueSyncJob({
+      entity: 'partner_transactions',
+      databaseId: txnId,
+      operation: 'CREATE',
+    });
+
+    if (type === 'PAYOUT') {
+      void enqueueSyncJob({
+        entity: 'payouts',
+        databaseId: txnId,
+        operation: 'CREATE',
+      });
+    }
+
     return NextResponse.json({ success: true, transaction: newTxn }, { status: 201 });
   } catch (error) {
     console.error('Error creating partner transaction:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+

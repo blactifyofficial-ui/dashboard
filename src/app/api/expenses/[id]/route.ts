@@ -3,6 +3,7 @@ import { db } from '@/db';
 import { expenses, expenseActivities, expenseCategories, paymentMethods, users } from '@/db/schema';
 import { eq, desc, and, isNull } from 'drizzle-orm';
 import { requireAuth } from '@/lib/auth-utils';
+import { enqueueSyncJob } from '@/lib/google-sheets';
 
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -120,6 +121,13 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
       remark: remark?.trim() || 'Expense updated',
     });
 
+    // Automatically sync updated expense to Google Sheets
+    void enqueueSyncJob({
+      entity: 'expenses',
+      databaseId: id,
+      operation: 'UPDATE',
+    });
+
     return NextResponse.json(updated);
   } catch (error) {
     console.error(error);
@@ -170,9 +178,17 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
       remark: 'Expense deleted',
     });
 
+    // Automatically sync deletion to Google Sheets (marks status = DELETED)
+    void enqueueSyncJob({
+      entity: 'expenses',
+      databaseId: id,
+      operation: 'DELETE',
+    });
+
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+

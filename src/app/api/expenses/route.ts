@@ -3,6 +3,7 @@ import { db } from '@/db';
 import { expenses, expenseActivities, users, expenseCategories, paymentMethods } from '@/db/schema';
 import { eq, desc, and, ilike, or, gte, lte, isNull } from 'drizzle-orm';
 import { requireAuth } from '@/lib/auth-utils';
+import { enqueueSyncJob } from '@/lib/google-sheets';
 
 export async function GET(req: Request) {
   try {
@@ -146,9 +147,17 @@ export async function POST(req: Request) {
       });
     }
 
+    // Automatically sync to Google Sheets
+    void enqueueSyncJob({
+      entity: 'expenses',
+      databaseId: expenseId,
+      operation: 'CREATE',
+    });
+
     return NextResponse.json(expense, { status: 201 });
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+

@@ -3,6 +3,7 @@ import { db } from '@/db';
 import { orderIssues, orderIssueActivities, issueCategories, orders } from '@/db/schema';
 import { eq, desc } from 'drizzle-orm';
 import { requireAuth } from '@/lib/auth-utils';
+import { enqueueSyncJob } from '@/lib/google-sheets';
 
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -66,9 +67,17 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
       db.delete(orderIssues).where(eq(orderIssues.id, id))
     ]);
 
+    // Automatically sync deletion to Google Sheets
+    void enqueueSyncJob({
+      entity: 'order_issues',
+      databaseId: id,
+      operation: 'DELETE',
+    });
+
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+

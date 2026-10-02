@@ -3,6 +3,7 @@ import { db } from '@/db';
 import { monthlyExpenseTemplates, monthlyExpenseEntries } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { requireAuth } from '@/lib/auth-utils';
+import { enqueueSyncJob } from '@/lib/google-sheets';
 
 export async function PATCH(
   req: Request,
@@ -41,6 +42,13 @@ export async function PATCH(
       return NextResponse.json({ error: 'Template item not found' }, { status: 404 });
     }
 
+    // Automatically sync template to Google Sheets
+    void enqueueSyncJob({
+      entity: 'monthly_expense_templates',
+      databaseId: id,
+      operation: 'UPDATE',
+    });
+
     return NextResponse.json(updated);
   } catch (error) {
     console.error('Error updating template item:', error);
@@ -74,9 +82,17 @@ export async function DELETE(
       return NextResponse.json({ error: 'Template item not found' }, { status: 404 });
     }
 
+    // Automatically sync template deletion to Google Sheets
+    void enqueueSyncJob({
+      entity: 'monthly_expense_templates',
+      databaseId: id,
+      operation: 'DELETE',
+    });
+
     return NextResponse.json({ success: true, id });
   } catch (error) {
     console.error('Error deleting template item:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+

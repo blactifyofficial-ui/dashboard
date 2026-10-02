@@ -11,6 +11,7 @@ import {
 } from '@/db/schema';
 import { eq, desc, ilike, or } from 'drizzle-orm';
 import { requireAuth } from '@/lib/auth-utils';
+import { enqueueSyncJob } from '@/lib/google-sheets';
 
 async function getOrCreateMetaAdsCategory() {
   const existing = await db
@@ -243,6 +244,21 @@ export async function POST(req: Request) {
       createdById: session.user.id,
     }).returning();
 
+    // Automatically sync Meta Ads transaction to Google Sheets
+    void enqueueSyncJob({
+      entity: 'meta_ads',
+      databaseId: transactionId,
+      operation: 'CREATE',
+    });
+
+    if (expenseId) {
+      void enqueueSyncJob({
+        entity: 'expenses',
+        databaseId: expenseId,
+        operation: 'CREATE',
+      });
+    }
+
     return NextResponse.json({
       success: true,
       transaction,
@@ -253,3 +269,4 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+

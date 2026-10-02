@@ -3,6 +3,7 @@ import { db } from '@/db';
 import { orderIssueActivities, orderIssues, users } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { requireAuth } from '@/lib/auth-utils';
+import { enqueueSyncJob } from '@/lib/google-sheets';
 
 const VALID_TRANSITIONS: Record<string, string[]> = {
   'OPEN': ['IN_PROGRESS', 'CANCELLED'],
@@ -72,9 +73,17 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       })
     ]);
 
+    // Automatically sync updated order issue to Google Sheets
+    void enqueueSyncJob({
+      entity: 'order_issues',
+      databaseId: id,
+      operation: 'UPDATE',
+    });
+
     return NextResponse.json({ success: true, status });
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+

@@ -2,6 +2,7 @@ import Link from 'next/link';
 import SyncButton from '@/components/SyncButton';
 import CategoryManager from '@/components/CategoryManager';
 import InstallPWA from '@/components/InstallPWA';
+import GoogleSheetsSettings from '@/components/GoogleSheetsSettings';
 
 export const dynamic = "force-dynamic";
 
@@ -13,6 +14,9 @@ export default function SettingsPage() {
       <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-white mb-6 sm:mb-8">Settings</h1>
 
       <div className="grid grid-cols-1 gap-6">
+        {/* Google Sheets Backup Section */}
+        <GoogleSheetsSettings />
+
         {/* Manual Sync Section */}
         <div className="bg-[#1e1e1e] p-4 sm:p-6 rounded-xl border border-white/10 shadow-sm text-white">
           <h2 className="text-lg sm:text-xl font-medium mb-4 border-b border-white/10 pb-2">Manual Sync</h2>
@@ -66,3 +70,4 @@ export default function SettingsPage() {
     </div>
   );
 }
+

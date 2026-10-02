@@ -34,6 +34,7 @@ interface ShopifyProduct {
 }
 
 import { requireAuth } from '@/lib/auth-utils';
+import { enqueueSyncJob } from '@/lib/google-sheets';
 
 export async function GET() {
   const authResult = await requireAuth();
@@ -133,9 +134,16 @@ export async function GET() {
         }
       });
 
+      // Automatically sync order to Google Sheets
+      void enqueueSyncJob({
+        entity: 'orders',
+        databaseId: order.id.toString(),
+        operation: 'UPDATE',
+      });
+
       if (order.line_items && order.line_items.length > 0) {
         for (const item of order.line_items) {
-await db.insert(orderItems).values({
+          await db.insert(orderItems).values({
             id: item.id.toString(),
             orderId: order.id.toString(),
             shopifyProductId: item.product_id?.toString() || null,
@@ -152,9 +160,17 @@ await db.insert(orderItems).values({
               imageUrl: item.product_id ? productImages[item.product_id] || null : null,
             }
           });
+
+          // Automatically sync order item to Google Sheets
+          void enqueueSyncJob({
+            entity: 'order_items',
+            databaseId: item.id.toString(),
+            operation: 'UPDATE',
+          });
         }
       }
     }
+
 
     return NextResponse.json({ success: true, count: fetchedOrders.length });
   } catch (error) {

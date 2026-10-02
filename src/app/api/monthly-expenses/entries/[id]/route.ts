@@ -3,10 +3,12 @@ import { db } from '@/db';
 import { monthlyExpenseEntries } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { requireAuth } from '@/lib/auth-utils';
+import { enqueueSyncJob } from '@/lib/google-sheets';
 import { 
   syncMonthlyBillPaymentToExpenses, 
   removeMonthlyBillPaymentFromExpenses 
 } from '@/lib/monthly-expenses-sync';
+
 
 export async function PATCH(
   req: Request,
@@ -116,6 +118,21 @@ export async function PATCH(
       .where(eq(monthlyExpenseEntries.id, id))
       .returning();
 
+    // Automatically sync updated monthly expense entry to Google Sheets
+    void enqueueSyncJob({
+      entity: 'monthly_expenses',
+      databaseId: id,
+      operation: 'UPDATE',
+    });
+
+    if (updateData.expenseId) {
+      void enqueueSyncJob({
+        entity: 'expenses',
+        databaseId: updateData.expenseId,
+        operation: 'UPDATE',
+      });
+    }
+
     return NextResponse.json(updated);
   } catch (error) {
     console.error('Error updating monthly expense entry:', error);
@@ -152,6 +169,11 @@ export async function DELETE(
         session.user.id,
         'Removed because monthly bill entry was deleted'
       );
+      void enqueueSyncJob({
+        entity: 'expenses',
+        databaseId: existing.expenseId,
+        operation: 'DELETE',
+      });
     }
 
     const [deleted] = await db
@@ -159,9 +181,17 @@ export async function DELETE(
       .where(eq(monthlyExpenseEntries.id, id))
       .returning();
 
+    // Automatically sync deletion to Google Sheets
+    void enqueueSyncJob({
+      entity: 'monthly_expenses',
+      databaseId: id,
+      operation: 'DELETE',
+    });
+
     return NextResponse.json({ success: true, id: deleted.id });
   } catch (error) {
     console.error('Error deleting monthly expense entry:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+

@@ -3,6 +3,7 @@ import { db } from '@/db';
 import { partners, partnerTransactions, paymentMethods, users } from '@/db/schema';
 import { eq, desc } from 'drizzle-orm';
 import { requireAuth } from '@/lib/auth-utils';
+import { enqueueSyncJob } from '@/lib/google-sheets';
 
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -108,6 +109,13 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
       return NextResponse.json({ error: 'Partner not found' }, { status: 404 });
     }
 
+    // Automatically sync partner update to Google Sheets
+    void enqueueSyncJob({
+      entity: 'partners',
+      databaseId: id,
+      operation: 'UPDATE',
+    });
+
     return NextResponse.json({ success: true, partner: updated });
   } catch (error) {
     console.error('Error updating partner:', error);
@@ -134,9 +142,17 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
       return NextResponse.json({ error: 'Partner not found' }, { status: 404 });
     }
 
+    // Automatically sync partner deletion to Google Sheets
+    void enqueueSyncJob({
+      entity: 'partners',
+      databaseId: id,
+      operation: 'DELETE',
+    });
+
     return NextResponse.json({ success: true, deletedId: id });
   } catch (error) {
     console.error('Error deleting partner:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+

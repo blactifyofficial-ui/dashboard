@@ -3,6 +3,7 @@ import { db } from '@/db';
 import { monthlyExpenseTemplates } from '@/db/schema';
 import { asc } from 'drizzle-orm';
 import { requireAuth } from '@/lib/auth-utils';
+import { enqueueSyncJob } from '@/lib/google-sheets';
 
 export async function GET() {
   try {
@@ -53,9 +54,17 @@ export async function POST(req: Request) {
       })
       .returning();
 
+    // Automatically sync template to Google Sheets
+    void enqueueSyncJob({
+      entity: 'monthly_expense_templates',
+      databaseId: id,
+      operation: 'CREATE',
+    });
+
     return NextResponse.json(template, { status: 201 });
   } catch (error) {
     console.error('Error creating template item:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+
