@@ -23,6 +23,8 @@ interface ShopifyOrder {
   created_at?: string | null;
   financial_status: string;
   fulfillment_status: string;
+  payment_gateway_names?: string[] | null;
+  gateway?: string | null;
   line_items?: ShopifyLineItem[] | null;
 }
 
@@ -109,6 +111,9 @@ export async function GET() {
 
       const customerName = order.customer ? `${order.customer.first_name || ''} ${order.customer.last_name || ''}`.trim() : null;
       const customerEmail = order.customer ? order.customer.email : null;
+      const paymentGateway = order.payment_gateway_names && order.payment_gateway_names.length > 0
+        ? order.payment_gateway_names.join(', ')
+        : (order.gateway || null);
 
       await db.insert(orders).values({
         id: order.id.toString(),
@@ -121,6 +126,7 @@ export async function GET() {
         createdAt: order.created_at ? new Date(order.created_at) : undefined,
         financialStatus: order.financial_status,
         fulfillmentStatus: order.fulfillment_status,
+        paymentGateway: paymentGateway,
       }).onConflictDoUpdate({
         target: orders.shopifyOrderId,
         set: {
@@ -131,6 +137,7 @@ export async function GET() {
           createdAt: order.created_at ? new Date(order.created_at) : undefined,
           financialStatus: order.financial_status,
           fulfillmentStatus: order.fulfillment_status,
+          paymentGateway: paymentGateway,
         }
       });
 

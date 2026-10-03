@@ -28,10 +28,13 @@ export async function POST(req: Request) {
     // Check webhook topic
     const topic = req.headers.get('X-Shopify-Topic');
     if (topic === 'orders/create' || topic === 'orders/updated') {
-      const { id, order_number, customer, current_total_price, currency, financial_status, fulfillment_status } = payload;
+      const { id, order_number, customer, current_total_price, currency, financial_status, fulfillment_status, payment_gateway_names, gateway } = payload;
       
       const customerName = customer ? `${customer.first_name || ''} ${customer.last_name || ''}`.trim() : null;
       const customerEmail = customer ? customer.email : null;
+      const paymentGateway = Array.isArray(payment_gateway_names) && payment_gateway_names.length > 0
+        ? payment_gateway_names.join(', ')
+        : (gateway || null);
 
       await db.insert(orders).values({
         id: id.toString(),
@@ -43,6 +46,7 @@ export async function POST(req: Request) {
         currency: currency,
         financialStatus: financial_status,
         fulfillmentStatus: fulfillment_status,
+        paymentGateway: paymentGateway,
       }).onConflictDoUpdate({
         target: orders.shopifyOrderId,
         set: {
@@ -52,6 +56,7 @@ export async function POST(req: Request) {
           currency,
           financialStatus: financial_status,
           fulfillmentStatus: fulfillment_status,
+          paymentGateway: paymentGateway,
         }
       });
 

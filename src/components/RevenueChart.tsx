@@ -17,7 +17,7 @@ export interface RevenueData {
 
 export default function RevenueChart({ data }: { data: RevenueData[] }) {
   return (
-    <div className="h-[400px] w-full">
+    <div className="h-[260px] sm:h-[300px] md:h-[340px] w-full">
       <ResponsiveContainer width="100%" height="100%">
         <LineChart
           data={data}
