@@ -13,6 +13,31 @@ import {
 export interface RevenueData {
   day: string;
   revenue: number;
+  ordersCount: number;
+}
+
+interface CustomTooltipProps {
+  active?: boolean;
+  payload?: Array<{ payload: RevenueData }>;
+  label?: string;
+}
+
+function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
+  if (active && payload && payload.length) {
+    const data = payload[0].payload;
+    return (
+      <div style={{ backgroundColor: '#111', border: '1px solid #333', borderRadius: '8px', padding: '10px 14px' }}>
+        <p style={{ color: '#888', margin: '0 0 6px 0', fontSize: '13px' }}>{label}</p>
+        <p style={{ color: '#fff', margin: '0 0 4px 0', fontSize: '14px', fontWeight: 500 }}>
+          Revenue : ₹{Number(data.revenue).toLocaleString('en-IN')}
+        </p>
+        <p style={{ color: '#fff', margin: 0, fontSize: '14px', fontWeight: 500 }}>
+          Orders : {Number(data.ordersCount ?? 0).toLocaleString('en-IN')}
+        </p>
+      </div>
+    );
+  }
+  return null;
 }
 
 export default function RevenueChart({ data }: { data: RevenueData[] }) {
@@ -45,12 +70,7 @@ export default function RevenueChart({ data }: { data: RevenueData[] }) {
             tickLine={false}
             tickMargin={10}
           />
-          <Tooltip 
-            contentStyle={{ backgroundColor: '#111', borderColor: '#333', borderRadius: '8px' }}
-            itemStyle={{ color: '#fff' }}
-            formatter={(value) => [`₹${Number(value).toLocaleString('en-IN')}`, 'Revenue']}
-            labelStyle={{ color: '#888', marginBottom: '4px' }}
-          />
+          <Tooltip content={<CustomTooltip />} />
           <Line 
             type="monotone" 
             dataKey="revenue" 

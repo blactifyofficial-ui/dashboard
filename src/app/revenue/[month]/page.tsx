@@ -82,12 +82,12 @@ async function MonthRevenueContent({ year, month, startDate, endDate }: {
     .orderBy(desc(orders.createdAt));
 
   // Calculate daily data for the chart
-  const dailyDataMap = new Map<number, number>();
+  const dailyDataMap = new Map<number, { revenue: number; ordersCount: number }>();
   
   // Initialize all days of the month to 0
   const daysInMonth = new Date(year, month, 0).getDate();
   for (let i = 1; i <= daysInMonth; i++) {
-    dailyDataMap.set(i, 0);
+    dailyDataMap.set(i, { revenue: 0, ordersCount: 0 });
   }
   
   let totalRevenue = 0;
@@ -97,28 +97,31 @@ async function MonthRevenueContent({ year, month, startDate, endDate }: {
   let codRevenue = 0;
   
   monthOrders.forEach((order) => {
-    if (order.totalPrice) {
-      const revenue = parseFloat(order.totalPrice) || 0;
-      totalRevenue += revenue;
+    const revenue = parseFloat(order.totalPrice || '0') || 0;
+    totalRevenue += revenue;
 
-      if (order.createdAt) {
-        const day = new Date(order.createdAt).getDate();
-        dailyDataMap.set(day, (dailyDataMap.get(day) || 0) + revenue);
-      }
+    if (order.createdAt) {
+      const day = new Date(order.createdAt).getDate();
+      const current = dailyDataMap.get(day) || { revenue: 0, ordersCount: 0 };
+      dailyDataMap.set(day, {
+        revenue: current.revenue + revenue,
+        ordersCount: current.ordersCount + 1,
+      });
+    }
 
-      if (isCodOrder(order)) {
-        codOrdersCount++;
-        codRevenue += revenue;
-      } else {
-        normalOrdersCount++;
-        normalRevenue += revenue;
-      }
+    if (isCodOrder(order)) {
+      codOrdersCount++;
+      codRevenue += revenue;
+    } else {
+      normalOrdersCount++;
+      normalRevenue += revenue;
     }
   });
   
-  const chartData = Array.from(dailyDataMap.entries()).map(([day, revenue]) => ({
+  const chartData = Array.from(dailyDataMap.entries()).map(([day, val]) => ({
     day: `${day} ${startDate.toLocaleDateString('en-US', { month: 'short' })}`,
-    revenue
+    revenue: val.revenue,
+    ordersCount: val.ordersCount,
   }));
 
   return (
