@@ -25,11 +25,14 @@ import {
   appendSheetRows,
   batchUpdateSheetRows,
   recordBackupLog,
+  getSpreadsheetMetadata,
 } from './sheets';
 import { SyncEntity, SyncOperation, SyncResult, FullSyncStats, FullSyncEntityStats } from './types';
+import { formatSheetsError, isQuotaExceededError } from './metrics';
 
 /**
- * Synchronizes a single entity record from PostgreSQL to Google Sheets
+ * Synchronizes a single entity record from PostgreSQL to Google Sheets.
+ * Uses cached sheet metadata and row-ID mapping to minimize API reads.
  */
 export async function syncRecordToGoogleSheets(
   entity: SyncEntity,
@@ -42,7 +45,7 @@ export async function syncRecordToGoogleSheets(
   try {
     sheetsClient = await getGoogleSheetsClient();
   } catch (err: unknown) {
-    const errorMsg = err instanceof Error ? err.message : 'Failed to get Google Sheets client';
+    const errorMsg = formatSheetsError(err);
     return {
       success: false,
       entity,
@@ -57,9 +60,10 @@ export async function syncRecordToGoogleSheets(
   const headers = SHEET_HEADERS[tabName];
 
   try {
+    // 1. Ensure sheet tab and headers exist (cached after first read)
     await ensureSheetWithHeaders(sheets, spreadsheetId, tabName, headers);
 
-    // Fetch entity record from database
+    // 2. Fetch entity record from database
     let rowData: (string | number)[] | null = null;
     const isDelete = operation === 'DELETE';
 
@@ -303,7 +307,7 @@ export async function syncRecordToGoogleSheets(
       }
     }
 
-    // Check if ID exists in Google Sheet
+    // 3. Check if ID exists in Google Sheet (using cached row map)
     const existingRows = await getSheetRowIds(sheets, spreadsheetId, tabName);
     const existingRowNumber = existingRows.get(databaseId);
 
@@ -312,7 +316,7 @@ export async function syncRecordToGoogleSheets(
         // Update existing row
         await updateSheetRow(sheets, spreadsheetId, tabName, existingRowNumber, rowData);
       } else {
-        // Append new row
+        // Append new row (and updates cache automatically)
         await appendSheetRows(sheets, spreadsheetId, tabName, [rowData]);
       }
     } else if (isDelete && existingRowNumber) {
@@ -328,7 +332,7 @@ export async function syncRecordToGoogleSheets(
       }
     }
 
-    // If entity is partner_transactions and type is PAYOUT, also mirror into Payouts sheet
+    // 4. If entity is partner_transactions and type is PAYOUT, mirror into Payouts sheet
     if (entity === 'partner_transactions' && rowData) {
       try {
         const [txn] = await db
@@ -349,18 +353,20 @@ export async function syncRecordToGoogleSheets(
           }
         }
       } catch (payoutErr) {
-        console.warn('Error mirroring payout to Payouts tab:', payoutErr);
+        console.warn('[Google Sheets] Error mirroring payout to Payouts tab:', formatSheetsError(payoutErr));
       }
     }
 
-    // Record success in Backup Log
-    await recordBackupLog(sheets, spreadsheetId, {
+    // 5. Record success in Backup Log safely (non-blocking & failure-tolerant)
+    void recordBackupLog(sheets, spreadsheetId, {
       timestamp: startTime,
       entity,
       databaseId,
       operation,
       status: 'SUCCESS',
       attempt: 1,
+    }).catch(() => {
+      // Non-critical, already handled inside recordBackupLog
     });
 
     return {
@@ -371,18 +377,21 @@ export async function syncRecordToGoogleSheets(
       rowsAffected: 1,
     };
   } catch (err: unknown) {
-    const errorMsg = err instanceof Error ? err.message : 'Unknown error syncing to Google Sheets';
-    console.error(`Google Sheets sync error for entity ${entity} (${databaseId}):`, err);
+    const errorMsg = formatSheetsError(err);
+    console.error(`[Google Sheets] Sync error for entity ${entity} (${databaseId}):`, errorMsg);
 
-    await recordBackupLog(sheets, spreadsheetId, {
-      timestamp: startTime,
-      entity,
-      databaseId,
-      operation,
-      status: 'FAILED',
-      attempt: 1,
-      error: errorMsg,
-    });
+    // Only attempt backup log if not a quota error
+    if (!isQuotaExceededError(err)) {
+      void recordBackupLog(sheets, spreadsheetId, {
+        timestamp: startTime,
+        entity,
+        databaseId,
+        operation,
+        status: 'FAILED',
+        attempt: 1,
+        error: errorMsg,
+      }).catch(() => {});
+    }
 
     return {
       success: false,
@@ -395,11 +404,14 @@ export async function syncRecordToGoogleSheets(
 }
 
 /**
- * Performs full, idempotent synchronization from PostgreSQL to Google Sheets
+ * Performs full, idempotent synchronization from PostgreSQL to Google Sheets in batches
  */
 export async function syncAllToGoogleSheets(): Promise<FullSyncStats> {
   const startTime = new Date();
   const { sheets, spreadsheetId } = await getGoogleSheetsClient();
+
+  // Load / cache spreadsheet metadata once
+  await getSpreadsheetMetadata(sheets, spreadsheetId);
 
   const entityStats: FullSyncEntityStats[] = [];
   let totalRecords = 0;
@@ -411,7 +423,7 @@ export async function syncAllToGoogleSheets(): Promise<FullSyncStats> {
     await ensureSheetWithHeaders(sheets, spreadsheetId, tabName, headers);
 
     const allOrders = await db.select().from(orders).orderBy(desc(orders.createdAt));
-    const existingIds = await getSheetRowIds(sheets, spreadsheetId, tabName);
+    const existingIds = await getSheetRowIds(sheets, spreadsheetId, tabName, true);
 
     const updates: { rowNumber: number; rowData: (string | number)[] }[] = [];
     const appends: (string | number)[][] = [];
@@ -432,8 +444,8 @@ export async function syncAllToGoogleSheets(): Promise<FullSyncStats> {
     totalRecords += allOrders.length;
     entityStats.push({ entity: 'orders', tabName, count: allOrders.length, success: true });
   } catch (err: unknown) {
-    const errorMsg = err instanceof Error ? err.message : 'Error syncing Orders';
-    console.error('Error syncing Orders:', err);
+    const errorMsg = formatSheetsError(err);
+    console.error('[Google Sheets] Error syncing Orders:', errorMsg);
     entityStats.push({ entity: 'orders', tabName: SHEET_TABS.ORDERS, count: 0, success: false, error: errorMsg });
   }
 
@@ -444,7 +456,7 @@ export async function syncAllToGoogleSheets(): Promise<FullSyncStats> {
     await ensureSheetWithHeaders(sheets, spreadsheetId, tabName, headers);
 
     const allItems = await db.select().from(orderItems);
-    const existingIds = await getSheetRowIds(sheets, spreadsheetId, tabName);
+    const existingIds = await getSheetRowIds(sheets, spreadsheetId, tabName, true);
 
     const updates: { rowNumber: number; rowData: (string | number)[] }[] = [];
     const appends: (string | number)[][] = [];
@@ -465,8 +477,8 @@ export async function syncAllToGoogleSheets(): Promise<FullSyncStats> {
     totalRecords += allItems.length;
     entityStats.push({ entity: 'order_items', tabName, count: allItems.length, success: true });
   } catch (err: unknown) {
-    const errorMsg = err instanceof Error ? err.message : 'Error syncing Order Items';
-    console.error('Error syncing Order Items:', err);
+    const errorMsg = formatSheetsError(err);
+    console.error('[Google Sheets] Error syncing Order Items:', errorMsg);
     entityStats.push({ entity: 'order_items', tabName: SHEET_TABS.ORDER_ITEMS, count: 0, success: false, error: errorMsg });
   }
 
@@ -499,12 +511,12 @@ export async function syncAllToGoogleSheets(): Promise<FullSyncStats> {
       .leftJoin(users, eq(expenses.createdById, users.id))
       .orderBy(desc(expenses.expenseDate));
 
-    const existingIds = await getSheetRowIds(sheets, spreadsheetId, tabName);
+    const existingIds = await getSheetRowIds(sheets, spreadsheetId, tabName, true);
     const updates: { rowNumber: number; rowData: (string | number)[] }[] = [];
     const appends: (string | number)[][] = [];
 
     for (const exp of allExpenses) {
-      const row = RowMapper.expense(exp as Record<string, unknown>, Boolean(exp.deletedAt));
+      const row = RowMapper.expense(exp as Record<string, unknown>, false);
       const existingRow = existingIds.get(exp.id);
       if (existingRow) {
         updates.push({ rowNumber: existingRow, rowData: row });
@@ -519,8 +531,8 @@ export async function syncAllToGoogleSheets(): Promise<FullSyncStats> {
     totalRecords += allExpenses.length;
     entityStats.push({ entity: 'expenses', tabName, count: allExpenses.length, success: true });
   } catch (err: unknown) {
-    const errorMsg = err instanceof Error ? err.message : 'Error syncing Expenses';
-    console.error('Error syncing Expenses:', err);
+    const errorMsg = formatSheetsError(err);
+    console.error('[Google Sheets] Error syncing Expenses:', errorMsg);
     entityStats.push({ entity: 'expenses', tabName: SHEET_TABS.EXPENSES, count: 0, success: false, error: errorMsg });
   }
 
@@ -544,7 +556,7 @@ export async function syncAllToGoogleSheets(): Promise<FullSyncStats> {
       .from(expenseAttachments)
       .leftJoin(users, eq(expenseAttachments.uploadedById, users.id));
 
-    const existingIds = await getSheetRowIds(sheets, spreadsheetId, tabName);
+    const existingIds = await getSheetRowIds(sheets, spreadsheetId, tabName, true);
     const updates: { rowNumber: number; rowData: (string | number)[] }[] = [];
     const appends: (string | number)[][] = [];
 
@@ -564,8 +576,8 @@ export async function syncAllToGoogleSheets(): Promise<FullSyncStats> {
     totalRecords += allAttachments.length;
     entityStats.push({ entity: 'expense_attachments', tabName, count: allAttachments.length, success: true });
   } catch (err: unknown) {
-    const errorMsg = err instanceof Error ? err.message : 'Error syncing Expense Attachments';
-    console.error('Error syncing Expense Attachments:', err);
+    const errorMsg = formatSheetsError(err);
+    console.error('[Google Sheets] Error syncing Expense Attachments:', errorMsg);
     entityStats.push({ entity: 'expense_attachments', tabName: SHEET_TABS.EXPENSE_ATTACHMENTS, count: 0, success: false, error: errorMsg });
   }
 
@@ -575,7 +587,7 @@ export async function syncAllToGoogleSheets(): Promise<FullSyncStats> {
     const headers = SHEET_HEADERS[tabName];
     await ensureSheetWithHeaders(sheets, spreadsheetId, tabName, headers);
 
-    const allEntries = await db
+    const allMonthly = await db
       .select({
         id: monthlyExpenseEntries.id,
         month: monthlyExpenseEntries.month,
@@ -602,11 +614,11 @@ export async function syncAllToGoogleSheets(): Promise<FullSyncStats> {
       .leftJoin(paymentMethods, eq(monthlyExpenseEntries.paymentMethodId, paymentMethods.id))
       .leftJoin(users, eq(monthlyExpenseEntries.paidById, users.id));
 
-    const existingIds = await getSheetRowIds(sheets, spreadsheetId, tabName);
+    const existingIds = await getSheetRowIds(sheets, spreadsheetId, tabName, true);
     const updates: { rowNumber: number; rowData: (string | number)[] }[] = [];
     const appends: (string | number)[][] = [];
 
-    for (const entry of allEntries) {
+    for (const entry of allMonthly) {
       const row = RowMapper.monthlyExpenseEntry(entry as Record<string, unknown>, false);
       const existingRow = existingIds.get(entry.id);
       if (existingRow) {
@@ -619,11 +631,11 @@ export async function syncAllToGoogleSheets(): Promise<FullSyncStats> {
     if (updates.length > 0) await batchUpdateSheetRows(sheets, spreadsheetId, tabName, updates);
     if (appends.length > 0) await appendSheetRows(sheets, spreadsheetId, tabName, appends);
 
-    totalRecords += allEntries.length;
-    entityStats.push({ entity: 'monthly_expenses', tabName, count: allEntries.length, success: true });
+    totalRecords += allMonthly.length;
+    entityStats.push({ entity: 'monthly_expenses', tabName, count: allMonthly.length, success: true });
   } catch (err: unknown) {
-    const errorMsg = err instanceof Error ? err.message : 'Error syncing Monthly Expenses';
-    console.error('Error syncing Monthly Expenses:', err);
+    const errorMsg = formatSheetsError(err);
+    console.error('[Google Sheets] Error syncing Monthly Expenses:', errorMsg);
     entityStats.push({ entity: 'monthly_expenses', tabName: SHEET_TABS.MONTHLY_EXPENSES, count: 0, success: false, error: errorMsg });
   }
 
@@ -651,13 +663,13 @@ export async function syncAllToGoogleSheets(): Promise<FullSyncStats> {
       .from(monthlyExpenseTemplates)
       .leftJoin(paymentMethods, eq(monthlyExpenseTemplates.paymentMethodId, paymentMethods.id));
 
-    const existingIds = await getSheetRowIds(sheets, spreadsheetId, tabName);
+    const existingIds = await getSheetRowIds(sheets, spreadsheetId, tabName, true);
     const updates: { rowNumber: number; rowData: (string | number)[] }[] = [];
     const appends: (string | number)[][] = [];
 
-    for (const tmpl of allTemplates) {
-      const row = RowMapper.monthlyExpenseTemplate(tmpl as Record<string, unknown>, false);
-      const existingRow = existingIds.get(tmpl.id);
+    for (const tpl of allTemplates) {
+      const row = RowMapper.monthlyExpenseTemplate(tpl as Record<string, unknown>, false);
+      const existingRow = existingIds.get(tpl.id);
       if (existingRow) {
         updates.push({ rowNumber: existingRow, rowData: row });
       } else {
@@ -671,18 +683,18 @@ export async function syncAllToGoogleSheets(): Promise<FullSyncStats> {
     totalRecords += allTemplates.length;
     entityStats.push({ entity: 'monthly_expense_templates', tabName, count: allTemplates.length, success: true });
   } catch (err: unknown) {
-    const errorMsg = err instanceof Error ? err.message : 'Error syncing Monthly Expense Templates';
-    console.error('Error syncing Monthly Expense Templates:', err);
+    const errorMsg = formatSheetsError(err);
+    console.error('[Google Sheets] Error syncing Monthly Expense Templates:', errorMsg);
     entityStats.push({ entity: 'monthly_expense_templates', tabName: SHEET_TABS.MONTHLY_EXPENSE_TEMPLATES, count: 0, success: false, error: errorMsg });
   }
 
-  // 7. Meta Ads Transactions
+  // 7. Meta Ads
   try {
     const tabName = SHEET_TABS.META_ADS;
     const headers = SHEET_HEADERS[tabName];
     await ensureSheetWithHeaders(sheets, spreadsheetId, tabName, headers);
 
-    const allMetaTxns = await db
+    const allMetaAds = await db
       .select({
         id: metaAdsTransactions.id,
         weekStartDate: metaAdsTransactions.weekStartDate,
@@ -703,15 +715,16 @@ export async function syncAllToGoogleSheets(): Promise<FullSyncStats> {
       })
       .from(metaAdsTransactions)
       .leftJoin(paymentMethods, eq(metaAdsTransactions.paymentMethodId, paymentMethods.id))
-      .leftJoin(users, eq(metaAdsTransactions.createdById, users.id));
+      .leftJoin(users, eq(metaAdsTransactions.createdById, users.id))
+      .orderBy(desc(metaAdsTransactions.weekStartDate));
 
-    const existingIds = await getSheetRowIds(sheets, spreadsheetId, tabName);
+    const existingIds = await getSheetRowIds(sheets, spreadsheetId, tabName, true);
     const updates: { rowNumber: number; rowData: (string | number)[] }[] = [];
     const appends: (string | number)[][] = [];
 
-    for (const mTxn of allMetaTxns) {
-      const row = RowMapper.metaAdsTransaction(mTxn as Record<string, unknown>, false);
-      const existingRow = existingIds.get(mTxn.id);
+    for (const ad of allMetaAds) {
+      const row = RowMapper.metaAdsTransaction(ad as Record<string, unknown>, false);
+      const existingRow = existingIds.get(ad.id);
       if (existingRow) {
         updates.push({ rowNumber: existingRow, rowData: row });
       } else {
@@ -722,11 +735,11 @@ export async function syncAllToGoogleSheets(): Promise<FullSyncStats> {
     if (updates.length > 0) await batchUpdateSheetRows(sheets, spreadsheetId, tabName, updates);
     if (appends.length > 0) await appendSheetRows(sheets, spreadsheetId, tabName, appends);
 
-    totalRecords += allMetaTxns.length;
-    entityStats.push({ entity: 'meta_ads', tabName, count: allMetaTxns.length, success: true });
+    totalRecords += allMetaAds.length;
+    entityStats.push({ entity: 'meta_ads', tabName, count: allMetaAds.length, success: true });
   } catch (err: unknown) {
-    const errorMsg = err instanceof Error ? err.message : 'Error syncing Meta Ads';
-    console.error('Error syncing Meta Ads:', err);
+    const errorMsg = formatSheetsError(err);
+    console.error('[Google Sheets] Error syncing Meta Ads:', errorMsg);
     entityStats.push({ entity: 'meta_ads', tabName: SHEET_TABS.META_ADS, count: 0, success: false, error: errorMsg });
   }
 
@@ -737,14 +750,14 @@ export async function syncAllToGoogleSheets(): Promise<FullSyncStats> {
     await ensureSheetWithHeaders(sheets, spreadsheetId, tabName, headers);
 
     const allPartners = await db.select().from(partners);
-    const existingIds = await getSheetRowIds(sheets, spreadsheetId, tabName);
+    const existingIds = await getSheetRowIds(sheets, spreadsheetId, tabName, true);
 
     const updates: { rowNumber: number; rowData: (string | number)[] }[] = [];
     const appends: (string | number)[][] = [];
 
-    for (const p of allPartners) {
-      const row = RowMapper.partner(p as Record<string, unknown>, false);
-      const existingRow = existingIds.get(p.id);
+    for (const part of allPartners) {
+      const row = RowMapper.partner(part as Record<string, unknown>, false);
+      const existingRow = existingIds.get(part.id);
       if (existingRow) {
         updates.push({ rowNumber: existingRow, rowData: row });
       } else {
@@ -758,19 +771,19 @@ export async function syncAllToGoogleSheets(): Promise<FullSyncStats> {
     totalRecords += allPartners.length;
     entityStats.push({ entity: 'partners', tabName, count: allPartners.length, success: true });
   } catch (err: unknown) {
-    const errorMsg = err instanceof Error ? err.message : 'Error syncing Partners';
-    console.error('Error syncing Partners:', err);
+    const errorMsg = formatSheetsError(err);
+    console.error('[Google Sheets] Error syncing Partners:', errorMsg);
     entityStats.push({ entity: 'partners', tabName: SHEET_TABS.PARTNERS, count: 0, success: false, error: errorMsg });
   }
 
   // 9. Partner Transactions & Payouts
   try {
     const tabName = SHEET_TABS.PARTNER_TRANSACTIONS;
-    const headers = SHEET_HEADERS[tabName];
-    await ensureSheetWithHeaders(sheets, spreadsheetId, tabName, headers);
-
     const payoutsTab = SHEET_TABS.PAYOUTS;
+    const headers = SHEET_HEADERS[tabName];
     const payoutsHeaders = SHEET_HEADERS[payoutsTab];
+
+    await ensureSheetWithHeaders(sheets, spreadsheetId, tabName, headers);
     await ensureSheetWithHeaders(sheets, spreadsheetId, payoutsTab, payoutsHeaders);
 
     const allPartnerTxns = await db
@@ -793,10 +806,11 @@ export async function syncAllToGoogleSheets(): Promise<FullSyncStats> {
       .from(partnerTransactions)
       .leftJoin(partners, eq(partnerTransactions.partnerId, partners.id))
       .leftJoin(paymentMethods, eq(partnerTransactions.paymentMethodId, paymentMethods.id))
-      .leftJoin(users, eq(partnerTransactions.createdById, users.id));
+      .leftJoin(users, eq(partnerTransactions.createdById, users.id))
+      .orderBy(desc(partnerTransactions.transactionDate));
 
-    const existingIds = await getSheetRowIds(sheets, spreadsheetId, tabName);
-    const existingPayoutIds = await getSheetRowIds(sheets, spreadsheetId, payoutsTab);
+    const existingIds = await getSheetRowIds(sheets, spreadsheetId, tabName, true);
+    const existingPayoutIds = await getSheetRowIds(sheets, spreadsheetId, payoutsTab, true);
 
     const updates: { rowNumber: number; rowData: (string | number)[] }[] = [];
     const appends: (string | number)[][] = [];
@@ -833,8 +847,8 @@ export async function syncAllToGoogleSheets(): Promise<FullSyncStats> {
     entityStats.push({ entity: 'partner_transactions', tabName, count: allPartnerTxns.length, success: true });
     entityStats.push({ entity: 'payouts', tabName: payoutsTab, count: payoutUpdates.length + payoutAppends.length, success: true });
   } catch (err: unknown) {
-    const errorMsg = err instanceof Error ? err.message : 'Error syncing Partner Transactions';
-    console.error('Error syncing Partner Transactions:', err);
+    const errorMsg = formatSheetsError(err);
+    console.error('[Google Sheets] Error syncing Partner Transactions:', errorMsg);
     entityStats.push({ entity: 'partner_transactions', tabName: SHEET_TABS.PARTNER_TRANSACTIONS, count: 0, success: false, error: errorMsg });
   }
 
@@ -868,7 +882,7 @@ export async function syncAllToGoogleSheets(): Promise<FullSyncStats> {
       .leftJoin(issueCategories, eq(orderIssues.categoryId, issueCategories.id))
       .leftJoin(users, eq(orderIssues.createdById, users.id));
 
-    const existingIds = await getSheetRowIds(sheets, spreadsheetId, tabName);
+    const existingIds = await getSheetRowIds(sheets, spreadsheetId, tabName, true);
     const updates: { rowNumber: number; rowData: (string | number)[] }[] = [];
     const appends: (string | number)[][] = [];
 
@@ -888,16 +902,16 @@ export async function syncAllToGoogleSheets(): Promise<FullSyncStats> {
     totalRecords += allIssues.length;
     entityStats.push({ entity: 'order_issues', tabName, count: allIssues.length, success: true });
   } catch (err: unknown) {
-    const errorMsg = err instanceof Error ? err.message : 'Error syncing Order Issues';
-    console.error('Error syncing Order Issues:', err);
+    const errorMsg = formatSheetsError(err);
+    console.error('[Google Sheets] Error syncing Order Issues:', errorMsg);
     entityStats.push({ entity: 'order_issues', tabName: SHEET_TABS.ORDER_ISSUES, count: 0, success: false, error: errorMsg });
   }
 
   const completedTime = new Date();
   const durationMs = completedTime.getTime() - startTime.getTime();
 
-  // Record Full Sync in Backup Log
-  await recordBackupLog(sheets, spreadsheetId, {
+  // Record Full Sync in Backup Log safely
+  void recordBackupLog(sheets, spreadsheetId, {
     timestamp: startTime,
     entity: 'ALL',
     databaseId: 'FULL_SYNC',
@@ -905,7 +919,7 @@ export async function syncAllToGoogleSheets(): Promise<FullSyncStats> {
     status: 'SUCCESS',
     attempt: 1,
     error: `Full sync completed: ${totalRecords} records across ${entityStats.length} tabs in ${(durationMs / 1000).toFixed(1)}s`,
-  });
+  }).catch(() => {});
 
   return {
     success: true,

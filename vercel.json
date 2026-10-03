@@ -1,0 +1,12 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/sync-orders",
+      "schedule": "*/3 * * * *"
+    },
+    {
+      "path": "/api/cron/google-sheets-sync",
+      "schedule": "0 12 * * *"
+    }
+  ]
+}

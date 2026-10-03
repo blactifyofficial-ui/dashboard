@@ -4,6 +4,8 @@ import { ConnectionStatusResult } from './types';
 import { db } from '@/db';
 import { googleSheetsSyncQueue } from '@/db/schema';
 import { desc } from 'drizzle-orm';
+import { getSpreadsheetMetadata } from './sheets';
+import { getGoogleSheetsMetrics, formatSheetsError } from './metrics';
 
 /**
  * Creates and returns an authenticated Google Sheets API client
@@ -31,7 +33,7 @@ export async function getGoogleSheetsClient(): Promise<{
 }
 
 /**
- * Tests connection to Google Sheets spreadsheet and returns status metadata
+ * Tests connection to Google Sheets spreadsheet, updates metadata cache, and returns status
  */
 export async function testGoogleSheetsConnection(): Promise<ConnectionStatusResult> {
   const config = getGoogleSheetsConfig();
@@ -56,7 +58,7 @@ export async function testGoogleSheetsConnection(): Promise<ConnectionStatusResu
       lastSuccessfulSync = new Date(lastSuccess.updatedAt).toISOString();
     }
   } catch (err) {
-    console.error('Error querying sync queue stats:', err);
+    console.error('[Google Sheets] Error querying sync queue stats:', formatSheetsError(err));
   }
 
   if (!config.isConfigured || !config.clientEmail || !config.privateKey) {
@@ -66,29 +68,26 @@ export async function testGoogleSheetsConnection(): Promise<ConnectionStatusResu
       pendingSyncsCount,
       failedSyncsCount,
       lastSuccessfulSync,
+      metrics: getGoogleSheetsMetrics(),
       error: 'Google Service Account credentials missing or incomplete (GOOGLE_SERVICE_ACCOUNT_EMAIL, GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY).',
     };
   }
 
   try {
     const { sheets, spreadsheetId } = await getGoogleSheetsClient();
-    const response = await sheets.spreadsheets.get({
-      spreadsheetId,
-      fields: 'properties.title,sheets.properties.title',
-    });
+    // Refresh and cache metadata
+    const metadata = await getSpreadsheetMetadata(sheets, spreadsheetId, true);
 
-    const spreadsheetTitle = response.data.properties?.title || 'Google Sheet';
-    const sheetNames = (response.data.sheets || [])
-      .map((s) => s.properties?.title)
-      .filter((t): t is string => Boolean(t));
+    const spreadsheetTitle = metadata.title || 'Google Sheet';
+    const sheetNames = Array.from(metadata.sheets.keys());
 
-    // Test write permission
+    // Test write permission if there are sheets
     let writePermissionWarning: string | null = null;
     try {
       const firstSheet = sheetNames[0] || 'Sheet1';
       await sheets.spreadsheets.values.append({
         spreadsheetId,
-        range: `${firstSheet}!Z1000`,
+        range: `'${firstSheet}'!Z1000`,
         valueInputOption: 'RAW',
         requestBody: { values: [] },
       });
@@ -107,17 +106,19 @@ export async function testGoogleSheetsConnection(): Promise<ConnectionStatusResu
       lastSuccessfulSync,
       pendingSyncsCount,
       failedSyncsCount,
+      metrics: getGoogleSheetsMetrics(),
       error: writePermissionWarning,
     };
   } catch (err: unknown) {
-    const errorMessage = err instanceof Error ? err.message : 'Failed to authenticate with Google Sheets API.';
-    console.error('Google Sheets connection error:', err);
+    const errorMessage = formatSheetsError(err);
+    console.error('[Google Sheets] Connection error:', errorMessage);
     return {
       connected: false,
       spreadsheetId: config.spreadsheetId,
       pendingSyncsCount,
       failedSyncsCount,
       lastSuccessfulSync,
+      metrics: getGoogleSheetsMetrics(),
       error: errorMessage,
     };
   }

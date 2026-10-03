@@ -6,8 +6,9 @@ import SignOutLink from"@/components/SignOutLink";
 import { Toaster } from "react-hot-toast";
 import { auth } from"@/lib/auth/server";
 import { db } from"@/db";
-import { allowedUsers } from"@/db/schema";
-import { eq } from"drizzle-orm";
+import { allowedUsers } from "@/db/schema";
+import { eq } from "drizzle-orm";
+import AutoSyncManager from "@/components/AutoSyncManager";
 
 
 const inter = Inter({
@@ -67,7 +68,12 @@ export const dynamic ='force-dynamic';
     >
       <body className="h-[100dvh] overflow-hidden bg-black text-neutral-100 flex flex-col md:flex-row relative selection:bg-white/30 font-sans">
         {/* Sidebar */}
-        {session?.user && <ResponsiveSidebar />}
+        {session?.user && (
+          <>
+            <ResponsiveSidebar />
+            <AutoSyncManager />
+          </>
+        )}
 
         {/* Main Content */}
         {session?.user ? (

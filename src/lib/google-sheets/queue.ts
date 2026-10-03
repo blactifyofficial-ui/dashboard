@@ -1,8 +1,9 @@
 import { db } from '@/db';
 import { googleSheetsSyncQueue } from '@/db/schema';
-import { eq, or, and, desc } from 'drizzle-orm';
+import { eq, or, and, lte, isNull, asc, desc } from 'drizzle-orm';
 import { syncRecordToGoogleSheets } from './sync';
 import { SyncEntity, SyncOperation, SyncStatus } from './types';
+import { incrementMetric, formatSheetsError, isQuotaExceededError } from './metrics';
 
 interface EnqueueOptions {
   entity: SyncEntity;
@@ -11,28 +12,106 @@ interface EnqueueOptions {
   payload?: unknown;
 }
 
+// Configurable concurrency limit (default: 2 simultaneous Google Sheets operations)
+const MAX_CONCURRENCY = Math.max(
+  1,
+  parseInt(process.env.GOOGLE_SHEETS_SYNC_CONCURRENCY || '2', 10)
+);
+
+// Worker state
+let activeWorkers = 0;
+let isQueueRunnerScheduled = false;
+let rateLimitCooldownUntil = 0;
+
 /**
- * Calculates exponential backoff delay in milliseconds
- * 1st attempt: 2s, 2nd attempt: 5s, 3rd attempt: 15s, 4th attempt: 60s, 5th+: 300s
+ * Calculates exponential backoff delay with randomized jitter in milliseconds
  */
-function getBackoffDelayMs(attemptNumber: number): number {
-  switch (attemptNumber) {
-    case 1:
-      return 2000;
-    case 2:
-      return 5000;
-    case 3:
-      return 15000;
-    case 4:
-      return 60000;
-    default:
-      return 300000;
+function getBackoffDelayWithJitter(attemptNumber: number, is429: boolean): number {
+  const baseDelay = is429 ? 3000 : 1500;
+  const maxDelay = is429 ? 60000 : 30000;
+  const exponential = Math.min(maxDelay, Math.pow(2, attemptNumber) * baseDelay);
+  const jitter = Math.random() * 1500;
+  return Math.round(exponential + jitter);
+}
+
+/**
+ * Schedules background queue processing if not already running
+ */
+export function scheduleQueueProcessing(): void {
+  if (isQueueRunnerScheduled) return;
+  isQueueRunnerScheduled = true;
+
+  // Run on next tick
+  setTimeout(() => {
+    isQueueRunnerScheduled = false;
+    void runQueueProcessor();
+  }, 10);
+}
+
+/**
+ * Controlled background queue processor that respects MAX_CONCURRENCY and 429 rate limit cooldowns
+ */
+async function runQueueProcessor(): Promise<void> {
+  const now = Date.now();
+  if (now < rateLimitCooldownUntil) {
+    const remainingCooldown = rateLimitCooldownUntil - now;
+    if (!isQueueRunnerScheduled) {
+      isQueueRunnerScheduled = true;
+      setTimeout(() => {
+        isQueueRunnerScheduled = false;
+        void runQueueProcessor();
+      }, remainingCooldown + 50);
+    }
+    return;
+  }
+
+  while (activeWorkers < MAX_CONCURRENCY) {
+    const slotsAvailable = MAX_CONCURRENCY - activeWorkers;
+    if (slotsAvailable <= 0) break;
+
+    try {
+      const pendingJobs = await db
+        .select()
+        .from(googleSheetsSyncQueue)
+        .where(
+          and(
+            eq(googleSheetsSyncQueue.status, 'PENDING'),
+            or(
+              isNull(googleSheetsSyncQueue.nextRetryAt),
+              lte(googleSheetsSyncQueue.nextRetryAt, new Date())
+            )
+          )
+        )
+        .orderBy(asc(googleSheetsSyncQueue.createdAt))
+        .limit(slotsAvailable);
+
+      if (pendingJobs.length === 0) {
+        break;
+      }
+
+      for (const job of pendingJobs) {
+        if (activeWorkers >= MAX_CONCURRENCY) break;
+        activeWorkers++;
+
+        void (async () => {
+          try {
+            await processSyncJob(job.id);
+          } finally {
+            activeWorkers = Math.max(0, activeWorkers - 1);
+            scheduleQueueProcessing();
+          }
+        })();
+      }
+    } catch (err) {
+      console.error('[Google Sheets] Error polling sync queue:', formatSheetsError(err));
+      break;
+    }
   }
 }
 
 /**
- * Enqueues a sync job in the database outbox and triggers background execution
- * Never throws or fails the caller - guarantees DB mutations are not disrupted.
+ * Enqueues a sync job in the database outbox and notifies the concurrency-controlled runner.
+ * Guarantees DB mutations are never disrupted.
  */
 export async function enqueueSyncJob(options: EnqueueOptions): Promise<string> {
   const { entity, databaseId, operation = 'UPDATE', payload } = options;
@@ -58,7 +137,7 @@ export async function enqueueSyncJob(options: EnqueueOptions): Promise<string> {
       .limit(1);
 
     if (existing.length > 0) {
-      // Update existing pending job with latest operation and payload
+      // Update existing job with latest payload & mark pending
       await db
         .update(googleSheetsSyncQueue)
         .set({
@@ -69,10 +148,7 @@ export async function enqueueSyncJob(options: EnqueueOptions): Promise<string> {
         })
         .where(eq(googleSheetsSyncQueue.id, existing[0].id));
 
-      // Trigger background attempt
-      void processSyncJob(existing[0].id).catch((e) =>
-        console.error(`Background sync error for job ${existing[0].id}:`, e)
-      );
+      scheduleQueueProcessing();
       return existing[0].id;
     }
 
@@ -90,20 +166,16 @@ export async function enqueueSyncJob(options: EnqueueOptions): Promise<string> {
       updatedAt: new Date(),
     });
 
-    // Execute asynchronously in background without blocking current request
-    void processSyncJob(jobId).catch((e) =>
-      console.error(`Background sync error for job ${jobId}:`, e)
-    );
-
+    scheduleQueueProcessing();
     return jobId;
   } catch (err) {
-    console.error(`Failed to enqueue sync job for ${entity} (${databaseId}):`, err);
+    console.error(`[Google Sheets] Failed to enqueue sync job for ${entity} (${databaseId}):`, formatSheetsError(err));
     return jobId;
   }
 }
 
 /**
- * Processes a single sync job with error handling and exponential backoff retry logic
+ * Processes a single sync job with controlled error handling and exponential backoff retry logic
  */
 export async function processSyncJob(jobId: string): Promise<boolean> {
   try {
@@ -130,7 +202,7 @@ export async function processSyncJob(jobId: string): Promise<boolean> {
       })
       .where(eq(googleSheetsSyncQueue.id, jobId));
 
-    // Attempt the synchronization
+    // Attempt synchronization
     const result = await syncRecordToGoogleSheets(
       job.entity as SyncEntity,
       job.databaseId,
@@ -138,7 +210,6 @@ export async function processSyncJob(jobId: string): Promise<boolean> {
     );
 
     if (result.success) {
-      // Update as SUCCESS
       await db
         .update(googleSheetsSyncQueue)
         .set({
@@ -148,13 +219,26 @@ export async function processSyncJob(jobId: string): Promise<boolean> {
           updatedAt: new Date(),
         })
         .where(eq(googleSheetsSyncQueue.id, jobId));
+
+      incrementMetric('successfulSyncs');
       return true;
     } else {
-      // Sync failed
+      const is429 = isQuotaExceededError(result.error);
       const newAttempts = currentAttempts + 1;
-      const delayMs = getBackoffDelayMs(newAttempts);
+      const delayMs = getBackoffDelayWithJitter(newAttempts, is429);
       const nextRetryAt = new Date(Date.now() + delayMs);
       const finalStatus: SyncStatus = newAttempts >= maxAttempts ? 'FAILED' : 'PENDING';
+
+      if (is429) {
+        rateLimitCooldownUntil = Math.max(rateLimitCooldownUntil, Date.now() + delayMs);
+        incrementMetric('quota429Errors');
+        incrementMetric('retryCount');
+        console.warn(
+          `[Google Sheets] 429 Quota limit hit for ${job.entity} (${job.databaseId}). Cooldown for ${Math.round(delayMs)}ms (attempt ${newAttempts}/${maxAttempts}).`
+        );
+      } else {
+        incrementMetric('failedSyncs');
+      }
 
       await db
         .update(googleSheetsSyncQueue)
@@ -170,8 +254,10 @@ export async function processSyncJob(jobId: string): Promise<boolean> {
       return false;
     }
   } catch (err: unknown) {
-    const errorMsg = err instanceof Error ? err.message : 'Execution error during sync';
-    console.error(`Error in processSyncJob for ${jobId}:`, err);
+    const errorMsg = formatSheetsError(err);
+    console.error(`[Google Sheets] Error processing sync job ${jobId}:`, errorMsg);
+    incrementMetric('failedSyncs');
+
     try {
       await db
         .update(googleSheetsSyncQueue)
@@ -182,7 +268,7 @@ export async function processSyncJob(jobId: string): Promise<boolean> {
         })
         .where(eq(googleSheetsSyncQueue.id, jobId));
     } catch {
-      // Ignore secondary update error
+      // Ignore secondary error
     }
     return false;
   }
@@ -212,12 +298,12 @@ export async function retryFailedSyncJobs(): Promise<{
   let failed = 0;
 
   for (const job of failedJobs) {
-    // Reset attempts if it was completely failed
     await db
       .update(googleSheetsSyncQueue)
       .set({
         status: 'PENDING',
         attempts: '0',
+        nextRetryAt: null,
         updatedAt: new Date(),
       })
       .where(eq(googleSheetsSyncQueue.id, job.id));
@@ -229,6 +315,8 @@ export async function retryFailedSyncJobs(): Promise<{
       failed++;
     }
   }
+
+  scheduleQueueProcessing();
 
   return {
     totalRetried: failedJobs.length,

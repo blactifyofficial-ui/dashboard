@@ -59,6 +59,16 @@ export interface FullSyncStats {
   error?: string;
 }
 
+export interface GoogleSheetsMetrics {
+  metadataCacheHits: number;
+  metadataCacheMisses: number;
+  sheetCreations: number;
+  quota429Errors: number;
+  retryCount: number;
+  successfulSyncs: number;
+  failedSyncs: number;
+}
+
 export interface ConnectionStatusResult {
   connected: boolean;
   spreadsheetId: string;
@@ -67,5 +77,6 @@ export interface ConnectionStatusResult {
   lastSuccessfulSync?: string | null;
   pendingSyncsCount: number;
   failedSyncsCount: number;
+  metrics?: GoogleSheetsMetrics;
   error?: string | null;
 }

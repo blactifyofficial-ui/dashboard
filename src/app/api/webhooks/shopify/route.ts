@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { db } from '@/db';
-import { orders } from '@/db/schema';
+import { orders, orderItems } from '@/db/schema';
 import { enqueueSyncJob } from '@/lib/google-sheets';
 
 export async function POST(req: Request) {
@@ -28,7 +28,19 @@ export async function POST(req: Request) {
     // Check webhook topic
     const topic = req.headers.get('X-Shopify-Topic');
     if (topic === 'orders/create' || topic === 'orders/updated') {
-      const { id, order_number, customer, current_total_price, currency, financial_status, fulfillment_status, payment_gateway_names, gateway } = payload;
+      const {
+        id,
+        order_number,
+        customer,
+        current_total_price,
+        currency,
+        created_at,
+        financial_status,
+        fulfillment_status,
+        payment_gateway_names,
+        gateway,
+        line_items,
+      } = payload;
       
       const customerName = customer ? `${customer.first_name || ''} ${customer.last_name || ''}`.trim() : null;
       const customerEmail = customer ? customer.email : null;
@@ -44,6 +56,7 @@ export async function POST(req: Request) {
         customerEmail: customerEmail,
         totalPrice: current_total_price,
         currency: currency,
+        createdAt: created_at ? new Date(created_at) : undefined,
         financialStatus: financial_status,
         fulfillmentStatus: fulfillment_status,
         paymentGateway: paymentGateway,
@@ -54,6 +67,7 @@ export async function POST(req: Request) {
           customerEmail,
           totalPrice: current_total_price,
           currency,
+          createdAt: created_at ? new Date(created_at) : undefined,
           financialStatus: financial_status,
           fulfillmentStatus: fulfillment_status,
           paymentGateway: paymentGateway,
@@ -66,6 +80,34 @@ export async function POST(req: Request) {
         databaseId: id.toString(),
         operation: 'UPDATE',
       });
+
+      // Sync line items if provided in webhook payload
+      if (Array.isArray(line_items) && line_items.length > 0) {
+        for (const item of line_items) {
+          if (!item.id) continue;
+          await db.insert(orderItems).values({
+            id: item.id.toString(),
+            orderId: id.toString(),
+            shopifyProductId: item.product_id?.toString() || null,
+            title: item.title,
+            quantity: item.quantity?.toString() || '0',
+            price: item.price,
+          }).onConflictDoUpdate({
+            target: orderItems.id,
+            set: {
+              title: item.title,
+              quantity: item.quantity?.toString() || '0',
+              price: item.price,
+            }
+          });
+
+          void enqueueSyncJob({
+            entity: 'order_items',
+            databaseId: item.id.toString(),
+            operation: 'UPDATE',
+          });
+        }
+      }
     }
 
     return NextResponse.json({ success: true }, { status: 200 });
@@ -74,4 +116,3 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
-
