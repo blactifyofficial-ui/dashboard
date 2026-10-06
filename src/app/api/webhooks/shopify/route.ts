@@ -27,7 +27,7 @@ export async function POST(req: Request) {
     
     // Check webhook topic
     const topic = req.headers.get('X-Shopify-Topic');
-    if (topic === 'orders/create' || topic === 'orders/updated') {
+    if (topic === 'orders/create' || topic === 'orders/updated' || topic === 'orders/fulfilled' || topic === 'orders/partially_fulfilled' || topic === 'orders/paid') {
       const {
         id,
         order_number,
@@ -40,6 +40,7 @@ export async function POST(req: Request) {
         payment_gateway_names,
         gateway,
         line_items,
+        fulfillments,
       } = payload;
       
       const customerName = customer ? `${customer.first_name || ''} ${customer.last_name || ''}`.trim() : null;
@@ -47,6 +48,35 @@ export async function POST(req: Request) {
       const paymentGateway = Array.isArray(payment_gateway_names) && payment_gateway_names.length > 0
         ? payment_gateway_names.join(', ')
         : (gateway || null);
+
+      let trackingId: string | null = null;
+      let trackingCompany: string | null = null;
+      let trackingUrl: string | null = null;
+
+      if (Array.isArray(fulfillments) && fulfillments.length > 0) {
+        const trackingNumbers = fulfillments
+          .map((f: { tracking_number?: string | null; tracking_numbers?: string[] | null }) => 
+            f.tracking_number || (Array.isArray(f.tracking_numbers) && f.tracking_numbers.length > 0 ? f.tracking_numbers.join(', ') : null)
+          )
+          .filter(Boolean);
+        if (trackingNumbers.length > 0) {
+          trackingId = trackingNumbers.join(', ');
+        }
+
+        const companies = fulfillments
+          .map((f: { tracking_company?: string | null }) => f.tracking_company)
+          .filter(Boolean);
+        if (companies.length > 0) {
+          trackingCompany = companies.join(', ');
+        }
+
+        const urlObj = fulfillments.find((f: { tracking_url?: string | null; tracking_urls?: string[] | null }) => 
+          f.tracking_url || (Array.isArray(f.tracking_urls) && f.tracking_urls.length > 0)
+        );
+        if (urlObj) {
+          trackingUrl = urlObj.tracking_url || urlObj.tracking_urls?.[0] || null;
+        }
+      }
 
       await db.insert(orders).values({
         id: id.toString(),
@@ -60,6 +90,9 @@ export async function POST(req: Request) {
         financialStatus: financial_status,
         fulfillmentStatus: fulfillment_status,
         paymentGateway: paymentGateway,
+        trackingId: trackingId,
+        trackingCompany: trackingCompany,
+        trackingUrl: trackingUrl,
       }).onConflictDoUpdate({
         target: orders.shopifyOrderId,
         set: {
@@ -71,6 +104,9 @@ export async function POST(req: Request) {
           financialStatus: financial_status,
           fulfillmentStatus: fulfillment_status,
           paymentGateway: paymentGateway,
+          trackingId: trackingId,
+          trackingCompany: trackingCompany,
+          trackingUrl: trackingUrl,
         }
       });
 

@@ -28,6 +28,9 @@ export interface MonthOrderDetail {
   financialStatus: string | null;
   fulfillmentStatus: string | null;
   paymentGateway: string | null;
+  trackingId?: string | null;
+  trackingCompany?: string | null;
+  trackingUrl?: string | null;
 }
 
 interface MonthOrdersTableProps {
@@ -370,13 +373,33 @@ export default function MonthOrdersTable({ orders }: MonthOrdersTableProps) {
 
                     {/* Fulfillment */}
                     <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium ${
-                        order.fulfillmentStatus === 'fulfilled'
-                          ? 'bg-blue-500/15 text-blue-300 border border-blue-500/20'
-                          : 'bg-neutral-800 text-neutral-400 border border-white/5'
-                      }`}>
-                        {order.fulfillmentStatus ? order.fulfillmentStatus.charAt(0).toUpperCase() + order.fulfillmentStatus.slice(1) : 'Unfulfilled'}
-                      </span>
+                      <div className="flex flex-col gap-1">
+                        <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium w-fit ${
+                          order.fulfillmentStatus === 'fulfilled'
+                            ? 'bg-blue-500/15 text-blue-300 border border-blue-500/20'
+                            : 'bg-neutral-800 text-neutral-400 border border-white/5'
+                        }`}>
+                          {order.fulfillmentStatus ? order.fulfillmentStatus.charAt(0).toUpperCase() + order.fulfillmentStatus.slice(1) : 'Unfulfilled'}
+                        </span>
+                        {order.trackingId && (
+                          order.trackingUrl ? (
+                            <a
+                              href={order.trackingUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="font-mono text-[11px] text-blue-400 hover:text-blue-300 hover:underline flex items-center gap-0.5 w-fit"
+                              title={`${order.trackingCompany || 'Courier'}: ${order.trackingId}`}
+                            >
+                              <span>{order.trackingCompany ? `${order.trackingCompany}: ` : ''}{order.trackingId}</span>
+                              <ArrowUpRight size={10} className="shrink-0" />
+                            </a>
+                          ) : (
+                            <span className="font-mono text-[11px] text-neutral-400 select-all">
+                              {order.trackingCompany ? `${order.trackingCompany}: ` : ''}{order.trackingId}
+                            </span>
+                          )
+                        )}
+                      </div>
                     </td>
 
                     {/* Amount */}

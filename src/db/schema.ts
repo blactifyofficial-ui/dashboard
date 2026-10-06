@@ -12,7 +12,9 @@ export const orders = pgTable('orders', {
   financialStatus: text('financial_status'),
   fulfillmentStatus: text('fulfillment_status'),
   paymentGateway: text('payment_gateway'),
-  trackingId: text('tracking_id')
+  trackingId: text('tracking_id'),
+  trackingCompany: text('tracking_company'),
+  trackingUrl: text('tracking_url'),
 });
 
 export const orderItems = pgTable('order_items', {

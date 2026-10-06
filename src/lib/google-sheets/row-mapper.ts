@@ -30,6 +30,8 @@ export const SHEET_HEADERS: Record<string, string[]> = {
     'Financial Status',
     'Fulfillment Status',
     'Tracking ID',
+    'Courier',
+    'Tracking URL',
     'Created At',
     'Sync Status',
   ],
@@ -249,6 +251,8 @@ export const RowMapper = {
       formatString(row.financialStatus),
       formatString(row.fulfillmentStatus),
       formatString(row.trackingId),
+      formatString(row.trackingCompany),
+      formatString(row.trackingUrl),
       formatDate(row.createdAt as Date | string),
       isDeleted ? 'DELETED' : 'ACTIVE',
     ];

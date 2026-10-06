@@ -83,6 +83,8 @@ describe('Google Sheets Backup System', () => {
         financialStatus: 'paid',
         fulfillmentStatus: 'fulfilled',
         trackingId: 'TRK999',
+        trackingCompany: 'Delhivery',
+        trackingUrl: 'https://track.delhivery.com/TRK999',
         createdAt: new Date('2026-10-02T10:00:00Z'),
       };
 

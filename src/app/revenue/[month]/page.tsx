@@ -71,6 +71,9 @@ async function MonthRevenueContent({ year, month, startDate, endDate }: {
     financialStatus: orders.financialStatus,
     fulfillmentStatus: orders.fulfillmentStatus,
     paymentGateway: orders.paymentGateway,
+    trackingId: orders.trackingId,
+    trackingCompany: orders.trackingCompany,
+    trackingUrl: orders.trackingUrl,
   })
     .from(orders)
     .where(

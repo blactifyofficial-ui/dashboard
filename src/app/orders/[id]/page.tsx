@@ -7,6 +7,8 @@ import { ArrowUpRight } from 'lucide-react';
 import { Suspense } from 'react';
 import LoadingSpinner from '@/components/LoadingSpinner';
 
+import BackButton from '@/components/BackButton';
+
 export const dynamic = "force-dynamic";
 
 export default async function OrderDetailPage(props: {
@@ -16,20 +18,7 @@ export default async function OrderDetailPage(props: {
   const orderId = params.id;
 
   return (
-    <div className="p-4 sm:p-6 md:p-8 max-w-7xl mx-auto text-black">
-      <Link 
-        href="/dashboard" 
-        className="text-gray-400 hover:text-white mb-6 inline-flex items-center min-h-[44px] transition-colors"
-      >
-        &larr; Back to Dashboard
-      </Link>
-      
-      <div className="flex items-center justify-between mb-6 sm:mb-8">
-        <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-white">
-          Order Details
-        </h1>
-      </div>
-
+    <div className="space-y-6 relative z-10 max-w-7xl mx-auto">
       <Suspense fallback={<LoadingSpinner />}>
         <OrderDetailContent orderId={orderId} />
       </Suspense>
@@ -61,12 +50,19 @@ async function OrderDetailContent({ orderId }: { orderId: string }) {
 
   return (
     <>
-      <div className="mb-4">
-        <p className="text-xl font-medium tracking-tight text-white/80">
-          Order #{order.orderNumber || order.id.substring(0,6)}
-        </p>
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <header className="flex items-center gap-2.5 sm:gap-3">
+        <BackButton fallbackUrl="/revenue" iconOnly label="Back to Orders" />
+        <div className="space-y-0.5">
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white">
+            Order Details
+          </h1>
+          <p className="text-neutral-400 text-xs sm:text-sm font-mono">
+            Order #{order.orderNumber || order.id.substring(0, 6)}
+          </p>
+        </div>
+      </header>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 pt-2">
         <div className="md:col-span-2 space-y-8">
           
           <div className="bg-[#1e1e1e] p-6 rounded-xl border border-white/10 shadow-sm text-white">
@@ -182,6 +178,48 @@ async function OrderDetailContent({ orderId }: { orderId: string }) {
                 <span className={`px-2 py-1 rounded text-xs font-medium ${order.fulfillmentStatus === 'fulfilled' ? 'bg-blue-500/20 text-blue-400' : 'bg-gray-500/20 text-gray-400'}`}>
                   {order.fulfillmentStatus || 'unfulfilled'}
                 </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-400">Courier</span>
+                {order.trackingUrl ? (
+                  <a
+                    href={order.trackingUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-blue-400 hover:text-blue-300 hover:underline transition-colors font-medium text-xs group"
+                  >
+                    <span>{order.trackingCompany || 'Track Shipment'}</span>
+                    <ArrowUpRight size={13} className="opacity-75 group-hover:opacity-100 shrink-0" />
+                  </a>
+                ) : (
+                  <span className="text-white font-medium text-xs">
+                    {order.trackingCompany || (order.fulfillmentStatus === 'fulfilled' ? 'Standard' : '-')}
+                  </span>
+                )}
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-400">Tracking ID</span>
+                {order.trackingId ? (
+                  order.trackingUrl ? (
+                    <a
+                      href={order.trackingUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-mono text-xs bg-white/10 hover:bg-white/15 px-2 py-1 rounded text-white font-medium inline-flex items-center gap-1 transition-colors select-all"
+                    >
+                      <span>{order.trackingId}</span>
+                      <ArrowUpRight size={11} className="opacity-60 shrink-0" />
+                    </a>
+                  ) : (
+                    <span className="font-mono text-xs bg-white/10 px-2 py-1 rounded text-white font-medium select-all">
+                      {order.trackingId}
+                    </span>
+                  )
+                ) : (
+                  <span className="text-gray-500 text-xs italic">
+                    {order.fulfillmentStatus === 'fulfilled' ? 'Not provided' : 'Unassigned'}
+                  </span>
+                )}
               </div>
               <div className="flex justify-between items-center pt-3 border-t border-white/5 mt-3">
                 <span className="text-gray-400">Total</span>

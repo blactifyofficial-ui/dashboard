@@ -9,6 +9,16 @@ export interface ShopifyLineItem {
   price: string;
 }
 
+export interface ShopifyFulfillment {
+  id?: number;
+  tracking_number?: string | null;
+  tracking_numbers?: string[] | null;
+  tracking_company?: string | null;
+  tracking_url?: string | null;
+  tracking_urls?: string[] | null;
+  status?: string | null;
+}
+
 export interface ShopifyOrder {
   id: number;
   order_number?: number | string | null;
@@ -25,6 +35,7 @@ export interface ShopifyOrder {
   payment_gateway_names?: string[] | null;
   gateway?: string | null;
   line_items?: ShopifyLineItem[] | null;
+  fulfillments?: ShopifyFulfillment[] | null;
 }
 
 interface ShopifyProduct {
@@ -126,6 +137,25 @@ export async function syncShopifyOrders(options: SyncOptions = {}): Promise<Sync
       ? order.payment_gateway_names.join(', ')
       : (order.gateway || null);
 
+    const trackingId = order.fulfillments && order.fulfillments.length > 0
+      ? order.fulfillments
+          .map((f) => f.tracking_number || (f.tracking_numbers && f.tracking_numbers.length > 0 ? f.tracking_numbers.join(', ') : null))
+          .filter(Boolean)
+          .join(', ') || null
+      : null;
+
+    const trackingCompany = order.fulfillments && order.fulfillments.length > 0
+      ? order.fulfillments
+          .map((f) => f.tracking_company)
+          .filter(Boolean)
+          .join(', ') || null
+      : null;
+
+    const trackingUrl = order.fulfillments && order.fulfillments.length > 0
+      ? (order.fulfillments.find((f) => f.tracking_url)?.tracking_url || 
+         order.fulfillments.find((f) => f.tracking_urls && f.tracking_urls.length > 0)?.tracking_urls?.[0] || null)
+      : null;
+
     await db.insert(orders).values({
       id: order.id.toString(),
       shopifyOrderId: order.id.toString(),
@@ -138,6 +168,9 @@ export async function syncShopifyOrders(options: SyncOptions = {}): Promise<Sync
       financialStatus: order.financial_status,
       fulfillmentStatus: order.fulfillment_status,
       paymentGateway: paymentGateway,
+      trackingId: trackingId,
+      trackingCompany: trackingCompany,
+      trackingUrl: trackingUrl,
     }).onConflictDoUpdate({
       target: orders.shopifyOrderId,
       set: {
@@ -149,6 +182,9 @@ export async function syncShopifyOrders(options: SyncOptions = {}): Promise<Sync
         financialStatus: order.financial_status,
         fulfillmentStatus: order.fulfillment_status,
         paymentGateway: paymentGateway,
+        trackingId: trackingId,
+        trackingCompany: trackingCompany,
+        trackingUrl: trackingUrl,
       }
     });
 
