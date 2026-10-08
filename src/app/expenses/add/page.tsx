@@ -107,76 +107,76 @@ export default function AddExpensePage() {
       <div className="flex items-center gap-3 sm:gap-4">
         <Link 
           href="/expenses" 
-          className="w-11 h-11 flex items-center justify-center hover:bg-white/10 rounded-lg transition-colors text-white/60 hover:text-white shrink-0"
+          className="w-9 h-9 flex items-center justify-center bg-neutral-800 hover:bg-neutral-700 rounded-lg transition-colors text-neutral-300 hover:text-white border border-neutral-700 shrink-0"
         >
-          <ArrowLeft size={20} />
+          <ArrowLeft size={16} />
         </Link>
         <div className="min-w-0">
-          <h1 className="text-xl sm:text-2xl font-bold truncate">Add Expense</h1>
-          <p className="text-xs sm:text-sm text-white/60">Create a new business expense record</p>
+          <h1 className="text-xl sm:text-2xl font-bold truncate text-white">Add Expense</h1>
+          <p className="text-xs sm:text-sm text-neutral-400">Create a new business expense record</p>
         </div>
       </div>
 
-      <div className="bg-white/5 border border-white/10 rounded-2xl p-4 sm:p-6">
+      <div className="bg-neutral-900/60 border border-neutral-800 rounded-xl p-4 sm:p-6">
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-white/60">Category</label>
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-neutral-300">Category</label>
                 <select
                   required
                   value={formData.categoryId}
                   onChange={e => setFormData({ ...formData, categoryId: e.target.value })}
-                  className="w-full bg-white/5 border border-white/10 rounded-lg px-3.5 py-2.5 min-h-[44px] text-base md:text-sm focus:outline-none focus:border-white/30"
+                  className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-neutral-500 transition-colors"
                 >
-                  <option value="" className="bg-[#121212] text-white">Select Category</option>
+                  <option value="" className="bg-neutral-900 text-white">Select Category</option>
                   {categories.map(c => (
-                    <option key={c.id} value={c.id} className="bg-[#121212] text-white">{c.name}</option>
+                    <option key={c.id} value={c.id} className="bg-neutral-900 text-white">{c.name}</option>
                   ))}
                 </select>
               </div>
               
               {isOtherCategory && (
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-white/60">Custom Category Name</label>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-neutral-300">Custom Category Name</label>
                   <input
                     required
                     type="text"
                     placeholder="E.g., Software Subscriptions"
                     value={formData.customCategoryName}
                     onChange={e => setFormData({ ...formData, customCategoryName: e.target.value })}
-                    className="w-full bg-white/5 border border-white/10 rounded-lg px-3.5 py-2.5 min-h-[44px] text-base md:text-sm focus:outline-none focus:border-white/30"
+                    className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:border-neutral-500 transition-colors"
                   />
                 </div>
               )}
               
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-white/60">Expense Date</label>
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-neutral-300">Expense Date</label>
                 <input
                   required
                   type="date"
                   value={formData.expenseDate}
                   onChange={e => setFormData({ ...formData, expenseDate: e.target.value })}
-                  className="w-full bg-white/5 border border-white/10 rounded-lg px-3.5 py-2.5 min-h-[44px] text-base md:text-sm focus:outline-none focus:border-white/30"
+                  className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-neutral-500 transition-colors"
                 />
               </div>
             </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-white/60">Title</label>
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-neutral-300">Title</label>
               <input
                 required
                 type="text"
                 placeholder="E.g., Petrol for delivery"
                 value={formData.title}
                 onChange={e => setFormData({ ...formData, title: e.target.value })}
-                className="w-full bg-white/5 border border-white/10 rounded-lg px-3.5 py-2.5 min-h-[44px] text-base md:text-sm focus:outline-none focus:border-white/30"
+                className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:border-neutral-500 transition-colors"
               />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-white/60">Amount (₹)</label>
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-neutral-300">Amount (₹)</label>
                 <input
                   required
                   type="number"
@@ -185,69 +185,69 @@ export default function AddExpensePage() {
                   placeholder="0.00"
                   value={formData.amount}
                   onChange={e => setFormData({ ...formData, amount: e.target.value })}
-                  className="w-full bg-white/5 border border-white/10 rounded-lg px-3.5 py-2.5 min-h-[44px] text-base md:text-sm focus:outline-none focus:border-white/30"
+                  className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:border-neutral-500 font-mono transition-colors"
                 />
               </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-white/60">Payment Method</label>
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-neutral-300">Payment Method</label>
                 <select
                   required
                   value={formData.paymentMethodId}
                   onChange={e => setFormData({ ...formData, paymentMethodId: e.target.value })}
-                  className="w-full bg-white/5 border border-white/10 rounded-lg px-3.5 py-2.5 min-h-[44px] text-base md:text-sm focus:outline-none focus:border-white/30"
+                  className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-neutral-500 transition-colors"
                 >
-                  <option value="" className="bg-[#121212] text-white">Select Payment</option>
+                  <option value="" className="bg-neutral-900 text-white">Select Payment</option>
                   {paymentMethods.map(p => (
-                    <option key={p.id} value={p.id} className="bg-[#121212] text-white">{p.name}</option>
+                    <option key={p.id} value={p.id} className="bg-neutral-900 text-white">{p.name}</option>
                   ))}
                 </select>
               </div>
             </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-white/60">Description (Optional)</label>
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-neutral-300">Description (Optional)</label>
               <textarea
                 placeholder="Enter additional details..."
                 value={formData.description}
                 onChange={e => setFormData({ ...formData, description: e.target.value })}
-                className="w-full bg-white/5 border border-white/10 rounded-lg px-3.5 py-2.5 text-base md:text-sm focus:outline-none focus:border-white/30 h-24 resize-none"
+                className="w-full bg-neutral-950 border border-neutral-800 rounded-lg p-3 text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:border-neutral-500 h-24 resize-none transition-colors"
               />
             </div>
             
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-white/60">Initial Remark (Optional)</label>
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-neutral-300">Initial Remark (Optional)</label>
               <input
                 type="text"
                 placeholder="E.g., Added via web portal"
                 value={formData.initialRemark}
                 onChange={e => setFormData({ ...formData, initialRemark: e.target.value })}
-                className="w-full bg-white/5 border border-white/10 rounded-lg px-3.5 py-2.5 min-h-[44px] text-base md:text-sm focus:outline-none focus:border-white/30"
+                className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:border-neutral-500 transition-colors"
               />
             </div>
             
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-white/60">Reference Number (Optional)</label>
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-neutral-300">Reference Number (Optional)</label>
               <input
                 type="text"
                 placeholder="E.g., UPI123456789"
                 value={formData.referenceNumber}
                 onChange={e => setFormData({ ...formData, referenceNumber: e.target.value })}
-                className="w-full bg-white/5 border border-white/10 rounded-lg px-3.5 py-2.5 min-h-[44px] text-base md:text-sm focus:outline-none focus:border-white/30"
+                className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:border-neutral-500 font-mono transition-colors"
               />
             </div>
           </div>
 
-          <div className="flex flex-col-reverse sm:flex-row gap-3 sm:justify-end pt-4 border-t border-white/10">
+          <div className="flex flex-col-reverse sm:flex-row gap-2.5 sm:justify-end pt-4 border-t border-neutral-800">
             <Link
               href="/expenses"
-              className="w-full sm:w-auto px-6 h-11 min-h-[44px] flex items-center justify-center text-sm font-medium text-white/60 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
+              className="w-full sm:w-auto px-4 h-9 flex items-center justify-center text-xs font-medium text-neutral-400 hover:text-white hover:bg-neutral-800 rounded-lg transition-colors"
             >
               Cancel
             </Link>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full sm:w-auto h-11 min-h-[44px] flex items-center justify-center bg-white text-black px-6 rounded-lg text-sm font-medium hover:bg-white/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full sm:w-auto h-9 flex items-center justify-center bg-white text-black px-5 rounded-lg text-xs font-semibold hover:bg-neutral-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSubmitting ? 'Saving...' : 'Save Expense'}
             </button>

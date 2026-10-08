@@ -205,13 +205,13 @@ export default function ExpenseDetailPage() {
         <div className="flex items-center gap-3 sm:gap-4">
           <Link
             href="/expenses"
-            className="w-11 h-11 flex items-center justify-center hover:bg-white/10 rounded-lg transition-colors text-white/60 hover:text-white shrink-0"
+            className="w-9 h-9 flex items-center justify-center bg-neutral-800 hover:bg-neutral-700 rounded-lg transition-colors text-neutral-300 hover:text-white border border-neutral-700 shrink-0"
           >
-            <ArrowLeft size={20} />
+            <ArrowLeft size={16} />
           </Link>
           <div className="min-w-0">
-            <h1 className="text-xl sm:text-2xl font-bold truncate">{isEditing ? 'Edit Expense' : expense.title}</h1>
-            <p className="text-xs sm:text-sm text-white/60 truncate">
+            <h1 className="text-xl sm:text-2xl font-bold truncate text-white">{isEditing ? 'Edit Expense' : expense.title}</h1>
+            <p className="text-xs sm:text-sm text-neutral-400 truncate">
               {isEditing ? 'Modify expense details below' : `Created ${new Date(expense.createdAt).toLocaleDateString()}`}
             </p>
           </div>
@@ -221,15 +221,15 @@ export default function ExpenseDetailPage() {
           <div className="flex items-center gap-2 self-start sm:self-auto">
             <button
               onClick={() => setIsEditing(true)}
-              className="flex items-center justify-center gap-2 px-4 h-11 min-h-[44px] bg-white/10 hover:bg-white/20 text-white rounded-lg text-sm font-medium transition-colors"
+              className="flex items-center justify-center gap-1.5 px-3.5 h-9 bg-neutral-800 hover:bg-neutral-700 text-neutral-200 border border-neutral-700 rounded-lg text-xs font-semibold transition-colors"
             >
-              <Pencil size={16} /> Edit
+              <Pencil size={14} /> Edit
             </button>
             <button
               onClick={() => setShowDeleteModal(true)}
-              className="flex items-center justify-center gap-2 px-4 h-11 min-h-[44px] bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg text-sm font-medium transition-colors"
+              className="flex items-center justify-center gap-1.5 px-3.5 h-9 bg-rose-600/15 hover:bg-rose-600/25 text-rose-300 border border-rose-500/30 rounded-lg text-xs font-semibold transition-colors"
             >
-              <Trash2 size={16} /> Delete
+              <Trash2 size={14} /> Delete
             </button>
           </div>
         )}
@@ -240,20 +240,20 @@ export default function ExpenseDetailPage() {
         <div className="lg:col-span-2 space-y-6">
           {isEditing ? (
             /* ── Edit Form ── */
-            <div className="bg-white/5 border border-white/10 rounded-2xl p-4 sm:p-6 space-y-5">
+            <div className="bg-neutral-900/60 border border-neutral-800 rounded-xl p-4 sm:p-6 space-y-5">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-white/60">Title</label>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-neutral-300">Title</label>
                   <input
                     required
                     type="text"
                     value={formData.title}
                     onChange={e => setFormData({ ...formData, title: e.target.value })}
-                    className="w-full bg-white/5 border border-white/10 rounded-lg px-3.5 py-2.5 min-h-[44px] text-base md:text-sm focus:outline-none focus:border-white/30"
+                    className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:border-neutral-500 transition-colors"
                   />
                 </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-white/60">Amount (₹)</label>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-neutral-300">Amount (₹)</label>
                   <input
                     required
                     type="number"
@@ -261,102 +261,102 @@ export default function ExpenseDetailPage() {
                     min="0"
                     value={formData.amount}
                     onChange={e => setFormData({ ...formData, amount: e.target.value })}
-                    className="w-full bg-white/5 border border-white/10 rounded-lg px-3.5 py-2.5 min-h-[44px] text-base md:text-sm focus:outline-none focus:border-white/30"
+                    className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:border-neutral-500 font-mono transition-colors"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-white/60">Category</label>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-neutral-300">Category</label>
                   <select
                     required
                     value={formData.categoryId}
                     onChange={e => setFormData({ ...formData, categoryId: e.target.value })}
-                    className="w-full bg-white/5 border border-white/10 rounded-lg px-3.5 py-2.5 min-h-[44px] text-base md:text-sm focus:outline-none focus:border-white/30"
+                    className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-neutral-500 transition-colors"
                   >
-                    <option value="" className="bg-[#121212] text-white">Select Category</option>
+                    <option value="" className="bg-neutral-900 text-white">Select Category</option>
                     {categories.map(c => (
-                      <option key={c.id} value={c.id} className="bg-[#121212] text-white">{c.name}</option>
+                      <option key={c.id} value={c.id} className="bg-neutral-900 text-white">{c.name}</option>
                     ))}
                   </select>
                 </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-white/60">Payment Method</label>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-neutral-300">Payment Method</label>
                   <select
                     required
                     value={formData.paymentMethodId}
                     onChange={e => setFormData({ ...formData, paymentMethodId: e.target.value })}
-                    className="w-full bg-white/5 border border-white/10 rounded-lg px-3.5 py-2.5 min-h-[44px] text-base md:text-sm focus:outline-none focus:border-white/30"
+                    className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-neutral-500 transition-colors"
                   >
-                    <option value="" className="bg-[#121212] text-white">Select Payment</option>
+                    <option value="" className="bg-neutral-900 text-white">Select Payment</option>
                     {paymentMethods.map(p => (
-                      <option key={p.id} value={p.id} className="bg-[#121212] text-white">{p.name}</option>
+                      <option key={p.id} value={p.id} className="bg-neutral-900 text-white">{p.name}</option>
                     ))}
                   </select>
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-white/60">Expense Date</label>
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-neutral-300">Expense Date</label>
                 <input
                   required
                   type="date"
                   value={formData.expenseDate}
                   onChange={e => setFormData({ ...formData, expenseDate: e.target.value })}
-                  className="w-full bg-white/5 border border-white/10 rounded-lg px-3.5 py-2.5 min-h-[44px] text-base md:text-sm focus:outline-none focus:border-white/30"
+                  className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-neutral-500 transition-colors"
                 />
               </div>
 
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-white/60">Description (Optional)</label>
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-neutral-300">Description (Optional)</label>
                 <textarea
                   value={formData.description}
                   onChange={e => setFormData({ ...formData, description: e.target.value })}
-                  className="w-full bg-white/5 border border-white/10 rounded-lg px-3.5 py-2.5 text-base md:text-sm focus:outline-none focus:border-white/30 h-24 resize-none"
+                  className="w-full bg-neutral-950 border border-neutral-800 rounded-lg p-3 text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:border-neutral-500 h-24 resize-none transition-colors"
                 />
               </div>
 
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-white/60">Reference Number (Optional)</label>
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-neutral-300">Reference Number (Optional)</label>
                 <input
                   type="text"
                   value={formData.referenceNumber}
                   onChange={e => setFormData({ ...formData, referenceNumber: e.target.value })}
-                  className="w-full bg-white/5 border border-white/10 rounded-lg px-3.5 py-2.5 min-h-[44px] text-base md:text-sm focus:outline-none focus:border-white/30"
+                  className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:border-neutral-500 font-mono transition-colors"
                 />
               </div>
 
-              <div className="flex flex-col-reverse sm:flex-row gap-3 sm:justify-end pt-4 border-t border-white/10">
+              <div className="flex flex-col-reverse sm:flex-row gap-2.5 sm:justify-end pt-4 border-t border-neutral-800">
                 <button
                   onClick={cancelEdit}
-                  className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 h-11 min-h-[44px] text-sm font-medium text-white/60 hover:text-white transition-colors"
+                  className="w-full sm:w-auto flex items-center justify-center gap-1.5 px-3.5 h-9 text-xs font-medium text-neutral-400 hover:text-white transition-colors"
                 >
-                  <X size={16} /> Cancel
+                  <X size={15} /> Cancel
                 </button>
                 <button
                   onClick={handleSave}
                   disabled={isSubmitting}
-                  className="w-full sm:w-auto flex items-center justify-center gap-2 bg-white text-black px-5 h-11 min-h-[44px] rounded-lg text-sm font-medium hover:bg-white/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full sm:w-auto flex items-center justify-center gap-1.5 bg-white text-black px-4 h-9 rounded-lg text-xs font-semibold hover:bg-neutral-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isSubmitting ? (
-                    <><Loader2 size={16} className="animate-spin" /> Saving...</>
+                    <><Loader2 size={14} className="animate-spin" /> Saving...</>
                   ) : (
-                    <><Save size={16} /> Save Changes</>
+                    <><Save size={14} /> Save Changes</>
                   )}
                 </button>
               </div>
             </div>
           ) : (
             /* ── Read-only Detail ── */
-            <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
-              <div className="flex flex-wrap items-center gap-3 mb-5">
-                <span className="bg-white/10 px-3 py-1 rounded-full text-xs font-medium">{expense.category}</span>
-                <span className="bg-white/10 px-3 py-1 rounded-full text-xs font-medium">{expense.paymentMethod}</span>
+            <div className="bg-neutral-900/60 border border-neutral-800 rounded-xl p-5 sm:p-6">
+              <div className="flex flex-wrap items-center gap-2 mb-5">
+                <span className="bg-neutral-800 border border-neutral-700 px-2.5 py-0.5 rounded-md text-xs font-medium text-neutral-300">{expense.category}</span>
+                <span className="bg-neutral-800 border border-neutral-700 px-2.5 py-0.5 rounded-md text-xs font-medium text-neutral-300">{expense.paymentMethod}</span>
                 {expense.category?.toLowerCase().includes('meta') && (
                   <Link
                     href="/meta-ads"
-                    className="bg-blue-500/10 border border-blue-500/20 text-blue-400 px-3 py-1 rounded-full text-xs font-medium hover:bg-blue-500/20 transition-colors flex items-center gap-1.5"
+                    className="bg-neutral-800 border border-neutral-700 text-neutral-200 px-2.5 py-0.5 rounded-md text-xs font-medium hover:bg-neutral-700 transition-colors flex items-center gap-1.5"
                   >
                     <span>Meta Ads Tracker</span>
                     <ExternalLink size={12} />
@@ -366,69 +366,69 @@ export default function ExpenseDetailPage() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div>
-                  <p className="text-xs text-white/40 uppercase tracking-wider mb-1">Amount</p>
-                  <p className="text-3xl font-bold">₹{parseFloat(expense.amount).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</p>
+                  <p className="text-xs text-neutral-400 uppercase tracking-wider mb-1">Amount</p>
+                  <p className="text-2xl sm:text-3xl font-bold font-mono text-white">₹{parseFloat(expense.amount).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-white/40 uppercase tracking-wider mb-1">Expense Date</p>
-                  <p className="text-lg font-medium">{new Date(expense.expenseDate).toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                  <p className="text-xs text-neutral-400 uppercase tracking-wider mb-1">Expense Date</p>
+                  <p className="text-base sm:text-lg font-medium text-neutral-200">{new Date(expense.expenseDate).toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
                 </div>
               </div>
 
               {expense.description && (
-                <div className="mt-6 pt-5 border-t border-white/5">
-                  <p className="text-xs text-white/40 uppercase tracking-wider mb-2">Description</p>
-                  <p className="text-white/80 leading-relaxed whitespace-pre-wrap">{expense.description}</p>
+                <div className="mt-6 pt-5 border-t border-neutral-800">
+                  <p className="text-xs text-neutral-400 uppercase tracking-wider mb-2">Description</p>
+                  <p className="text-neutral-300 text-sm leading-relaxed whitespace-pre-wrap">{expense.description}</p>
                 </div>
               )}
 
               {expense.referenceNumber && (
-                <div className="mt-4 pt-4 border-t border-white/5">
-                  <p className="text-xs text-white/40 uppercase tracking-wider mb-1">Reference Number</p>
-                  <p className="font-mono text-sm text-white/70">{expense.referenceNumber}</p>
+                <div className="mt-4 pt-4 border-t border-neutral-800">
+                  <p className="text-xs text-neutral-400 uppercase tracking-wider mb-1">Reference Number</p>
+                  <p className="font-mono text-sm text-neutral-300">{expense.referenceNumber}</p>
                 </div>
               )}
             </div>
           )}
 
           {/* Activity Timeline */}
-          <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
-            <h2 className="text-lg font-semibold mb-5">Activity Timeline</h2>
+          <div className="bg-neutral-900/60 border border-neutral-800 rounded-xl p-5 sm:p-6">
+            <h2 className="text-base font-semibold text-white mb-4">Activity Timeline</h2>
             {expense.activities.length === 0 ? (
-              <p className="text-white/40 text-sm">No activity recorded.</p>
+              <p className="text-neutral-500 text-xs">No activity recorded.</p>
             ) : (
-              <div className="space-y-5">
+              <div className="space-y-4">
                 {expense.activities.map((activity) => (
-                  <div key={activity.id} className="flex gap-4">
+                  <div key={activity.id} className="flex gap-3">
                     <div className="flex flex-col items-center">
-                      <div className={`w-2.5 h-2.5 rounded-full mt-2 ${
-                        activity.activityType === 'CREATED' ? 'bg-green-500' :
-                        activity.activityType === 'DELETED' ? 'bg-red-500' :
-                        activity.activityType === 'UPDATED' ? 'bg-yellow-500' :
-                        'bg-blue-500'
+                      <div className={`w-2 h-2 rounded-full mt-1.5 ${
+                        activity.activityType === 'CREATED' ? 'bg-emerald-400' :
+                        activity.activityType === 'DELETED' ? 'bg-rose-400' :
+                        activity.activityType === 'UPDATED' ? 'bg-amber-400' :
+                        'bg-neutral-400'
                       }`} />
-                      <div className="w-0.5 h-full bg-white/10 mt-2" />
+                      <div className="w-px h-full bg-neutral-800 mt-2" />
                     </div>
-                    <div className="flex-1 pb-4">
-                      <p className="text-sm text-white/40 mb-1">
+                    <div className="flex-1 pb-3">
+                      <p className="text-xs text-neutral-400 mb-0.5">
                         {new Date(activity.createdAt).toLocaleString()} • {activity.actorName || 'System'}
                       </p>
                       {activity.activityType === 'CREATED' && (
-                        <p className="text-white/80">Expense created — ₹{parseFloat(activity.newValue || '0').toFixed(2)}</p>
+                        <p className="text-sm text-neutral-200">Expense created — ₹{parseFloat(activity.newValue || '0').toFixed(2)}</p>
                       )}
                       {activity.activityType === 'UPDATED' && (
-                        <p className="text-white/80">
+                        <p className="text-sm text-neutral-200">
                           Expense updated
                           {activity.oldValue && activity.newValue && activity.oldValue !== activity.newValue && (
-                            <span className="text-white/50"> — amount changed from ₹{parseFloat(activity.oldValue).toFixed(2)} to ₹{parseFloat(activity.newValue).toFixed(2)}</span>
+                            <span className="text-neutral-400"> — amount changed from ₹{parseFloat(activity.oldValue).toFixed(2)} to ₹{parseFloat(activity.newValue).toFixed(2)}</span>
                           )}
                         </p>
                       )}
                       {activity.activityType === 'DELETED' && (
-                        <p className="text-red-400">Expense deleted</p>
+                        <p className="text-sm text-rose-400">Expense deleted</p>
                       )}
                       {activity.activityType === 'REMARK_ADDED' && activity.remark && (
-                        <div className="mt-1 bg-white/5 p-3 rounded-lg border border-white/5 text-white/70 text-sm">
+                        <div className="mt-1 bg-neutral-950 p-2.5 rounded-lg border border-neutral-800 text-neutral-300 text-xs">
                           &quot;{activity.remark}&quot;
                         </div>
                       )}
@@ -442,44 +442,44 @@ export default function ExpenseDetailPage() {
 
         {/* Sidebar */}
         <div className="space-y-6">
-          <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
-            <h3 className="text-sm font-medium text-white/40 uppercase tracking-wider mb-4">Details</h3>
-            <div className="space-y-4 text-sm">
+          <div className="bg-neutral-900/60 border border-neutral-800 rounded-xl p-5 sm:p-6">
+            <h3 className="text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-4">Details</h3>
+            <div className="space-y-3 text-sm">
               <div className="flex justify-between">
-                <span className="text-white/40">Category</span>
-                <span className="font-medium">{expense.category}</span>
+                <span className="text-neutral-400 text-xs">Category</span>
+                <span className="font-medium text-xs text-white">{expense.category}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-white/40">Payment</span>
-                <span className="font-medium">{expense.paymentMethod}</span>
+                <span className="text-neutral-400 text-xs">Payment</span>
+                <span className="font-medium text-xs text-white">{expense.paymentMethod}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-white/40">Date</span>
-                <span>{new Date(expense.expenseDate).toLocaleDateString()}</span>
+                <span className="text-neutral-400 text-xs">Date</span>
+                <span className="text-xs text-white">{new Date(expense.expenseDate).toLocaleDateString()}</span>
               </div>
               {expense.referenceNumber && (
                 <div className="flex justify-between">
-                  <span className="text-white/40">Reference</span>
-                  <span className="font-mono text-xs">{expense.referenceNumber}</span>
+                  <span className="text-neutral-400 text-xs">Reference</span>
+                  <span className="font-mono text-xs text-neutral-300">{expense.referenceNumber}</span>
                 </div>
               )}
-              <div className="pt-3 border-t border-white/5 flex justify-between items-center">
-                <span className="text-white/40">Amount</span>
-                <span className="font-bold text-lg">₹{parseFloat(expense.amount).toFixed(2)}</span>
+              <div className="pt-3 border-t border-neutral-800 flex justify-between items-center">
+                <span className="text-neutral-400 text-xs">Amount</span>
+                <span className="font-bold text-base font-mono text-white">₹{parseFloat(expense.amount).toFixed(2)}</span>
               </div>
             </div>
           </div>
 
-          <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
-            <h3 className="text-sm font-medium text-white/40 uppercase tracking-wider mb-4">Timestamps</h3>
+          <div className="bg-neutral-900/60 border border-neutral-800 rounded-xl p-5 sm:p-6">
+            <h3 className="text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-4">Timestamps</h3>
             <div className="space-y-3 text-sm">
               <div>
-                <p className="text-white/40 mb-0.5">Created</p>
-                <p>{new Date(expense.createdAt).toLocaleString()}</p>
+                <p className="text-neutral-400 text-xs mb-0.5">Created</p>
+                <p className="text-xs text-neutral-200">{new Date(expense.createdAt).toLocaleString()}</p>
               </div>
               <div>
-                <p className="text-white/40 mb-0.5">Last Updated</p>
-                <p>{new Date(expense.updatedAt).toLocaleString()}</p>
+                <p className="text-neutral-400 text-xs mb-0.5">Last Updated</p>
+                <p className="text-xs text-neutral-200">{new Date(expense.updatedAt).toLocaleString()}</p>
               </div>
             </div>
           </div>

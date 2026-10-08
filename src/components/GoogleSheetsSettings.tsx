@@ -158,29 +158,29 @@ export default function GoogleSheetsSettings() {
   };
 
   return (
-    <div className="bg-[#1e1e1e] p-4 sm:p-6 rounded-xl border border-white/10 shadow-sm text-white space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-4">
+    <div className="bg-neutral-900/60 p-4 sm:p-6 rounded-xl border border-neutral-800 shadow-sm text-white space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-neutral-800 pb-4">
         <div className="flex items-center gap-3">
-          <div className="p-2.5 bg-emerald-500/10 text-emerald-400 rounded-lg border border-emerald-500/20">
+          <div className="p-2.5 bg-emerald-500/15 text-emerald-400 rounded-lg border border-emerald-500/30">
             <FileSpreadsheet className="w-5 h-5" />
           </div>
           <div>
-            <h2 className="text-lg sm:text-xl font-medium text-white">Google Sheets Backup & Mirror</h2>
-            <p className="text-xs text-gray-400">Automatic real-time synchronization from PostgreSQL</p>
+            <h2 className="text-base sm:text-lg font-semibold text-white">Google Sheets Backup &amp; Mirror</h2>
+            <p className="text-xs text-neutral-400">Automatic real-time synchronization from PostgreSQL</p>
           </div>
         </div>
 
         <div className="flex items-center gap-2">
           {loading ? (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-gray-800 text-gray-400 border border-gray-700">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-xs font-medium bg-neutral-800 text-neutral-400 border border-neutral-700">
               <RefreshCw className="w-3.5 h-3.5 animate-spin" /> Checking...
             </span>
           ) : status?.connected ? (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-xs font-medium bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
               <CheckCircle2 className="w-3.5 h-3.5" /> Connected
             </span>
           ) : (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-rose-500/10 text-rose-400 border border-rose-500/20">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-xs font-medium bg-rose-500/15 text-rose-300 border border-rose-500/30">
               <XCircle className="w-3.5 h-3.5" /> Not Connected
             </span>
           )}
@@ -188,11 +188,11 @@ export default function GoogleSheetsSettings() {
       </div>
 
       {/* Connection & Configuration Info */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white/[0.03] p-3.5 rounded-lg border border-white/5 space-y-1">
-          <span className="text-xs text-gray-400 font-medium">Spreadsheet Destination</span>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="bg-neutral-950 p-3.5 rounded-lg border border-neutral-800 space-y-1">
+          <span className="text-xs text-neutral-400 font-medium">Spreadsheet Destination</span>
           <div className="flex items-center gap-1.5">
-            <span className="text-xs font-mono text-gray-200 truncate" title={spreadsheetId}>
+            <span className="text-xs font-mono text-neutral-200 truncate" title={spreadsheetId}>
               {spreadsheetId.slice(0, 12)}...
             </span>
             <a 
@@ -207,23 +207,23 @@ export default function GoogleSheetsSettings() {
           </div>
         </div>
 
-        <div className="bg-white/[0.03] p-3.5 rounded-lg border border-white/5 space-y-1">
-          <span className="text-xs text-gray-400 font-medium">Last Successful Sync</span>
-          <p className="text-sm font-medium text-gray-200">
+        <div className="bg-neutral-950 p-3.5 rounded-lg border border-neutral-800 space-y-1">
+          <span className="text-xs text-neutral-400 font-medium">Last Successful Sync</span>
+          <p className="text-sm font-medium text-neutral-200">
             {formatDateTime(status?.lastSuccessfulSync)}
           </p>
         </div>
 
-        <div className="bg-white/[0.03] p-3.5 rounded-lg border border-white/5 space-y-1">
-          <span className="text-xs text-gray-400 font-medium">Pending Sync Jobs</span>
-          <p className="text-sm font-semibold text-amber-400">
+        <div className="bg-neutral-950 p-3.5 rounded-lg border border-neutral-800 space-y-1">
+          <span className="text-xs text-neutral-400 font-medium">Pending Sync Jobs</span>
+          <p className="text-sm font-semibold text-amber-400 font-mono">
             {status?.pendingSyncsCount ?? 0}
           </p>
         </div>
 
-        <div className="bg-white/[0.03] p-3.5 rounded-lg border border-white/5 space-y-1">
-          <span className="text-xs text-gray-400 font-medium">Failed Sync Jobs</span>
-          <p className={`text-sm font-semibold ${(status?.failedSyncsCount ?? 0) > 0 ? 'text-rose-400' : 'text-emerald-400'}`}>
+        <div className="bg-neutral-950 p-3.5 rounded-lg border border-neutral-800 space-y-1">
+          <span className="text-xs text-neutral-400 font-medium">Failed Sync Jobs</span>
+          <p className={`text-sm font-semibold font-mono ${(status?.failedSyncsCount ?? 0) > 0 ? 'text-rose-400' : 'text-emerald-400'}`}>
             {status?.failedSyncsCount ?? 0}
           </p>
         </div>
@@ -241,14 +241,14 @@ export default function GoogleSheetsSettings() {
 
       {/* Tabs Synchronized List */}
       {status?.sheetNames && status.sheetNames.length > 0 && (
-        <div className="bg-white/[0.02] p-3.5 rounded-lg border border-white/5 space-y-2">
-          <div className="flex items-center gap-2 text-xs font-medium text-gray-300">
+        <div className="bg-neutral-950 p-3.5 rounded-lg border border-neutral-800 space-y-2">
+          <div className="flex items-center gap-2 text-xs font-medium text-neutral-300">
             <Database className="w-3.5 h-3.5 text-emerald-400" />
             <span>Detected Sheets in Spreadsheet:</span>
           </div>
           <div className="flex flex-wrap gap-1.5">
             {status.sheetNames.map((name) => (
-              <span key={name} className="px-2 py-0.5 text-[11px] bg-white/5 rounded border border-white/10 text-gray-300 font-mono">
+              <span key={name} className="px-2 py-0.5 text-[11px] bg-neutral-900 rounded border border-neutral-800 text-neutral-300 font-mono">
                 {name}
               </span>
             ))}
@@ -264,9 +264,9 @@ export default function GoogleSheetsSettings() {
           </p>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
             {lastSyncReport.entities?.map((ent: FullSyncEntityStats) => (
-              <div key={ent.entity} className="bg-black/20 p-2 rounded">
-                <span className="text-gray-400 block truncate">{ent.tabName}</span>
-                <span className="font-medium text-white">{ent.count} rows</span>
+              <div key={ent.entity} className="bg-neutral-900 p-2 rounded border border-neutral-800">
+                <span className="text-neutral-400 block truncate">{ent.tabName}</span>
+                <span className="font-medium text-white font-mono">{ent.count} rows</span>
               </div>
             ))}
           </div>
@@ -274,22 +274,22 @@ export default function GoogleSheetsSettings() {
       )}
 
       {/* Action Buttons */}
-      <div className="flex flex-wrap items-center gap-3 pt-2">
+      <div className="flex flex-wrap items-center gap-2.5 pt-2">
         <button
           onClick={handleTestConnection}
           disabled={isTesting}
-          className="h-10 px-4 text-xs sm:text-sm font-medium bg-white/10 hover:bg-white/15 text-white rounded-lg border border-white/15 transition-all inline-flex items-center gap-2 disabled:opacity-50"
+          className="h-9 px-3.5 text-xs font-medium bg-neutral-800 hover:bg-neutral-700 text-neutral-200 rounded-lg border border-neutral-700 transition-colors inline-flex items-center gap-2 disabled:opacity-50"
         >
-          {isTesting ? <RefreshCw className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+          {isTesting ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
           Test Connection
         </button>
 
         <button
           onClick={handleSyncAll}
           disabled={isSyncing}
-          className="h-10 px-5 text-xs sm:text-sm font-medium bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg shadow-sm transition-all inline-flex items-center gap-2 disabled:opacity-50"
+          className="h-9 px-4 text-xs font-semibold bg-white hover:bg-neutral-200 text-black rounded-lg transition-colors inline-flex items-center gap-2 disabled:opacity-50"
         >
-          {isSyncing ? <RefreshCw className="w-4 h-4 animate-spin" /> : <RotateCw className="w-4 h-4" />}
+          {isSyncing ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <RotateCw className="w-3.5 h-3.5" />}
           Sync Everything
         </button>
 
@@ -297,15 +297,15 @@ export default function GoogleSheetsSettings() {
           <button
             onClick={handleRetryFailed}
             disabled={isRetrying}
-            className="h-10 px-4 text-xs sm:text-sm font-medium bg-rose-600/80 hover:bg-rose-600 text-white rounded-lg transition-all inline-flex items-center gap-2 disabled:opacity-50"
+            className="h-9 px-3.5 text-xs font-semibold bg-rose-600 hover:bg-rose-500 text-white rounded-lg transition-colors inline-flex items-center gap-2 disabled:opacity-50"
           >
-            {isRetrying ? <RefreshCw className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+            {isRetrying ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
             Retry Failed Syncs ({status?.failedSyncsCount})
           </button>
         )}
       </div>
 
-      <p className="text-[11px] text-gray-500">
+      <p className="text-[11px] text-neutral-500">
         PostgreSQL is the single source of truth. All database mutations automatically queue background backup syncs to Google Sheets without interrupting normal user operations.
       </p>
     </div>

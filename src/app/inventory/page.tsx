@@ -177,9 +177,9 @@ export default function InventoryPage() {
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white flex items-center gap-2.5">
-              <span>Inventory & Stock Value</span>
+              <span>Inventory &amp; Stock Value</span>
             </h1>
-            <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-white/10 text-neutral-300 border border-white/15">
+            <span className="px-2 py-0.5 rounded-md text-xs font-medium bg-neutral-800 text-neutral-300 border border-neutral-700">
               Shopify Live Stock
             </span>
           </div>
@@ -196,7 +196,7 @@ export default function InventoryPage() {
             <button
               onClick={() => fetchInventory(true)}
               disabled={refreshing}
-              className="p-2.5 min-h-[40px] px-3.5 text-xs font-semibold text-black bg-white hover:bg-neutral-200 rounded-xl transition-all shadow-sm flex items-center gap-2 disabled:opacity-50"
+              className="px-3.5 py-2 text-xs font-semibold text-black bg-white hover:bg-neutral-200 rounded-lg transition-colors flex items-center gap-2 disabled:opacity-50"
               title="Refresh from Shopify"
             >
               <RefreshCw size={14} className={refreshing ? 'animate-spin' : ''} />
@@ -211,62 +211,61 @@ export default function InventoryPage() {
         <div className={`grid grid-cols-1 sm:grid-cols-2 ${canViewValuation ? 'lg:grid-cols-4' : 'lg:grid-cols-2'} gap-3 sm:gap-4`}>
           {/* Card 1: Total Potential Revenue (Valuation only) */}
           {canViewValuation && (
-            <div className="bg-white/5 border border-white/10 rounded-2xl p-4 sm:p-5 relative overflow-hidden">
-              <div className="absolute top-0 right-0 -mt-4 -mr-4 w-20 h-20 bg-white/5 rounded-full blur-xl pointer-events-none" />
-              <p className="text-xs font-medium text-white/60 mb-1 uppercase tracking-wider">Total Stock Value</p>
+            <div className="bg-neutral-900/60 border border-neutral-800 rounded-xl p-4 sm:p-5">
+              <p className="text-xs font-medium text-neutral-400 mb-1 uppercase tracking-wider">Total Stock Value</p>
               <p className="text-xl sm:text-2xl font-bold font-mono text-white tracking-tight">
                 {formatCurrency(summary.totalPotentialRevenue)}
               </p>
-              <p className="mt-1 text-xs text-neutral-400">
+              <p className="mt-1 text-xs text-neutral-500">
                 Avg. {formatCurrency(summary.avgUnitSellingPrice)} / piece
               </p>
             </div>
           )}
 
           {/* Card 2: Total Units in Stock */}
-          <div className="bg-white/5 border border-white/10 rounded-2xl p-4 sm:p-5">
-            <p className="text-xs font-medium text-white/60 mb-1 uppercase tracking-wider">Total Items in Stock</p>
+          <div className="bg-neutral-900/60 border border-neutral-800 rounded-xl p-4 sm:p-5">
+            <p className="text-xs font-medium text-neutral-400 mb-1 uppercase tracking-wider">Total Items in Stock</p>
             <p className="text-xl sm:text-2xl font-bold font-mono text-white tracking-tight">
-              {summary.totalStockUnits.toLocaleString()} <span className="text-xs font-normal text-white/40">units</span>
+              {summary.totalStockUnits.toLocaleString()} <span className="text-xs font-normal text-neutral-500">units</span>
             </p>
-            <p className="mt-1 text-xs text-neutral-400">
+            <p className="mt-1 text-xs text-neutral-500">
               {summary.totalActiveProducts} active products ({summary.totalVariants} options/sizes)
             </p>
           </div>
 
           {/* Card 3: Catalog MRP Valuation (Valuation only) */}
           {canViewValuation && (
-            <div className="bg-white/5 border border-white/10 rounded-2xl p-4 sm:p-5">
-              <p className="text-xs font-medium text-white/60 mb-1 uppercase tracking-wider">Original MRP Value</p>
+            <div className="bg-neutral-900/60 border border-neutral-800 rounded-xl p-4 sm:p-5">
+              <p className="text-xs font-medium text-neutral-400 mb-1 uppercase tracking-wider">Original MRP Value</p>
               <p className="text-xl sm:text-2xl font-bold font-mono text-white tracking-tight">
                 {formatCurrency(summary.totalMRPValuation)}
               </p>
-              <p className="mt-1 text-xs text-neutral-400">
+              <p className="mt-1 text-xs text-neutral-500">
                 Store Discount: {formatCurrency(summary.potentialDiscountValue)}
               </p>
             </div>
           )}
 
           {/* Card 4: Stock Health */}
-          <div className="bg-white/5 border border-white/10 rounded-2xl p-4 sm:p-5">
-            <p className="text-xs font-medium text-white/60 mb-1 uppercase tracking-wider">Stock Availability</p>
+          <div className="bg-neutral-900/60 border border-neutral-800 rounded-xl p-4 sm:p-5">
+            <p className="text-xs font-medium text-neutral-400 mb-1 uppercase tracking-wider">Stock Availability</p>
             <div className="flex items-center gap-2.5 mt-1.5 flex-wrap">
               <span className="inline-flex items-center gap-1.5 text-xs text-emerald-400 font-mono font-medium">
-                <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+                <span className="w-2 h-2 rounded-full bg-emerald-500" />
                 {summary.inStockCount} In Stock
               </span>
-              <span className="text-white/20">•</span>
+              <span className="text-neutral-600">•</span>
               <span className="inline-flex items-center gap-1.5 text-xs text-amber-400 font-mono font-medium">
-                <span className="w-2 h-2 rounded-full bg-amber-400"></span>
+                <span className="w-2 h-2 rounded-full bg-amber-500" />
                 {summary.lowStockCount} Low
               </span>
-              <span className="text-white/20">•</span>
+              <span className="text-neutral-600">•</span>
               <span className="inline-flex items-center gap-1.5 text-xs text-rose-400 font-mono font-medium">
-                <span className="w-2 h-2 rounded-full bg-rose-400"></span>
+                <span className="w-2 h-2 rounded-full bg-rose-500" />
                 {summary.outOfStockCount} Out
               </span>
             </div>
-            <div className="w-full bg-white/10 h-2 rounded-full mt-3 overflow-hidden flex">
+            <div className="w-full bg-neutral-800 h-2 rounded-full mt-3 overflow-hidden flex">
               <div
                 style={{ width: `${(summary.inStockCount / (summary.totalProducts || 1)) * 100}%` }}
                 className="bg-emerald-500 h-full transition-all"
@@ -288,7 +287,7 @@ export default function InventoryPage() {
       )}
 
       {/* Search & Filter Bar */}
-      <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-3 sm:p-4 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+      <div className="bg-neutral-900/60 border border-neutral-800 rounded-xl p-3 sm:p-4 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
         {/* Search */}
         <div className="relative flex-1 min-w-[220px]">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-500" />
@@ -300,13 +299,13 @@ export default function InventoryPage() {
               setCurrentPage(1);
             }}
             placeholder="Search by product name, SKU, or category..."
-            className="w-full bg-black/40 border border-white/10 focus:border-white/25 rounded-xl h-10 pl-10 pr-4 text-xs sm:text-sm text-white placeholder:text-neutral-500 focus:outline-none transition-all"
+            className="w-full bg-neutral-900 border border-neutral-800 focus:border-neutral-600 rounded-lg h-9 pl-9 pr-4 text-xs sm:text-sm text-white placeholder:text-neutral-500 focus:outline-none transition-colors"
           />
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
           {/* Status Filter */}
-          <div className="flex items-center gap-1.5 bg-black/40 border border-white/10 rounded-xl px-2.5 py-1.5">
+          <div className="flex items-center gap-1.5 bg-neutral-900 border border-neutral-800 rounded-lg px-2.5 py-1.5">
             <Filter size={13} className="text-neutral-400" />
             <select
               value={statusFilter}
@@ -318,14 +317,14 @@ export default function InventoryPage() {
               className="bg-transparent text-xs text-neutral-300 focus:outline-none cursor-pointer"
             >
               <option value="ALL" className="bg-[#1e1e1e] text-white">All Products ({data?.products?.length || 0})</option>
-              <option value="IN_STOCK" className="bg-[#1e1e1e] text-white">In Stock (More than 5)</option>
-              <option value="LOW_STOCK" className="bg-[#1e1e1e] text-white">Low Stock (1 to 5 left)</option>
-              <option value="OUT_OF_STOCK" className="bg-[#1e1e1e] text-white">Out of Stock (0 left)</option>
+              <option value="IN_STOCK" className="bg-[#1e1e1e] text-white">In Stock (&gt; 5)</option>
+              <option value="LOW_STOCK" className="bg-[#1e1e1e] text-white">Low Stock (1 to 5)</option>
+              <option value="OUT_OF_STOCK" className="bg-[#1e1e1e] text-white">Out of Stock (0)</option>
             </select>
           </div>
 
           {/* Sort By */}
-          <div className="flex items-center gap-1.5 bg-black/40 border border-white/10 rounded-xl px-2.5 py-1.5">
+          <div className="flex items-center gap-1.5 bg-neutral-900 border border-neutral-800 rounded-lg px-2.5 py-1.5">
             <ArrowUpDown size={13} className="text-neutral-400" />
             <select
               value={sortBy}
@@ -348,11 +347,11 @@ export default function InventoryPage() {
       </div>
 
       {/* Product List Table */}
-      <div className="bg-white/[0.02] border border-white/5 rounded-3xl shadow-2xl relative overflow-hidden flex flex-col">
-        <div className="flex-none p-4 sm:px-6 border-b border-white/5 flex items-center justify-between bg-black/40">
+      <div className="bg-neutral-900/60 border border-neutral-800 rounded-xl overflow-hidden flex flex-col">
+        <div className="p-4 sm:px-6 border-b border-neutral-800 flex items-center justify-between bg-neutral-900/80">
           <div className="flex items-center gap-2">
-            <span className="text-sm font-semibold text-white">Product Stock & Value Breakdown</span>
-            <span className="text-xs px-2 py-0.5 rounded-full bg-white/10 text-neutral-300 border border-white/10">
+            <span className="text-sm font-semibold text-white">Product Stock &amp; Value Breakdown</span>
+            <span className="text-xs px-2 py-0.5 rounded-md bg-neutral-800 text-neutral-300 border border-neutral-700">
               {filteredProducts.length} items
             </span>
           </div>
@@ -365,23 +364,23 @@ export default function InventoryPage() {
 
         {filteredProducts.length === 0 ? (
           <div className="p-12 text-center text-neutral-500">
-            <Package className="w-8 h-8 mx-auto mb-2 text-white/20" />
+            <Package className="w-8 h-8 mx-auto mb-2 text-neutral-600" />
             <p className="text-sm">No products found matching your search or filters.</p>
           </div>
         ) : (
           <>
-            <div className="divide-y divide-white/5 overflow-x-auto">
+            <div className="divide-y divide-neutral-800/60 overflow-x-auto">
               {paginatedProducts.map((product) => {
                 const isExpanded = !!expandedProducts[product.id];
                 const hasMultipleVariants = product.variants.length > 1;
 
                 return (
-                  <div key={product.id} className="transition-colors hover:bg-white/[0.02]">
+                  <div key={product.id} className="transition-colors hover:bg-neutral-800/30">
                     {/* Main Product Row */}
                     <div className="p-4 sm:px-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                       {/* Left: Image & Info */}
                       <div className="flex items-center gap-3.5 min-w-0 flex-1">
-                        <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 overflow-hidden shrink-0 flex items-center justify-center relative">
+                        <div className="w-12 h-12 rounded-lg bg-neutral-900 border border-neutral-800 overflow-hidden shrink-0 flex items-center justify-center relative">
                           {product.imageUrl ? (
                             <Image
                               src={product.imageUrl}
@@ -392,7 +391,7 @@ export default function InventoryPage() {
                               unoptimized
                             />
                           ) : (
-                            <Package className="w-5 h-5 text-white/20" />
+                            <Package className="w-5 h-5 text-neutral-600" />
                           )}
                         </div>
 
@@ -415,11 +414,11 @@ export default function InventoryPage() {
                             <span>{product.vendor}</span>
                             {product.productType && (
                               <>
-                                <span className="text-white/20">•</span>
+                                <span className="text-neutral-600">•</span>
                                 <span>{product.productType}</span>
                               </>
                             )}
-                            <span className="text-white/20">•</span>
+                            <span className="text-neutral-600">•</span>
                             <span>{product.variants.length} variant{product.variants.length > 1 ? 's' : ''}</span>
                           </div>
                         </div>
@@ -431,12 +430,12 @@ export default function InventoryPage() {
                         <div className="text-right">
                           <div className="flex items-center gap-1.5 justify-end">
                             <span
-                              className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                              className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-xs font-medium ${
                                 product.stockStatus === 'IN_STOCK'
-                                  ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/25'
+                                  ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30'
                                   : product.stockStatus === 'LOW_STOCK'
-                                  ? 'bg-amber-500/10 text-amber-400 border border-amber-500/25'
-                                  : 'bg-rose-500/10 text-rose-400 border border-rose-500/25'
+                                  ? 'bg-amber-500/15 text-amber-300 border border-amber-500/30'
+                                  : 'bg-rose-500/15 text-rose-300 border border-rose-500/30'
                               }`}
                             >
                               <span
@@ -473,7 +472,7 @@ export default function InventoryPage() {
                         {hasMultipleVariants && (
                           <button
                             onClick={() => toggleExpand(product.id)}
-                            className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-neutral-400 hover:text-white transition-all"
+                            className="p-1.5 rounded-lg bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-neutral-400 hover:text-white transition-colors"
                             title={isExpanded ? 'Collapse variants' : 'Expand variants'}
                           >
                             {isExpanded ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
@@ -484,9 +483,9 @@ export default function InventoryPage() {
 
                     {/* Expanded Variants Accordion */}
                     {isExpanded && (
-                      <div className="bg-black/40 border-t border-white/5 px-4 sm:px-6 py-3 sm:pl-16">
+                      <div className="bg-neutral-950/60 border-t border-neutral-800 px-4 sm:px-6 py-3 sm:pl-16">
                         <p className="text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-2">
-                          Options & Variants
+                          Options &amp; Variants
                         </p>
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
                           {product.variants.map((v) => {
@@ -507,7 +506,7 @@ export default function InventoryPage() {
                             return (
                               <div
                                 key={v.id}
-                                className="bg-white/5 border border-white/5 rounded-xl p-2.5 flex items-center justify-between"
+                                className="bg-neutral-900 border border-neutral-800 rounded-lg p-2.5 flex items-center justify-between"
                               >
                                 <div>
                                   <div className="text-xs font-medium text-white">{v.title}</div>
@@ -519,7 +518,7 @@ export default function InventoryPage() {
                                 </div>
                                 <div className="text-right">
                                   <div className={`text-xs font-semibold font-mono flex items-center justify-end gap-1.5 ${variantStockColor}`}>
-                                    <span className={`w-1.5 h-1.5 rounded-full ${variantDotColor}`}></span>
+                                    <span className={`w-1.5 h-1.5 rounded-full ${variantDotColor}`} />
                                     {v.inventoryQuantity} in stock
                                   </div>
                                   {canViewValuation && (
@@ -540,7 +539,7 @@ export default function InventoryPage() {
             </div>
 
             {/* Pagination Controls Footer */}
-            <div className="flex-none p-4 sm:px-6 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-3 bg-black/40">
+            <div className="p-4 sm:px-6 border-t border-neutral-800 flex flex-col sm:flex-row items-center justify-between gap-3 bg-neutral-900/80">
               {/* Left: Showing range */}
               <div className="text-xs text-neutral-400">
                 Showing <span className="font-mono font-medium text-white">{filteredProducts.length === 0 ? 0 : startIndex + 1}</span> to <span className="font-mono font-medium text-white">{endIndex}</span> of <span className="font-mono font-medium text-white">{filteredProducts.length}</span> products
@@ -562,10 +561,10 @@ export default function InventoryPage() {
                       <button
                         key={`page-${page}`}
                         onClick={() => setCurrentPage(page as number)}
-                        className={`min-w-[32px] h-8 px-2 text-xs font-mono font-medium rounded-lg transition-all ${
+                        className={`min-w-[32px] h-8 px-2 text-xs font-mono font-medium rounded-lg transition-colors ${
                           isCurrent
-                            ? 'bg-white text-black shadow-sm font-semibold'
-                            : 'bg-white/5 hover:bg-white/10 text-neutral-300 border border-white/5'
+                            ? 'bg-white text-black font-semibold'
+                            : 'bg-neutral-900 hover:bg-neutral-800 text-neutral-300 border border-neutral-800'
                         }`}
                       >
                         {page}
@@ -577,7 +576,7 @@ export default function InventoryPage() {
 
               {/* Right: Page Size Selector + Prev/Next */}
               <div className="flex items-center gap-2">
-                <div className="flex items-center gap-1.5 bg-black/50 border border-white/10 rounded-xl px-2.5 py-1">
+                <div className="flex items-center gap-1.5 bg-neutral-900 border border-neutral-800 rounded-lg px-2.5 py-1">
                   <select
                     value={pageSize}
                     onChange={(e) => {
@@ -598,7 +597,7 @@ export default function InventoryPage() {
                   <button
                     onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                     disabled={safeCurrentPage <= 1}
-                    className="p-2 min-h-[32px] min-w-[32px] rounded-xl border border-white/10 bg-white/5 text-white disabled:opacity-30 disabled:cursor-not-allowed hover:bg-white/10 transition-colors flex items-center justify-center"
+                    className="p-2 min-h-[32px] min-w-[32px] rounded-lg border border-neutral-800 bg-neutral-900 text-white disabled:opacity-30 disabled:cursor-not-allowed hover:bg-neutral-800 transition-colors flex items-center justify-center"
                     title="Previous Page"
                   >
                     <ChevronLeft size={14} />
@@ -606,7 +605,7 @@ export default function InventoryPage() {
                   <button
                     onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                     disabled={safeCurrentPage >= totalPages}
-                    className="p-2 min-h-[32px] min-w-[32px] rounded-xl border border-white/10 bg-white/5 text-white disabled:opacity-30 disabled:cursor-not-allowed hover:bg-white/10 transition-colors flex items-center justify-center"
+                    className="p-2 min-h-[32px] min-w-[32px] rounded-lg border border-neutral-800 bg-neutral-900 text-white disabled:opacity-30 disabled:cursor-not-allowed hover:bg-neutral-800 transition-colors flex items-center justify-center"
                     title="Next Page"
                   >
                     <ChevronRight size={14} />

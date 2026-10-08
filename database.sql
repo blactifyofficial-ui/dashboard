@@ -268,6 +268,25 @@ CREATE TABLE IF NOT EXISTS "meta_ads_transactions" (
     CONSTRAINT "meta_ads_transactions_created_by_id_user_id_fk" FOREIGN KEY ("created_by_id") REFERENCES "user"("id") ON DELETE NO ACTION ON UPDATE CASCADE
 );
 
+-- Meta Ads Daily Campaign Planner
+CREATE TABLE IF NOT EXISTS "meta_ads_daily_plans" (
+    "id" TEXT PRIMARY KEY NOT NULL,
+    "date" TEXT NOT NULL, -- 'YYYY-MM-DD'
+    "total_budget" NUMERIC DEFAULT '0' NOT NULL,
+    "campaign_count" NUMERIC DEFAULT '1' NOT NULL,
+    "distribution_mode" TEXT DEFAULT 'ALL_SAME' NOT NULL, -- 'ALL_SAME', 'DIFFERENT'
+    "campaigns" TEXT DEFAULT '[]' NOT NULL, -- JSON array of campaigns
+    "status" TEXT DEFAULT 'IN_PROGRESS' NOT NULL, -- 'IN_PROGRESS', 'DONE', 'NOT_DONE'
+    "notes" TEXT,
+    "created_by_id" TEXT,
+    "updated_by_id" TEXT,
+    "created_at" TIMESTAMP WITHOUT TIME ZONE DEFAULT NOW() NOT NULL,
+    "updated_at" TIMESTAMP WITHOUT TIME ZONE DEFAULT NOW() NOT NULL,
+    CONSTRAINT "meta_ads_daily_plans_date_unique" UNIQUE ("date"),
+    CONSTRAINT "meta_ads_daily_plans_created_by_id_user_id_fk" FOREIGN KEY ("created_by_id") REFERENCES "user"("id") ON DELETE SET NULL ON UPDATE CASCADE,
+    CONSTRAINT "meta_ads_daily_plans_updated_by_id_user_id_fk" FOREIGN KEY ("updated_by_id") REFERENCES "user"("id") ON DELETE SET NULL ON UPDATE CASCADE
+);
+
 -- ==============================================================================
 -- 7. PARTNERS & EQUITY / PAYOUT TRANSACTIONS
 -- ==============================================================================

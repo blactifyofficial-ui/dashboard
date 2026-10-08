@@ -18,6 +18,7 @@ export const PERMISSIONS = {
   // --- Meta Ads ---
   'meta_ads:view': ['SUPER_ADMIN', 'ADMIN', 'PARTNER', 'VIEWER'],
   'meta_ads:edit': ['SUPER_ADMIN', 'ADMIN'],
+  'meta_ads:manage_planner': ['SUPER_ADMIN', 'ADMIN', 'STAFF'],
 
   // --- Partners ---
   'partners:view_all': ['SUPER_ADMIN', 'ADMIN'],
@@ -89,8 +90,9 @@ export const PERMISSION_CATALOG: PermissionItem[] = [
   { key: 'inventory:sync', label: 'Sync Inventory', description: 'Trigger manual inventory replenishment sync', category: 'Inventory' },
 
   // Meta Ads
-  { key: 'meta_ads:view', label: 'View Meta Ads', description: 'See ad spend analytics and weekly budgets', category: 'Meta Ads' },
+  { key: 'meta_ads:view', label: 'View Meta Ads', description: 'See ad spend analytics, daily planner, and weekly budgets', category: 'Meta Ads' },
   { key: 'meta_ads:edit', label: 'Manage Meta Ads', description: 'Set weekly budgets and record ad spend entries', category: 'Meta Ads' },
+  { key: 'meta_ads:manage_planner', label: 'Manage Daily Planner', description: 'Configure daily campaigns, distribute budgets, and update execution status', category: 'Meta Ads' },
 
   // Partners
   { key: 'partners:view_all', label: 'View All Partners', description: 'Access full list of partners and equity shares', category: 'Partners' },

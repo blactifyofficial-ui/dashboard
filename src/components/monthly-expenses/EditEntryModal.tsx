@@ -83,35 +83,35 @@ function EditEntryForm({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-neutral-900 border border-white/10 rounded-2xl w-full max-w-md max-h-[90dvh] flex flex-col overflow-hidden shadow-2xl">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70">
+      <div className="bg-neutral-900 border border-neutral-800 rounded-xl w-full max-w-md max-h-[90dvh] flex flex-col overflow-hidden shadow-2xl">
         {/* Header */}
-        <div className="flex items-center justify-between px-5 sm:px-6 py-4 border-b border-white/10 bg-white/5 shrink-0">
+        <div className="flex items-center justify-between px-4 sm:px-5 py-3.5 border-b border-neutral-800 bg-neutral-950 shrink-0">
           <div>
-            <h3 className="text-base font-semibold text-white">Edit Bill Details</h3>
+            <h3 className="text-sm sm:text-base font-semibold text-white">Edit Bill Details</h3>
             <p className="text-xs text-neutral-400 mt-0.5">Month: {entry.month}</p>
           </div>
           <button
             onClick={onClose}
-            className="w-10 h-10 flex items-center justify-center text-neutral-400 hover:text-white rounded-lg hover:bg-white/10 transition-colors"
+            className="w-8 h-8 flex items-center justify-center text-neutral-400 hover:text-white rounded-lg bg-neutral-800 hover:bg-neutral-700 transition-colors"
           >
-            <X size={18} />
+            <X size={15} />
           </button>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="p-5 sm:p-6 space-y-4 overflow-y-auto flex-1">
+        <form onSubmit={handleSubmit} className="p-4 sm:p-5 space-y-3.5 overflow-y-auto flex-1">
           {/* Bill Name */}
           <div>
             <label className="block text-xs font-medium text-neutral-300 mb-1.5">
-              Bill / Expense Name <span className="text-white/60">*</span>
+              Bill / Expense Name <span className="text-neutral-500">*</span>
             </label>
             <input
               type="text"
               required
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full px-3.5 py-2.5 min-h-[44px] bg-neutral-950/60 border border-white/10 rounded-xl text-white placeholder:text-neutral-600 focus:outline-none focus:border-white/30 transition-colors text-base md:text-sm"
+              className="w-full px-3 py-2 min-h-[38px] bg-neutral-950 border border-neutral-800 rounded-lg text-white placeholder:text-neutral-500 focus:outline-none focus:border-neutral-500 transition-colors text-xs"
             />
           </div>
 
@@ -122,13 +122,13 @@ function EditEntryForm({
                 Expected Amount (₹)
               </label>
               <div className="relative">
-                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400 font-mono text-base md:text-xs">₹</span>
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 font-mono text-xs">₹</span>
                 <input
                   type="number"
                   step="0.01"
                   value={expectedAmount}
                   onChange={(e) => setExpectedAmount(e.target.value)}
-                  className="w-full pl-8 pr-3.5 py-2.5 min-h-[44px] bg-neutral-950/60 border border-white/10 rounded-xl text-white font-mono placeholder:text-neutral-600 focus:outline-none focus:border-white/30 transition-colors text-base md:text-xs"
+                  className="w-full pl-7 pr-3 py-2 min-h-[38px] bg-neutral-950 border border-neutral-800 rounded-lg text-white font-mono placeholder:text-neutral-500 focus:outline-none focus:border-neutral-500 transition-colors text-xs"
                 />
               </div>
             </div>
@@ -144,7 +144,7 @@ function EditEntryForm({
                 value={dueDay}
                 onChange={(e) => setDueDay(e.target.value)}
                 placeholder="e.g. 5"
-                className="w-full px-3.5 py-2.5 min-h-[44px] bg-neutral-950/60 border border-white/10 rounded-xl text-white font-mono placeholder:text-neutral-600 focus:outline-none focus:border-white/30 transition-colors text-base md:text-xs"
+                className="w-full px-3 py-2 min-h-[38px] bg-neutral-950 border border-neutral-800 rounded-lg text-white font-mono placeholder:text-neutral-500 focus:outline-none focus:border-neutral-500 transition-colors text-xs"
               />
             </div>
           </div>
@@ -156,13 +156,13 @@ function EditEntryForm({
                 Actual Amount Settled (₹)
               </label>
               <div className="relative">
-                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400 font-mono text-base md:text-xs">₹</span>
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 font-mono text-xs">₹</span>
                 <input
                   type="number"
                   step="0.01"
                   value={actualAmount}
                   onChange={(e) => setActualAmount(e.target.value)}
-                  className="w-full pl-8 pr-3.5 py-2.5 min-h-[44px] bg-neutral-950/60 border border-white/10 rounded-xl text-white font-mono focus:outline-none focus:border-white/30 transition-colors text-base md:text-xs"
+                  className="w-full pl-7 pr-3 py-2 min-h-[38px] bg-neutral-950 border border-neutral-800 rounded-lg text-white font-mono focus:outline-none focus:border-neutral-500 transition-colors text-xs"
                 />
               </div>
             </div>
@@ -177,10 +177,10 @@ function EditEntryForm({
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="w-full px-3.5 py-2.5 min-h-[44px] bg-neutral-950/60 border border-white/10 rounded-xl text-white text-base md:text-xs focus:outline-none focus:border-white/30 transition-colors"
+                className="w-full px-3 py-2 min-h-[38px] bg-neutral-950 border border-neutral-800 rounded-lg text-white text-xs focus:outline-none focus:border-neutral-500 transition-colors"
               >
                 {EXPENSE_CATEGORIES.map((c) => (
-                  <option key={c.value} value={c.value} className="bg-[#121212] text-white">
+                  <option key={c.value} value={c.value} className="bg-neutral-900 text-white">
                     {c.label}
                   </option>
                 ))}
@@ -194,11 +194,11 @@ function EditEntryForm({
               <select
                 value={paymentMethodId}
                 onChange={(e) => setPaymentMethodId(e.target.value)}
-                className="w-full px-3.5 py-2.5 min-h-[44px] bg-neutral-950/60 border border-white/10 rounded-xl text-white text-base md:text-xs focus:outline-none focus:border-white/30 transition-colors"
+                className="w-full px-3 py-2 min-h-[38px] bg-neutral-950 border border-neutral-800 rounded-lg text-white text-xs focus:outline-none focus:border-neutral-500 transition-colors"
               >
-                <option value="" className="bg-[#121212] text-white">Select Method</option>
+                <option value="" className="bg-neutral-900 text-white">Select Method</option>
                 {paymentMethods.map((pm) => (
-                  <option key={pm.id} value={pm.id} className="bg-[#121212] text-white">
+                  <option key={pm.id} value={pm.id} className="bg-neutral-900 text-white">
                     {pm.name}
                   </option>
                 ))}
@@ -216,19 +216,19 @@ function EditEntryForm({
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="e.g. Consumer ID, Account details"
-              className="w-full px-3.5 py-2.5 min-h-[44px] bg-neutral-950/60 border border-white/10 rounded-xl text-white placeholder:text-neutral-600 focus:outline-none focus:border-white/30 transition-colors text-base md:text-xs"
+              className="w-full px-3 py-2 min-h-[38px] bg-neutral-950 border border-neutral-800 rounded-lg text-white placeholder:text-neutral-500 focus:outline-none focus:border-neutral-500 transition-colors text-xs"
             />
           </div>
 
           {/* Actions */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 pt-3 border-t border-white/10">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 pt-3 border-t border-neutral-800">
             <button
               type="button"
               onClick={handleDelete}
               disabled={isDeleting}
-              className="px-3.5 h-11 min-h-[44px] text-xs font-medium text-rose-400 hover:text-rose-300 rounded-xl hover:bg-rose-500/10 transition-colors flex items-center justify-center gap-1.5"
+              className="px-3 py-2 min-h-[38px] text-xs font-medium text-rose-300 hover:text-rose-200 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 transition-colors flex items-center justify-center gap-1.5"
             >
-              <Trash2 size={14} />
+              <Trash2 size={13} />
               {isDeleting ? 'Deleting...' : 'Delete'}
             </button>
 
@@ -236,14 +236,14 @@ function EditEntryForm({
               <button
                 type="button"
                 onClick={onClose}
-                className="flex-1 sm:flex-none px-4 h-11 min-h-[44px] text-xs font-medium text-neutral-400 hover:text-white rounded-xl hover:bg-white/10 transition-colors"
+                className="flex-1 sm:flex-none px-3.5 py-2 min-h-[38px] text-xs font-medium text-neutral-300 hover:text-white rounded-lg bg-neutral-800 hover:bg-neutral-700 border border-neutral-700 transition-colors"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="flex-1 sm:flex-none px-5 h-11 min-h-[44px] text-xs font-semibold text-black bg-white hover:bg-neutral-200 disabled:opacity-50 rounded-xl transition-all shadow-sm flex items-center justify-center gap-1.5"
+                className="flex-1 sm:flex-none px-4 py-2 min-h-[38px] text-xs font-semibold text-black bg-white hover:bg-neutral-200 disabled:opacity-50 rounded-lg transition-colors flex items-center justify-center gap-1.5"
               >
                 <Check size={14} />
                 {isSubmitting ? 'Saving...' : 'Save Changes'}

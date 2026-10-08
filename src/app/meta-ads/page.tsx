@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import Link from 'next/link';
 import { 
-  Calendar, 
+  Calendar as CalendarIcon, 
   TrendingUp, 
   Plus, 
   CheckCircle2, 
@@ -13,13 +13,16 @@ import {
   Check, 
   Clock,
   Wallet,
-  Loader2
+  Loader2,
+  Scale
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import ConfirmModal from '@/components/ConfirmModal';
 import { useAuth } from '@/context/AuthContext';
 import AccessDenied from '@/components/AccessDenied';
+import MetaAdsCalendar, { DailyPlanItem } from '@/components/meta-ads/MetaAdsCalendar';
+import DailyCampaignPlanner, { CampaignEntry } from '@/components/meta-ads/DailyCampaignPlanner';
 
 interface MetaAdsSettings {
   id: string;
@@ -79,6 +82,10 @@ export default function MetaAdsPage() {
   const { hasPermission } = useAuth();
   const canViewAds = hasPermission('meta_ads:view');
   const canEditAds = hasPermission('meta_ads:edit');
+  const canManagePlanner = hasPermission('meta_ads:manage_planner') || canEditAds;
+
+  // Tabs: 'planner' | 'billing'
+  const [activeTab, setActiveTab] = useState<'planner' | 'billing'>('planner');
 
   const [loading, setLoading] = useState(true);
   const [savingBudget, setSavingBudget] = useState(false);
@@ -86,6 +93,12 @@ export default function MetaAdsPage() {
   const [transactions, setTransactions] = useState<MetaAdsTransaction[]>([]);
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
   const [summary, setSummary] = useState<SummaryData | null>(null);
+
+  // Daily Planner State
+  const todayStr = useMemo(() => formatLocalDate(new Date()), []);
+  const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
+  const [selectedDate, setSelectedDate] = useState<string>(todayStr);
+  const [plansMap, setPlansMap] = useState<Record<string, DailyPlanItem>>({});
 
   // Daily budget input state
   const [dailyBudgetInput, setDailyBudgetInput] = useState<string>('0');
@@ -164,7 +177,30 @@ export default function MetaAdsPage() {
     return diffDays > 0 ? diffDays : 1;
   };
 
-  // Fetch data
+  // Fetch Planner Plans for month
+  const fetchPlannerData = useCallback(async (monthDate: Date) => {
+    try {
+      const year = monthDate.getFullYear();
+      const month = String(monthDate.getMonth() + 1).padStart(2, '0');
+      const monthQuery = `${year}-${month}`;
+
+      const res = await fetch(`/api/meta-ads/planner?month=${monthQuery}`);
+      if (!res.ok) throw new Error('Failed to fetch planner plans');
+      const data = await res.json();
+
+      if (data.plans) {
+        const map: Record<string, DailyPlanItem> = {};
+        data.plans.forEach((p: DailyPlanItem) => {
+          map[p.date] = p;
+        });
+        setPlansMap(map);
+      }
+    } catch (err) {
+      console.error('Failed to load planner data:', err);
+    }
+  }, []);
+
+  // Fetch general meta ads data
   const fetchData = useCallback(async (isInitial = false) => {
     try {
       if (!isInitial) setLoading(true);
@@ -199,6 +235,11 @@ export default function MetaAdsPage() {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchData(true);
   }, [fetchData]);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchPlannerData(currentMonth);
+  }, [currentMonth, fetchPlannerData]);
 
   // Recalculate default payment amount based on daily budget and date range
   const calculatedDays = calculateDays(weekStartDate, weekEndDate);
@@ -303,6 +344,43 @@ export default function MetaAdsPage() {
     }
   };
 
+  // Handle Save Daily Planner
+  const handleSaveDailyPlan = async (planData: {
+    date: string;
+    totalBudget: number;
+    campaignCount: number;
+    distributionMode: 'ALL_SAME' | 'DIFFERENT';
+    campaigns: CampaignEntry[];
+    status: 'IN_PROGRESS' | 'DONE' | 'NOT_DONE';
+    notes: string;
+  }): Promise<boolean> => {
+    try {
+      const res = await fetch('/api/meta-ads/planner', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(planData),
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || 'Failed to save plan');
+      }
+
+      const resData = await res.json();
+      if (resData.plan) {
+        setPlansMap((prev) => ({
+          ...prev,
+          [resData.plan.date]: resData.plan,
+        }));
+      }
+
+      return true;
+    } catch (error) {
+      if (error instanceof Error) toast.error(error.message);
+      else toast.error('Failed to save daily plan');
+      return false;
+    }
+  };
 
   // Handle Submit Payment
   const handleSubmitPayment = async (e: React.FormEvent) => {
@@ -400,18 +478,22 @@ export default function MetaAdsPage() {
   const livePeriodBudget = currentDailyBudgetNum * currentDaysNum;
   const liveMonthlyBudget = currentDailyBudgetNum * 30;
 
+  // Monthly Budget Balance Calculation
+  const thisMonthSpent = summary?.thisMonthPaid || 0;
+  const monthlyBalanceRemaining = Math.max(0, liveMonthlyBudget - thisMonthSpent);
+
   if (!canViewAds) {
     return <AccessDenied message="You do not have permission to view Meta Ads performance and budgets." />;
   }
 
   return (
     <div className="space-y-6 sm:space-y-8 relative z-10 pb-8 sm:pb-12">
-      {/* Header - Matches Dashboard and Revenue header style */}
+      {/* Header */}
       <header className="flex-none flex flex-col md:flex-row md:items-end justify-between gap-4 sm:gap-6">
         <div className="space-y-1 sm:space-y-2">
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-white">Meta Ads</h1>
           <p className="text-neutral-400 text-xs sm:text-sm md:text-base">
-            Daily budget planning, weekly targets, and expense tracking
+            Daily campaign planning, budget allocation, and billing ledger
           </p>
         </div>
         {canEditAds && (
@@ -427,551 +509,528 @@ export default function MetaAdsPage() {
         )}
       </header>
 
+      {/* Tab Switcher */}
+      <div className="flex items-center gap-1 bg-neutral-900 border border-neutral-800 p-1 rounded-lg w-fit">
+        <button
+          type="button"
+          onClick={() => setActiveTab('planner')}
+          className={`px-3.5 py-1.5 text-xs sm:text-sm font-medium rounded-md transition-colors flex items-center gap-2 whitespace-nowrap ${
+            activeTab === 'planner'
+              ? 'bg-neutral-800 text-white font-semibold'
+              : 'text-neutral-400 hover:text-white'
+          }`}
+        >
+          <CalendarIcon size={15} />
+          <span>Daily Planner</span>
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab('billing')}
+          className={`px-3.5 py-1.5 text-xs sm:text-sm font-medium rounded-md transition-colors flex items-center gap-2 whitespace-nowrap ${
+            activeTab === 'billing'
+              ? 'bg-neutral-800 text-white font-semibold'
+              : 'text-neutral-400 hover:text-white'
+          }`}
+        >
+          <Wallet size={15} />
+          <span>Billing &amp; Payments ({transactions.length})</span>
+        </button>
+      </div>
+
       {loading && !settings ? (
         <LoadingSpinner />
       ) : (
         <>
-          {/* Top Row: 4 Uniform KPI Cards - Matches Dashboard / RevenueCard grid & sizing */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
+          {/* Top Row: 4 Uniform KPI Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             {/* Card 1: Daily Budget */}
-            <div className="group bg-white/[0.03] border border-white/5 rounded-3xl p-5 sm:p-6 md:p-8 hover:bg-white/[0.06] transition-all duration-500 relative shadow-2xl flex flex-col justify-between">
-              <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-white/5 rounded-full blur-2xl group-hover:bg-white/10 transition-all duration-500 pointer-events-none"></div>
-              <div className="flex items-center justify-between mb-2 md:mb-3 relative z-10">
-                <h2 className="text-xs sm:text-sm font-medium text-neutral-400">Daily Budget</h2>
-                <Calendar size={18} className="text-neutral-500 shrink-0" />
+            <div className="bg-neutral-900/60 border border-neutral-800 rounded-xl p-5 flex flex-col justify-between">
+              <div className="flex items-center justify-between mb-2">
+                <h2 className="text-xs font-medium text-neutral-400 uppercase tracking-wider">Daily Budget</h2>
+                <CalendarIcon size={16} className="text-neutral-500 shrink-0" />
               </div>
-              <div className="relative z-10">
-                <p className="text-2xl sm:text-3xl md:text-4xl font-bold text-white tracking-tight truncate">
+              <div>
+                <p className="text-2xl sm:text-3xl font-semibold font-mono text-white tracking-tight truncate">
                   ₹{currentDailyBudgetNum.toLocaleString('en-IN')}
                 </p>
-                <p className="text-xs text-neutral-400 mt-1.5 sm:mt-2">Active daily target</p>
+                <p className="text-xs text-neutral-500 mt-1">Active daily target</p>
               </div>
             </div>
 
             {/* Card 2: Period Budget Target */}
-            <div className="group bg-white/[0.03] border border-white/5 rounded-3xl p-5 sm:p-6 md:p-8 hover:bg-white/[0.06] transition-all duration-500 relative shadow-2xl flex flex-col justify-between">
-              <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-white/5 rounded-full blur-2xl group-hover:bg-white/10 transition-all duration-500 pointer-events-none"></div>
-              <div className="flex items-center justify-between mb-2 md:mb-3 relative z-10">
-                <h2 className="text-xs sm:text-sm font-medium text-neutral-400">
-                  Target ({currentDaysNum} {currentDaysNum === 1 ? 'Day' : 'Days'})
+            <div className="bg-neutral-900/60 border border-neutral-800 rounded-xl p-5 flex flex-col justify-between">
+              <div className="flex items-center justify-between mb-2">
+                <h2 className="text-xs font-medium text-neutral-400 uppercase tracking-wider">
+                  Period Budget ({currentDaysNum}d)
                 </h2>
-                <TrendingUp size={18} className="text-neutral-500 shrink-0" />
+                <TrendingUp size={16} className="text-neutral-500 shrink-0" />
               </div>
-              <div className="relative z-10">
-                <p className="text-2xl sm:text-3xl md:text-4xl font-bold text-white tracking-tight truncate">
+              <div>
+                <p className="text-2xl sm:text-3xl font-semibold font-mono text-white tracking-tight truncate">
                   ₹{livePeriodBudget.toLocaleString('en-IN')}
                 </p>
-                <p className="text-xs text-neutral-400 mt-1.5 sm:mt-2">
+                <p className="text-xs text-neutral-500 mt-1">
                   {currentDaysNum}d × ₹{currentDailyBudgetNum.toLocaleString('en-IN')}/day
                 </p>
               </div>
             </div>
 
-            {/* Card 3: Monthly Projection */}
-            <div className="group bg-white/[0.03] border border-white/5 rounded-3xl p-5 sm:p-6 md:p-8 hover:bg-white/[0.06] transition-all duration-500 relative shadow-2xl flex flex-col justify-between">
-              <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-white/5 rounded-full blur-2xl group-hover:bg-white/10 transition-all duration-500 pointer-events-none"></div>
-              <div className="flex items-center justify-between mb-2 md:mb-3 relative z-10">
-                <h2 className="text-xs sm:text-sm font-medium text-neutral-400">Monthly Projection</h2>
-                <Clock size={18} className="text-neutral-500 shrink-0" />
+            {/* Card 3: Monthly Budget */}
+            <div className="bg-neutral-900/60 border border-neutral-800 rounded-xl p-5 flex flex-col justify-between">
+              <div className="flex items-center justify-between mb-2">
+                <h2 className="text-xs font-medium text-neutral-400 uppercase tracking-wider">Monthly Budget</h2>
+                <Clock size={16} className="text-neutral-500 shrink-0" />
               </div>
-              <div className="relative z-10">
-                <p className="text-2xl sm:text-3xl md:text-4xl font-bold text-white tracking-tight truncate">
+              <div>
+                <p className="text-2xl sm:text-3xl font-semibold font-mono text-white tracking-tight truncate">
                   ₹{liveMonthlyBudget.toLocaleString('en-IN')}
                 </p>
-                <p className="text-xs text-neutral-400 mt-1.5 sm:mt-2">30 Days estimated spend</p>
+                <p className="text-xs text-neutral-500 mt-1">30 Days estimated spend</p>
               </div>
             </div>
 
-            {/* Card 4: Total Meta Paid */}
-            <div className="group bg-white/[0.03] border border-white/5 rounded-3xl p-5 sm:p-6 md:p-8 hover:bg-white/[0.06] transition-all duration-500 relative shadow-2xl flex flex-col justify-between">
-              <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-white/5 rounded-full blur-2xl group-hover:bg-white/10 transition-all duration-500 pointer-events-none"></div>
-              <div className="flex items-center justify-between mb-2 md:mb-3 relative z-10">
-                <h2 className="text-xs sm:text-sm font-medium text-neutral-400">Total Meta Paid</h2>
-                <Wallet size={18} className="text-neutral-500 shrink-0" />
+            {/* Card 4: Monthly Balance */}
+            <div className="bg-neutral-900/60 border border-neutral-800 rounded-xl p-5 flex flex-col justify-between">
+              <div className="flex items-center justify-between mb-2">
+                <h2 className="text-xs font-medium text-neutral-400 uppercase tracking-wider">Monthly Balance</h2>
+                <Scale size={16} className="text-neutral-500 shrink-0" />
               </div>
-              <div className="relative z-10">
-                <p className="text-2xl sm:text-3xl md:text-4xl font-bold text-white tracking-tight truncate">
-                  ₹{(summary?.totalPaid || 0).toLocaleString('en-IN')}
+              <div>
+                <p className="text-2xl sm:text-3xl font-semibold font-mono text-white tracking-tight truncate">
+                  ₹{monthlyBalanceRemaining.toLocaleString('en-IN')}
                 </p>
-                <p className="text-xs text-neutral-400 mt-1.5 sm:mt-2">
-                  {transactions.length} payment {transactions.length === 1 ? 'batch' : 'batches'} recorded
+                <p className="text-xs text-neutral-500 mt-1">
+                  ₹{thisMonthSpent.toLocaleString('en-IN')} spent this month
                 </p>
               </div>
             </div>
           </div>
 
-          {/* Middle Row: Budget Configuration Panel */}
-          <div className="bg-white/[0.02] border border-white/5 rounded-3xl p-5 sm:p-6 md:p-8 shadow-2xl relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent pointer-events-none"></div>
-            
-            <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-5 sm:gap-6">
-              <div className="space-y-1.5 max-w-md">
-                <div className="flex items-center gap-2">
-                  <span className="h-2 w-2 rounded-full bg-emerald-400 shrink-0"></span>
-                  <h2 className="text-base sm:text-lg md:text-xl font-semibold text-white tracking-tight">Set Daily Ad Budget</h2>
-                </div>
-                <p className="text-xs sm:text-sm text-neutral-400 leading-relaxed">
-                  Enter daily spend &amp; number of days to calculate budget target (Daily × Days).
-                </p>
+          {/* TAB 1: Daily Planner View */}
+          {activeTab === 'planner' && (
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+              {/* Left Side: Daily Campaign Planner */}
+              <div className="lg:col-span-6 xl:col-span-6 bg-neutral-900/60 border border-neutral-800 rounded-xl p-5 sm:p-6 flex flex-col justify-between">
+                <DailyCampaignPlanner
+                  key={selectedDate}
+                  selectedDate={selectedDate}
+                  onDateChange={(d) => setSelectedDate(d)}
+                  currentPlan={plansMap[selectedDate] || null}
+                  defaultDailyBudget={currentDailyBudgetNum}
+                  onSavePlan={handleSaveDailyPlan}
+                  canEdit={canManagePlanner}
+                  todayStr={todayStr}
+                />
               </div>
 
-              <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
-                {/* Daily Budget Input */}
-                <div className="relative flex-1 sm:flex-initial">
-                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400 font-medium text-sm">
-                    ₹
-                  </span>
-                  <input
-                    type="number"
-                    inputMode="decimal"
-                    min="0"
-                    step="50"
-                    value={dailyBudgetInput}
-                    onChange={(e) => setDailyBudgetInput(e.target.value)}
-                    placeholder="400"
-                    className="w-full sm:w-32 bg-white/5 border border-white/10 rounded-xl pl-8 pr-12 py-2.5 min-h-[44px] text-base md:text-sm font-medium text-white focus:outline-none focus:border-white/20 transition-colors"
-                  />
-                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-neutral-500 font-medium">
-                    / day
-                  </span>
-                </div>
-
-                <span className="text-neutral-500 font-bold text-sm hidden sm:inline">×</span>
-
-                {/* Number of Days Input */}
-                <div className="relative flex-1 sm:flex-initial">
-                  <input
-                    type="number"
-                    inputMode="numeric"
-                    min="1"
-                    max="365"
-                    step="1"
-                    value={daysInput}
-                    onChange={(e) => setDaysInput(e.target.value)}
-                    placeholder="7"
-                    className="w-full sm:w-24 bg-white/5 border border-white/10 rounded-xl pl-3 pr-10 py-2.5 min-h-[44px] text-base md:text-sm font-medium text-white focus:outline-none focus:border-white/20 transition-colors"
-                  />
-                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-neutral-500 font-medium">
-                    days
-                  </span>
-                </div>
-
-                <span className="text-neutral-500 font-bold text-sm hidden sm:inline">=</span>
-
-                {/* Calculated Result Display */}
-                <div className="w-full sm:w-auto bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 min-h-[44px] flex items-center justify-center text-sm font-semibold text-white whitespace-nowrap">
-                  Target: ₹{livePeriodBudget.toLocaleString('en-IN')}
-                </div>
-
-                <button
-                  onClick={handleSaveBudget}
-                  disabled={savingBudget}
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-white text-black px-4 py-2.5 min-h-[44px] rounded-xl font-semibold hover:bg-neutral-200 active:bg-neutral-300 transition-colors text-sm disabled:opacity-50 shadow-sm"
-                >
-                  {savingBudget ? (
-                    <>
-                      <Loader2 size={16} className="animate-spin" />
-                      <span>Saving...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Check size={16} />
-                      <span>Save Budget</span>
-                    </>
-                  )}
-                </button>
+              {/* Right Side: Interactive Calendar */}
+              <div className="lg:col-span-6 xl:col-span-6 bg-neutral-900/60 border border-neutral-800 rounded-xl p-5 sm:p-6 flex flex-col justify-between">
+                <MetaAdsCalendar
+                  currentMonth={currentMonth}
+                  onMonthChange={(m) => setCurrentMonth(m)}
+                  selectedDate={selectedDate}
+                  onSelectDate={(d) => setSelectedDate(d)}
+                  plansMap={plansMap}
+                  todayStr={todayStr}
+                />
               </div>
             </div>
+          )}
 
-          </div>
 
-          {/* Bottom Row: Transactions & Payment History Table - Matches Orders table container */}
-          <div className="bg-white/[0.02] border border-white/5 rounded-3xl shadow-2xl relative overflow-hidden min-h-[480px] flex flex-col">
-            <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent pointer-events-none"></div>
-            
-            {/* Table Header */}
-            <div className="flex-none p-4 md:px-8 md:py-6 border-b border-white/5 flex flex-col md:flex-row justify-between items-stretch md:items-center gap-4 relative z-10 bg-black/50">
-              <div className="flex items-center gap-3">
-                <h2 className="text-lg md:text-xl font-semibold text-white tracking-tight">Weekly Budget Payments</h2>
-                <span className="text-xs px-2.5 py-0.5 rounded-full bg-white/10 text-neutral-300 font-medium">
-                  {transactions.length}
-                </span>
-              </div>
-
-              <div className="w-full md:w-auto">
-                <div className="relative">
-                  <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-500" />
-                  <input
-                    type="text"
-                    placeholder="Search payments, reference..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full md:w-64 bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-2.5 min-h-[44px] text-base md:text-sm text-white focus:outline-none focus:border-white/20 transition-colors"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Table Content */}
-            <div className="relative z-10 w-full overflow-x-auto no-scrollbar flex-1 flex flex-col justify-center">
-              {filteredTransactions.length === 0 ? (
-                <div className="flex flex-col items-center justify-center space-y-4 py-16 sm:py-20 md:py-24 px-4 text-center text-neutral-400 my-auto">
-                  <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-white/5 flex items-center justify-center mb-2 shadow-inner border border-white/5">
-                    <Wallet size={32} className="text-white/50 sm:hidden" />
-                    <Wallet size={36} className="text-white/50 hidden sm:block" />
-                  </div>
-                  <div className="space-y-1.5 max-w-md">
-                    <p className="text-lg sm:text-xl font-semibold text-white/90">No payment transactions recorded yet</p>
+          {/* TAB 2: Billing & Payments View (Budget Config & Weekly Ledger) */}
+          {activeTab === 'billing' && (
+            <div className="space-y-6">
+              {/* Budget Configuration Panel */}
+              <div className="bg-neutral-900/60 border border-neutral-800 rounded-xl p-5 sm:p-6">
+                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5 sm:gap-6">
+                  <div className="space-y-1 max-w-md">
+                    <div className="flex items-center gap-2">
+                      <span className="h-2 w-2 rounded-full bg-emerald-500 shrink-0" />
+                      <h2 className="text-base sm:text-lg font-semibold text-white tracking-tight">Base Target Settings</h2>
+                    </div>
                     <p className="text-xs sm:text-sm text-neutral-400 leading-relaxed">
-                      {searchQuery 
-                        ? 'No transactions matched your search criteria.' 
-                        : 'When you pay your weekly Meta budget, click "Mark Weekly Budget Paid" to record the transaction and create the corresponding business expense.'}
+                      Enter baseline daily spend &amp; number of days to set the period budget target.
                     </p>
                   </div>
-                  {!searchQuery && (
-                    <button
-                      onClick={handleOpenPaymentModal}
-                      className="mt-3 inline-flex items-center justify-center gap-2 bg-white text-black px-5 py-2.5 min-h-[44px] rounded-xl font-medium hover:bg-neutral-200 transition-colors text-xs sm:text-sm shadow-sm"
-                    >
-                      <Plus size={16} />
-                      Record First Payment
-                    </button>
-                  )}
+
+                  <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
+                    {/* Daily Budget Input */}
+                    <div className="relative flex-1 sm:flex-initial">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 font-medium text-sm">
+                        ₹
+                      </span>
+                      <input
+                        type="number"
+                        inputMode="decimal"
+                        min="0"
+                        step="50"
+                        value={dailyBudgetInput}
+                        onChange={(e) => setDailyBudgetInput(e.target.value)}
+                        placeholder="400"
+                        className="w-full sm:w-32 bg-neutral-900 border border-neutral-800 rounded-lg pl-7 pr-12 py-2 min-h-[40px] text-sm font-medium text-white focus:outline-none focus:border-neutral-600 transition-colors"
+                      />
+                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-neutral-500 font-medium">
+                        / day
+                      </span>
+                    </div>
+
+                    <span className="text-neutral-500 font-bold text-sm hidden sm:inline">×</span>
+
+                    {/* Number of Days Input */}
+                    <div className="relative flex-1 sm:flex-initial">
+                      <input
+                        type="number"
+                        inputMode="numeric"
+                        min="1"
+                        max="365"
+                        step="1"
+                        value={daysInput}
+                        onChange={(e) => setDaysInput(e.target.value)}
+                        placeholder="7"
+                        className="w-full sm:w-24 bg-neutral-900 border border-neutral-800 rounded-lg pl-3 pr-10 py-2 min-h-[40px] text-sm font-medium text-white focus:outline-none focus:border-neutral-600 transition-colors"
+                      />
+                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-neutral-500 font-medium">
+                        days
+                      </span>
+                    </div>
+
+                    <span className="text-neutral-500 font-bold text-sm hidden sm:inline">=</span>
+
+                    {/* Calculated Result Display */}
+                    <div className="w-full sm:w-auto bg-neutral-900 border border-neutral-800 rounded-lg px-3.5 py-2 min-h-[40px] flex items-center justify-center text-sm font-semibold text-white whitespace-nowrap">
+                      Target: ₹{livePeriodBudget.toLocaleString('en-IN')}
+                    </div>
+
+                    {canEditAds && (
+                      <button
+                        onClick={handleSaveBudget}
+                        disabled={savingBudget}
+                        className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-white text-black px-4 py-2 min-h-[40px] rounded-lg font-semibold hover:bg-neutral-200 active:bg-neutral-300 transition-colors text-sm disabled:opacity-50"
+                      >
+                        {savingBudget ? (
+                          <>
+                            <Loader2 size={16} className="animate-spin" />
+                            <span>Saving...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Check size={16} />
+                            <span>Save Budget</span>
+                          </>
+                        )}
+                      </button>
+                    )}
+                  </div>
                 </div>
-              ) : (
-                <table className="w-full text-sm text-left min-w-[800px]">
-                  <thead className="text-xs text-neutral-400 uppercase tracking-wider bg-white/[0.01] border-b border-white/5">
-                    <tr>
-                      <th className="px-4 md:px-8 py-4 md:py-5 font-semibold">Period / Week</th>
-                      <th className="px-4 md:px-8 py-4 md:py-5 font-semibold">Daily Rate</th>
-                      <th className="px-4 md:px-8 py-4 md:py-5 font-semibold">Weekly Target</th>
-                      <th className="px-4 md:px-8 py-4 md:py-5 font-semibold">Amount Paid</th>
-                      <th className="px-4 md:px-8 py-4 md:py-5 font-semibold">Payment Date</th>
-                      <th className="px-4 md:px-8 py-4 md:py-5 font-semibold">Method</th>
-                      <th className="px-4 md:px-8 py-4 md:py-5 font-semibold">Reference</th>
-                      <th className="px-4 md:px-8 py-4 md:py-5 font-semibold">Expense Sync</th>
-                      <th className="px-4 md:px-8 py-4 md:py-5 font-semibold text-right">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-white/5">
-                    {filteredTransactions.map((tx) => {
-                      const startDate = new Date(tx.weekStartDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
-                      const endDate = new Date(tx.weekEndDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-                      const paidDate = new Date(tx.paymentDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+              </div>
 
-                      return (
-                        <tr key={tx.id} className="hover:bg-white/[0.02] transition-colors">
-                          {/* Period */}
-                          <td className="px-4 md:px-8 py-4 md:py-5 font-medium text-white whitespace-nowrap">
-                            <div>{startDate} – {endDate}</div>
-                            {tx.notes && (
-                              <p className="text-xs text-neutral-500 mt-0.5 line-clamp-1 max-w-xs">{tx.notes}</p>
-                            )}
-                          </td>
+              {/* Transactions & Payment History Table */}
+              <div className="bg-neutral-900/60 border border-neutral-800 rounded-xl overflow-hidden flex flex-col">
+                {/* Table Header */}
+                <div className="p-4 md:px-6 md:py-4 border-b border-neutral-800 flex flex-col md:flex-row justify-between items-stretch md:items-center gap-4 bg-neutral-900/80">
+                  <div className="flex items-center gap-2.5">
+                    <h2 className="text-base md:text-lg font-semibold text-white tracking-tight">Weekly Budget Payments</h2>
+                    <span className="text-xs px-2 py-0.5 rounded-md bg-neutral-800 text-neutral-300 font-medium">
+                      {transactions.length}
+                    </span>
+                  </div>
 
-                          {/* Daily Rate */}
-                          <td className="px-4 md:px-8 py-4 md:py-5 text-neutral-300 whitespace-nowrap">
-                            ₹{parseFloat(tx.dailyBudget || '0').toLocaleString('en-IN')}/day
-                          </td>
+                  {/* Search and Action Bar */}
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                    <div className="relative flex-1 sm:w-64">
+                      <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" />
+                      <input
+                        type="text"
+                        placeholder="Search ref, notes, method..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="w-full bg-neutral-900 border border-neutral-800 rounded-lg pl-9 pr-3 py-1.5 text-xs text-white placeholder:text-neutral-500 focus:outline-none focus:border-neutral-600 transition-colors"
+                      />
+                    </div>
 
-                          {/* Weekly Target */}
-                          <td className="px-4 md:px-8 py-4 md:py-5 text-neutral-400 whitespace-nowrap">
-                            ₹{parseFloat(tx.calculatedWeeklyBudget || '0').toLocaleString('en-IN')}
-                          </td>
+                    {canEditAds && (
+                      <button
+                        onClick={handleOpenPaymentModal}
+                        className="inline-flex items-center justify-center gap-2 bg-white text-black px-3.5 py-1.5 rounded-lg text-xs font-semibold hover:bg-neutral-200 transition-colors"
+                      >
+                        <Plus size={15} />
+                        <span>Record Payment</span>
+                      </button>
+                    )}
+                  </div>
+                </div>
 
-                          {/* Amount Paid */}
-                          <td className="px-4 md:px-8 py-4 md:py-5 font-bold text-white whitespace-nowrap">
-                            ₹{parseFloat(tx.amountPaid).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
-                          </td>
-
-                          {/* Payment Date */}
-                          <td className="px-4 md:px-8 py-4 md:py-5 text-neutral-300 whitespace-nowrap">
-                            {paidDate}
-                          </td>
-
-                          {/* Payment Method */}
-                          <td className="px-4 md:px-8 py-4 md:py-5 whitespace-nowrap">
-                            <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-white/5 border border-white/10 text-neutral-200">
-                              {tx.paymentMethodName || tx.paymentMethodCode || 'Default'}
-                            </span>
-                          </td>
-
-                          {/* Reference Number */}
-                          <td className="px-4 md:px-8 py-4 md:py-5 text-neutral-400 text-xs font-mono whitespace-nowrap">
-                            {tx.referenceNumber ? tx.referenceNumber : '—'}
-                          </td>
-
-                          {/* Expense Link */}
-                          <td className="px-4 md:px-8 py-4 md:py-5 whitespace-nowrap">
-                            {tx.expenseId ? (
-                              <Link
-                                href={`/expenses/${tx.expenseId}`}
-                                className="inline-flex items-center gap-1.5 px-2.5 py-1.5 min-h-[32px] rounded-md text-xs font-medium bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/20 transition-colors"
-                              >
-                                <CheckCircle2 size={13} />
-                                <span>Synced Expense</span>
-                                <ExternalLink size={11} />
-                              </Link>
-                            ) : (
-                              <span className="text-xs text-neutral-500">Not linked</span>
-                            )}
-                          </td>
-
-                          {/* Actions */}
-                          <td className="px-4 md:px-8 py-4 md:py-5 text-right whitespace-nowrap">
-                            <button
-                              onClick={() => setTxToDelete(tx)}
-                              className="inline-flex items-center justify-center p-2 min-h-[36px] min-w-[36px] text-neutral-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
-                              title="Delete Record"
-                            >
-                              <Trash2 size={16} />
-                            </button>
+                {/* Table Body */}
+                <div className="flex-1 overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="border-b border-neutral-800 text-[11px] text-neutral-400 font-semibold uppercase tracking-wider bg-neutral-900">
+                        <th className="py-3 px-4 md:px-6">Period</th>
+                        <th className="py-3 px-4 md:px-6">Target Spend</th>
+                        <th className="py-3 px-4 md:px-6">Amount Paid</th>
+                        <th className="py-3 px-4 md:px-6">Payment Date</th>
+                        <th className="py-3 px-4 md:px-6">Method &amp; Ref</th>
+                        <th className="py-3 px-4 md:px-6">Linked Expense</th>
+                        {canEditAds && <th className="py-3 px-4 md:px-6 text-right">Actions</th>}
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-neutral-800/60 text-sm">
+                      {filteredTransactions.length === 0 ? (
+                        <tr>
+                          <td colSpan={canEditAds ? 7 : 6} className="py-12 text-center text-neutral-500 text-sm">
+                            {searchQuery ? 'No payment records match your search.' : 'No weekly ad payments recorded yet.'}
                           </td>
                         </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              )}
+                      ) : (
+                        filteredTransactions.map((tx) => {
+                          const daysInPeriod = calculateDays(tx.weekStartDate, tx.weekEndDate);
+                          return (
+                            <tr key={tx.id} className="hover:bg-neutral-800/30 transition-colors group">
+                              {/* Period Range */}
+                              <td className="py-3.5 px-4 md:px-6">
+                                <div className="font-semibold text-white">
+                                  {tx.weekStartDate} to {tx.weekEndDate}
+                                </div>
+                                <div className="text-xs text-neutral-400">
+                                  {daysInPeriod} {daysInPeriod === 1 ? 'day' : 'days'}
+                                </div>
+                              </td>
+
+                              {/* Target Spend */}
+                              <td className="py-3.5 px-4 md:px-6">
+                                <div className="text-neutral-300 font-medium">
+                                  ₹{parseFloat(tx.calculatedWeeklyBudget).toLocaleString('en-IN')}
+                                </div>
+                                <div className="text-xs text-neutral-500">
+                                  ₹{parseFloat(tx.dailyBudget).toLocaleString('en-IN')}/day
+                                </div>
+                              </td>
+
+                              {/* Amount Paid */}
+                              <td className="py-3.5 px-4 md:px-6">
+                                <div className="font-semibold text-emerald-400">
+                                  ₹{parseFloat(tx.amountPaid).toLocaleString('en-IN')}
+                                </div>
+                                <div className="text-[11px] text-neutral-500 flex items-center gap-1">
+                                  <CheckCircle2 size={12} className="text-emerald-400" />
+                                  <span>{tx.status}</span>
+                                </div>
+                              </td>
+
+                              {/* Payment Date */}
+                              <td className="py-3.5 px-4 md:px-6 text-neutral-300">
+                                {tx.paymentDate}
+                              </td>
+
+                              {/* Method & Ref */}
+                              <td className="py-3.5 px-4 md:px-6">
+                                <div className="text-white font-medium">
+                                  {tx.paymentMethodName || tx.paymentMethodCode || 'Other'}
+                                </div>
+                                {tx.referenceNumber && (
+                                  <div className="text-xs text-neutral-400 font-mono">
+                                    {tx.referenceNumber}
+                                  </div>
+                                )}
+                              </td>
+
+                              {/* Linked Expense */}
+                              <td className="py-3.5 px-4 md:px-6">
+                                {tx.expenseId ? (
+                                  <Link
+                                    href="/expenses"
+                                    className="inline-flex items-center gap-1 text-xs text-neutral-300 hover:text-white bg-neutral-800 hover:bg-neutral-700 px-2 py-1 rounded-md border border-neutral-700 transition-colors"
+                                  >
+                                    <span>View Expense</span>
+                                    <ExternalLink size={12} />
+                                  </Link>
+                                ) : (
+                                  <span className="text-xs text-neutral-500">Unlinked</span>
+                                )}
+                              </td>
+
+                              {/* Actions */}
+                              {canEditAds && (
+                                <td className="py-3.5 px-4 md:px-6 text-right">
+                                  <button
+                                    onClick={() => setTxToDelete(tx)}
+                                    className="p-1 text-neutral-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-md transition-colors"
+                                    title="Delete Transaction"
+                                  >
+                                    <Trash2 size={15} />
+                                  </button>
+                                </td>
+                              )}
+                            </tr>
+                          );
+                        })
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
             </div>
-          </div>
+          )}
         </>
       )}
 
-      {/* Record Payment / Mark Week as Paid Modal */}
+      {/* Payment Recording Modal */}
       {isPaymentModalOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-sm">
-          <div 
-            className="bg-[#1e1e1e] border border-white/10 rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden flex flex-col max-h-[90dvh]"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Modal Header */}
-            <div className="p-4 sm:p-6 border-b border-white/5 flex items-center justify-between">
-              <div>
-                <h3 className="text-lg sm:text-xl font-semibold text-white">
-                  Mark {currentDaysNum === 7 ? 'Weekly' : `${currentDaysNum}-Day`} Budget Paid
-                </h3>
-                <p className="text-xs sm:text-sm text-neutral-400 mt-0.5 sm:mt-1">Record payment and sync to business expenses</p>
-              </div>
-              <button
-                onClick={() => setIsPaymentModalOpen(false)}
-                className="text-neutral-400 hover:text-white p-2 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg hover:bg-white/5 transition-colors"
-              >
-                ✕
-              </button>
-            </div>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75">
+          <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-6 max-w-lg w-full shadow-xl relative">
+            <h3 className="text-lg font-bold text-white mb-1">Record Meta Ads Budget Payment</h3>
+            <p className="text-xs text-neutral-400 mb-5">
+              Confirm payment details for your selected ad period.
+            </p>
 
-            {/* Modal Body */}
-            <form onSubmit={handleSubmitPayment} className="p-4 sm:p-6 space-y-4 overflow-y-auto flex-1">
-              {/* Preset Week/Period Selector */}
-              <div>
-                <label className="block text-xs sm:text-sm font-medium text-neutral-300 mb-2">
-                  Billing Period
-                </label>
-                <div className="grid grid-cols-3 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => handleSelectPreset('current_week')}
-                    className={`py-2 px-2 sm:px-3 min-h-[40px] text-xs font-medium rounded-lg border transition-colors ${
-                      paymentPreset === 'current_week'
-                        ? 'bg-white/15 border-white/30 text-white'
-                        : 'bg-white/5 border-white/10 text-neutral-400 hover:bg-white/10 hover:text-white'
-                    }`}
-                  >
-                    {currentDaysNum === 7 ? 'Current Week' : `Current (${currentDaysNum}d)`}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleSelectPreset('previous_week')}
-                    className={`py-2 px-2 sm:px-3 min-h-[40px] text-xs font-medium rounded-lg border transition-colors ${
-                      paymentPreset === 'previous_week'
-                        ? 'bg-white/15 border-white/30 text-white'
-                        : 'bg-white/5 border-white/10 text-neutral-400 hover:bg-white/10 hover:text-white'
-                    }`}
-                  >
-                    {currentDaysNum === 7 ? 'Previous Week' : `Prev (${currentDaysNum}d)`}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleSelectPreset('custom')}
-                    className={`py-2 px-2 sm:px-3 min-h-[40px] text-xs font-medium rounded-lg border transition-colors ${
-                      paymentPreset === 'custom'
-                        ? 'bg-white/15 border-white/30 text-white'
-                        : 'bg-white/5 border-white/10 text-neutral-400 hover:bg-white/10 hover:text-white'
-                    }`}
-                  >
-                    Custom Dates
-                  </button>
-                </div>
+            <form onSubmit={handleSubmitPayment} className="space-y-4">
+              {/* Presets */}
+              <div className="flex items-center gap-1.5 bg-neutral-950 p-1 rounded-lg border border-neutral-800">
+                <button
+                  type="button"
+                  onClick={() => handleSelectPreset('current_week')}
+                  className={`flex-1 py-1.5 text-xs font-semibold rounded-md transition-colors ${
+                    paymentPreset === 'current_week' ? 'bg-neutral-800 text-white' : 'text-neutral-400 hover:text-white'
+                  }`}
+                >
+                  Current Period
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleSelectPreset('previous_week')}
+                  className={`flex-1 py-1.5 text-xs font-semibold rounded-md transition-colors ${
+                    paymentPreset === 'previous_week' ? 'bg-neutral-800 text-white' : 'text-neutral-400 hover:text-white'
+                  }`}
+                >
+                  Previous Period
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPaymentPreset('custom')}
+                  className={`flex-1 py-1.5 text-xs font-semibold rounded-md transition-colors ${
+                    paymentPreset === 'custom' ? 'bg-neutral-800 text-white' : 'text-neutral-400 hover:text-white'
+                  }`}
+                >
+                  Custom
+                </button>
               </div>
 
-              {/* Date Pickers */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-medium text-neutral-400 mb-1.5">
-                    Start Date
-                  </label>
+              {/* Date Range Inputs */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-neutral-400">Start Date</label>
                   <input
                     type="date"
                     required
                     value={weekStartDate}
                     onChange={(e) => handleStartDateChange(e.target.value)}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 min-h-[44px] text-base md:text-sm text-white focus:outline-none focus:border-white/20 transition-colors"
+                    className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-neutral-600"
                   />
                 </div>
-                <div>
-                  <label className="block text-xs font-medium text-neutral-400 mb-1.5">
-                    End Date
-                  </label>
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-neutral-400">End Date</label>
                   <input
                     type="date"
                     required
                     value={weekEndDate}
                     onChange={(e) => handleEndDateChange(e.target.value)}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 min-h-[44px] text-base md:text-sm text-white focus:outline-none focus:border-white/20 transition-colors"
+                    className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-neutral-600"
                   />
                 </div>
               </div>
 
-              {/* Calculation Summary Notice */}
-              <div className="p-3 bg-white/5 border border-white/10 rounded-xl flex items-center justify-between text-xs">
-                <span className="text-neutral-400">
-                  {calculatedDays} Days × ₹{currentDailyBudgetNum.toLocaleString('en-IN')}/day
-                </span>
-                <span className="text-white font-medium">
-                  Target: ₹{calculatedBudgetForPeriod.toLocaleString('en-IN')}
-                </span>
-              </div>
-
-              {/* Amount Paid */}
-              <div>
-                <div className="flex items-center justify-between mb-1.5">
-                  <label className="block text-xs sm:text-sm font-medium text-neutral-300">
-                    Amount Paid (₹)
-                  </label>
-                  <button
-                    type="button"
-                    onClick={() => setAmountPaid(calculatedBudgetForPeriod.toString())}
-                    className="text-xs text-neutral-400 hover:text-white underline p-1 min-h-[30px]"
-                  >
-                    Use target (₹{calculatedBudgetForPeriod.toLocaleString('en-IN')})
-                  </button>
+              {/* Amount and Payment Date */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-neutral-400">Amount Paid (₹)</label>
+                  <input
+                    type="number"
+                    required
+                    min="0"
+                    step="1"
+                    value={amountPaid}
+                    onChange={(e) => setAmountPaid(e.target.value)}
+                    placeholder="e.g. 2800"
+                    className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-1.5 text-xs font-semibold text-white focus:outline-none focus:border-neutral-600"
+                  />
                 </div>
-                <input
-                  type="number"
-                  inputMode="decimal"
-                  step="0.01"
-                  min="1"
-                  required
-                  placeholder="Enter amount"
-                  value={amountPaid}
-                  onChange={(e) => setAmountPaid(e.target.value)}
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 min-h-[44px] text-base font-semibold text-white focus:outline-none focus:border-white/20 transition-colors"
-                />
-              </div>
-
-              {/* Payment Date & Payment Method */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-medium text-neutral-400 mb-1.5">
-                    Payment Date
-                  </label>
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-neutral-400">Payment Date</label>
                   <input
                     type="date"
                     required
                     value={paymentDate}
                     onChange={(e) => setPaymentDate(e.target.value)}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 min-h-[44px] text-base md:text-sm text-white focus:outline-none focus:border-white/20 transition-colors"
+                    className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-neutral-600"
                   />
                 </div>
-                <div>
-                  <label className="block text-xs font-medium text-neutral-400 mb-1.5">
-                    Payment Method
-                  </label>
+              </div>
+
+              {/* Payment Method & Reference */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-neutral-400">Payment Method</label>
                   <select
                     required
                     value={paymentMethodId}
                     onChange={(e) => setPaymentMethodId(e.target.value)}
-                    className="w-full bg-[#2a2a2a] border border-white/10 rounded-xl px-3 py-2.5 min-h-[44px] text-base md:text-sm text-white focus:outline-none focus:border-white/20 transition-colors"
+                    className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-neutral-600"
                   >
                     {paymentMethods.map((pm) => (
-                      <option key={pm.id} value={pm.id}>
+                      <option key={pm.id} value={pm.id} className="bg-neutral-900 text-white">
                         {pm.name}
                       </option>
                     ))}
                   </select>
                 </div>
-              </div>
-
-              {/* Reference Number */}
-              <div>
-                <label className="block text-xs font-medium text-neutral-400 mb-1.5">
-                  Reference / Transaction ID (Optional)
-                </label>
-                <input
-                  type="text"
-                  placeholder="e.g. UPI-98421049281, Meta Inv #10294"
-                  value={referenceNumber}
-                  onChange={(e) => setReferenceNumber(e.target.value)}
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 min-h-[44px] text-base md:text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:border-white/20 font-mono transition-colors"
-                />
-              </div>
-
-              {/* Notes */}
-              <div>
-                <label className="block text-xs font-medium text-neutral-400 mb-1.5">
-                  Notes (Optional)
-                </label>
-                <input
-                  type="text"
-                  placeholder="Optional notes or campaign details"
-                  value={paymentNotes}
-                  onChange={(e) => setPaymentNotes(e.target.value)}
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 min-h-[44px] text-base md:text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:border-white/20 transition-colors"
-                />
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-neutral-400">Reference / UTR (Optional)</label>
+                  <input
+                    type="text"
+                    value={referenceNumber}
+                    onChange={(e) => setReferenceNumber(e.target.value)}
+                    placeholder="e.g. UPI Ref #12345"
+                    className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-neutral-600"
+                  />
+                </div>
               </div>
 
               {/* Sync to Expenses Toggle */}
-              <div className="pt-2">
-                <label className="flex items-start gap-3 p-3 bg-white/5 border border-white/10 rounded-xl cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={syncToExpenses}
-                    onChange={(e) => setSyncToExpenses(e.target.checked)}
-                    className="mt-0.5 rounded text-white focus:ring-white/20 h-4 w-4"
-                  />
-                  <div className="text-xs">
-                    <p className="font-medium text-white">
-                      Automatically add to Business Expenses
-                    </p>
-                    <p className="text-neutral-400 mt-0.5">
-                      Filing under category <strong>&quot;Meta Ads.&quot;</strong> so business expense totals remain synchronized.
-                    </p>
-                  </div>
+              <div className="flex items-center gap-3 p-3 bg-neutral-950 border border-neutral-800 rounded-lg">
+                <input
+                  type="checkbox"
+                  id="syncExpenses"
+                  checked={syncToExpenses}
+                  onChange={(e) => setSyncToExpenses(e.target.checked)}
+                  className="rounded border-neutral-700 text-white focus:ring-0"
+                />
+                <label htmlFor="syncExpenses" className="text-xs text-neutral-300 select-none cursor-pointer">
+                  Automatically sync this payment to <strong>Expenses</strong> ledger
                 </label>
               </div>
 
-              {/* Submit Buttons */}
-              <div className="pt-4 border-t border-white/5 flex flex-col-reverse sm:flex-row items-center justify-end gap-3">
+              {/* Action Buttons */}
+              <div className="flex items-center justify-end gap-3 pt-4 border-t border-neutral-800">
                 <button
                   type="button"
                   onClick={() => setIsPaymentModalOpen(false)}
-                  className="w-full sm:w-auto px-4 py-2.5 min-h-[44px] text-sm font-medium text-neutral-400 hover:text-white transition-colors"
+                  className="px-4 py-2 text-xs font-medium text-neutral-400 hover:text-white transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmittingPayment}
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-white text-black px-5 py-2.5 min-h-[44px] rounded-xl font-medium hover:bg-neutral-200 transition-colors text-sm disabled:opacity-50 shadow-sm"
+                  className="px-4 py-2 bg-white text-black font-semibold text-xs rounded-lg hover:bg-neutral-200 transition-colors disabled:opacity-50 flex items-center gap-2"
                 >
                   {isSubmittingPayment ? (
                     <>
-                      <Loader2 size={16} className="animate-spin" />
+                      <Loader2 size={14} className="animate-spin" />
                       <span>Recording...</span>
                     </>
                   ) : (
-                    <span>Confirm &amp; Record Payment</span>
+                    <span>Record Payment</span>
                   )}
                 </button>
               </div>
@@ -980,17 +1039,18 @@ export default function MetaAdsPage() {
         </div>
       )}
 
-      {/* Confirmation Modal for Delete */}
-      <ConfirmModal
-        isOpen={!!txToDelete}
-        title="Delete Meta Ads Payment Record?"
-        message={`Are you sure you want to delete the payment record of ₹${parseFloat(txToDelete?.amountPaid || '0').toLocaleString('en-IN')}? If this payment was synchronized to Business Expenses, the corresponding expense record will also be removed.`}
-        confirmText="Delete Record"
-        cancelText="Cancel"
-        isLoading={isDeleting}
-        onConfirm={handleConfirmDelete}
-        onCancel={() => setTxToDelete(null)}
-      />
+      {/* Delete Confirmation Modal */}
+      {txToDelete && (
+        <ConfirmModal
+          isOpen={true}
+          title="Delete Payment Record"
+          message={`Are you sure you want to delete the payment record for period ${txToDelete.weekStartDate} to ${txToDelete.weekEndDate}? This will also delete any linked expense record.`}
+          confirmText="Delete"
+          onConfirm={handleConfirmDelete}
+          onCancel={() => setTxToDelete(null)}
+          isLoading={isDeleting}
+        />
+      )}
     </div>
   );
 }

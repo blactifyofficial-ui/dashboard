@@ -32,14 +32,15 @@ export default function BackButton({
       onClick={handleBack}
       aria-label={label}
       title={label}
-      className={`inline-flex items-center justify-center transition-all duration-150 cursor-pointer text-white bg-white/5 hover:bg-white/10 active:bg-white/15 border border-white/10 shrink-0 ${
+      className={`inline-flex items-center justify-center transition-colors cursor-pointer text-neutral-300 hover:text-white bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 shrink-0 ${
         iconOnly 
-          ? 'min-h-[38px] min-w-[38px] sm:min-h-[40px] sm:min-w-[40px] rounded-xl' 
-          : 'gap-2 text-sm font-medium py-2 px-3 rounded-xl'
+          ? 'h-9 w-9 rounded-lg' 
+          : 'gap-1.5 text-xs sm:text-sm font-medium py-1.5 px-3 rounded-lg'
       } ${className}`}
     >
-      <ArrowLeft size={18} className="shrink-0" />
+      <ArrowLeft size={16} className="shrink-0" />
       {!iconOnly && <span>{label}</span>}
     </button>
   );
 }
+

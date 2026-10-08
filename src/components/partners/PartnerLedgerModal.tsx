@@ -23,14 +23,14 @@ export default function PartnerLedgerModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 overflow-y-auto">
-      <div className="bg-[#18181b] border border-white/10 rounded-2xl w-full max-w-3xl shadow-2xl overflow-hidden my-8">
-        <div className="p-4 sm:p-5 border-b border-white/10 flex items-center justify-between bg-white/[0.02]">
+      <div className="bg-neutral-900 border border-neutral-800 rounded-xl w-full max-w-3xl shadow-2xl overflow-hidden my-8">
+        <div className="p-4 sm:p-5 border-b border-neutral-800 flex items-center justify-between bg-neutral-950/50">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-white/5 border border-white/10 text-white/70">
+            <div className="p-2 rounded-lg bg-neutral-800 border border-neutral-700 text-neutral-300">
               <Users size={18} />
             </div>
             <div>
-              <h3 className="text-base font-bold text-white">{partner.name} - Statement & History</h3>
+              <h3 className="text-base font-semibold text-white">{partner.name} - Statement & History</h3>
               <p className="text-xs text-neutral-400">
                 Equity: <strong className="text-white">{partner.equityPercentage}%</strong> • Joined {formatDisplayDate(partner.joinedDate)}
               </p>
@@ -38,34 +38,34 @@ export default function PartnerLedgerModal({
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 text-neutral-400 hover:text-white rounded-lg hover:bg-white/10 transition-colors"
+            className="p-1.5 text-neutral-400 hover:text-white rounded-lg hover:bg-neutral-800 transition-colors"
           >
             <X size={16} />
           </button>
         </div>
 
         {/* Quick Metrics Bar in Modal */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-4 bg-black/40 border-b border-white/5 text-center">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-4 bg-neutral-950 border-b border-neutral-800 text-center">
           <div>
-            <span className="text-[11px] text-white/50 font-medium block">Total Invested</span>
+            <span className="text-[11px] text-neutral-400 font-medium block">Total Invested</span>
             <span className="text-sm sm:text-base font-bold text-white font-mono">
               {formatCurrency(partner.totalInvested)}
             </span>
           </div>
           <div>
-            <span className="text-[11px] text-emerald-400/80 font-medium block">Payouts Taken</span>
+            <span className="text-[11px] text-emerald-400 font-medium block">Payouts Taken</span>
             <span className="text-sm sm:text-base font-bold text-emerald-400 font-mono">
               {formatCurrency(partner.totalPayout || 0)}
             </span>
           </div>
           <div>
-            <span className="text-[11px] text-white/50 font-medium block">Withdrawn</span>
-            <span className="text-sm sm:text-base font-bold text-white/80 font-mono">
+            <span className="text-[11px] text-neutral-400 font-medium block">Withdrawn</span>
+            <span className="text-sm sm:text-base font-bold text-neutral-200 font-mono">
               {formatCurrency(partner.totalWithdrawn)}
             </span>
           </div>
           <div>
-            <span className="text-[11px] text-white/50 font-medium block">Net Balance</span>
+            <span className="text-[11px] text-neutral-400 font-medium block">Net Balance</span>
             <span className="text-sm sm:text-base font-bold text-white font-mono">
               {formatCurrency(partner.netCapital)}
             </span>
@@ -86,15 +86,15 @@ export default function PartnerLedgerModal({
               return (
                 <div
                   key={txn.id}
-                  className="p-3 sm:p-3.5 rounded-xl bg-white/[0.02] border border-white/5 flex items-center justify-between gap-3 hover:bg-white/[0.04] transition-colors"
+                  className="p-3 sm:p-3.5 rounded-lg bg-neutral-950/60 border border-neutral-800 flex items-center justify-between gap-3 hover:bg-neutral-950 transition-colors"
                 >
                   <div>
                     <div className="flex items-center gap-2">
                       <span
-                        className={`text-[10px] font-semibold px-2 py-0.5 rounded-full uppercase border ${
+                        className={`text-[10px] font-semibold px-2 py-0.5 rounded-md uppercase border ${
                           isPayout
-                            ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
-                            : 'bg-white/10 text-white/80 border-white/15'
+                            ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30'
+                            : 'bg-neutral-800 text-neutral-300 border-neutral-700'
                         }`}
                       >
                         {txn.type}
@@ -130,7 +130,7 @@ export default function PartnerLedgerModal({
           )}
         </div>
 
-        <div className="p-4 border-t border-white/10 bg-white/[0.02] flex flex-wrap items-center justify-between gap-2">
+        <div className="p-4 border-t border-neutral-800 bg-neutral-950/50 flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <button
               onClick={() => {
@@ -138,7 +138,7 @@ export default function PartnerLedgerModal({
                 onClose();
                 onAddTransaction(pid, 'PAYOUT');
               }}
-              className="px-3.5 py-1.5 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shadow-sm"
+              className="px-3.5 py-1.5 bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/30 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors"
             >
               <Plus size={14} />
               <span>Record Payout</span>
@@ -149,7 +149,7 @@ export default function PartnerLedgerModal({
                 onClose();
                 onAddTransaction(pid, 'INVESTMENT');
               }}
-              className="px-3.5 py-1.5 bg-white hover:bg-neutral-200 text-black rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shadow-sm"
+              className="px-3.5 py-1.5 bg-white hover:bg-neutral-200 text-black rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors"
             >
               <Plus size={14} />
               <span>Record Transaction</span>
@@ -157,7 +157,7 @@ export default function PartnerLedgerModal({
           </div>
           <button
             onClick={onClose}
-            className="px-3.5 py-1.5 bg-white/5 hover:bg-white/10 border border-white/10 text-neutral-300 rounded-xl text-xs font-medium transition-colors"
+            className="px-3.5 py-1.5 bg-neutral-800 hover:bg-neutral-700 border border-neutral-700 text-neutral-300 rounded-lg text-xs font-medium transition-colors"
           >
             Close
           </button>

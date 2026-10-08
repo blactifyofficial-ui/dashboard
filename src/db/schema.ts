@@ -203,6 +203,21 @@ export const metaAdsTransactions = pgTable('meta_ads_transactions', {
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
+export const metaAdsDailyPlans = pgTable('meta_ads_daily_plans', {
+  id: text('id').primaryKey(),
+  date: text('date').notNull().unique(), // 'YYYY-MM-DD'
+  totalBudget: numeric('total_budget').notNull().default('0'),
+  campaignCount: numeric('campaign_count').notNull().default('1'),
+  distributionMode: text('distribution_mode').notNull().default('ALL_SAME'), // 'ALL_SAME' | 'DIFFERENT'
+  campaigns: text('campaigns').notNull().default('[]'), // JSON Array string: Array<{ id: string, name: string, budget: number, status?: string }>
+  status: text('status').notNull().default('IN_PROGRESS'), // 'IN_PROGRESS' | 'DONE' | 'NOT_DONE'
+  notes: text('notes'),
+  createdById: text('created_by_id').references(() => users.id),
+  updatedById: text('updated_by_id').references(() => users.id),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
 export const partners = pgTable('partners', {
   id: text('id').primaryKey(),
   name: text('name').notNull(),

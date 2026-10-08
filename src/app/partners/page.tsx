@@ -328,10 +328,10 @@ export default function PartnersPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 flex-shrink-0">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white flex items-center gap-2.5">
+            <h1 className="text-lg sm:text-xl lg:text-2xl font-bold tracking-tight text-white flex items-center gap-2.5">
               <span>Partners &amp; Capital</span>
             </h1>
-            <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-white/10 text-neutral-300 border border-white/15">
+            <span className="px-2 py-0.5 rounded-md text-xs font-medium bg-neutral-800 text-neutral-300 border border-neutral-700">
               Equity &amp; Capital
             </span>
           </div>
@@ -345,9 +345,9 @@ export default function PartnersPage() {
           {canManagePartners && (
             <button
               onClick={handleOpenAddPartner}
-              className="px-3.5 py-2 min-h-[40px] text-xs font-medium text-neutral-200 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 rounded-xl transition-colors flex items-center gap-1.5 shadow-sm"
+              className="px-3.5 py-2 min-h-[38px] text-xs font-medium text-neutral-200 bg-neutral-800 hover:bg-neutral-700 border border-neutral-700 rounded-lg transition-colors flex items-center gap-1.5"
             >
-              <Users size={14} className="text-white/60" />
+              <Users size={14} className="text-neutral-400" />
               <span>Add Partner</span>
             </button>
           )}
@@ -356,7 +356,7 @@ export default function PartnersPage() {
             <>
               <button
                 onClick={() => handleOpenAddTxn(undefined, 'PAYOUT')}
-                className="px-3.5 py-2 min-h-[40px] text-xs font-semibold text-emerald-300 bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/30 rounded-xl transition-all shadow-sm flex items-center gap-1.5"
+                className="px-3.5 py-2 min-h-[38px] text-xs font-semibold text-emerald-300 bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 rounded-lg transition-colors flex items-center gap-1.5"
               >
                 <Banknote size={14} />
                 <span>Record Payout</span>
@@ -364,9 +364,9 @@ export default function PartnersPage() {
 
               <button
                 onClick={() => handleOpenAddTxn()}
-                className="px-4 py-2 min-h-[40px] text-xs font-semibold text-black bg-white hover:bg-neutral-200 rounded-xl transition-all shadow-sm flex items-center gap-1.5"
+                className="px-4 py-2 min-h-[38px] text-xs font-semibold text-black bg-white hover:bg-neutral-200 rounded-lg transition-colors flex items-center gap-1.5"
               >
-                <Plus size={15} />
+                <Plus size={14} />
                 <span>Record Transaction</span>
               </button>
             </>
@@ -380,12 +380,12 @@ export default function PartnersPage() {
       {/* Tabs & Search Filter Controls Bar */}
       <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 flex-shrink-0">
         {/* Tab Selection Pills */}
-        <div className="flex items-center overflow-x-auto no-scrollbar bg-white/5 border border-white/10 p-1 rounded-xl">
+        <div className="flex items-center overflow-x-auto no-scrollbar bg-neutral-900 border border-neutral-800 p-1 rounded-lg">
           <button
             onClick={() => setActiveTab('overview')}
-            className={`px-3 py-2 min-h-[36px] text-xs font-medium rounded-lg transition-colors flex items-center gap-1.5 whitespace-nowrap ${
+            className={`px-3 py-1.5 min-h-[34px] text-xs font-medium rounded-md transition-colors flex items-center gap-1.5 whitespace-nowrap ${
               activeTab === 'overview'
-                ? 'bg-white/15 text-white'
+                ? 'bg-neutral-800 text-white font-semibold'
                 : 'text-neutral-400 hover:text-white'
             }`}
           >
@@ -394,9 +394,9 @@ export default function PartnersPage() {
           </button>
           <button
             onClick={() => setActiveTab('ledger')}
-            className={`px-3 py-2 min-h-[36px] text-xs font-medium rounded-lg transition-colors flex items-center gap-1.5 whitespace-nowrap ${
+            className={`px-3 py-1.5 min-h-[34px] text-xs font-medium rounded-md transition-colors flex items-center gap-1.5 whitespace-nowrap ${
               activeTab === 'ledger'
-                ? 'bg-white/15 text-white'
+                ? 'bg-neutral-800 text-white font-semibold'
                 : 'text-neutral-400 hover:text-white'
             }`}
           >
@@ -405,9 +405,9 @@ export default function PartnersPage() {
           </button>
           <button
             onClick={() => setActiveTab('captable')}
-            className={`px-3 py-2 min-h-[36px] text-xs font-medium rounded-lg transition-colors flex items-center gap-1.5 whitespace-nowrap ${
+            className={`px-3 py-1.5 min-h-[34px] text-xs font-medium rounded-md transition-colors flex items-center gap-1.5 whitespace-nowrap ${
               activeTab === 'captable'
-                ? 'bg-white/15 text-white'
+                ? 'bg-neutral-800 text-white font-semibold'
                 : 'text-neutral-400 hover:text-white'
             }`}
           >
@@ -419,7 +419,7 @@ export default function PartnersPage() {
         {/* Search and Secondary Filter */}
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
           <div className="relative flex-1 sm:w-56">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-500 w-3.5 h-3.5" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500 w-3.5 h-3.5" />
             <input
               type="text"
               placeholder={
@@ -429,14 +429,14 @@ export default function PartnersPage() {
               }
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-8 py-2 min-h-[40px] bg-white/5 border border-white/10 rounded-xl text-base md:text-xs text-white placeholder:text-neutral-500 focus:outline-none focus:border-white/20 transition-colors"
+              className="w-full pl-8 pr-8 py-2 min-h-[38px] bg-neutral-900 border border-neutral-800 rounded-lg text-xs text-white placeholder:text-neutral-500 focus:outline-none focus:border-neutral-500 transition-colors"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery('')}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-white p-1"
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-white p-1"
               >
-                <X size={14} />
+                <X size={13} />
               </button>
             )}
           </div>
@@ -446,7 +446,7 @@ export default function PartnersPage() {
               <select
                 value={partnerFilter}
                 onChange={(e) => setPartnerFilter(e.target.value)}
-                className="flex-1 sm:flex-initial bg-white/5 border border-white/10 rounded-xl px-2.5 py-2 min-h-[40px] text-base md:text-xs text-white focus:outline-none focus:border-white/20 transition-colors"
+                className="flex-1 sm:flex-initial bg-neutral-900 border border-neutral-800 rounded-lg px-2.5 py-2 min-h-[38px] text-xs text-white focus:outline-none focus:border-neutral-500 transition-colors"
               >
                 <option value="ALL" className="bg-neutral-900 text-white">All Partners</option>
                 {partners.map((p) => (
@@ -459,7 +459,7 @@ export default function PartnersPage() {
               <select
                 value={typeFilter}
                 onChange={(e) => setTypeFilter(e.target.value)}
-                className="flex-1 sm:flex-initial bg-white/5 border border-white/10 rounded-xl px-2.5 py-2 min-h-[40px] text-base md:text-xs text-white focus:outline-none focus:border-white/20 transition-colors"
+                className="flex-1 sm:flex-initial bg-neutral-900 border border-neutral-800 rounded-lg px-2.5 py-2 min-h-[38px] text-xs text-white focus:outline-none focus:border-neutral-500 transition-colors"
               >
                 <option value="ALL" className="bg-neutral-900 text-white">All Types</option>
                 <option value="PAYOUT" className="bg-neutral-900 text-white">Partner Payout</option>

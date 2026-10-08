@@ -125,28 +125,27 @@ export default function CreateIssuePage() {
   };
 
   return (
-    <div className="flex flex-col min-h-full pb-12 sm:pb-20 space-y-4 sm:space-y-6 relative z-10 max-w-4xl mx-auto w-full">
+    <div className="flex flex-col min-h-full pb-12 sm:pb-20 space-y-4 sm:space-y-6 max-w-4xl mx-auto w-full">
       <header className="flex-none flex flex-col gap-3 sm:gap-4">
         <Link href="/order-issues" className="inline-flex items-center text-xs sm:text-sm text-neutral-400 hover:text-white transition-colors w-fit p-1 min-h-[36px]">
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Issues
         </Link>
-        <div className="space-y-1 sm:space-y-2">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-white">Create Order Issue</h1>
-          <p className="text-neutral-400 text-xs sm:text-sm md:text-base">File a new issue for a customer order</p>
+        <div className="space-y-1">
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white">Create Order Issue</h1>
+          <p className="text-neutral-400 text-xs sm:text-sm">File a new issue for a customer order</p>
         </div>
       </header>
 
-      <div className="flex-1 shrink-0 bg-white/[0.02] border border-white/5 rounded-3xl p-4 sm:p-6 md:p-8 shadow-2xl relative">
-        <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent pointer-events-none rounded-3xl"></div>
-        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5 relative z-10">
+      <div className="bg-neutral-900/60 border border-neutral-800 rounded-xl p-4 sm:p-6">
+        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
             <div className="relative">
-              <label className="block text-xs sm:text-sm font-medium text-neutral-400 mb-1.5 sm:mb-2">Order Search (ID or Name)</label>
+              <label className="block text-xs sm:text-sm font-medium text-neutral-300 mb-1.5 sm:mb-2">Order Search (ID or Name)</label>
               <input 
                 type="text" 
                 placeholder="Search orders..."
-                className={`w-full bg-white/5 border ${errors.orderId ? 'border-red-500' : 'border-white/10'} rounded-xl px-4 py-2.5 min-h-[44px] text-base md:text-sm text-white focus:outline-none focus:border-blue-500 transition-colors`}
+                className={`w-full bg-neutral-900 border ${errors.orderId ? 'border-rose-500' : 'border-neutral-800'} rounded-lg px-3.5 py-2.5 min-h-[40px] text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-neutral-500 transition-colors`}
                 value={orderSearchQuery}
                 onFocus={() => setShowOrderDropdown(true)}
                 onBlur={() => setTimeout(() => setShowOrderDropdown(false), 200)}
@@ -180,13 +179,13 @@ export default function CreateIssuePage() {
                   if (errors.orderId) setErrors({ ...errors, orderId: '' });
                 }}
               />
-              {errors.orderId && <p className="text-red-500 text-xs mt-1.5">{errors.orderId}</p>}
+              {errors.orderId && <p className="text-rose-400 text-xs mt-1.5">{errors.orderId}</p>}
               {showOrderDropdown && orderSuggestions.length > 0 && (
-                <div className="absolute z-20 w-full mt-1 bg-[#0f0f0f]/90 backdrop-blur-xl border border-white/10 rounded-xl shadow-lg max-h-60 overflow-y-auto">
+                <div className="absolute z-20 w-full mt-1 bg-neutral-900 border border-neutral-800 rounded-lg shadow-xl max-h-60 overflow-y-auto">
                   {orderSuggestions.map((order, index) => (
                     <div 
                       key={order.id}
-                      className={`p-3 cursor-pointer border-b border-white/5 last:border-0 ${index === focusedIndex ? 'bg-white/20' : 'hover:bg-white/10'}`}
+                      className={`p-3 cursor-pointer border-b border-neutral-800 last:border-0 ${index === focusedIndex ? 'bg-neutral-800' : 'hover:bg-neutral-800/60'}`}
                       onClick={() => {
                         setSelectedOrder(order);
                         setFormData({ ...formData, orderId: order.id });
@@ -194,8 +193,8 @@ export default function CreateIssuePage() {
                         setShowOrderDropdown(false);
                       }}
                     >
-                      <div className="font-medium text-white">{order.orderNumber || order.id}</div>
-                      <div className="text-xs text-gray-400 mt-1">
+                      <div className="font-medium text-white text-sm">{order.orderNumber || order.id}</div>
+                      <div className="text-xs text-neutral-400 mt-0.5">
                         {order.customerName || 'Unknown Customer'} {order.customerEmail ? `• ${order.customerEmail}` : ''}
                       </div>
                     </div>
@@ -203,24 +202,24 @@ export default function CreateIssuePage() {
                 </div>
               )}
               {selectedOrder && (
-                <div className="mt-4 text-sm text-gray-300 bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
-                  <span className="text-gray-400 block text-xs mb-1 uppercase tracking-wider font-semibold">Customer Info</span>
-                  <div className="font-medium text-white text-base">{selectedOrder.customerName || 'Unknown Name'}</div>
-                  <div className="text-gray-400 mt-0.5 flex items-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                <div className="mt-3 text-xs text-neutral-300 bg-neutral-800/60 border border-neutral-700 rounded-lg p-3">
+                  <span className="text-neutral-400 block text-[11px] mb-1 uppercase tracking-wider font-semibold">Customer Info</span>
+                  <div className="font-medium text-white text-sm">{selectedOrder.customerName || 'Unknown Name'}</div>
+                  <div className="text-neutral-400 mt-1 flex items-center gap-1.5">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
                     {selectedOrder.customerEmail || 'No email provided'}
                   </div>
                 </div>
               )}
             </div>
             <div>
-              <label className="block text-xs sm:text-sm font-medium text-neutral-400 mb-1.5 sm:mb-2">Issue Category</label>
+              <label className="block text-xs sm:text-sm font-medium text-neutral-300 mb-1.5 sm:mb-2">Issue Category</label>
               <select 
-                className={`w-full bg-[#2a2a2a] border ${errors.categoryId ? 'border-red-500' : 'border-white/10'} rounded-xl px-4 py-2.5 min-h-[44px] text-base md:text-sm text-white focus:outline-none focus:border-blue-500 transition-colors appearance-none pr-10`}
+                className={`w-full bg-neutral-900 border ${errors.categoryId ? 'border-rose-500' : 'border-neutral-800'} rounded-lg px-3.5 py-2.5 min-h-[40px] text-sm text-white focus:outline-none focus:border-neutral-500 transition-colors appearance-none pr-10`}
                 style={{
                   backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgba(255, 255, 255, 0.5)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`,
                   backgroundRepeat: 'no-repeat',
-                  backgroundPosition: 'right 1rem center',
+                  backgroundPosition: 'right 0.75rem center',
                   backgroundSize: '1em 1em'
                 }}
                 value={formData.categoryId}
@@ -236,46 +235,46 @@ export default function CreateIssuePage() {
               </select>
               {categories.find(c => c.id === formData.categoryId)?.name.toLowerCase() === 'other' && (
                 <div className="mt-3">
-                  <label className="block text-xs sm:text-sm font-medium text-neutral-400 mb-1.5 sm:mb-2">Please specify</label>
+                  <label className="block text-xs sm:text-sm font-medium text-neutral-300 mb-1.5 sm:mb-2">Please specify</label>
                   <input 
                     type="text" 
                     placeholder="Specify the category..."
-                    className={`w-full bg-white/5 border ${errors.otherCategoryText ? 'border-red-500' : 'border-white/10'} rounded-xl px-4 py-2.5 min-h-[44px] text-base md:text-sm text-white focus:outline-none focus:border-blue-500 transition-colors`}
+                    className={`w-full bg-neutral-900 border ${errors.otherCategoryText ? 'border-rose-500' : 'border-neutral-800'} rounded-lg px-3.5 py-2.5 min-h-[40px] text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-neutral-500 transition-colors`}
                     value={otherCategoryText}
                     onChange={e => {
                       setOtherCategoryText(e.target.value);
                       if (errors.otherCategoryText) setErrors({ ...errors, otherCategoryText: '' });
                     }}
                   />
-                  {errors.otherCategoryText && <p className="text-red-500 text-xs mt-1.5">{errors.otherCategoryText}</p>}
+                  {errors.otherCategoryText && <p className="text-rose-400 text-xs mt-1.5">{errors.otherCategoryText}</p>}
                 </div>
               )}
             </div>
           </div>
 
           <div>
-            <label className="block text-xs sm:text-sm font-medium text-neutral-400 mb-1.5 sm:mb-2">Title</label>
+            <label className="block text-xs sm:text-sm font-medium text-neutral-300 mb-1.5 sm:mb-2">Title</label>
             <input 
               type="text" 
               placeholder="Short issue title"
-              className={`w-full bg-white/5 border ${errors.title ? 'border-red-500' : 'border-white/10'} rounded-xl px-4 py-2.5 min-h-[44px] text-base md:text-sm text-white focus:outline-none focus:border-blue-500 transition-colors`}
+              className={`w-full bg-neutral-900 border ${errors.title ? 'border-rose-500' : 'border-neutral-800'} rounded-lg px-3.5 py-2.5 min-h-[40px] text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-neutral-500 transition-colors`}
               value={formData.title}
               onChange={e => {
                 setFormData({...formData, title: e.target.value});
                 if (errors.title) setErrors({ ...errors, title: '' });
               }}
             />
-            {errors.title && <p className="text-red-500 text-xs mt-1.5">{errors.title}</p>}
+            {errors.title && <p className="text-rose-400 text-xs mt-1.5">{errors.title}</p>}
           </div>
 
           <div>
-            <label className="block text-xs sm:text-sm font-medium text-neutral-400 mb-1.5 sm:mb-2">Priority</label>
+            <label className="block text-xs sm:text-sm font-medium text-neutral-300 mb-1.5 sm:mb-2">Priority</label>
             <select 
-              className="w-full bg-[#2a2a2a] border border-white/10 rounded-xl px-4 py-2.5 min-h-[44px] text-base md:text-sm text-white focus:outline-none focus:border-blue-500 transition-colors appearance-none pr-10"
+              className="w-full bg-neutral-900 border border-neutral-800 rounded-lg px-3.5 py-2.5 min-h-[40px] text-sm text-white focus:outline-none focus:border-neutral-500 transition-colors appearance-none pr-10"
               style={{
                 backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgba(255, 255, 255, 0.5)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`,
                 backgroundRepeat: 'no-repeat',
-                backgroundPosition: 'right 1rem center',
+                backgroundPosition: 'right 0.75rem center',
                 backgroundSize: '1em 1em'
               }}
               value={formData.priority}
@@ -289,43 +288,43 @@ export default function CreateIssuePage() {
           </div>
 
           <div>
-            <label className="block text-xs sm:text-sm font-medium text-neutral-400 mb-1.5 sm:mb-2">Description</label>
+            <label className="block text-xs sm:text-sm font-medium text-neutral-300 mb-1.5 sm:mb-2">Description</label>
             <textarea 
               rows={4}
               placeholder="Describe the issue..."
-              className={`w-full bg-white/5 border ${errors.description ? 'border-red-500' : 'border-white/10'} rounded-xl p-4 text-base md:text-sm text-white focus:outline-none focus:border-blue-500 transition-colors resize-y`}
+              className={`w-full bg-neutral-900 border ${errors.description ? 'border-rose-500' : 'border-neutral-800'} rounded-lg p-3.5 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-neutral-500 transition-colors resize-y`}
               value={formData.description}
               onChange={e => {
                 setFormData({...formData, description: e.target.value});
                 if (errors.description) setErrors({ ...errors, description: '' });
               }}
             ></textarea>
-            {errors.description && <p className="text-red-500 text-xs mt-1.5">{errors.description}</p>}
+            {errors.description && <p className="text-rose-400 text-xs mt-1.5">{errors.description}</p>}
           </div>
 
           <div>
-            <label className="block text-xs sm:text-sm font-medium text-neutral-400 mb-1.5 sm:mb-2">Initial Remark (Optional)</label>
+            <label className="block text-xs sm:text-sm font-medium text-neutral-300 mb-1.5 sm:mb-2">Initial Remark (Optional)</label>
             <textarea 
               rows={3}
               placeholder="Add an initial remark..."
-              className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-base md:text-sm text-white focus:outline-none focus:border-blue-500 transition-colors resize-y"
+              className="w-full bg-neutral-900 border border-neutral-800 rounded-lg p-3.5 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-neutral-500 transition-colors resize-y"
               value={formData.initialRemark}
               onChange={e => setFormData({...formData, initialRemark: e.target.value})}
             ></textarea>
           </div>
 
-          <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-3 pt-4 mt-6 border-t border-white/5">
+          <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-3 pt-4 border-t border-neutral-800">
             <button 
               type="button" 
               onClick={() => router.push('/order-issues')}
-              className="py-3 px-6 min-h-[44px] bg-white/5 hover:bg-white/10 rounded-xl font-medium text-neutral-300 transition-colors text-center"
+              className="py-2.5 px-4 min-h-[38px] bg-neutral-800 hover:bg-neutral-700 rounded-lg font-medium text-neutral-200 transition-colors text-center text-sm border border-neutral-700"
             >
               Cancel
             </button>
             <button 
               type="submit" 
               disabled={loading}
-              className="py-3 px-6 min-h-[44px] bg-blue-600 hover:bg-blue-700 rounded-xl font-bold flex items-center justify-center gap-2 transition-colors disabled:opacity-50 text-white shadow-md"
+              className="py-2.5 px-5 min-h-[38px] bg-white text-black hover:bg-neutral-200 rounded-lg font-semibold flex items-center justify-center gap-2 transition-colors disabled:opacity-50 text-sm"
             >
               {loading ? 'Creating...' : 'Create Issue'}
             </button>

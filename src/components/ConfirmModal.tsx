@@ -36,25 +36,25 @@ export default function ConfirmModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 overflow-y-auto">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 overflow-y-auto">
       <div 
-        className="bg-[#1e1e1e] border border-white/10 rounded-2xl w-full max-w-md shadow-2xl overflow-hidden max-h-[90dvh] flex flex-col"
+        className="bg-neutral-900 border border-neutral-800 rounded-xl w-full max-w-md shadow-2xl overflow-hidden max-h-[90dvh] flex flex-col"
       >
         <div className="p-5 sm:p-6 overflow-y-auto flex-1">
-          <h2 className="text-xl font-semibold text-white mb-2">{title}</h2>
-          <p className="text-gray-400 text-sm leading-relaxed">{message}</p>
+          <h2 className="text-base sm:text-lg font-semibold text-white mb-2">{title}</h2>
+          <p className="text-neutral-400 text-xs sm:text-sm leading-relaxed">{message}</p>
         </div>
-        <div className="bg-black/20 p-4 border-t border-white/5 flex items-center justify-end gap-3 shrink-0">
+        <div className="bg-neutral-950/60 p-4 border-t border-neutral-800 flex items-center justify-end gap-2.5 shrink-0">
           <button
             onClick={onCancel}
-            className="min-h-[44px] px-4 flex items-center justify-center rounded-xl text-sm font-medium text-gray-300 hover:text-white hover:bg-white/5 active:bg-white/10 transition-colors"
+            className="h-9 px-3.5 flex items-center justify-center rounded-lg text-xs font-medium text-neutral-300 bg-neutral-800 hover:bg-neutral-700 border border-neutral-700 transition-colors"
           >
             {cancelText}
           </button>
           <button
             onClick={onConfirm}
             disabled={isLoading}
-            className="min-h-[44px] px-5 flex items-center justify-center rounded-xl text-sm font-medium bg-red-500 hover:bg-red-600 active:bg-red-700 text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
+            className="h-9 px-4 flex items-center justify-center rounded-lg text-xs font-semibold bg-rose-600 hover:bg-rose-500 text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
           >
             {isLoading ? 'Processing...' : confirmText}
           </button>

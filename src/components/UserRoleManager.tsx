@@ -260,15 +260,15 @@ export default function UserRoleManager() {
   };
 
   return (
-    <div className="bg-[#1e1e1e] p-4 sm:p-6 rounded-xl border border-white/10 shadow-sm text-white">
+    <div className="bg-neutral-900/60 p-4 sm:p-6 rounded-xl border border-neutral-800 shadow-sm text-white">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-white/10">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-neutral-800">
         <div className="flex items-center gap-2.5">
-          <div className="p-2 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-400">
-            <Users size={20} />
+          <div className="p-2 rounded-lg bg-neutral-800 border border-neutral-700 text-neutral-300">
+            <Users size={18} />
           </div>
           <div>
-            <h2 className="text-lg sm:text-xl font-semibold tracking-tight">Team &amp; Role Management</h2>
+            <h2 className="text-base sm:text-lg font-semibold tracking-tight">Team &amp; Role Management</h2>
             <p className="text-xs sm:text-sm text-neutral-400">
               Invite team members, assign permission tiers, and create custom dashboard roles.
             </p>
@@ -279,29 +279,29 @@ export default function UserRoleManager() {
         <div className="flex items-center gap-2">
           <Link
             href="/team/roles/new"
-            className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 bg-neutral-900 border border-white/15 text-white text-xs sm:text-sm font-medium rounded-xl hover:bg-neutral-800 transition-all shadow-sm active:scale-95 shrink-0"
+            className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 bg-neutral-800 border border-neutral-700 text-neutral-200 text-xs sm:text-sm font-medium rounded-lg hover:bg-neutral-700 transition-colors shrink-0"
           >
-            <ShieldCheck size={16} className="text-purple-400" />
+            <ShieldCheck size={15} className="text-neutral-300" />
             <span>+ Add Role</span>
           </Link>
           <button
             onClick={() => setIsAddUserOpen(true)}
-            className="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-white text-black text-xs sm:text-sm font-semibold rounded-xl hover:bg-neutral-200 transition-all shadow-sm active:scale-95 shrink-0"
+            className="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-white text-black text-xs sm:text-sm font-semibold rounded-lg hover:bg-neutral-200 transition-colors shrink-0"
           >
-            <Plus size={16} />
+            <Plus size={15} />
             <span>Invite Member</span>
           </button>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-2 mt-4 border-b border-white/10 pb-2">
+      <div className="flex items-center gap-2 mt-4 border-b border-neutral-800 pb-2">
         <button
           onClick={() => setActiveTab('members')}
           className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-colors ${
             activeTab === 'members'
-              ? 'bg-white/10 text-white shadow-sm'
-              : 'text-neutral-400 hover:text-neutral-200 hover:bg-white/5'
+              ? 'bg-neutral-800 text-white shadow-sm'
+              : 'text-neutral-400 hover:text-neutral-200 hover:bg-neutral-800/50'
           }`}
         >
           <Users size={15} />
@@ -311,8 +311,8 @@ export default function UserRoleManager() {
           onClick={() => setActiveTab('roles')}
           className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-colors ${
             activeTab === 'roles'
-              ? 'bg-white/10 text-white shadow-sm'
-              : 'text-neutral-400 hover:text-neutral-200 hover:bg-white/5'
+              ? 'bg-neutral-800 text-white shadow-sm'
+              : 'text-neutral-400 hover:text-neutral-200 hover:bg-neutral-800/50'
           }`}
         >
           <ShieldCheck size={15} />
@@ -330,28 +330,28 @@ export default function UserRoleManager() {
         /* TAB 1: TEAM MEMBERS LIST */
         /* ========================================================= */
         <div className="mt-4 space-y-3">
-          <div className="divide-y divide-white/5 overflow-hidden rounded-xl border border-white/5 bg-black/30">
+          <div className="divide-y divide-neutral-800 overflow-hidden rounded-xl border border-neutral-800 bg-neutral-950/40">
             {users.map((u) => {
               const isCurrent = u.email.toLowerCase() === currentUserEmail.toLowerCase();
               const isUpdating = updatingUserId === u.id;
               const roleConfig = getRoleConfig(u.role);
 
               return (
-                <div key={u.id} className="p-3.5 sm:p-4 flex flex-col md:flex-row md:items-center justify-between gap-3 hover:bg-white/[0.02] transition-colors">
+                <div key={u.id} className="p-3.5 sm:p-4 flex flex-col md:flex-row md:items-center justify-between gap-3 hover:bg-neutral-900/40 transition-colors">
                   {/* Left: Email & Role Badge */}
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-9 h-9 rounded-full bg-white/10 border border-white/10 flex items-center justify-center font-semibold text-xs text-white uppercase shrink-0">
+                    <div className="w-8 h-8 rounded-full bg-neutral-800 border border-neutral-700 flex items-center justify-center font-semibold text-xs text-neutral-200 uppercase shrink-0">
                       {u.email.substring(0, 2)}
                     </div>
                     <div className="min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-sm font-semibold text-white truncate max-w-xs">{u.email}</span>
+                        <span className="text-sm font-medium text-white truncate max-w-xs">{u.email}</span>
                         {isCurrent && (
-                          <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                          <span className="px-2 py-0.5 rounded-md text-[10px] font-medium bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
                             You
                           </span>
                         )}
-                        <span className={`px-2 py-0.5 rounded-full text-[11px] font-medium border ${roleConfig.badge}`}>
+                        <span className={`px-2 py-0.5 rounded-md text-[11px] font-medium border ${roleConfig.badge}`}>
                           {roleConfig.label}
                         </span>
                       </div>
@@ -370,7 +370,7 @@ export default function UserRoleManager() {
                         value={u.role}
                         disabled={isUpdating || (isCurrent && u.role === 'SUPER_ADMIN')}
                         onChange={(e) => handleRoleChange(u.id, e.target.value, u.partnerId)}
-                        className="bg-neutral-900 border border-white/15 text-white text-xs rounded-xl px-3 py-1.5 focus:ring-1 focus:ring-purple-500 focus:outline-none appearance-none pr-8 cursor-pointer disabled:opacity-50"
+                        className="bg-neutral-950 border border-neutral-800 text-white text-xs rounded-lg px-3 py-1.5 focus:border-neutral-500 focus:outline-none appearance-none pr-8 cursor-pointer disabled:opacity-50"
                       >
                         <optgroup label="System Roles">
                           {systemRoles.map((r) => (
@@ -399,7 +399,7 @@ export default function UserRoleManager() {
                           value={u.partnerId || ''}
                           disabled={isUpdating}
                           onChange={(e) => handleRoleChange(u.id, 'PARTNER', e.target.value || null)}
-                          className="bg-neutral-900 border border-amber-500/30 text-amber-300 text-xs rounded-xl px-3 py-1.5 focus:ring-1 focus:ring-amber-500 focus:outline-none appearance-none pr-8 cursor-pointer"
+                          className="bg-neutral-950 border border-amber-500/30 text-amber-300 text-xs rounded-lg px-3 py-1.5 focus:border-amber-500 focus:outline-none appearance-none pr-8 cursor-pointer"
                         >
                           <option value="">Unlinked Partner</option>
                           {partners.map((p) => (
@@ -416,11 +416,11 @@ export default function UserRoleManager() {
                     <button
                       onClick={() => handleResendInvite(u)}
                       disabled={resendingInviteUserId === u.id}
-                      className="p-2 text-neutral-400 hover:text-purple-300 hover:bg-purple-500/10 rounded-xl transition-colors border border-transparent hover:border-purple-500/20 disabled:opacity-50"
+                      className="p-1.5 text-neutral-400 hover:text-neutral-200 hover:bg-neutral-800 rounded-lg transition-colors border border-transparent disabled:opacity-50"
                       title="Resend invitation email"
                     >
                       {resendingInviteUserId === u.id ? (
-                        <Loader2 size={15} className="animate-spin text-purple-400" />
+                        <Loader2 size={15} className="animate-spin text-neutral-400" />
                       ) : (
                         <Send size={15} />
                       )}
@@ -430,7 +430,7 @@ export default function UserRoleManager() {
                     {!isCurrent && (
                       <button
                         onClick={() => setUserToDelete(u)}
-                        className="p-2 text-neutral-400 hover:text-red-400 hover:bg-red-500/10 rounded-xl transition-colors border border-transparent hover:border-red-500/20"
+                        className="p-1.5 text-neutral-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors border border-transparent hover:border-rose-500/20"
                         title="Remove user"
                       >
                         <Trash2 size={15} />
@@ -447,16 +447,16 @@ export default function UserRoleManager() {
         /* TAB 2: ROLES & PERMISSIONS */
         /* ========================================================= */
         <div className="mt-4 space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-xl bg-purple-500/5 border border-purple-500/20">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-xl bg-neutral-950/60 border border-neutral-800">
             <div className="flex items-start gap-2.5 text-xs text-neutral-300">
-              <Info size={16} className="text-purple-400 shrink-0 mt-0.5" />
+              <Info size={16} className="text-neutral-400 shrink-0 mt-0.5" />
               <span>
                 Create custom roles to grant tailored access levels (e.g. Warehouse Staff, Media Buyers, Accountants) without exposing restricted financial records.
               </span>
             </div>
             <Link
               href="/team/roles/new"
-              className="inline-flex items-center justify-center gap-1.5 px-3.5 py-1.5 bg-white text-black text-xs font-semibold rounded-xl hover:bg-neutral-200 transition-all shadow-sm shrink-0"
+              className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 bg-white text-black text-xs font-semibold rounded-lg hover:bg-neutral-200 transition-colors shrink-0"
             >
               <Plus size={14} />
               <span>Create New Role</span>
@@ -471,23 +471,23 @@ export default function UserRoleManager() {
               return (
                 <div
                   key={role.code}
-                  className="bg-neutral-950/60 border border-white/10 rounded-xl p-4 sm:p-5 flex flex-col justify-between hover:border-white/20 transition-all shadow-sm relative group"
+                  className="bg-neutral-950/60 border border-neutral-800 rounded-xl p-4 sm:p-5 flex flex-col justify-between hover:border-neutral-700 transition-colors relative group"
                 >
                   <div>
                     {/* Top Row: Title, Badge, and Action Buttons */}
                     <div className="flex items-start justify-between gap-2 mb-2">
                       <div>
                         <div className="flex items-center gap-2 flex-wrap">
-                          <h3 className="text-sm sm:text-base font-bold text-white">{role.name}</h3>
-                          <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold border ${badgeStyle}`}>
+                          <h3 className="text-sm sm:text-base font-semibold text-white">{role.name}</h3>
+                          <span className={`px-2 py-0.5 rounded-md text-[10px] font-semibold border ${badgeStyle}`}>
                             {role.code}
                           </span>
                           {role.isSystem ? (
-                            <span className="inline-flex items-center gap-1 text-[10px] text-neutral-400 bg-white/5 px-2 py-0.5 rounded-md border border-white/5">
+                            <span className="inline-flex items-center gap-1 text-[10px] text-neutral-400 bg-neutral-800/80 px-2 py-0.5 rounded-md border border-neutral-700">
                               <Lock size={10} /> System Default
                             </span>
                           ) : (
-                            <span className="inline-flex items-center text-[10px] text-purple-300 bg-purple-500/10 px-2 py-0.5 rounded-md border border-purple-500/20 font-medium">
+                            <span className="inline-flex items-center text-[10px] text-neutral-300 bg-neutral-800 px-2 py-0.5 rounded-md border border-neutral-700 font-medium">
                               Custom Role
                             </span>
                           )}
@@ -500,14 +500,14 @@ export default function UserRoleManager() {
                         <div className="flex items-center gap-1 shrink-0">
                           <Link
                             href={`/team/roles/${role.id}`}
-                            className="p-1.5 text-neutral-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors inline-flex items-center justify-center"
+                            className="p-1.5 text-neutral-400 hover:text-white hover:bg-neutral-800 rounded-lg transition-colors inline-flex items-center justify-center"
                             title="Edit Role & Permissions"
                           >
                             <Edit2 size={14} />
                           </Link>
                           <button
                             onClick={() => setRoleToDelete(role)}
-                            className="p-1.5 text-neutral-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
+                            className="p-1.5 text-neutral-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors"
                             title="Delete Custom Role"
                           >
                             <Trash2 size={14} />
@@ -517,7 +517,7 @@ export default function UserRoleManager() {
                     </div>
 
                     {/* Permissions summary */}
-                    <div className="mt-3 pt-3 border-t border-white/5 text-xs">
+                    <div className="mt-3 pt-3 border-t border-neutral-800 text-xs">
                       <div className="flex items-center justify-between text-neutral-400 mb-2">
                         <span className="font-medium text-neutral-300">
                           {isSuper ? 'All System Permissions (*)' : `${role.permissions.length} Permissions Enabled`}
@@ -532,7 +532,7 @@ export default function UserRoleManager() {
                             return (
                               <span
                                 key={pKey}
-                                className="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[10px] text-neutral-300 truncate"
+                                className="px-2 py-0.5 rounded-md bg-neutral-800/70 border border-neutral-700 text-[10px] text-neutral-300 truncate"
                                 title={def?.description || pKey}
                               >
                                 {def?.label || pKey}
@@ -540,7 +540,7 @@ export default function UserRoleManager() {
                             );
                           })}
                           {role.permissions.length > 8 && (
-                            <span className="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[10px] text-neutral-400">
+                            <span className="px-2 py-0.5 rounded-md bg-neutral-800/70 border border-neutral-700 text-[10px] text-neutral-400">
                               +{role.permissions.length - 8} more
                             </span>
                           )}
@@ -560,15 +560,15 @@ export default function UserRoleManager() {
       {/* ========================================================= */}
       {isAddUserOpen && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-neutral-900 border border-white/10 rounded-2xl w-full max-w-md p-5 sm:p-6 shadow-2xl relative">
-            <h3 className="text-lg font-bold text-white mb-1">Invite Team Member</h3>
+          <div className="bg-neutral-900 border border-neutral-800 rounded-xl w-full max-w-md p-5 sm:p-6 shadow-2xl relative">
+            <h3 className="text-base font-semibold text-white mb-1">Invite Team Member</h3>
             <p className="text-xs text-neutral-400 mb-4">
               Add a Google account email and assign appropriate dashboard permissions.
             </p>
 
             <form onSubmit={handleAddUser} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-neutral-300 mb-1.5">Email Address</label>
+                <label className="block text-xs font-medium text-neutral-300 mb-1.5">Email Address</label>
                 <div className="relative">
                   <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-500" />
                   <input
@@ -577,13 +577,13 @@ export default function UserRoleManager() {
                     placeholder="user@example.com"
                     value={newEmail}
                     onChange={(e) => setNewEmail(e.target.value)}
-                    className="w-full bg-neutral-950 border border-white/10 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+                    className="w-full bg-neutral-950 border border-neutral-800 rounded-lg pl-10 pr-3 py-2 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-neutral-500"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-neutral-300 mb-1.5">Assigned Role</label>
+                <label className="block text-xs font-medium text-neutral-300 mb-1.5">Assigned Role</label>
                 <div className="grid grid-cols-1 gap-2 max-h-60 overflow-y-auto pr-1">
                   {allRoles.map((r) => {
                     const cfg = getRoleConfig(r.code);
@@ -592,15 +592,15 @@ export default function UserRoleManager() {
                       <div
                         key={r.code}
                         onClick={() => setNewRole(r.code)}
-                        className={`p-3 rounded-xl border cursor-pointer transition-all ${
+                        className={`p-3 rounded-lg border cursor-pointer transition-colors ${
                           isSelected
-                            ? 'bg-purple-500/10 border-purple-500/40 text-white'
-                            : 'bg-neutral-950 border-white/5 text-neutral-400 hover:border-white/15'
+                            ? 'bg-neutral-800 border-neutral-600 text-white'
+                            : 'bg-neutral-950 border-neutral-800 text-neutral-400 hover:border-neutral-700'
                         }`}
                       >
                         <div className="flex items-center justify-between">
-                          <span className="text-xs font-bold text-white">{cfg.label}</span>
-                          <span className={`text-[10px] px-2 py-0.5 rounded-full border ${cfg.badge}`}>
+                          <span className="text-xs font-semibold text-white">{cfg.label}</span>
+                          <span className={`text-[10px] px-2 py-0.5 rounded-md border ${cfg.badge}`}>
                             {r.code}
                           </span>
                         </div>
@@ -615,13 +615,13 @@ export default function UserRoleManager() {
 
               {newRole === 'PARTNER' && (
                 <div>
-                  <label className="block text-xs font-semibold text-neutral-300 mb-1.5">
+                  <label className="block text-xs font-medium text-neutral-300 mb-1.5">
                     Link to Partner Record (Optional)
                   </label>
                   <select
                     value={newPartnerId}
                     onChange={(e) => setNewPartnerId(e.target.value)}
-                    className="w-full bg-neutral-950 border border-white/10 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+                    className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-neutral-500"
                   >
                     <option value="">No Partner Link (Generic Partner View)</option>
                     {partners.map((p) => (
@@ -633,18 +633,18 @@ export default function UserRoleManager() {
                 </div>
               )}
 
-              <div className="flex items-center justify-end gap-2 pt-3 border-t border-white/10">
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-neutral-800">
                 <button
                   type="button"
                   onClick={() => setIsAddUserOpen(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-semibold text-neutral-400 hover:text-white hover:bg-white/5 transition-colors"
+                  className="px-3.5 py-2 rounded-lg text-xs font-medium text-neutral-400 hover:text-white hover:bg-neutral-800 transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmittingUser}
-                  className="inline-flex items-center justify-center gap-2 px-5 py-2 bg-white text-black text-xs font-bold rounded-xl hover:bg-neutral-200 transition-all shadow-md disabled:opacity-50"
+                  className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-white text-black text-xs font-semibold rounded-lg hover:bg-neutral-200 transition-colors disabled:opacity-50"
                 >
                   {isSubmittingUser && <Loader2 size={14} className="animate-spin" />}
                   <span>Save Member</span>

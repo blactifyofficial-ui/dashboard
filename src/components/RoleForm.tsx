@@ -166,7 +166,7 @@ export default function RoleForm({
   const previewBadgeStyle = ROLE_COLOR_PALETTES[roleColor]?.badge || ROLE_COLOR_PALETTES.blue.badge;
 
   return (
-    <div className="space-y-6 pb-20">
+    <div className="space-y-6 pb-20 max-w-5xl mx-auto w-full">
       {/* Top Header & Breadcrumb */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -178,8 +178,8 @@ export default function RoleForm({
             <span>Back to Team &amp; Roles</span>
           </Link>
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-2xl bg-purple-500/10 border border-purple-500/20 text-purple-400">
-              <ShieldCheck size={22} />
+            <div className="p-2.5 rounded-lg bg-neutral-800 border border-neutral-700 text-neutral-300">
+              <ShieldCheck size={20} />
             </div>
             <div>
               <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white">
@@ -193,9 +193,9 @@ export default function RoleForm({
         </div>
 
         {/* Live Badge Preview */}
-        <div className="bg-neutral-900/90 border border-white/10 rounded-2xl px-4 py-2.5 flex items-center gap-2.5 self-start sm:self-auto">
+        <div className="bg-neutral-900/90 border border-neutral-800 rounded-lg px-3.5 py-2 flex items-center gap-2.5 self-start sm:self-auto">
           <span className="text-xs text-neutral-400 font-medium">Badge Preview:</span>
-          <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold border ${previewBadgeStyle}`}>
+          <span className={`px-2.5 py-0.5 rounded-md text-xs font-semibold border ${previewBadgeStyle}`}>
             {roleName.trim() || 'Role Name'}
           </span>
         </div>
@@ -203,8 +203,8 @@ export default function RoleForm({
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* CARD 1: Basic Role Details */}
-        <div className="bg-[#1e1e1e] p-5 sm:p-6 rounded-2xl border border-white/10 shadow-sm space-y-5">
-          <div className="pb-3 border-b border-white/10">
+        <div className="bg-neutral-900/60 p-5 sm:p-6 rounded-xl border border-neutral-800 shadow-sm space-y-5">
+          <div className="pb-3 border-b border-neutral-800">
             <h2 className="text-base font-semibold text-white">1. Role Information</h2>
             <p className="text-xs text-neutral-400">
               Set the public name, unique internal code, and description for this role.
@@ -214,7 +214,7 @@ export default function RoleForm({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             {/* Role Name */}
             <div>
-              <label className="block text-xs font-semibold text-neutral-300 mb-1.5">Role Name *</label>
+              <label className="block text-xs font-medium text-neutral-300 mb-1.5">Role Name *</label>
               <input
                 type="text"
                 required
@@ -226,13 +226,13 @@ export default function RoleForm({
                     setRoleCode(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '_'));
                   }
                 }}
-                className="w-full bg-neutral-950 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+                className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3.5 py-2 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-neutral-500"
               />
             </div>
 
             {/* Role Code */}
             <div>
-              <label className="block text-xs font-semibold text-neutral-300 mb-1.5">
+              <label className="block text-xs font-medium text-neutral-300 mb-1.5">
                 Role Code {isEdit ? '(Immutable)' : '*'}
               </label>
               <input
@@ -242,26 +242,26 @@ export default function RoleForm({
                 placeholder="e.g. WAREHOUSE_LEAD"
                 value={roleCode}
                 onChange={(e) => setRoleCode(e.target.value.toUpperCase().replace(/[^A-Z0-9_]/g, '_'))}
-                className="w-full bg-neutral-950 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white font-mono uppercase placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 disabled:opacity-50"
+                className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3.5 py-2 text-sm text-white font-mono uppercase placeholder-neutral-500 focus:outline-none focus:border-neutral-500 disabled:opacity-50"
               />
             </div>
           </div>
 
           {/* Description */}
           <div>
-            <label className="block text-xs font-semibold text-neutral-300 mb-1.5">Description</label>
+            <label className="block text-xs font-medium text-neutral-300 mb-1.5">Description</label>
             <input
               type="text"
               placeholder="e.g. Handles product inventory, stock sync, and resolves order issues"
               value={roleDescription}
               onChange={(e) => setRoleDescription(e.target.value)}
-              className="w-full bg-neutral-950 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+              className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3.5 py-2 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-neutral-500"
             />
           </div>
 
           {/* Color Palette Selector */}
           <div>
-            <label className="block text-xs font-semibold text-neutral-300 mb-2">Badge Color Palette</label>
+            <label className="block text-xs font-medium text-neutral-300 mb-2">Badge Color Palette</label>
             <div className="flex items-center gap-2 flex-wrap">
               {COLOR_CHOICES.map((c) => {
                 const isSelected = roleColor === c.id;
@@ -270,13 +270,13 @@ export default function RoleForm({
                     key={c.id}
                     type="button"
                     onClick={() => setRoleColor(c.id)}
-                    className={`flex items-center gap-2 px-3.5 py-2 rounded-xl border text-xs font-semibold transition-all ${
+                    className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors ${
                       isSelected
-                        ? `${c.border} bg-white/10 text-white ring-2 ring-white/30 scale-105`
-                        : 'border-white/10 bg-neutral-950 text-neutral-400 hover:border-white/20'
+                        ? 'border-neutral-500 bg-neutral-800 text-white ring-1 ring-neutral-500'
+                        : 'border-neutral-800 bg-neutral-950 text-neutral-400 hover:border-neutral-700'
                     }`}
                   >
-                    <span className={`w-3 h-3 rounded-full ${c.bg}`} />
+                    <span className={`w-2.5 h-2.5 rounded-full ${c.bg}`} />
                     <span>{c.name}</span>
                   </button>
                 );
@@ -286,8 +286,8 @@ export default function RoleForm({
         </div>
 
         {/* CARD 2: Module Permissions */}
-        <div className="bg-[#1e1e1e] p-5 sm:p-6 rounded-2xl border border-white/10 shadow-sm space-y-5">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-white/10">
+        <div className="bg-neutral-900/60 p-5 sm:p-6 rounded-xl border border-neutral-800 shadow-sm space-y-5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-neutral-800">
             <div>
               <h2 className="text-base font-semibold text-white">2. Module Permissions</h2>
               <p className="text-xs text-neutral-400 mt-0.5">
@@ -298,7 +298,7 @@ export default function RoleForm({
             <button
               type="button"
               onClick={handleSelectAll}
-              className="inline-flex items-center justify-center px-3.5 py-1.5 rounded-xl border border-white/15 bg-neutral-900 text-xs font-semibold text-purple-300 hover:bg-neutral-800 transition-colors shrink-0"
+              className="inline-flex items-center justify-center px-3 py-1.5 rounded-lg border border-neutral-700 bg-neutral-800 text-xs font-semibold text-neutral-200 hover:bg-neutral-700 transition-colors shrink-0"
             >
               {selectedPermissions.length === PERMISSION_CATALOG.length ? 'Deselect All' : 'Grant All Permissions'}
             </button>
@@ -311,14 +311,14 @@ export default function RoleForm({
               const someCatSelected = items.some((i) => selectedPermissions.includes(i.key));
 
               return (
-                <div key={category} className="rounded-xl border border-white/10 bg-black/40 p-4 flex flex-col justify-between">
+                <div key={category} className="rounded-xl border border-neutral-800 bg-neutral-950/60 p-4 flex flex-col justify-between">
                   <div>
-                    <div className="flex items-center justify-between pb-2.5 border-b border-white/5 mb-3">
-                      <span className="text-xs font-bold text-white uppercase tracking-wider">{category}</span>
+                    <div className="flex items-center justify-between pb-2.5 border-b border-neutral-800 mb-3">
+                      <span className="text-xs font-semibold text-white uppercase tracking-wider">{category}</span>
                       <button
                         type="button"
                         onClick={() => toggleCategoryPermissions(items)}
-                        className="text-[11px] font-semibold text-neutral-400 hover:text-purple-300 transition-colors"
+                        className="text-[11px] font-medium text-neutral-400 hover:text-white transition-colors"
                       >
                         {allCatSelected ? 'Clear Module' : someCatSelected ? 'Select All in Module' : 'Select All'}
                       </button>
@@ -331,23 +331,23 @@ export default function RoleForm({
                           <div
                             key={item.key}
                             onClick={() => togglePermission(item.key)}
-                            className={`p-2.5 rounded-xl border cursor-pointer transition-all flex items-start gap-3 ${
+                            className={`p-2.5 rounded-lg border cursor-pointer transition-colors flex items-start gap-3 ${
                               isChecked
-                                ? 'bg-purple-500/10 border-purple-500/40 text-white'
-                                : 'bg-neutral-950/40 border-white/5 text-neutral-400 hover:border-white/15'
+                                ? 'bg-neutral-800/80 border-neutral-700 text-white'
+                                : 'bg-neutral-950/40 border-neutral-800/80 text-neutral-400 hover:border-neutral-700'
                             }`}
                           >
                             <div
                               className={`w-4 h-4 rounded mt-0.5 flex items-center justify-center border shrink-0 transition-colors ${
                                 isChecked
-                                  ? 'bg-purple-500 border-purple-400 text-white'
-                                  : 'border-white/20 bg-neutral-900'
+                                  ? 'bg-white border-white text-black'
+                                  : 'border-neutral-700 bg-neutral-900'
                               }`}
                             >
                               {isChecked && <Check size={12} strokeWidth={3} />}
                             </div>
                             <div className="min-w-0">
-                              <div className="text-xs font-semibold text-neutral-200">{item.label}</div>
+                              <div className="text-xs font-medium text-neutral-200">{item.label}</div>
                               <div className="text-[11px] text-neutral-400 mt-0.5 leading-snug">
                                 {item.description}
                               </div>
@@ -364,13 +364,13 @@ export default function RoleForm({
         </div>
 
         {/* Sticky Action Footer */}
-        <div className="bg-[#1e1e1e]/95 backdrop-blur-md p-4 rounded-2xl border border-white/10 flex items-center justify-between gap-4 shadow-xl sticky bottom-4 z-20">
+        <div className="bg-neutral-900/95 backdrop-blur-md p-4 rounded-xl border border-neutral-800 flex items-center justify-between gap-4 shadow-xl sticky bottom-4 z-20">
           <div>
             {isEdit && !initialData?.isSystem && (
               <button
                 type="button"
                 onClick={() => setIsDeleteModalOpen(true)}
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-xl transition-colors border border-transparent hover:border-red-500/20"
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 rounded-lg transition-colors border border-transparent hover:border-rose-500/20"
               >
                 <Trash2 size={15} />
                 <span>Delete Role</span>
@@ -381,14 +381,14 @@ export default function RoleForm({
           <div className="flex items-center gap-3">
             <Link
               href="/team"
-              className="px-4 py-2 text-xs font-semibold text-neutral-400 hover:text-white transition-colors"
+              className="px-3.5 py-2 text-xs font-medium text-neutral-400 hover:text-white transition-colors"
             >
               Cancel
             </Link>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="inline-flex items-center justify-center gap-2 px-6 py-2.5 bg-white text-black text-xs sm:text-sm font-bold rounded-xl hover:bg-neutral-200 transition-all shadow-md active:scale-95 disabled:opacity-50"
+              className="inline-flex items-center justify-center gap-2 px-5 py-2 bg-white text-black text-xs sm:text-sm font-semibold rounded-lg hover:bg-neutral-200 transition-colors disabled:opacity-50"
             >
               {isSubmitting && <Loader2 size={16} className="animate-spin" />}
               <span>{isEdit ? 'Save Changes' : 'Create Role'}</span>

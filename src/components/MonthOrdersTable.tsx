@@ -128,36 +128,34 @@ export default function MonthOrdersTable({ orders }: MonthOrdersTableProps) {
     return filteredOrders.reduce((sum, o) => sum + (parseFloat(o.totalPrice || '0') || 0), 0);
   }, [filteredOrders]);
 
-  return (
-    <div className="bg-white/[0.02] border border-white/5 rounded-3xl shadow-2xl relative overflow-hidden flex flex-col">
-      <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent pointer-events-none"></div>
-
+    return (
+    <div className="bg-neutral-900/60 border border-neutral-800 rounded-xl relative overflow-hidden flex flex-col">
       {/* Header & Filter Controls */}
-      <div className="p-4 sm:p-6 md:p-8 border-b border-white/5 relative z-10 space-y-4 sm:space-y-6 bg-black/40">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+      <div className="p-4 sm:p-5 border-b border-neutral-800 relative z-10 space-y-4 bg-neutral-900/80">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
           <div>
-            <h2 className="text-lg sm:text-xl md:text-2xl font-semibold text-white tracking-tight">
-              Order Details & Payment Types
+            <h2 className="text-base sm:text-lg font-semibold text-white tracking-tight">
+              Order Details &amp; Payment Types
             </h2>
-            <p className="text-neutral-400 text-xs sm:text-sm mt-1">
+            <p className="text-neutral-400 text-xs mt-0.5">
               Detailed list of all orders with order number, amount, and COD / normal payment breakdown
             </p>
           </div>
 
           {/* Search Input */}
-          <div className="relative w-full lg:w-80">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400" size={18} />
+          <div className="relative w-full lg:w-72">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500" size={15} />
             <input
               type="text"
-              placeholder="Search by order #, customer, amount..."
+              placeholder="Search orders..."
               value={searchQuery}
               onChange={(e) => handleSearchChange(e.target.value)}
-              className="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-white/20 transition-all"
+              className="w-full bg-neutral-900 border border-neutral-800 rounded-lg pl-9 pr-8 py-2 text-xs sm:text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-neutral-600 transition-colors"
             />
             {searchQuery && (
               <button
                 onClick={() => handleSearchChange('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-neutral-400 hover:text-white px-1.5 py-0.5 rounded bg-white/10"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-neutral-400 hover:text-white px-1.5 py-0.5 rounded bg-neutral-800"
               >
                 Clear
               </button>
@@ -166,83 +164,83 @@ export default function MonthOrdersTable({ orders }: MonthOrdersTableProps) {
         </div>
 
         {/* Filter Pills */}
-        <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
+        <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
           {/* Order Type Tabs */}
-          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 bg-white/[0.03] p-1 rounded-2xl border border-white/5">
+          <div className="flex flex-wrap items-center gap-1 bg-neutral-900 p-1 rounded-lg border border-neutral-800">
             <button
               onClick={() => handleFilterChange('ALL')}
-              className={`px-3.5 py-1.5 min-h-[36px] rounded-xl text-xs sm:text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
+              className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors flex items-center gap-1.5 ${
                 filterType === 'ALL'
-                  ? 'bg-white/15 text-white font-semibold shadow-sm'
-                  : 'text-neutral-400 hover:text-white hover:bg-white/5'
+                  ? 'bg-neutral-800 text-white font-semibold'
+                  : 'text-neutral-400 hover:text-white'
               }`}
             >
               <span>All Orders</span>
-              <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-white/10 font-mono">
+              <span className="text-[10px] px-1.5 py-0.2 rounded bg-neutral-800 border border-neutral-700 font-mono text-neutral-300">
                 {orders.length}
               </span>
             </button>
 
             <button
               onClick={() => handleFilterChange('NORMAL')}
-              className={`px-3.5 py-1.5 min-h-[36px] rounded-xl text-xs sm:text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
+              className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors flex items-center gap-1.5 ${
                 filterType === 'NORMAL'
-                  ? 'bg-emerald-500/20 text-emerald-300 font-semibold border border-emerald-500/30'
-                  : 'text-neutral-400 hover:text-white hover:bg-white/5'
+                  ? 'bg-emerald-500/15 text-emerald-300 font-semibold border border-emerald-500/30'
+                  : 'text-neutral-400 hover:text-white'
               }`}
             >
-              <CreditCard size={14} className="text-emerald-400" />
+              <CreditCard size={13} className="text-emerald-400" />
               <span>Normal (Prepaid)</span>
-              <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-mono">
+              <span className="text-[10px] px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 font-mono">
                 {orderStats.normalCount}
               </span>
             </button>
 
             <button
               onClick={() => handleFilterChange('COD')}
-              className={`px-3.5 py-1.5 min-h-[36px] rounded-xl text-xs sm:text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
+              className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors flex items-center gap-1.5 ${
                 filterType === 'COD'
-                  ? 'bg-amber-500/20 text-amber-300 font-semibold border border-amber-500/30'
-                  : 'text-neutral-400 hover:text-white hover:bg-white/5'
+                  ? 'bg-amber-500/15 text-amber-300 font-semibold border border-amber-500/30'
+                  : 'text-neutral-400 hover:text-white'
               }`}
             >
-              <Banknote size={14} className="text-amber-400" />
+              <Banknote size={13} className="text-amber-400" />
               <span>COD (Cash on Delivery)</span>
-              <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-mono">
+              <span className="text-[10px] px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 font-mono">
                 {orderStats.codCount}
               </span>
             </button>
           </div>
 
           {/* Fulfillment Status Toggle */}
-          <div className="flex items-center gap-1.5 text-xs">
-            <SlidersHorizontal size={14} className="text-neutral-400 mr-1 hidden sm:inline" />
+          <div className="flex items-center gap-1 text-xs">
+            <SlidersHorizontal size={13} className="text-neutral-500 mr-1 hidden sm:inline" />
             <button
               onClick={() => handleFulfillmentChange('ALL')}
-              className={`px-2.5 py-1.5 rounded-lg border transition-colors ${
+              className={`px-2.5 py-1.5 rounded-md border transition-colors ${
                 fulfillmentFilter === 'ALL'
-                  ? 'bg-white/10 text-white border-white/20'
-                  : 'text-neutral-400 border-white/5 hover:text-white'
+                  ? 'bg-neutral-800 text-white border-neutral-700'
+                  : 'text-neutral-400 border-neutral-800 hover:text-white'
               }`}
             >
               All Status
             </button>
             <button
               onClick={() => handleFulfillmentChange('FULFILLED')}
-              className={`px-2.5 py-1.5 rounded-lg border transition-colors ${
+              className={`px-2.5 py-1.5 rounded-md border transition-colors ${
                 fulfillmentFilter === 'FULFILLED'
-                  ? 'bg-blue-500/20 text-blue-300 border-blue-500/30'
-                  : 'text-neutral-400 border-white/5 hover:text-white'
+                  ? 'bg-blue-500/15 text-blue-300 border-blue-500/30 font-medium'
+                  : 'text-neutral-400 border-neutral-800 hover:text-white'
               }`}
             >
               Fulfilled
             </button>
             <button
               onClick={() => handleFulfillmentChange('UNFULFILLED')}
-              className={`px-2.5 py-1.5 rounded-lg border transition-colors ${
+              className={`px-2.5 py-1.5 rounded-md border transition-colors ${
                 fulfillmentFilter === 'UNFULFILLED'
-                  ? 'bg-neutral-700 text-white border-neutral-600'
-                  : 'text-neutral-400 border-white/5 hover:text-white'
+                  ? 'bg-neutral-800 text-neutral-200 border-neutral-700 font-medium'
+                  : 'text-neutral-400 border-neutral-800 hover:text-white'
               }`}
             >
               Unfulfilled
@@ -251,7 +249,7 @@ export default function MonthOrdersTable({ orders }: MonthOrdersTableProps) {
         </div>
 
         {/* Showing Summary text */}
-        <div className="flex items-center justify-between text-xs text-neutral-400 pt-1">
+        <div className="flex items-center justify-between text-xs text-neutral-400 pt-1 border-t border-neutral-800/60">
           <span>
             Showing <strong className="text-white">{filteredOrders.length}</strong> {filteredOrders.length === 1 ? 'order' : 'orders'}
             {filterType !== 'ALL' && ` (${filterType === 'NORMAL' ? 'Normal / Prepaid' : 'COD'})`}
@@ -265,26 +263,26 @@ export default function MonthOrdersTable({ orders }: MonthOrdersTableProps) {
       {/* Orders Table (Desktop & Tablet) */}
       <div className="relative z-10 w-full overflow-x-auto">
         <table className="w-full text-sm text-left min-w-[700px]">
-          <thead className="text-xs text-neutral-400 uppercase tracking-wider bg-white/[0.02] border-b border-white/5">
+          <thead className="text-xs text-neutral-400 uppercase tracking-wider bg-neutral-900 border-b border-neutral-800">
             <tr>
-              <th className="px-4 sm:px-6 py-4 font-semibold">Order</th>
-              <th className="px-4 sm:px-6 py-4 font-semibold">Date & Time</th>
-              <th className="px-4 sm:px-6 py-4 font-semibold">Customer</th>
-              <th className="px-4 sm:px-6 py-4 font-semibold">Payment / Order Type</th>
-              <th className="px-4 sm:px-6 py-4 font-semibold">Fulfillment</th>
-              <th className="px-4 sm:px-6 py-4 font-semibold text-right">Amount</th>
-              <th className="px-4 sm:px-6 py-4 font-semibold text-center">Action</th>
+              <th className="px-4 sm:px-6 py-3 font-medium">Order</th>
+              <th className="px-4 sm:px-6 py-3 font-medium">Date &amp; Time</th>
+              <th className="px-4 sm:px-6 py-3 font-medium">Customer</th>
+              <th className="px-4 sm:px-6 py-3 font-medium">Payment / Type</th>
+              <th className="px-4 sm:px-6 py-3 font-medium">Fulfillment</th>
+              <th className="px-4 sm:px-6 py-3 font-medium text-right">Amount</th>
+              <th className="px-4 sm:px-6 py-3 font-medium text-center">Action</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-white/5">
+          <tbody className="divide-y divide-neutral-800/60">
             {paginatedOrders.length === 0 ? (
               <tr>
                 <td colSpan={7} className="px-6 py-16 text-center text-neutral-400">
                   <div className="flex flex-col items-center justify-center space-y-3">
-                    <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center border border-white/5">
-                      <Package size={24} className="text-neutral-500" />
+                    <div className="w-12 h-12 rounded-lg bg-neutral-900 border border-neutral-800 flex items-center justify-center text-neutral-500">
+                      <Package size={24} />
                     </div>
-                    <p className="text-base font-medium text-white/80">No orders found matching your criteria</p>
+                    <p className="text-sm font-medium text-neutral-300">No orders found matching your criteria</p>
                     <p className="text-xs text-neutral-500">Try changing your search term or filter options</p>
                   </div>
                 </td>
@@ -304,21 +302,21 @@ export default function MonthOrdersTable({ orders }: MonthOrdersTableProps) {
                 return (
                   <tr 
                     key={order.id} 
-                    className="hover:bg-white/[0.03] transition-colors duration-150 group"
+                    className="hover:bg-neutral-900/40 transition-colors"
                   >
                     {/* Order Number */}
-                    <td className="px-4 sm:px-6 py-4 font-medium text-white whitespace-nowrap">
+                    <td className="px-4 sm:px-6 py-3.5 font-medium text-white whitespace-nowrap">
                       <Link 
                         href={`/orders/${order.id}`}
-                        className="inline-flex items-center gap-1.5 font-semibold text-white hover:text-blue-400 transition-colors group/link"
+                        className="inline-flex items-center gap-1 font-semibold text-white hover:text-neutral-300 transition-colors group/link"
                       >
                         <span className="font-mono text-sm">#{order.orderNumber || order.id.slice(0, 8)}</span>
-                        <ArrowUpRight size={14} className="opacity-40 group-hover/link:opacity-100 transition-opacity shrink-0" />
+                        <ArrowUpRight size={13} className="text-neutral-500 group-hover/link:text-white transition-colors shrink-0" />
                       </Link>
                     </td>
 
                     {/* Date */}
-                    <td className="px-4 sm:px-6 py-4 text-neutral-300 whitespace-nowrap">
+                    <td className="px-4 sm:px-6 py-3.5 text-neutral-300 whitespace-nowrap">
                       <div className="text-xs font-medium text-white">{formattedDate}</div>
                       {formattedTime && (
                         <div className="text-[11px] text-neutral-500 flex items-center gap-1 mt-0.5">
@@ -329,26 +327,26 @@ export default function MonthOrdersTable({ orders }: MonthOrdersTableProps) {
                     </td>
 
                     {/* Customer */}
-                    <td className="px-4 sm:px-6 py-4">
-                      <div className="font-medium text-white text-sm max-w-[180px] truncate">
+                    <td className="px-4 sm:px-6 py-3.5">
+                      <div className="font-medium text-white text-xs sm:text-sm max-w-[180px] truncate">
                         {order.customerName || 'Guest Customer'}
                       </div>
                       {order.customerEmail && (
-                        <div className="text-xs text-neutral-400 max-w-[180px] truncate">
+                        <div className="text-xs text-neutral-500 max-w-[180px] truncate mt-0.5">
                           {order.customerEmail}
                         </div>
                       )}
                     </td>
 
                     {/* COD or Normal Order Detail */}
-                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
+                    <td className="px-4 sm:px-6 py-3.5 whitespace-nowrap">
                       {isCod ? (
                         <div className="flex flex-col gap-1">
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-amber-500/15 text-amber-300 border border-amber-500/25 w-fit">
-                            <Banknote size={13} className="text-amber-400 shrink-0" />
+                          <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-xs font-medium bg-amber-500/15 text-amber-300 border border-amber-500/25 w-fit">
+                            <Banknote size={12} className="text-amber-400 shrink-0" />
                             <span>COD</span>
                           </span>
-                          <span className="text-[11px] text-neutral-400">
+                          <span className="text-[11px] text-neutral-500">
                             {order.financialStatus === 'partially_paid' 
                               ? 'Partial COD (Advance Paid)' 
                               : order.financialStatus === 'pending'
@@ -358,11 +356,11 @@ export default function MonthOrdersTable({ orders }: MonthOrdersTableProps) {
                         </div>
                       ) : (
                         <div className="flex flex-col gap-1">
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-emerald-500/15 text-emerald-300 border border-emerald-500/25 w-fit">
-                            <CreditCard size={13} className="text-emerald-400 shrink-0" />
+                          <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-xs font-medium bg-emerald-500/15 text-emerald-300 border border-emerald-500/25 w-fit">
+                            <CreditCard size={12} className="text-emerald-400 shrink-0" />
                             <span>Normal (Prepaid)</span>
                           </span>
-                          <span className="text-[11px] text-neutral-400 flex items-center gap-1">
+                          <span className="text-[11px] text-neutral-500 flex items-center gap-1">
                             <CheckCircle2 size={11} className="text-emerald-400" />
                             <span>{order.financialStatus || 'Paid Online'}</span>
                             {order.paymentGateway && <span className="text-neutral-500">• {order.paymentGateway}</span>}
@@ -372,12 +370,12 @@ export default function MonthOrdersTable({ orders }: MonthOrdersTableProps) {
                     </td>
 
                     {/* Fulfillment */}
-                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
+                    <td className="px-4 sm:px-6 py-3.5 whitespace-nowrap">
                       <div className="flex flex-col gap-1">
-                        <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium w-fit ${
+                        <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium w-fit ${
                           order.fulfillmentStatus === 'fulfilled'
                             ? 'bg-blue-500/15 text-blue-300 border border-blue-500/20'
-                            : 'bg-neutral-800 text-neutral-400 border border-white/5'
+                            : 'bg-neutral-800 text-neutral-400 border border-neutral-700/60'
                         }`}>
                           {order.fulfillmentStatus ? order.fulfillmentStatus.charAt(0).toUpperCase() + order.fulfillmentStatus.slice(1) : 'Unfulfilled'}
                         </span>
@@ -403,21 +401,21 @@ export default function MonthOrdersTable({ orders }: MonthOrdersTableProps) {
                     </td>
 
                     {/* Amount */}
-                    <td className="px-4 sm:px-6 py-4 text-right whitespace-nowrap">
-                      <span className="font-bold text-base text-white font-mono">
+                    <td className="px-4 sm:px-6 py-3.5 text-right whitespace-nowrap">
+                      <span className="font-medium text-sm sm:text-base text-white font-mono">
                         ₹{amount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </span>
                     </td>
 
                     {/* Action */}
-                    <td className="px-4 sm:px-6 py-4 text-center whitespace-nowrap">
+                    <td className="px-4 sm:px-6 py-3.5 text-center whitespace-nowrap">
                       <Link
                         href={`/orders/${order.id}`}
-                        className="inline-flex items-center justify-center p-2 rounded-xl bg-white/5 hover:bg-white/10 active:bg-white/15 text-neutral-300 hover:text-white transition-colors border border-white/5"
+                        className="inline-flex items-center justify-center p-1.5 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-neutral-400 hover:text-white transition-colors border border-neutral-800"
                         title="View Order Details"
                         aria-label="View Order Details"
                       >
-                        <ArrowUpRight size={16} />
+                        <ArrowUpRight size={14} />
                       </Link>
                     </td>
                   </tr>
@@ -430,7 +428,7 @@ export default function MonthOrdersTable({ orders }: MonthOrdersTableProps) {
 
       {/* Pagination Footer */}
       {totalPages > 1 && (
-        <div className="p-4 sm:px-6 sm:py-4 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-3 bg-black/20 relative z-10">
+        <div className="p-3.5 sm:px-6 border-t border-neutral-800 flex flex-col sm:flex-row items-center justify-between gap-3 bg-neutral-900/60 relative z-10">
           <div className="text-xs text-neutral-400">
             Page <span className="font-medium text-white">{currentPage}</span> of <span className="font-medium text-white">{totalPages}</span>
           </div>
@@ -438,18 +436,18 @@ export default function MonthOrdersTable({ orders }: MonthOrdersTableProps) {
             <button
               onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
               disabled={currentPage <= 1}
-              className="px-3 py-1.5 min-h-[36px] flex items-center gap-1 text-xs rounded-xl border border-white/10 bg-white/5 text-white disabled:opacity-40 disabled:cursor-not-allowed hover:bg-white/10 transition-colors"
+              className="px-3 py-1.5 min-h-[32px] flex items-center gap-1 text-xs rounded-lg border border-neutral-800 bg-neutral-900 text-neutral-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-neutral-800 transition-colors"
             >
-              <ChevronLeft size={14} />
+              <ChevronLeft size={13} />
               <span>Previous</span>
             </button>
             <button
               onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
               disabled={currentPage >= totalPages}
-              className="px-3 py-1.5 min-h-[36px] flex items-center gap-1 text-xs rounded-xl border border-white/10 bg-white/5 text-white disabled:opacity-40 disabled:cursor-not-allowed hover:bg-white/10 transition-colors"
+              className="px-3 py-1.5 min-h-[32px] flex items-center gap-1 text-xs rounded-lg border border-neutral-800 bg-neutral-900 text-neutral-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-neutral-800 transition-colors"
             >
               <span>Next</span>
-              <ChevronRight size={14} />
+              <ChevronRight size={13} />
             </button>
           </div>
         </div>

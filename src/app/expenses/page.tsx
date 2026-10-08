@@ -12,7 +12,6 @@ import {
   FileText, 
   Pencil, 
   Check, 
-  X, 
   ArrowUpDown, 
   Loader2,
   ChevronDown,
@@ -359,37 +358,37 @@ export default function ExpensesPage() {
     return (
       <div 
         key={dateKey} 
-        className="bg-zinc-900/60 border border-white/10 rounded-xl overflow-hidden shadow-sm transition-all"
+        className="bg-neutral-900/60 border border-neutral-800 rounded-xl overflow-hidden"
       >
         {/* Date Group Header (Clickable to Toggle Collapse) */}
         <div 
           onClick={() => toggleExpandDate(dateKey)}
-          className={`p-3.5 sm:p-4 bg-zinc-900/90 flex flex-col sm:flex-row sm:items-center justify-between gap-3 cursor-pointer hover:bg-zinc-800/80 transition-colors select-none ${
-            isDateExpanded ? 'border-b border-white/10' : ''
+          className={`p-3 sm:p-3.5 bg-neutral-900 flex flex-col sm:flex-row sm:items-center justify-between gap-3 cursor-pointer hover:bg-neutral-800/80 transition-colors select-none ${
+            isDateExpanded ? 'border-b border-neutral-800' : ''
           }`}
         >
           <div className="flex items-center flex-wrap gap-2.5">
             {/* Date chevron indicator */}
-            <div className="text-white/50 hover:text-white transition-colors">
+            <div className="text-neutral-400 hover:text-white transition-colors">
               {isDateExpanded ? (
-                <ChevronDown size={17} />
+                <ChevronDown size={16} />
               ) : (
-                <ChevronRight size={17} />
+                <ChevronRight size={16} />
               )}
             </div>
 
             <div className="flex items-center gap-2">
-              <Calendar size={16} className="text-white/60" />
-              <span className="font-semibold text-sm sm:text-base text-white">{displayDate}</span>
+              <Calendar size={15} className="text-neutral-400" />
+              <span className="font-semibold text-sm text-white">{displayDate}</span>
             </div>
 
             {relative && (
-              <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-blue-500/20 text-blue-300 border border-blue-500/30">
+              <span className="px-2 py-0.5 rounded-md text-xs font-medium bg-neutral-800 text-neutral-300 border border-neutral-700">
                 {relative}
               </span>
             )}
 
-            <span className="text-xs text-white/40">
+            <span className="text-xs text-neutral-400">
               • {items.length} {items.length === 1 ? 'record' : 'records'}
             </span>
 
@@ -408,8 +407,8 @@ export default function ExpensesPage() {
           {/* Right: Daily total and Note edit action */}
           <div className="flex items-center gap-3">
             <div className="text-right">
-              <span className="text-xs text-white/40 block">Daily Total</span>
-              <span className="font-bold text-sm sm:text-base text-white">₹{dayTotal}</span>
+              <span className="text-xs text-neutral-400 block">Daily Total</span>
+              <span className="font-semibold text-sm sm:text-base text-white">₹{dayTotal}</span>
             </div>
 
             {!isEditingThisNote && (
@@ -419,14 +418,14 @@ export default function ExpensesPage() {
                   e.stopPropagation();
                   handleStartEditNote(dateKey);
                 }}
-                className={`flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-lg border transition-colors ${
+                className={`flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-lg border transition-colors ${
                   currentNote 
                     ? 'bg-amber-500/10 border-amber-500/30 text-amber-300 hover:bg-amber-500/20' 
-                    : 'bg-white/5 border-white/10 text-white/60 hover:text-white hover:bg-white/10'
+                    : 'bg-neutral-800 border-neutral-700 text-neutral-300 hover:text-white hover:bg-neutral-700'
                 }`}
                 title={currentNote ? 'Edit note for this date' : 'Add note for this date'}
               >
-                <FileText size={13} />
+                <FileText size={12} />
                 <span>{currentNote ? 'Edit Note' : '+ Note'}</span>
               </button>
             )}
@@ -443,66 +442,61 @@ export default function ExpensesPage() {
                   <span className="text-xs font-medium text-amber-300 flex items-center gap-1.5">
                     <FileText size={14} /> Note for {displayDate}
                   </span>
-                  <span className="text-[11px] text-white/40">Visible to team</span>
+                  <span className="text-[11px] text-neutral-400">Visible to team</span>
                 </div>
                 <textarea
                   value={tempNote}
                   onChange={(e) => setTempNote(e.target.value)}
-                  placeholder="Add overall notes for this date (e.g., Shoot in Calicut, travel expenses, client dinner)..."
+                  placeholder="Add note or context about this day's expenses..."
                   rows={2}
-                  autoFocus
-                  className="w-full bg-black/60 border border-amber-500/30 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-amber-400 placeholder-white/30 resize-none transition-colors"
+                  className="w-full bg-neutral-950 border border-neutral-800 rounded-lg p-2.5 text-xs text-white placeholder:text-neutral-500 focus:outline-none focus:border-neutral-600 transition-colors"
                 />
-                <div className="flex justify-end items-center gap-2">
+                <div className="flex items-center justify-end gap-2">
                   <button
                     type="button"
                     onClick={handleCancelEditNote}
                     disabled={isSavingThisNote}
-                    className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs text-white/60 hover:text-white bg-white/5 border border-white/10 transition-colors"
+                    className="px-2.5 py-1 text-xs text-neutral-400 hover:text-white transition-colors"
                   >
-                    <X size={13} /> Cancel
+                    Cancel
                   </button>
                   <button
                     type="button"
                     onClick={() => handleSaveNote(dateKey)}
                     disabled={isSavingThisNote}
-                    className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium text-black bg-amber-400 hover:bg-amber-300 transition-colors"
+                    className="px-3 py-1 bg-white text-black font-semibold text-xs rounded-lg hover:bg-neutral-200 transition-colors flex items-center gap-1"
                   >
                     {isSavingThisNote ? (
-                      <>
-                        <Loader2 size={13} className="animate-spin" /> Saving...
-                      </>
+                      <Loader2 size={12} className="animate-spin" />
                     ) : (
-                      <>
-                        <Check size={13} /> Save Note
-                      </>
+                      <Check size={12} />
                     )}
+                    <span>Save Note</span>
                   </button>
                 </div>
               </div>
             ) : currentNote ? (
-              <div className="p-3 bg-amber-500/5 border-b border-white/5 flex items-start justify-between gap-3 text-sm">
-                <div className="flex items-start gap-2 text-amber-200/90">
-                  <FileText size={15} className="mt-0.5 flex-shrink-0 text-amber-400" />
-                  <p className="whitespace-pre-wrap leading-relaxed text-xs sm:text-sm">
-                    {currentNote}
-                  </p>
+              <div className="p-3 bg-amber-500/5 border-b border-neutral-800 flex items-start justify-between gap-3 text-xs">
+                <div className="flex items-start gap-2 text-amber-300/90">
+                  <FileText size={14} className="mt-0.5 text-amber-400 shrink-0" />
+                  <p className="leading-relaxed whitespace-pre-wrap">{currentNote}</p>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => handleStartEditNote(dateKey)}
-                  className="text-white/40 hover:text-amber-300 transition-colors p-1"
-                  title="Edit date note"
-                >
-                  <Pencil size={13} />
-                </button>
+                {canEditExpenses && (
+                  <button
+                    type="button"
+                    onClick={() => handleStartEditNote(dateKey)}
+                    className="text-neutral-400 hover:text-white text-xs shrink-0"
+                  >
+                    <Pencil size={12} />
+                  </button>
+                )}
               </div>
             ) : null}
 
             {/* Expenses Table for this Date */}
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm whitespace-nowrap">
-                <thead className="bg-white/[0.02] text-white/50 text-xs border-b border-white/5">
+                <thead className="bg-neutral-900 text-neutral-400 text-xs border-b border-neutral-800">
                   <tr>
                     <th className="px-6 py-2.5 font-medium flex items-center gap-1">
                       <Clock size={12} />
@@ -515,35 +509,35 @@ export default function ExpensesPage() {
                     <th className="px-6 py-2.5 font-medium text-right">Action</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-white/5">
+                <tbody className="divide-y divide-neutral-800/60">
                   {items.map(expense => (
                     <tr 
                       key={expense.id} 
-                      className="hover:bg-white/[0.03] transition-colors group"
+                      className="hover:bg-neutral-800/30 transition-colors group"
                     >
-                      <td className="px-6 py-3.5 text-white/70 font-mono text-xs">
+                      <td className="px-6 py-3 text-neutral-400 font-mono text-xs">
                         {formatAddedTime(expense.createdAt)}
                       </td>
-                      <td className="px-6 py-3.5">
-                        <span className="bg-white/10 px-2 py-0.5 rounded text-xs text-white/80">
+                      <td className="px-6 py-3">
+                        <span className="bg-neutral-800 px-2 py-0.5 rounded text-xs text-neutral-300">
                           {expense.category || 'N/A'}
                         </span>
                       </td>
-                      <td className="px-6 py-3.5">
+                      <td className="px-6 py-3">
                         <span className="font-medium text-white">{expense.title}</span>
                       </td>
-                      <td className="px-6 py-3.5 text-right font-medium text-white">
+                      <td className="px-6 py-3 text-right font-medium text-white">
                         ₹{parseFloat(expense.amount || '0').toFixed(2)}
                       </td>
-                      <td className="px-6 py-3.5 text-white/70 text-xs">
+                      <td className="px-6 py-3 text-neutral-400 text-xs">
                         {expense.paymentMethod || 'N/A'}
                       </td>
-                      <td className="px-6 py-3.5 text-right">
+                      <td className="px-6 py-3 text-right">
                         <Link 
                           href={`/expenses/${expense.id}`} 
-                          className="inline-flex items-center justify-center text-white/40 group-hover:text-white transition-colors"
+                          className="inline-flex items-center justify-center text-neutral-400 group-hover:text-white transition-colors"
                         >
-                          <ArrowRight size={16} />
+                          <ArrowRight size={15} />
                         </Link>
                       </td>
                     </tr>
@@ -566,23 +560,23 @@ export default function ExpensesPage() {
       {/* Header */}
       <div className="flex-none flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-white">Expenses</h1>
-          <p className="text-xs sm:text-sm text-white/60 mt-1">Manage and track your business expenses grouped by date</p>
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white">Expenses</h1>
+          <p className="text-xs sm:text-sm text-neutral-400 mt-1">Manage and track your business expenses grouped by date</p>
         </div>
         <div className="flex items-center gap-2.5 w-full sm:w-auto">
           <Link
             href="/meta-ads"
-            className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 bg-blue-500/10 border border-blue-500/20 text-blue-400 px-4 py-2.5 min-h-[44px] rounded-xl font-medium hover:bg-blue-500/20 transition-colors text-xs sm:text-sm"
+            className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 bg-neutral-900 border border-neutral-800 text-neutral-300 px-3.5 py-2 min-h-[40px] rounded-lg font-medium hover:bg-neutral-800 transition-colors text-xs"
           >
-            <Megaphone size={16} />
+            <Megaphone size={15} />
             <span>Meta Ads</span>
           </Link>
           {canEditExpenses && (
             <Link
               href="/expenses/add"
-              className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 bg-white text-black px-4 py-2.5 min-h-[44px] rounded-xl font-medium hover:bg-white/90 transition-colors text-xs sm:text-sm shadow-sm"
+              className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 bg-white text-black px-3.5 py-2 min-h-[40px] rounded-lg font-semibold hover:bg-neutral-200 transition-colors text-xs"
             >
-              <Plus size={16} />
+              <Plus size={15} />
               <span>Add Expense</span>
             </Link>
           )}
@@ -595,32 +589,32 @@ export default function ExpensesPage() {
         <>
           {/* Top Metrics Cards */}
           <div className="flex-none grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-            <div className="bg-white/5 border border-white/10 rounded-2xl p-4 sm:p-5">
-              <p className="text-xs sm:text-sm text-white/60 mb-1">Total Expenses</p>
-              <p className="text-xl sm:text-2xl font-bold">₹{calculateTotal()}</p>
+            <div className="bg-neutral-900/60 border border-neutral-800 rounded-xl p-4 sm:p-5">
+              <p className="text-xs text-neutral-400 mb-1 uppercase tracking-wider font-medium">Total Expenses</p>
+              <p className="text-xl sm:text-2xl font-bold text-white">₹{calculateTotal()}</p>
             </div>
-            <div className="bg-white/5 border border-white/10 rounded-2xl p-4 sm:p-5">
-              <p className="text-xs sm:text-sm text-white/60 mb-1">Total Records</p>
-              <p className="text-xl sm:text-2xl font-bold">{filteredExpenses.length}</p>
+            <div className="bg-neutral-900/60 border border-neutral-800 rounded-xl p-4 sm:p-5">
+              <p className="text-xs text-neutral-400 mb-1 uppercase tracking-wider font-medium">Total Records</p>
+              <p className="text-xl sm:text-2xl font-bold text-white">{filteredExpenses.length}</p>
             </div>
-            <div className="bg-white/5 border border-white/10 rounded-2xl p-4 sm:p-5">
-              <p className="text-xs sm:text-sm text-white/60 mb-1">Days Tracked</p>
-              <p className="text-xl sm:text-2xl font-bold">{totalDaysTracked}</p>
+            <div className="bg-neutral-900/60 border border-neutral-800 rounded-xl p-4 sm:p-5">
+              <p className="text-xs text-neutral-400 mb-1 uppercase tracking-wider font-medium">Days Tracked</p>
+              <p className="text-xl sm:text-2xl font-bold text-white">{totalDaysTracked}</p>
             </div>
           </div>
 
           {/* Main Card with Controls & Expenses */}
-          <div className="flex-1 min-h-0 flex flex-col bg-white/5 border border-white/10 rounded-2xl overflow-hidden">
+          <div className="flex-1 min-h-0 flex flex-col bg-neutral-900/60 border border-neutral-800 rounded-xl overflow-hidden">
             {/* Filter & Search Bar */}
-            <div className="flex-none p-3 sm:p-4 border-b border-white/10 flex flex-col sm:flex-row gap-2.5 sm:gap-3 justify-between bg-black/50">
+            <div className="flex-none p-3 sm:p-4 border-b border-neutral-800 flex flex-col sm:flex-row gap-2.5 sm:gap-3 justify-between bg-neutral-900/80">
               <div className="relative w-full sm:max-w-xs">
-                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/40" size={16} />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500" size={15} />
                 <input 
                   type="text" 
                   placeholder="Search expenses..." 
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-2.5 min-h-[44px] text-base md:text-sm text-white focus:outline-none focus:border-white/20 transition-colors"
+                  className="w-full bg-neutral-900 border border-neutral-800 rounded-lg pl-9 pr-3 py-1.5 text-xs text-white focus:outline-none focus:border-neutral-600 transition-colors"
                 />
               </div>
               
@@ -630,9 +624,9 @@ export default function ExpensesPage() {
                   <button
                     onClick={toggleCollapseAll}
                     title={areAnyExpanded ? 'Collapse all' : 'Expand all'}
-                    className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 text-xs sm:text-sm px-3 py-2 min-h-[40px] rounded-xl border bg-white/5 border-white/10 text-white/80 hover:text-white hover:bg-white/10 transition-colors"
+                    className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 text-xs px-3 py-1.5 rounded-lg border bg-neutral-900 border-neutral-800 text-neutral-300 hover:text-white hover:bg-neutral-800 transition-colors"
                   >
-                    <ChevronsUpDown size={15} />
+                    <ChevronsUpDown size={14} />
                     <span>{areAnyExpanded ? 'Collapse All' : 'Expand All'}</span>
                   </button>
                 )}
@@ -641,9 +635,9 @@ export default function ExpensesPage() {
                 <button
                   onClick={() => setTimeSortOrder(prev => prev === 'desc' ? 'asc' : 'desc')}
                   title="Toggle order by adding time"
-                  className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 text-xs sm:text-sm px-3 py-2 min-h-[40px] rounded-xl border bg-white/5 border-white/10 text-white/80 hover:text-white hover:bg-white/10 transition-colors"
+                  className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 text-xs px-3 py-1.5 rounded-lg border bg-neutral-900 border-neutral-800 text-neutral-300 hover:text-white hover:bg-neutral-800 transition-colors"
                 >
-                  <ArrowUpDown size={15} />
+                  <ArrowUpDown size={14} />
                   <span>Time: {timeSortOrder === 'desc' ? 'Newest' : 'Oldest'}</span>
                 </button>
 
@@ -651,14 +645,14 @@ export default function ExpensesPage() {
                 <div className="relative flex-1 sm:flex-initial">
                   <button 
                     onClick={() => setShowFilter(!showFilter)}
-                    className={`w-full sm:w-auto inline-flex items-center justify-center gap-2 text-xs sm:text-sm px-3 py-2 min-h-[40px] rounded-xl border transition-colors ${showFilter || selectedCategory !== 'All' ? 'bg-white/10 border-white/20 text-white' : 'text-white/60 hover:text-white bg-white/5 border-white/10'}`}
+                    className={`w-full sm:w-auto inline-flex items-center justify-center gap-2 text-xs px-3 py-1.5 rounded-lg border transition-colors ${showFilter || selectedCategory !== 'All' ? 'bg-neutral-800 border-neutral-700 text-white' : 'text-neutral-400 hover:text-white bg-neutral-900 border-neutral-800'}`}
                   >
-                    <Filter size={15} />
+                    <Filter size={14} />
                     <span>{selectedCategory !== 'All' ? selectedCategory : 'Category'}</span>
                   </button>
 
                   {showFilter && (
-                    <div className="absolute right-0 top-full mt-2 w-48 bg-zinc-900 border border-white/10 rounded-xl shadow-xl z-30 py-1 max-h-60 overflow-y-auto">
+                    <div className="absolute right-0 top-full mt-2 w-48 bg-neutral-900 border border-neutral-800 rounded-lg shadow-xl z-30 py-1 max-h-60 overflow-y-auto">
                       {categories.map(category => (
                         <button
                           key={category as string}
@@ -666,7 +660,7 @@ export default function ExpensesPage() {
                             setSelectedCategory(category as string);
                             setShowFilter(false);
                           }}
-                          className={`w-full text-left px-4 py-2.5 min-h-[38px] text-xs sm:text-sm hover:bg-white/5 transition-colors ${selectedCategory === category ? 'text-white bg-white/5 font-medium' : 'text-white/70'}`}
+                          className={`w-full text-left px-3.5 py-2 text-xs hover:bg-neutral-800 transition-colors ${selectedCategory === category ? 'text-white bg-neutral-800 font-semibold' : 'text-neutral-400'}`}
                         >
                           {category as string}
                         </button>
@@ -680,10 +674,10 @@ export default function ExpensesPage() {
             {/* Scrollable Grouped Content */}
             <div className="flex-1 min-h-0 overflow-y-auto p-4 space-y-4">
               {totalDaysTracked === 0 ? (
-                <div className="py-16 text-center text-white/40">
+                <div className="py-16 text-center text-neutral-500">
                   <Calendar className="mx-auto mb-3 opacity-40" size={32} />
                   <p>No expenses found.</p>
-                  <p className="text-xs text-white/30 mt-1">Try adjusting your search or click &apos;Add Expense&apos; to create one.</p>
+                  <p className="text-xs text-neutral-600 mt-1">Try adjusting your search or click &apos;Add Expense&apos; to create one.</p>
                 </div>
               ) : (
                 <>
@@ -693,8 +687,8 @@ export default function ExpensesPage() {
                   {/* Divider if both current month dates and past months exist */}
                   {currentMonthDateKeys.length > 0 && pastMonthKeys.length > 0 && (
                     <div className="pt-2 pb-1 flex items-center gap-3">
-                      <span className="text-xs font-semibold uppercase tracking-wider text-white/40">Ended Months</span>
-                      <div className="flex-1 h-px bg-white/10" />
+                      <span className="text-xs font-semibold uppercase tracking-wider text-neutral-500">Ended Months</span>
+                      <div className="flex-1 h-px bg-neutral-800" />
                     </div>
                   )}
 
@@ -705,31 +699,31 @@ export default function ExpensesPage() {
 
                     return (
                       <div 
-                        key={monthKey}
-                        className="bg-zinc-950/70 border border-white/10 rounded-2xl overflow-hidden shadow-lg transition-all"
+                        key={monthKey} 
+                        className="bg-neutral-900/60 border border-neutral-800 rounded-xl overflow-hidden"
                       >
                         {/* Month Header (Clickable to Toggle Month Expansion) */}
                         <div
                           onClick={() => toggleExpandMonth(monthKey)}
-                          className={`p-4 sm:p-4.5 bg-gradient-to-r from-zinc-900 via-zinc-900/80 to-zinc-900/50 hover:bg-zinc-800/80 cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3 select-none transition-colors ${
-                            isMonthExpanded ? 'border-b border-white/10' : ''
+                          className={`p-3.5 sm:p-4 bg-neutral-900 hover:bg-neutral-800/80 cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3 select-none transition-colors ${
+                            isMonthExpanded ? 'border-b border-neutral-800' : ''
                           }`}
                         >
                           <div className="flex items-center flex-wrap gap-2.5">
-                            <div className="text-white/60 hover:text-white transition-colors">
+                            <div className="text-neutral-400 hover:text-white transition-colors">
                               {isMonthExpanded ? (
-                                <ChevronDown size={20} />
+                                <ChevronDown size={18} />
                               ) : (
-                                <ChevronRight size={20} />
+                                <ChevronRight size={18} />
                               )}
                             </div>
 
                             <div className="flex items-center gap-2">
-                              <Calendar size={18} className="text-blue-400" />
-                              <span className="font-bold text-lg text-white">{monthGroup.monthLabel}</span>
+                              <Calendar size={16} className="text-neutral-400" />
+                              <span className="font-semibold text-base text-white">{monthGroup.monthLabel}</span>
                             </div>
 
-                            <span className="text-xs text-white/50 bg-white/5 px-2.5 py-0.5 rounded-md border border-white/5">
+                            <span className="text-xs text-neutral-400 bg-neutral-800 px-2 py-0.5 rounded-md border border-neutral-700">
                               {monthGroup.totalRecords} {monthGroup.totalRecords === 1 ? 'record' : 'records'} • {monthGroup.daysCount} {monthGroup.daysCount === 1 ? 'day' : 'days'}
                             </span>
                           </div>
@@ -737,15 +731,15 @@ export default function ExpensesPage() {
                           {/* Monthly total */}
                           <div className="flex items-center gap-3">
                             <div className="text-right">
-                              <span className="text-xs text-white/40 block">Monthly Total</span>
-                              <span className="font-bold text-lg text-emerald-400">₹{monthGroup.totalAmount.toFixed(2)}</span>
+                              <span className="text-xs text-neutral-400 block">Monthly Total</span>
+                              <span className="font-semibold text-base text-emerald-400">₹{monthGroup.totalAmount.toFixed(2)}</span>
                             </div>
                           </div>
                         </div>
 
                         {/* Month Content: List of Dates in this Past Month (when expanded) */}
                         {isMonthExpanded && (
-                          <div className="p-3 sm:p-4 space-y-3.5 bg-black/40">
+                          <div className="p-3 sm:p-4 space-y-3 bg-neutral-950/60">
                             {monthGroup.dateKeys.map(dateKey => renderDateCard(dateKey))}
                           </div>
                         )}
