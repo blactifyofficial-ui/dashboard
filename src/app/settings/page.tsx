@@ -3,7 +3,6 @@ import SyncButton from '@/components/SyncButton';
 import CategoryManager from '@/components/CategoryManager';
 import InstallPWA from '@/components/InstallPWA';
 import GoogleSheetsSettings from '@/components/GoogleSheetsSettings';
-import UserRoleManager from '@/components/UserRoleManager';
 import { requirePermission } from '@/lib/auth-utils';
 import { hasPermission } from '@/lib/rbac';
 import AccessDenied from '@/components/AccessDenied';
@@ -26,8 +25,25 @@ export default async function SettingsPage() {
       <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-white mb-6 sm:mb-8">Settings</h1>
 
       <div className="grid grid-cols-1 gap-6">
-        {/* Team & User Role Management (Super Admin) */}
-        {canManageUsers && <UserRoleManager />}
+        {/* Team & User Role Management Link (Super Admin) */}
+        {canManageUsers && (
+          <div className="bg-[#1e1e1e] p-4 sm:p-6 rounded-xl border border-white/10 shadow-sm text-white">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <h2 className="text-lg sm:text-xl font-medium mb-1">Team &amp; Role Management (RBAC)</h2>
+                <p className="text-xs sm:text-sm text-gray-400">
+                  Invite team members, assign permission tiers, and configure partner-scoped views.
+                </p>
+              </div>
+              <Link
+                href="/team"
+                className="inline-flex items-center justify-center px-4 py-2.5 bg-white text-black text-xs sm:text-sm font-semibold rounded-xl hover:bg-neutral-200 transition-all shrink-0 shadow-sm"
+              >
+                Manage Team &amp; Roles
+              </Link>
+            </div>
+          </div>
+        )}
 
         {/* Google Sheets Backup Section */}
         {canManageIntegrations && <GoogleSheetsSettings />}

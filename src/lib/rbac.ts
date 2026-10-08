@@ -78,6 +78,7 @@ export const ROUTE_PERMISSIONS: Record<string, Permission> = {
   '/order-issues': 'issues:view',
   '/expenses': 'expenses:view',
   '/monthly-expenses': 'monthly_expenses:view',
+  '/team': 'settings:manage_users',
   '/settings': 'settings:view',
 };
 

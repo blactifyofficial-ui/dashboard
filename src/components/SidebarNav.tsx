@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, AlertCircle, Settings, Wallet, BarChart3, Megaphone, Handshake, CalendarCheck, Banknote, Boxes } from 'lucide-react';
+import { LayoutDashboard, AlertCircle, Settings, Wallet, BarChart3, Megaphone, Handshake, CalendarCheck, Banknote, Boxes, Users } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { ROUTE_PERMISSIONS } from '@/lib/rbac';
 
@@ -16,6 +16,7 @@ const NAV_LINKS = [
   { href: '/order-issues', label: 'Issues', icon: AlertCircle },
   { href: '/expenses', label: 'Expenses', icon: Wallet },
   { href: '/monthly-expenses', label: 'Monthly Bills', icon: CalendarCheck },
+  { href: '/team', label: 'Team & Roles', icon: Users },
   { href: '/settings', label: 'Settings', icon: Settings },
 ];
 
