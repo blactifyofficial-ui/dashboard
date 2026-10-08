@@ -17,8 +17,15 @@ import {
 import toast from 'react-hot-toast';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import type { InventoryResponse } from '@/app/api/inventory/route';
+import { useAuth } from '@/context/AuthContext';
+import AccessDenied from '@/components/AccessDenied';
 
 export default function InventoryPage() {
+  const { hasPermission } = useAuth();
+  const canViewInventory = hasPermission('inventory:view');
+  const canViewValuation = hasPermission('inventory:view_valuation');
+  const canSyncInventory = hasPermission('inventory:sync');
+
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -159,6 +166,10 @@ export default function InventoryPage() {
 
   const summary = data?.summary;
 
+  if (!canViewInventory) {
+    return <AccessDenied message="You do not have permission to view inventory and stock levels." />;
+  }
+
   return (
     <div className="flex flex-col space-y-4 sm:space-y-6 pb-12 w-full">
       {/* Top Header */}
@@ -173,38 +184,44 @@ export default function InventoryPage() {
             </span>
           </div>
           <p className="text-xs sm:text-sm text-neutral-400 mt-1">
-            Live stock counts and expected revenue if all current stock is sold.
+            {canViewValuation
+              ? 'Live stock counts and expected revenue if all current stock is sold.'
+              : 'Live inventory stock counts and product availability across warehouses.'}
           </p>
         </div>
 
         {/* Top Header Action Buttons */}
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => fetchInventory(true)}
-            disabled={refreshing}
-            className="p-2.5 min-h-[40px] px-3.5 text-xs font-semibold text-black bg-white hover:bg-neutral-200 rounded-xl transition-all shadow-sm flex items-center gap-2 disabled:opacity-50"
-            title="Refresh from Shopify"
-          >
-            <RefreshCw size={14} className={refreshing ? 'animate-spin' : ''} />
-            <span>{refreshing ? 'Syncing...' : 'Sync Shopify'}</span>
-          </button>
-        </div>
+        {canSyncInventory && (
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => fetchInventory(true)}
+              disabled={refreshing}
+              className="p-2.5 min-h-[40px] px-3.5 text-xs font-semibold text-black bg-white hover:bg-neutral-200 rounded-xl transition-all shadow-sm flex items-center gap-2 disabled:opacity-50"
+              title="Refresh from Shopify"
+            >
+              <RefreshCw size={14} className={refreshing ? 'animate-spin' : ''} />
+              <span>{refreshing ? 'Syncing...' : 'Sync Shopify'}</span>
+            </button>
+          </div>
+        )}
       </div>
 
       {/* KPI Cards Grid */}
       {summary && (
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-          {/* Card 1: Total Potential Revenue */}
-          <div className="bg-white/5 border border-white/10 rounded-2xl p-4 sm:p-5 relative overflow-hidden">
-            <div className="absolute top-0 right-0 -mt-4 -mr-4 w-20 h-20 bg-white/5 rounded-full blur-xl pointer-events-none" />
-            <p className="text-xs font-medium text-white/60 mb-1 uppercase tracking-wider">Total Stock Value</p>
-            <p className="text-xl sm:text-2xl font-bold font-mono text-white tracking-tight">
-              {formatCurrency(summary.totalPotentialRevenue)}
-            </p>
-            <p className="mt-1 text-xs text-neutral-400">
-              Avg. {formatCurrency(summary.avgUnitSellingPrice)} / piece
-            </p>
-          </div>
+        <div className={`grid grid-cols-1 sm:grid-cols-2 ${canViewValuation ? 'lg:grid-cols-4' : 'lg:grid-cols-2'} gap-3 sm:gap-4`}>
+          {/* Card 1: Total Potential Revenue (Valuation only) */}
+          {canViewValuation && (
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-4 sm:p-5 relative overflow-hidden">
+              <div className="absolute top-0 right-0 -mt-4 -mr-4 w-20 h-20 bg-white/5 rounded-full blur-xl pointer-events-none" />
+              <p className="text-xs font-medium text-white/60 mb-1 uppercase tracking-wider">Total Stock Value</p>
+              <p className="text-xl sm:text-2xl font-bold font-mono text-white tracking-tight">
+                {formatCurrency(summary.totalPotentialRevenue)}
+              </p>
+              <p className="mt-1 text-xs text-neutral-400">
+                Avg. {formatCurrency(summary.avgUnitSellingPrice)} / piece
+              </p>
+            </div>
+          )}
 
           {/* Card 2: Total Units in Stock */}
           <div className="bg-white/5 border border-white/10 rounded-2xl p-4 sm:p-5">
@@ -217,16 +234,18 @@ export default function InventoryPage() {
             </p>
           </div>
 
-          {/* Card 3: Catalog MRP Valuation */}
-          <div className="bg-white/5 border border-white/10 rounded-2xl p-4 sm:p-5">
-            <p className="text-xs font-medium text-white/60 mb-1 uppercase tracking-wider">Original MRP Value</p>
-            <p className="text-xl sm:text-2xl font-bold font-mono text-white tracking-tight">
-              {formatCurrency(summary.totalMRPValuation)}
-            </p>
-            <p className="mt-1 text-xs text-neutral-400">
-              Store Discount: {formatCurrency(summary.potentialDiscountValue)}
-            </p>
-          </div>
+          {/* Card 3: Catalog MRP Valuation (Valuation only) */}
+          {canViewValuation && (
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-4 sm:p-5">
+              <p className="text-xs font-medium text-white/60 mb-1 uppercase tracking-wider">Original MRP Value</p>
+              <p className="text-xl sm:text-2xl font-bold font-mono text-white tracking-tight">
+                {formatCurrency(summary.totalMRPValuation)}
+              </p>
+              <p className="mt-1 text-xs text-neutral-400">
+                Store Discount: {formatCurrency(summary.potentialDiscountValue)}
+              </p>
+            </div>
+          )}
 
           {/* Card 4: Stock Health */}
           <div className="bg-white/5 border border-white/10 rounded-2xl p-4 sm:p-5">
@@ -432,19 +451,23 @@ export default function InventoryPage() {
                               {product.totalStock} in stock
                             </span>
                           </div>
-                          <div className="text-[11px] font-mono text-neutral-400 mt-0.5">
-                            {formatCurrency(product.minPrice)}
-                            {product.maxPrice > product.minPrice ? ` - ${formatCurrency(product.maxPrice)}` : ''}
-                          </div>
+                          {canViewValuation && (
+                            <div className="text-[11px] font-mono text-neutral-400 mt-0.5">
+                              {formatCurrency(product.minPrice)}
+                              {product.maxPrice > product.minPrice ? ` - ${formatCurrency(product.maxPrice)}` : ''}
+                            </div>
+                          )}
                         </div>
 
                         {/* Total Stock Value */}
-                        <div className="text-right min-w-[110px]">
-                          <div className="text-sm font-bold font-mono text-white tracking-tight">
-                            {formatCurrency(product.potentialRevenue)}
+                        {canViewValuation && (
+                          <div className="text-right min-w-[110px]">
+                            <div className="text-sm font-bold font-mono text-white tracking-tight">
+                              {formatCurrency(product.potentialRevenue)}
+                            </div>
+                            <div className="text-[11px] text-neutral-500">Stock Value</div>
                           </div>
-                          <div className="text-[11px] text-neutral-500">Stock Value</div>
-                        </div>
+                        )}
 
                         {/* Expand Toggle */}
                         {hasMultipleVariants && (
@@ -489,8 +512,9 @@ export default function InventoryPage() {
                                 <div>
                                   <div className="text-xs font-medium text-white">{v.title}</div>
                                   <div className="text-[10px] font-mono text-neutral-400">
-                                    {v.sku ? `SKU: ${v.sku} • ` : ''}
-                                    {formatCurrency(v.price)}
+                                    {v.sku ? `SKU: ${v.sku}` : ''}
+                                    {v.sku && canViewValuation ? ' • ' : ''}
+                                    {canViewValuation ? formatCurrency(v.price) : ''}
                                   </div>
                                 </div>
                                 <div className="text-right">
@@ -498,9 +522,11 @@ export default function InventoryPage() {
                                     <span className={`w-1.5 h-1.5 rounded-full ${variantDotColor}`}></span>
                                     {v.inventoryQuantity} in stock
                                   </div>
-                                  <div className="text-[10px] font-mono text-neutral-300">
-                                    {formatCurrency(v.potentialRevenue)}
-                                  </div>
+                                  {canViewValuation && (
+                                    <div className="text-[10px] font-mono text-neutral-300">
+                                      {formatCurrency(v.potentialRevenue)}
+                                    </div>
+                                  )}
                                 </div>
                               </div>
                             );

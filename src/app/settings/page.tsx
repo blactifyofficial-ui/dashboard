@@ -3,10 +3,22 @@ import SyncButton from '@/components/SyncButton';
 import CategoryManager from '@/components/CategoryManager';
 import InstallPWA from '@/components/InstallPWA';
 import GoogleSheetsSettings from '@/components/GoogleSheetsSettings';
+import UserRoleManager from '@/components/UserRoleManager';
+import { requirePermission } from '@/lib/auth-utils';
+import { hasPermission } from '@/lib/rbac';
+import AccessDenied from '@/components/AccessDenied';
 
 export const dynamic = "force-dynamic";
 
-export default function SettingsPage() {
+export default async function SettingsPage() {
+  const authRes = await requirePermission('settings:view');
+  if ('error' in authRes) {
+    return <AccessDenied message="You do not have permission to view settings." />;
+  }
+
+  const canManageUsers = hasPermission(authRes.role, 'settings:manage_users');
+  const canManageIntegrations = hasPermission(authRes.role, 'settings:manage_integrations');
+
   const shopifyAuthUrl = `https://admin.shopify.com/store/${process.env.SHOPIFY_SHOP_NAME?.replace('.myshopify.com', '')}/oauth/authorize?client_id=${process.env.SHOPIFY_CLIENT_ID}&scope=read_all_orders,read_assigned_fulfillment_orders,read_orders,read_product_feeds,read_product_listings,read_third_party_fulfillment_orders,read_products,read_inventory,read_locations&redirect_uri=https://dashboard.blactify.com/api/auth/callback`;
 
   return (
@@ -14,8 +26,11 @@ export default function SettingsPage() {
       <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-white mb-6 sm:mb-8">Settings</h1>
 
       <div className="grid grid-cols-1 gap-6">
+        {/* Team & User Role Management (Super Admin) */}
+        {canManageUsers && <UserRoleManager />}
+
         {/* Google Sheets Backup Section */}
-        <GoogleSheetsSettings />
+        {canManageIntegrations && <GoogleSheetsSettings />}
 
         {/* Manual Sync Section */}
         <div className="bg-[#1e1e1e] p-4 sm:p-6 rounded-xl border border-white/10 shadow-sm text-white">
@@ -31,27 +46,29 @@ export default function SettingsPage() {
         </div>
 
         {/* Authorization Section */}
-        <div className="bg-[#1e1e1e] p-4 sm:p-6 rounded-xl border border-white/10 shadow-sm text-white">
-          <h2 className="text-lg sm:text-xl font-medium mb-4 border-b border-white/10 pb-2">Shopify Integration</h2>
-          <div className="space-y-4 text-sm text-gray-300">
-            <p>
-              If you ever need to re-authenticate your Shopify application or update your permissions (for example, if your <code>shpat_</code> access token expires or is invalidated), use the button below to authorize the app again.
-            </p>
-            <div className="mt-4">
-              <Link 
-                href={shopifyAuthUrl}
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="w-full sm:w-auto h-11 min-h-[44px] inline-flex items-center justify-center bg-white text-black px-6 rounded-lg font-medium hover:bg-gray-200 transition-colors"
-              >
-                Re-Authorize Shopify App
-              </Link>
+        {canManageIntegrations && (
+          <div className="bg-[#1e1e1e] p-4 sm:p-6 rounded-xl border border-white/10 shadow-sm text-white">
+            <h2 className="text-lg sm:text-xl font-medium mb-4 border-b border-white/10 pb-2">Shopify Integration</h2>
+            <div className="space-y-4 text-sm text-gray-300">
+              <p>
+                If you ever need to re-authenticate your Shopify application or update your permissions (for example, if your <code>shpat_</code> access token expires or is invalidated), use the button below to authorize the app again.
+              </p>
+              <div className="mt-4">
+                <Link 
+                  href={shopifyAuthUrl}
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="w-full sm:w-auto h-11 min-h-[44px] inline-flex items-center justify-center bg-white text-black px-6 rounded-lg font-medium hover:bg-gray-200 transition-colors"
+                >
+                  Re-Authorize Shopify App
+                </Link>
+              </div>
+              <p className="mt-4 text-xs text-gray-500">
+                Ensure your Client ID and Shop Name are set in the <code>.env.local</code> file for this to work.
+              </p>
             </div>
-            <p className="mt-4 text-xs text-gray-500">
-              Ensure your Client ID and Shop Name are set in the <code>.env.local</code> file for this to work.
-            </p>
           </div>
-        </div>
+        )}
         
         {/* Category Management */}
         <CategoryManager />

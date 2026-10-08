@@ -19,6 +19,8 @@ import ConfirmModal from '@/components/ConfirmModal';
 
 import { Partner, PartnerTransaction, PaymentMethod } from '@/components/partners/types';
 import { formatInputDate, formatCurrency, formatDisplayDate } from '@/components/partners/utils';
+import { useAuth } from '@/context/AuthContext';
+import AccessDenied from '@/components/AccessDenied';
 
 interface PayoutFormData {
   partnerId: string;
@@ -30,6 +32,10 @@ interface PayoutFormData {
 }
 
 export default function PayoutsPage() {
+  const { hasPermission } = useAuth();
+  const canViewPayouts = hasPermission('payouts:view_self');
+  const canManagePayouts = hasPermission('payouts:manage');
+
   const [loading, setLoading] = useState(true);
 
   const [partners, setPartners] = useState<Partner[]>([]);
@@ -243,6 +249,10 @@ export default function PayoutsPage() {
     );
   }
 
+  if (!canViewPayouts) {
+    return <AccessDenied message="You do not have permission to view partner payouts." />;
+  }
+
   return (
     <div className="flex-1 flex flex-col min-h-0 space-y-4 sm:space-y-6">
       {/* Top Header */}
@@ -262,15 +272,17 @@ export default function PayoutsPage() {
         </div>
 
         {/* Top Header Action Buttons */}
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => handleOpenAddPayout()}
-            className="px-4 py-2 min-h-[40px] text-xs font-semibold text-black bg-white hover:bg-neutral-200 rounded-xl transition-all shadow-sm flex items-center gap-1.5"
-          >
-            <Plus size={15} />
-            <span>Record Payout</span>
-          </button>
-        </div>
+        {canManagePayouts && (
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => handleOpenAddPayout()}
+              className="px-4 py-2 min-h-[40px] text-xs font-semibold text-black bg-white hover:bg-neutral-200 rounded-xl transition-all shadow-sm flex items-center gap-1.5"
+            >
+              <Plus size={15} />
+              <span>Record Payout</span>
+            </button>
+          </div>
+        )}
       </div>
 
       {/* KPI Cards Grid */}

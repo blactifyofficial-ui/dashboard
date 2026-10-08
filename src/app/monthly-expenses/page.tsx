@@ -24,8 +24,14 @@ import AddEntryModal from '@/components/monthly-expenses/AddEntryModal';
 import EditEntryModal from '@/components/monthly-expenses/EditEntryModal';
 import TemplateManagerModal from '@/components/monthly-expenses/TemplateManagerModal';
 import UnlockMonthModal from '@/components/monthly-expenses/UnlockMonthModal';
+import { useAuth } from '@/context/AuthContext';
+import AccessDenied from '@/components/AccessDenied';
 
 export default function MonthlyExpensesPage() {
+  const { hasPermission } = useAuth();
+  const canViewBills = hasPermission('monthly_expenses:view');
+  const canEditBills = hasPermission('monthly_expenses:edit');
+
   const [loading, setLoading] = useState(true);
   const [activeMonth, setActiveMonth] = useState<string>('');
   const [months, setMonths] = useState<MonthMeta[]>([]);
@@ -289,6 +295,10 @@ export default function MonthlyExpensesPage() {
     );
   }
 
+  if (!canViewBills) {
+    return <AccessDenied message="You do not have permission to view monthly bills and overheads." />;
+  }
+
   return (
     <div className="flex-1 flex flex-col min-h-0 space-y-4 p-4 sm:p-6 md:p-8">
       {/* Top Header */}
@@ -298,22 +308,24 @@ export default function MonthlyExpensesPage() {
           <p className="text-xs sm:text-sm text-white/60">Manage recurring bills, salaries, rent, and overheads</p>
         </div>
 
-        <div className="flex items-center gap-2.5 sm:gap-3 w-full sm:w-auto">
-          <button
-            onClick={() => setIsTemplateModalOpen(true)}
-            className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-white/5 border border-white/10 text-white/80 hover:text-white px-4 h-11 min-h-[44px] rounded-lg font-medium hover:bg-white/10 transition-colors text-sm"
-          >
-            <Layers size={16} />
-            Templates
-          </button>
-          <button
-            onClick={() => setIsAddModalOpen(true)}
-            className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-white text-black px-4 h-11 min-h-[44px] rounded-lg font-medium hover:bg-white/90 transition-colors text-sm shadow-sm"
-          >
-            <Plus size={16} />
-            Add Bill
-          </button>
-        </div>
+        {canEditBills && (
+          <div className="flex items-center gap-2.5 sm:gap-3 w-full sm:w-auto">
+            <button
+              onClick={() => setIsTemplateModalOpen(true)}
+              className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-white/5 border border-white/10 text-white/80 hover:text-white px-4 h-11 min-h-[44px] rounded-lg font-medium hover:bg-white/10 transition-colors text-sm"
+            >
+              <Layers size={16} />
+              Templates
+            </button>
+            <button
+              onClick={() => setIsAddModalOpen(true)}
+              className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-white text-black px-4 h-11 min-h-[44px] rounded-lg font-medium hover:bg-white/90 transition-colors text-sm shadow-sm"
+            >
+              <Plus size={16} />
+              Add Bill
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Month Timeline / Selector */}

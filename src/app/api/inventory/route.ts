@@ -1,4 +1,6 @@
 import { NextResponse } from 'next/server';
+import { requirePermission } from '@/lib/auth-utils';
+import { hasPermission } from '@/lib/rbac';
 
 export const dynamic = 'force-dynamic';
 
@@ -56,6 +58,11 @@ export interface InventoryResponse {
 }
 
 export async function GET() {
+  const authRes = await requirePermission('inventory:view');
+  if ('error' in authRes) {
+    return NextResponse.json({ error: authRes.error }, { status: authRes.status });
+  }
+
   const shop = process.env.SHOPIFY_SHOP_NAME;
   const token = process.env.SHOPIFY_ADMIN_ACCESS_TOKEN;
 

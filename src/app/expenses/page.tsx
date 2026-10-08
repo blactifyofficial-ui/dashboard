@@ -22,6 +22,8 @@ import {
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 import LoadingSpinner from '@/components/LoadingSpinner';
+import { useAuth } from '@/context/AuthContext';
+import AccessDenied from '@/components/AccessDenied';
 
 interface Expense {
   id: string;
@@ -124,6 +126,10 @@ function formatAddedTime(createdAtStr: string): string {
 }
 
 export default function ExpensesPage() {
+  const { hasPermission } = useAuth();
+  const canViewExpenses = hasPermission('expenses:view');
+  const canEditExpenses = hasPermission('expenses:edit');
+
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [dateNotes, setDateNotes] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
@@ -551,6 +557,10 @@ export default function ExpensesPage() {
     );
   };
 
+  if (!canViewExpenses) {
+    return <AccessDenied message="You do not have permission to view expenses." />;
+  }
+
   return (
     <div className="flex flex-col h-full space-y-6">
       {/* Header */}
@@ -567,13 +577,15 @@ export default function ExpensesPage() {
             <Megaphone size={16} />
             <span>Meta Ads</span>
           </Link>
-          <Link
-            href="/expenses/add"
-            className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 bg-white text-black px-4 py-2.5 min-h-[44px] rounded-xl font-medium hover:bg-white/90 transition-colors text-xs sm:text-sm shadow-sm"
-          >
-            <Plus size={16} />
-            <span>Add Expense</span>
-          </Link>
+          {canEditExpenses && (
+            <Link
+              href="/expenses/add"
+              className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 bg-white text-black px-4 py-2.5 min-h-[44px] rounded-xl font-medium hover:bg-white/90 transition-colors text-xs sm:text-sm shadow-sm"
+            >
+              <Plus size={16} />
+              <span>Add Expense</span>
+            </Link>
+          )}
         </div>
       </div>
 

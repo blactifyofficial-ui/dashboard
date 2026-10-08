@@ -18,6 +18,8 @@ import {
 import toast from 'react-hot-toast';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import ConfirmModal from '@/components/ConfirmModal';
+import { useAuth } from '@/context/AuthContext';
+import AccessDenied from '@/components/AccessDenied';
 
 interface MetaAdsSettings {
   id: string;
@@ -74,6 +76,10 @@ const formatLocalDate = (d: Date): string => {
 };
 
 export default function MetaAdsPage() {
+  const { hasPermission } = useAuth();
+  const canViewAds = hasPermission('meta_ads:view');
+  const canEditAds = hasPermission('meta_ads:edit');
+
   const [loading, setLoading] = useState(true);
   const [savingBudget, setSavingBudget] = useState(false);
   const [settings, setSettings] = useState<MetaAdsSettings | null>(null);
@@ -394,6 +400,10 @@ export default function MetaAdsPage() {
   const livePeriodBudget = currentDailyBudgetNum * currentDaysNum;
   const liveMonthlyBudget = currentDailyBudgetNum * 30;
 
+  if (!canViewAds) {
+    return <AccessDenied message="You do not have permission to view Meta Ads performance and budgets." />;
+  }
+
   return (
     <div className="space-y-6 sm:space-y-8 relative z-10 pb-8 sm:pb-12">
       {/* Header - Matches Dashboard and Revenue header style */}
@@ -404,15 +414,17 @@ export default function MetaAdsPage() {
             Daily budget planning, weekly targets, and expense tracking
           </p>
         </div>
-        <div className="flex items-center gap-3 w-full sm:w-auto">
-          <button
-            onClick={handleOpenPaymentModal}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-white text-black px-4 py-2.5 min-h-[44px] rounded-xl font-semibold hover:bg-neutral-200 active:bg-neutral-300 transition-colors text-xs sm:text-sm shadow-sm"
-          >
-            <Plus size={18} className="shrink-0" />
-            <span>Mark {currentDaysNum === 7 ? 'Weekly' : `${currentDaysNum}-Day`} Budget Paid</span>
-          </button>
-        </div>
+        {canEditAds && (
+          <div className="flex items-center gap-3 w-full sm:w-auto">
+            <button
+              onClick={handleOpenPaymentModal}
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-white text-black px-4 py-2.5 min-h-[44px] rounded-xl font-semibold hover:bg-neutral-200 active:bg-neutral-300 transition-colors text-xs sm:text-sm shadow-sm"
+            >
+              <Plus size={18} className="shrink-0" />
+              <span>Mark {currentDaysNum === 7 ? 'Weekly' : `${currentDaysNum}-Day`} Budget Paid</span>
+            </button>
+          </div>
+        )}
       </header>
 
       {loading && !settings ? (

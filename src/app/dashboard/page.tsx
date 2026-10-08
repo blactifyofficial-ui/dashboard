@@ -6,6 +6,8 @@ import RevenueCard from '@/components/RevenueCard';
 import DynamicOrdersChart from '@/components/DynamicOrdersChart';
 import { Suspense } from 'react';
 import LoadingSpinner from '@/components/LoadingSpinner';
+import { requireAuth } from '@/lib/auth-utils';
+import { hasPermission } from '@/lib/rbac';
 
 export const dynamic = "force-dynamic"; // Disable static rendering for this page
 
@@ -33,9 +35,15 @@ export default async function Dashboard() {
 }
 
 async function DashboardContent() {
+  const authRes = await requireAuth();
+  const role = 'role' in authRes ? authRes.role : 'VIEWER';
+
+  const canViewRevenue = hasPermission(role, 'overview:view_revenue');
+  const canViewStatus = hasPermission(role, 'overview:view_status');
+
   const [totalResult] = await db.select({
     totalOrders: count(),
-    totalSales: sql<number>`COALESCE(SUM(CAST(${orders.totalPrice} AS NUMERIC)), 0)`
+    totalSales: canViewRevenue ? sql<number>`COALESCE(SUM(CAST(${orders.totalPrice} AS NUMERIC)), 0)` : sql<number>`0`
   }).from(orders);
 
   const totalOrders = totalResult.totalOrders;
@@ -54,23 +62,28 @@ async function DashboardContent() {
     <div className="space-y-6 sm:space-y-8">
       {/* Stats Row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-        <RevenueCard totalSales={totalSales} />
+        {canViewRevenue && <RevenueCard totalSales={totalSales} />}
+
         <div className="group bg-white/[0.03] border border-white/5 rounded-3xl p-5 sm:p-6 md:p-8 hover:bg-white/[0.06] transition-all duration-500 relative shadow-2xl flex flex-col justify-between">
           <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-white/5 rounded-full blur-2xl group-hover:bg-white/10 transition-all duration-500 pointer-events-none"></div>
           <h2 className="text-sm font-medium text-neutral-400 mb-2 md:mb-3 relative z-10">Total Orders (All Time)</h2>
           <p className="text-3xl sm:text-4xl md:text-5xl font-bold text-white tracking-tight relative z-10 truncate">{totalOrders.toLocaleString('en-IN')}</p>
         </div>
-        <div className="group bg-neutral-900 border border-white/10 rounded-3xl p-5 sm:p-6 md:p-8 shadow-2xl shadow-black/50 flex flex-col justify-center relative transform hover:-translate-y-1 transition-all duration-500 sm:col-span-2 lg:col-span-1">
-          <div className="absolute inset-0 bg-black/10 opacity-20 mix-blend-overlay"></div>
-          <h2 className="text-xs font-semibold text-white/80 mb-2 md:mb-3 relative z-10 uppercase tracking-wider">System Status</h2>
-          <div className="flex items-center gap-3 relative z-10">
-            <div className="p-2 bg-white/20 rounded-full shadow-[0_0_15px_rgba(255,255,255,0.3)] shrink-0">
-              <div className="h-2.5 w-2.5 rounded-full bg-white animate-pulse"></div>
+
+        {canViewStatus && (
+          <div className="group bg-neutral-900 border border-white/10 rounded-3xl p-5 sm:p-6 md:p-8 shadow-2xl shadow-black/50 flex flex-col justify-center relative transform hover:-translate-y-1 transition-all duration-500 sm:col-span-2 lg:col-span-1">
+            <div className="absolute inset-0 bg-black/10 opacity-20 mix-blend-overlay"></div>
+            <h2 className="text-xs font-semibold text-white/80 mb-2 md:mb-3 relative z-10 uppercase tracking-wider">System Status</h2>
+            <div className="flex items-center gap-3 relative z-10">
+              <div className="p-2 bg-white/20 rounded-full shadow-[0_0_15px_rgba(255,255,255,0.3)] shrink-0">
+                <div className="h-2.5 w-2.5 rounded-full bg-white animate-pulse"></div>
+              </div>
+              <p className="text-lg sm:text-xl md:text-2xl font-semibold text-white">Listening for Webhooks</p>
             </div>
-            <p className="text-lg sm:text-xl md:text-2xl font-semibold text-white">Listening for Webhooks</p>
           </div>
-        </div>
+        )}
       </div>
+
       {/* Chart Row */}
       <div className="bg-white/[0.02] border border-white/5 rounded-3xl p-4 sm:p-6 md:p-8 shadow-2xl relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent pointer-events-none"></div>
@@ -91,3 +104,4 @@ async function DashboardContent() {
     </div>
   );
 }
+

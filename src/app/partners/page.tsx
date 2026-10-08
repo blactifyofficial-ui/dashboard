@@ -23,8 +23,16 @@ import CapTableTab from '@/components/partners/CapTableTab';
 import PartnerModal, { PartnerFormData } from '@/components/partners/PartnerModal';
 import TransactionModal, { TransactionFormData } from '@/components/partners/TransactionModal';
 import PartnerLedgerModal from '@/components/partners/PartnerLedgerModal';
+import { useAuth } from '@/context/AuthContext';
+import AccessDenied from '@/components/AccessDenied';
 
 export default function PartnersPage() {
+  const { hasPermission } = useAuth();
+  const canViewPartners = hasPermission('partners:view_self');
+  const canManagePartners = hasPermission('partners:manage_partners');
+  const canRecordTransaction = hasPermission('partners:record_transaction');
+  const canDeleteTransaction = hasPermission('partners:delete_transaction');
+
   const [loading, setLoading] = useState(true);
 
   const [partners, setPartners] = useState<Partner[]>([]);
@@ -311,6 +319,10 @@ export default function PartnersPage() {
     );
   }
 
+  if (!canViewPartners) {
+    return <AccessDenied message="You do not have permission to view partners and capital investments." />;
+  }
+
   return (
     <div className="flex-1 flex flex-col min-h-0 space-y-4 sm:space-y-6">
       {/* Top Header */}
@@ -331,29 +343,35 @@ export default function PartnersPage() {
 
         {/* Top Header Action Buttons */}
         <div className="flex flex-wrap items-center gap-2">
-          <button
-            onClick={handleOpenAddPartner}
-            className="px-3.5 py-2 min-h-[40px] text-xs font-medium text-neutral-200 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 rounded-xl transition-colors flex items-center gap-1.5 shadow-sm"
-          >
-            <Users size={14} className="text-white/60" />
-            <span>Add Partner</span>
-          </button>
+          {canManagePartners && (
+            <button
+              onClick={handleOpenAddPartner}
+              className="px-3.5 py-2 min-h-[40px] text-xs font-medium text-neutral-200 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 rounded-xl transition-colors flex items-center gap-1.5 shadow-sm"
+            >
+              <Users size={14} className="text-white/60" />
+              <span>Add Partner</span>
+            </button>
+          )}
 
-          <button
-            onClick={() => handleOpenAddTxn(undefined, 'PAYOUT')}
-            className="px-3.5 py-2 min-h-[40px] text-xs font-semibold text-emerald-300 bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/30 rounded-xl transition-all shadow-sm flex items-center gap-1.5"
-          >
-            <Banknote size={14} />
-            <span>Record Payout</span>
-          </button>
+          {canRecordTransaction && (
+            <>
+              <button
+                onClick={() => handleOpenAddTxn(undefined, 'PAYOUT')}
+                className="px-3.5 py-2 min-h-[40px] text-xs font-semibold text-emerald-300 bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/30 rounded-xl transition-all shadow-sm flex items-center gap-1.5"
+              >
+                <Banknote size={14} />
+                <span>Record Payout</span>
+              </button>
 
-          <button
-            onClick={() => handleOpenAddTxn()}
-            className="px-4 py-2 min-h-[40px] text-xs font-semibold text-black bg-white hover:bg-neutral-200 rounded-xl transition-all shadow-sm flex items-center gap-1.5"
-          >
-            <Plus size={15} />
-            <span>Record Transaction</span>
-          </button>
+              <button
+                onClick={() => handleOpenAddTxn()}
+                className="px-4 py-2 min-h-[40px] text-xs font-semibold text-black bg-white hover:bg-neutral-200 rounded-xl transition-all shadow-sm flex items-center gap-1.5"
+              >
+                <Plus size={15} />
+                <span>Record Transaction</span>
+              </button>
+            </>
+          )}
         </div>
       </div>
 

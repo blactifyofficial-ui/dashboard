@@ -1,19 +1,22 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/db';
 import { partners, partnerTransactions, paymentMethods, users } from '@/db/schema';
-import { eq, desc } from 'drizzle-orm';
-import { requireAuth } from '@/lib/auth-utils';
+import { eq, desc, and } from 'drizzle-orm';
+import { requirePermission } from '@/lib/auth-utils';
 import { enqueueSyncJob } from '@/lib/google-sheets';
 
 export async function GET() {
   try {
-    const authResult = await requireAuth();
-    if (authResult.error) {
+    const authResult = await requirePermission('partners:view_self');
+    if ('error' in authResult) {
       return NextResponse.json({ error: authResult.error }, { status: authResult.status });
     }
 
-    // 1. Fetch all partners
-    const allPartners = await db
+    const isPartnerRole = authResult.role === 'PARTNER';
+    const partnerIdScope = authResult.partnerId;
+
+    // 1. Fetch partners (scoped if role is PARTNER)
+    const partnersQuery = db
       .select({
         id: partners.id,
         name: partners.name,
@@ -26,11 +29,14 @@ export async function GET() {
         createdAt: partners.createdAt,
         updatedAt: partners.updatedAt,
       })
-      .from(partners)
-      .orderBy(desc(partners.createdAt));
+      .from(partners);
 
-    // 2. Fetch all transactions
-    const allTransactions = await db
+    const allPartners = isPartnerRole && partnerIdScope
+      ? await partnersQuery.where(eq(partners.id, partnerIdScope)).orderBy(desc(partners.createdAt))
+      : await partnersQuery.orderBy(desc(partners.createdAt));
+
+    // 2. Fetch transactions (scoped if role is PARTNER)
+    const txQuery = db
       .select({
         id: partnerTransactions.id,
         partnerId: partnerTransactions.partnerId,
@@ -51,8 +57,11 @@ export async function GET() {
       .from(partnerTransactions)
       .leftJoin(partners, eq(partnerTransactions.partnerId, partners.id))
       .leftJoin(paymentMethods, eq(partnerTransactions.paymentMethodId, paymentMethods.id))
-      .leftJoin(users, eq(partnerTransactions.createdById, users.id))
-      .orderBy(desc(partnerTransactions.transactionDate), desc(partnerTransactions.createdAt));
+      .leftJoin(users, eq(partnerTransactions.createdById, users.id));
+
+    const allTransactions = isPartnerRole && partnerIdScope
+      ? await txQuery.where(eq(partnerTransactions.partnerId, partnerIdScope)).orderBy(desc(partnerTransactions.transactionDate), desc(partnerTransactions.createdAt))
+      : await txQuery.orderBy(desc(partnerTransactions.transactionDate), desc(partnerTransactions.createdAt));
 
     // 3. Fetch active payment methods
     const activePaymentMethods = await db
@@ -135,8 +144,8 @@ export async function GET() {
 
 export async function POST(req: Request) {
   try {
-    const authResult = await requireAuth();
-    if (authResult.error) {
+    const authResult = await requirePermission('partners:manage_partners');
+    if ('error' in authResult) {
       return NextResponse.json({ error: authResult.error }, { status: authResult.status });
     }
     const session = { user: authResult.user! };

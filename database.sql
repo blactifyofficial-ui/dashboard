@@ -18,10 +18,14 @@ CREATE TABLE IF NOT EXISTS "user" (
     "email" TEXT
 );
 
--- Whitelisted / Allowed Users for Dashboard Access
+-- Whitelisted / Allowed Users for Dashboard Access (with RBAC)
 CREATE TABLE IF NOT EXISTS "allowed_users" (
     "id" TEXT PRIMARY KEY NOT NULL,
     "email" TEXT NOT NULL,
+    "role" TEXT NOT NULL DEFAULT 'VIEWER',
+    "partner_id" TEXT,
+    "created_at" TIMESTAMP WITHOUT TIME ZONE DEFAULT NOW() NOT NULL,
+    "updated_at" TIMESTAMP WITHOUT TIME ZONE DEFAULT NOW() NOT NULL,
     CONSTRAINT "allowed_users_email_unique" UNIQUE ("email")
 );
 

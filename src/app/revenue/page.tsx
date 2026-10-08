@@ -8,11 +8,19 @@ import Image from 'next/image';
 import { Suspense } from 'react';
 import LoadingSpinner from '@/components/LoadingSpinner';
 
+import { requirePermission } from '@/lib/auth-utils';
+import AccessDenied from '@/components/AccessDenied';
+
 export const dynamic = "force-dynamic";
 
 export default async function RevenuePage(props: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }) {
+  const authRes = await requirePermission('revenue:view');
+  if ('error' in authRes) {
+    return <AccessDenied message="You do not have permission to view revenue and sales performance." />;
+  }
+
   const searchParams = await props.searchParams;
   const tab = (searchParams.tab as string) || 'monthly';
   const q = (searchParams.q as string) || '';

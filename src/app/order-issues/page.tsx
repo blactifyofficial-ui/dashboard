@@ -6,6 +6,8 @@ import toast from 'react-hot-toast';
 import ConfirmModal from '@/components/ConfirmModal';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { Search, Plus, ChevronRight } from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
+import AccessDenied from '@/components/AccessDenied';
 
 type Issue = {
   id: string;
@@ -22,6 +24,11 @@ type Issue = {
 
 export default function OrderIssuesDashboard() {
   const router = useRouter();
+  const { hasPermission } = useAuth();
+  const canViewIssues = hasPermission('issues:view');
+  const canCreateIssues = hasPermission('issues:create');
+  const canDeleteIssues = hasPermission('issues:delete');
+
   const [issues, setIssues] = useState<Issue[]>([]);
   const [loading, setLoading] = useState(true);
   const [isFetching, setIsFetching] = useState(false);
@@ -96,6 +103,10 @@ export default function OrderIssuesDashboard() {
     }
   };
 
+  if (!canViewIssues) {
+    return <AccessDenied message="You do not have permission to view order issues." />;
+  }
+
   return (
     <div className="flex flex-col h-full space-y-6 relative z-10">
       <ConfirmModal
@@ -116,13 +127,15 @@ export default function OrderIssuesDashboard() {
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-white">Order Issues</h1>
           <p className="text-neutral-400 text-xs sm:text-sm md:text-base">Manage and track customer order issues</p>
         </div>
-        <Link
-          href="/order-issues/new"
-          className="inline-flex items-center justify-center px-5 py-2.5 min-h-[44px] border border-white/10 bg-white/5 text-white rounded-xl hover:bg-white/10 text-sm font-medium transition-all gap-2 w-full md:w-auto"
-        >
-          <Plus size={16} />
-          <span>Create Issue</span>
-        </Link>
+        {canCreateIssues && (
+          <Link
+            href="/order-issues/new"
+            className="inline-flex items-center justify-center px-5 py-2.5 min-h-[44px] border border-white/10 bg-white/5 text-white rounded-xl hover:bg-white/10 text-sm font-medium transition-all gap-2 w-full md:w-auto"
+          >
+            <Plus size={16} />
+            <span>Create Issue</span>
+          </Link>
+        )}
       </header>
 
       {/* Summary Cards */}

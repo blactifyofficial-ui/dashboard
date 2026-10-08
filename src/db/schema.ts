@@ -27,9 +27,16 @@ export const orderItems = pgTable('order_items', {
   imageUrl: text('image_url'),
 });
 
+export const userRoles = ['SUPER_ADMIN', 'ADMIN', 'STAFF', 'PARTNER', 'VIEWER'] as const;
+export type UserRole = typeof userRoles[number];
+
 export const allowedUsers = pgTable('allowed_users', {
   id: text('id').primaryKey(),
   email: text('email').notNull().unique(),
+  role: text('role').$type<UserRole>().default('VIEWER').notNull(),
+  partnerId: text('partner_id'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
 export const users = pgTable('user', {
