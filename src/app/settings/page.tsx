@@ -7,7 +7,7 @@ import GoogleSheetsSettings from '@/components/GoogleSheetsSettings';
 export const dynamic = "force-dynamic";
 
 export default function SettingsPage() {
-  const shopifyAuthUrl = `https://admin.shopify.com/store/${process.env.SHOPIFY_SHOP_NAME?.replace('.myshopify.com', '')}/oauth/authorize?client_id=${process.env.SHOPIFY_CLIENT_ID}&scope=read_all_orders,read_assigned_fulfillment_orders,read_orders,read_product_feeds,read_product_listings,read_third_party_fulfillment_orders,read_products&redirect_uri=https://dashboard.blactify.com/api/auth/callback`;
+  const shopifyAuthUrl = `https://admin.shopify.com/store/${process.env.SHOPIFY_SHOP_NAME?.replace('.myshopify.com', '')}/oauth/authorize?client_id=${process.env.SHOPIFY_CLIENT_ID}&scope=read_all_orders,read_assigned_fulfillment_orders,read_orders,read_product_feeds,read_product_listings,read_third_party_fulfillment_orders,read_products,read_inventory,read_locations&redirect_uri=https://dashboard.blactify.com/api/auth/callback`;
 
   return (
     <div className="p-4 sm:p-6 md:p-8 max-w-4xl mx-auto text-black">

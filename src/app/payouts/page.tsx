@@ -5,8 +5,6 @@ import {
   Plus, 
   Search, 
   X, 
-  Lock, 
-  KeyRound, 
   Loader2, 
   Banknote, 
   CreditCard, 
@@ -18,7 +16,6 @@ import {
 import toast from 'react-hot-toast';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import ConfirmModal from '@/components/ConfirmModal';
-import { verifyRevenuePin } from '@/app/actions/revenuePin';
 
 import { Partner, PartnerTransaction, PaymentMethod } from '@/components/partners/types';
 import { formatInputDate, formatCurrency, formatDisplayDate } from '@/components/partners/utils';
@@ -34,10 +31,6 @@ interface PayoutFormData {
 
 export default function PayoutsPage() {
   const [loading, setLoading] = useState(true);
-  const [isUnlocked, setIsUnlocked] = useState<boolean>(false);
-  const [pinInput, setPinInput] = useState('');
-  const [pinLoading, setPinLoading] = useState(false);
-  const [pinError, setPinError] = useState('');
 
   const [partners, setPartners] = useState<Partner[]>([]);
   const [payouts, setPayouts] = useState<PartnerTransaction[]>([]);
@@ -108,59 +101,10 @@ export default function PayoutsPage() {
     }
   }, []);
 
-  // Auto-lock on tab switch / window blur / unmount
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      sessionStorage.removeItem('payouts_unlocked');
-    }
-
-    const handleVisibilityChange = () => {
-      if (document.hidden) {
-        setIsUnlocked(false);
-        setPinInput('');
-        setPinError('');
-      }
-    };
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-      if (typeof window !== 'undefined') {
-        sessionStorage.removeItem('payouts_unlocked');
-      }
-    };
-  }, []);
-
-  // Handle PIN verification
-  const handleVerifyPin = async (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
-    if (!pinInput.trim()) return;
-
-    try {
-      setPinLoading(true);
-      setPinError('');
-      const isValid = await verifyRevenuePin(pinInput.trim());
-      if (isValid) {
-        setIsUnlocked(true);
-        toast.success('Access granted');
-        fetchData();
-      } else {
-        setPinError('Invalid PIN. Please try again.');
-      }
-    } catch {
-      setPinError('An error occurred during verification');
-    } finally {
-      setPinLoading(false);
-    }
-  };
-
-  // Handle Lock
-  const handleLock = () => {
-    setIsUnlocked(false);
-    setPinInput('');
-    setPinError('');
-    toast.success('Payouts page locked');
-  };
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchData();
+  }, [fetchData]);
 
   // Open Add Payout Modal
   const handleOpenAddPayout = (defaultPartnerId?: string) => {
@@ -291,74 +235,10 @@ export default function PayoutsPage() {
     });
   }, [payouts, partnerFilter, paymentMethodFilter, searchQuery]);
 
-  if (isUnlocked && loading) {
+  if (loading) {
     return (
       <div className="flex-1 flex items-center justify-center min-h-[400px]">
         <LoadingSpinner />
-      </div>
-    );
-  }
-
-  if (!isUnlocked) {
-    return (
-      <div className="flex-1 flex items-center justify-center min-h-[500px] p-4">
-        <div className="w-full max-w-md bg-white/[0.03] border border-white/10 rounded-3xl p-6 sm:p-8 shadow-2xl backdrop-blur-xl relative overflow-hidden text-center">
-          {/* Subtle Ambient Glow */}
-          <div className="absolute top-0 right-1/2 translate-x-1/2 -mt-10 w-44 h-44 bg-white/5 rounded-full blur-3xl pointer-events-none" />
-
-          <div className="relative z-10 flex flex-col items-center">
-            <div className="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mb-4 text-white shadow-lg">
-              <Lock size={24} className="text-white/80" />
-            </div>
-
-            <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white mb-2">
-              Partner Payouts
-            </h2>
-            <p className="text-xs sm:text-sm text-neutral-400 max-w-xs mb-6">
-              Enter your PIN to access partner payout distribution records and statements.
-            </p>
-
-            <form onSubmit={handleVerifyPin} className="w-full space-y-4">
-              <div className="relative">
-                <input
-                  type="password"
-                  value={pinInput}
-                  onChange={(e) => {
-                    setPinInput(e.target.value);
-                    if (pinError) setPinError('');
-                  }}
-                  placeholder="Enter PIN"
-                  className="w-full bg-black/40 border border-white/15 focus:border-white/30 rounded-xl h-12 px-4 text-center text-lg tracking-widest text-white placeholder:text-neutral-500 placeholder:tracking-normal focus:outline-none focus:ring-1 focus:ring-white/20 transition-all"
-                  autoFocus
-                />
-              </div>
-
-              {pinError && (
-                <p className="text-red-400 text-xs font-medium">
-                  {pinError}
-                </p>
-              )}
-
-              <button
-                type="submit"
-                disabled={pinLoading || pinInput.trim().length === 0}
-                className="w-full h-11 bg-white hover:bg-neutral-200 text-black font-semibold text-sm rounded-xl transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-              >
-                {pinLoading ? (
-                  <>
-                    <Loader2 size={16} className="animate-spin" />
-                    <span>Verifying...</span>
-                  </>
-                ) : (
-                  <>
-                    <KeyRound size={16} />
-                    <span>Unlock Page</span>
-                  </>
-                )}
-              </button>
-            </form>
-          </div>
-        </div>
       </div>
     );
   }
@@ -383,14 +263,6 @@ export default function PayoutsPage() {
 
         {/* Top Header Action Buttons */}
         <div className="flex items-center gap-2">
-          <button
-            onClick={handleLock}
-            className="p-2.5 min-h-[40px] min-w-[40px] text-xs font-medium text-neutral-400 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 rounded-xl transition-colors flex items-center justify-center gap-1.5 shadow-sm"
-            title="Lock Page"
-          >
-            <Lock size={15} />
-          </button>
-
           <button
             onClick={() => handleOpenAddPayout()}
             className="px-4 py-2 min-h-[40px] text-xs font-semibold text-black bg-white hover:bg-neutral-200 rounded-xl transition-all shadow-sm flex items-center gap-1.5"

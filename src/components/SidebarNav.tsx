@@ -2,12 +2,13 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, AlertCircle, Settings, Wallet, BarChart3, Megaphone, Handshake, CalendarCheck, Banknote } from 'lucide-react';
+import { LayoutDashboard, AlertCircle, Settings, Wallet, BarChart3, Megaphone, Handshake, CalendarCheck, Banknote, Boxes } from 'lucide-react';
 
 
 const NAV_LINKS = [
   { href: '/dashboard', label: 'Overview', icon: LayoutDashboard },
   { href: '/revenue', label: 'Revenue', icon: BarChart3 },
+  { href: '/inventory', label: 'Inventory & Stock Value', icon: Boxes },
   { href: '/meta-ads', label: 'Meta Ads', icon: Megaphone },
   { href: '/partners', label: 'Partners & Capital', icon: Handshake },
   { href: '/payouts', label: 'Payouts', icon: Banknote },
