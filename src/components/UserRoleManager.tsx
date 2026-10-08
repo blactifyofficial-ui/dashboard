@@ -13,7 +13,8 @@ import {
   Edit2,
   Sparkles,
   Info,
-  Lock
+  Lock,
+  Send
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import ConfirmModal from '@/components/ConfirmModal';
@@ -64,6 +65,7 @@ export default function UserRoleManager() {
 
   // Updating User State
   const [updatingUserId, setUpdatingUserId] = useState<string | null>(null);
+  const [resendingInviteUserId, setResendingInviteUserId] = useState<string | null>(null);
 
   // Delete User State
   const [userToDelete, setUserToDelete] = useState<AllowedUser | null>(null);
@@ -213,6 +215,24 @@ export default function UserRoleManager() {
       toast.error(err instanceof Error ? err.message : 'Error deleting user');
     } finally {
       setIsDeletingUser(false);
+    }
+  };
+
+  const handleResendInvite = async (user: AllowedUser) => {
+    try {
+      setResendingInviteUserId(user.id);
+      const res = await fetch(`/api/users/${user.id}/resend-invite`, {
+        method: 'POST',
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to send invite');
+
+      toast.success(`Invitation email sent to ${user.email}`);
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : 'Error sending invitation');
+    } finally {
+      setResendingInviteUserId(null);
     }
   };
 
@@ -392,6 +412,20 @@ export default function UserRoleManager() {
                         <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-amber-400 pointer-events-none" />
                       </div>
                     )}
+
+                    {/* Resend Invite Email button */}
+                    <button
+                      onClick={() => handleResendInvite(u)}
+                      disabled={resendingInviteUserId === u.id}
+                      className="p-2 text-neutral-400 hover:text-purple-300 hover:bg-purple-500/10 rounded-xl transition-colors border border-transparent hover:border-purple-500/20 disabled:opacity-50"
+                      title="Resend invitation email"
+                    >
+                      {resendingInviteUserId === u.id ? (
+                        <Loader2 size={15} className="animate-spin text-purple-400" />
+                      ) : (
+                        <Send size={15} />
+                      )}
+                    </button>
 
                     {/* Delete button (cannot delete yourself) */}
                     {!isCurrent && (

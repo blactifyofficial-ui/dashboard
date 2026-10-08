@@ -3,6 +3,7 @@ import { db } from '@/db';
 import { allowedUsers, customRoles, partners, userRoles, UserRole } from '@/db/schema';
 import { eq, ilike, desc } from 'drizzle-orm';
 import { requirePermission } from '@/lib/auth-utils';
+import { sendTeamInvitationEmail } from '@/lib/email';
 
 export const dynamic = 'force-dynamic';
 
@@ -107,6 +108,24 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'This user is already in the allowed users list' }, { status: 409 });
     }
 
+    // Resolve human-readable role name for email
+    let roleDisplayName = assignedRole;
+    if (assignedRole === 'SUPER_ADMIN') roleDisplayName = 'Super Admin';
+    else if (assignedRole === 'ADMIN') roleDisplayName = 'Admin';
+    else if (assignedRole === 'STAFF') roleDisplayName = 'Staff';
+    else if (assignedRole === 'PARTNER') roleDisplayName = 'Partner';
+    else if (assignedRole === 'VIEWER') roleDisplayName = 'Viewer';
+    else {
+      const [customRoleRec] = await db
+        .select({ name: customRoles.name })
+        .from(customRoles)
+        .where(eq(customRoles.code, assignedRole))
+        .limit(1);
+      if (customRoleRec) {
+        roleDisplayName = customRoleRec.name;
+      }
+    }
+
     const newId = crypto.randomUUID();
     const [newUser] = await db
       .insert(allowedUsers)
@@ -118,7 +137,28 @@ export async function POST(req: Request) {
       })
       .returning();
 
-    return NextResponse.json({ success: true, user: newUser }, { status: 201 });
+    // Send invitation email via Resend
+    let emailResult: { success: boolean; error?: string; data?: unknown } = { success: false, error: 'Not sent' };
+    try {
+      emailResult = await sendTeamInvitationEmail({
+        toEmail: cleanEmail,
+        roleName: roleDisplayName,
+        invitedByName: authResult.user.name,
+        invitedByEmail: authResult.user.email,
+      });
+    } catch (mailErr) {
+      console.error('Failed to dispatch invitation email:', mailErr);
+    }
+
+    return NextResponse.json(
+      {
+        success: true,
+        user: newUser,
+        emailSent: emailResult.success,
+        emailError: emailResult.error || null,
+      },
+      { status: 201 }
+    );
   } catch (error) {
     console.error('Error adding user:', error);
     return NextResponse.json({ error: 'Failed to add user' }, { status: 500 });
