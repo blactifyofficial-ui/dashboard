@@ -11,7 +11,6 @@ import {
   Mail, 
   ChevronDown,
   Edit2,
-  Sparkles,
   Info,
   Lock,
   Send
@@ -488,8 +487,8 @@ export default function UserRoleManager() {
                               <Lock size={10} /> System Default
                             </span>
                           ) : (
-                            <span className="inline-flex items-center gap-1 text-[10px] text-purple-300 bg-purple-500/10 px-2 py-0.5 rounded-md border border-purple-500/20">
-                              <Sparkles size={10} /> Custom Role
+                            <span className="inline-flex items-center text-[10px] text-purple-300 bg-purple-500/10 px-2 py-0.5 rounded-md border border-purple-500/20 font-medium">
+                              Custom Role
                             </span>
                           )}
                         </div>
