@@ -28,11 +28,8 @@ export default async function TeamPage() {
         <div>
           <div className="flex items-center gap-2.5">
             <h1 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-white">
-              Team &amp; Roles (RBAC)
+              Team &amp; Roles
             </h1>
-            <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-purple-500/10 text-purple-300 border border-purple-500/20">
-              Access Control
-            </span>
           </div>
           <p className="text-xs sm:text-sm text-neutral-400 mt-1">
             Invite members, assign permission tiers, and configure partner-scoped views across the dashboard.

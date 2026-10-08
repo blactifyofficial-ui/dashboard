@@ -369,7 +369,7 @@ export default function UserRoleManager() {
             <Users size={20} />
           </div>
           <div>
-            <h2 className="text-lg sm:text-xl font-semibold tracking-tight">Team &amp; Role Management (RBAC)</h2>
+            <h2 className="text-lg sm:text-xl font-semibold tracking-tight">Team &amp; Role Management</h2>
             <p className="text-xs sm:text-sm text-neutral-400">
               Invite team members, assign permission tiers, and create custom dashboard roles.
             </p>
