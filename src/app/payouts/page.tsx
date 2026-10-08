@@ -259,14 +259,14 @@ export default function PayoutsPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 flex-shrink-0">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-lg sm:text-xl lg:text-2xl font-bold tracking-tight text-white flex items-center gap-2.5">
+            <h1 className="text-lg sm:text-xl lg:text-2xl font-bold tracking-tight text-foreground flex items-center gap-2.5">
               <span>Partner Payouts</span>
             </h1>
-            <span className="px-2 py-0.5 rounded-md text-xs font-medium bg-neutral-800 text-neutral-300 border border-neutral-700">
+            <span className="px-2 py-0.5 rounded-md text-xs font-medium bg-muted text-foreground border border-border">
               Payout Distributions
             </span>
           </div>
-          <p className="text-xs sm:text-sm text-neutral-400 mt-1">
+          <p className="text-xs sm:text-sm text-muted-foreground mt-1">
             Record, manage, and monitor all dividend payouts and profit withdrawals taken by partners.
           </p>
         </div>
@@ -276,7 +276,7 @@ export default function PayoutsPage() {
           <div className="flex items-center gap-2">
             <button
               onClick={() => handleOpenAddPayout()}
-              className="px-4 py-2 min-h-[38px] text-xs font-semibold text-black bg-white hover:bg-neutral-200 rounded-lg transition-colors flex items-center gap-1.5"
+              className="px-4 py-2 min-h-[38px] text-xs font-semibold text-primary-foreground bg-primary hover:opacity-90 rounded-lg transition-opacity flex items-center gap-1.5"
             >
               <Plus size={14} />
               <span>Record Payout</span>
@@ -288,56 +288,56 @@ export default function PayoutsPage() {
       {/* KPI Cards Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {/* Card 1: Total Payouts */}
-        <div className="bg-neutral-900/60 border border-neutral-800 rounded-xl p-4 sm:p-5">
-          <p className="text-[11px] font-semibold text-neutral-400 mb-1 uppercase tracking-wider">Total Payouts Distributed</p>
-          <p className="text-xl sm:text-2xl font-bold font-mono text-white tracking-tight">
+        <div className="bg-card border border-border rounded-xl p-4 sm:p-5">
+          <p className="text-[11px] font-semibold text-muted-foreground mb-1 uppercase tracking-wider">Total Payouts Distributed</p>
+          <p className="text-xl sm:text-2xl font-bold font-mono text-foreground tracking-tight">
             {formatCurrency(metrics.totalDistributed)}
           </p>
-          <p className="mt-1 text-xs text-neutral-500">
+          <p className="mt-1 text-xs text-muted-foreground">
             {metrics.totalCount} {metrics.totalCount === 1 ? 'payout recorded' : 'payouts recorded'}
           </p>
         </div>
 
         {/* Card 2: This Month's Payouts */}
-        <div className="bg-neutral-900/60 border border-neutral-800 rounded-xl p-4 sm:p-5">
-          <p className="text-[11px] font-semibold text-emerald-400 mb-1 uppercase tracking-wider">This Month Payouts</p>
-          <p className="text-xl sm:text-2xl font-bold font-mono text-emerald-400 tracking-tight">
+        <div className="bg-card border border-border rounded-xl p-4 sm:p-5">
+          <p className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 mb-1 uppercase tracking-wider">This Month Payouts</p>
+          <p className="text-xl sm:text-2xl font-bold font-mono text-emerald-600 dark:text-emerald-400 tracking-tight">
             {formatCurrency(metrics.thisMonthPayouts)}
           </p>
-          <p className="mt-1 text-xs text-neutral-500">
+          <p className="mt-1 text-xs text-muted-foreground">
             Current calendar month
           </p>
         </div>
 
         {/* Card 3: Partners with Payouts */}
-        <div className="bg-neutral-900/60 border border-neutral-800 rounded-xl p-4 sm:p-5">
-          <p className="text-[11px] font-semibold text-neutral-400 mb-1 uppercase tracking-wider">Beneficiary Partners</p>
-          <p className="text-xl sm:text-2xl font-bold font-mono text-white tracking-tight">
+        <div className="bg-card border border-border rounded-xl p-4 sm:p-5">
+          <p className="text-[11px] font-semibold text-muted-foreground mb-1 uppercase tracking-wider">Beneficiary Partners</p>
+          <p className="text-xl sm:text-2xl font-bold font-mono text-foreground tracking-tight">
             {metrics.partnersWithPayoutsCount} / {partners.length}
           </p>
-          <p className="mt-1 text-xs text-neutral-500">
+          <p className="mt-1 text-xs text-muted-foreground">
             Partners who received payouts
           </p>
         </div>
 
         {/* Card 4: Average Payout */}
-        <div className="bg-neutral-900/60 border border-neutral-800 rounded-xl p-4 sm:p-5">
-          <p className="text-[11px] font-semibold text-neutral-400 mb-1 uppercase tracking-wider">Average Per Payout</p>
-          <p className="text-xl sm:text-2xl font-bold font-mono text-white tracking-tight">
+        <div className="bg-card border border-border rounded-xl p-4 sm:p-5">
+          <p className="text-[11px] font-semibold text-muted-foreground mb-1 uppercase tracking-wider">Average Per Payout</p>
+          <p className="text-xl sm:text-2xl font-bold font-mono text-foreground tracking-tight">
             {formatCurrency(metrics.avgPayout)}
           </p>
-          <p className="mt-1 text-xs text-neutral-500">
+          <p className="mt-1 text-xs text-muted-foreground">
             Across all transactions
           </p>
         </div>
       </div>
 
       {/* Partner Payout Quick Summary Cards */}
-      <div className="bg-neutral-900/60 border border-neutral-800 rounded-xl p-4 sm:p-5">
+      <div className="bg-card border border-border rounded-xl p-4 sm:p-5">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <h2 className="text-xs font-semibold uppercase tracking-wider text-neutral-400">Partner Payout Summary</h2>
-            <span className="px-2 py-0.5 rounded-md text-[10px] font-medium bg-neutral-800 text-neutral-300 border border-neutral-700">
+            <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Partner Payout Summary</h2>
+            <span className="px-2 py-0.5 rounded-md text-[10px] font-medium bg-muted text-foreground border border-border">
               {partners.length} {partners.length === 1 ? 'Partner' : 'Partners'}
             </span>
           </div>
@@ -352,38 +352,38 @@ export default function PayoutsPage() {
             return (
               <div
                 key={partner.id}
-                className="bg-neutral-950 border border-neutral-800 rounded-lg p-3.5 flex flex-col justify-between"
+                className="bg-card border border-border rounded-lg p-3.5 flex flex-col justify-between"
               >
                 <div>
                   <div className="flex items-start justify-between gap-2 mb-2">
                     <div>
-                      <h4 className="text-xs sm:text-sm font-bold text-white truncate">{partner.name}</h4>
-                      <p className="text-[11px] text-neutral-400">Equity: <span className="font-mono text-neutral-300">{partner.equityPercentage}%</span></p>
+                      <h4 className="text-xs sm:text-sm font-bold text-foreground truncate">{partner.name}</h4>
+                      <p className="text-[11px] text-muted-foreground">Equity: <span className="font-mono text-foreground">{partner.equityPercentage}%</span></p>
                     </div>
-                    <span className="px-2 py-0.5 rounded text-[10px] font-mono font-medium bg-neutral-900 text-neutral-400 border border-neutral-800">
+                    <span className="px-2 py-0.5 rounded text-[10px] font-mono font-medium bg-muted text-muted-foreground border border-border">
                       {payoutShare}% Share
                     </span>
                   </div>
 
-                  <div className="pt-2 border-t border-neutral-800 flex items-center justify-between">
-                    <span className="text-xs text-neutral-400">Total Payouts:</span>
-                    <span className="text-sm font-bold font-mono text-white">
+                  <div className="pt-2 border-t border-border flex items-center justify-between">
+                    <span className="text-xs text-muted-foreground">Total Payouts:</span>
+                    <span className="text-sm font-bold font-mono text-foreground">
                       {formatCurrency(totalPayoutAmt)}
                     </span>
                   </div>
 
-                  <div className="mt-1 flex items-center justify-between text-[11px] text-neutral-500">
+                  <div className="mt-1 flex items-center justify-between text-[11px] text-muted-foreground">
                     <span>Transactions:</span>
-                    <span className="font-mono text-neutral-400">{partnerPayouts.length} entries</span>
+                    <span className="font-mono text-foreground">{partnerPayouts.length} entries</span>
                   </div>
                 </div>
 
-                <div className="mt-3 pt-2.5 border-t border-neutral-800 flex items-center justify-end">
+                <div className="mt-3 pt-2.5 border-t border-border flex items-center justify-end">
                   <button
                     onClick={() => handleOpenAddPayout(partner.id)}
-                    className="w-full py-2 min-h-[34px] px-3 text-xs font-medium text-neutral-200 bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 rounded-lg transition-colors flex items-center justify-center gap-1.5"
+                    className="w-full py-2 min-h-[34px] px-3 text-xs font-medium text-foreground bg-muted hover:bg-muted/80 border border-border rounded-lg transition-colors flex items-center justify-center gap-1.5"
                   >
-                    <Banknote size={13} className="text-neutral-400" />
+                    <Banknote size={13} className="text-muted-foreground" />
                     <span>Record Payout</span>
                   </button>
                 </div>
@@ -397,18 +397,18 @@ export default function PayoutsPage() {
       <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 flex-shrink-0">
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
           <div className="relative flex-1 sm:w-64">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500 w-3.5 h-3.5" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-3.5 h-3.5" />
             <input
               type="text"
               placeholder="Search by partner, UTR, notes..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-8 pr-8 py-2 min-h-[38px] bg-neutral-900 border border-neutral-800 rounded-lg text-xs text-white placeholder:text-neutral-500 focus:outline-none focus:border-neutral-500 transition-colors"
+              className="w-full pl-8 pr-8 py-2 min-h-[38px] bg-card border border-border rounded-lg text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-border-hover transition-colors"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery('')}
-                className="absolute right-2 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-white p-1"
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-1"
               >
                 <X size={13} />
               </button>
@@ -419,11 +419,11 @@ export default function PayoutsPage() {
             <select
               value={partnerFilter}
               onChange={(e) => setPartnerFilter(e.target.value)}
-              className="flex-1 sm:flex-initial bg-neutral-900 border border-neutral-800 rounded-lg px-2.5 py-2 min-h-[38px] text-xs text-white focus:outline-none focus:border-neutral-500 transition-colors"
+              className="flex-1 sm:flex-initial bg-card border border-border rounded-lg px-2.5 py-2 min-h-[38px] text-xs text-foreground focus:outline-none focus:border-border-hover transition-colors"
             >
-              <option value="ALL" className="bg-neutral-900 text-white">All Partners</option>
+              <option value="ALL" className="bg-card text-foreground">All Partners</option>
               {partners.map((p) => (
-                <option key={p.id} value={p.id} className="bg-neutral-900 text-white">
+                <option key={p.id} value={p.id} className="bg-card text-foreground">
                   {p.name}
                 </option>
               ))}
@@ -432,11 +432,11 @@ export default function PayoutsPage() {
             <select
               value={paymentMethodFilter}
               onChange={(e) => setPaymentMethodFilter(e.target.value)}
-              className="flex-1 sm:flex-initial bg-neutral-900 border border-neutral-800 rounded-lg px-2.5 py-2 min-h-[38px] text-xs text-white focus:outline-none focus:border-neutral-500 transition-colors"
+              className="flex-1 sm:flex-initial bg-card border border-border rounded-lg px-2.5 py-2 min-h-[38px] text-xs text-foreground focus:outline-none focus:border-border-hover transition-colors"
             >
-              <option value="ALL" className="bg-neutral-900 text-white">All Payment Methods</option>
+              <option value="ALL" className="bg-card text-foreground">All Payment Methods</option>
               {paymentMethods.map((pm) => (
-                <option key={pm.id} value={pm.id} className="bg-neutral-900 text-white">
+                <option key={pm.id} value={pm.id} className="bg-card text-foreground">
                   {pm.name}
                 </option>
               ))}
@@ -444,19 +444,19 @@ export default function PayoutsPage() {
           </div>
         </div>
 
-        <span className="text-xs text-neutral-400 self-end md:self-center font-mono">
+        <span className="text-xs text-muted-foreground self-end md:self-center font-mono">
           Showing {filteredPayouts.length} {filteredPayouts.length === 1 ? 'payout' : 'payouts'}
         </span>
       </div>
 
       {/* Payouts Ledger Table */}
-      <div className="bg-neutral-900/60 border border-neutral-800 rounded-xl overflow-hidden flex flex-col flex-1 min-h-0">
-        <div className="p-4 sm:p-5 border-b border-neutral-800 flex items-center justify-between bg-neutral-950">
+      <div className="bg-card border border-border rounded-xl overflow-hidden flex flex-col flex-1 min-h-0">
+        <div className="p-4 sm:p-5 border-b border-border flex items-center justify-between bg-muted/40">
           <div className="flex items-center gap-2">
-            <h3 className="text-sm sm:text-base font-semibold text-white">
+            <h3 className="text-sm sm:text-base font-semibold text-foreground">
               Payout History Ledger
             </h3>
-            <span className="px-2 py-0.5 rounded-md text-xs font-medium bg-neutral-800 text-neutral-300 border border-neutral-700">
+            <span className="px-2 py-0.5 rounded-md text-xs font-medium bg-muted text-foreground border border-border">
               {filteredPayouts.length} {filteredPayouts.length === 1 ? 'entry' : 'entries'}
             </span>
           </div>
@@ -465,7 +465,7 @@ export default function PayoutsPage() {
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs sm:text-sm border-collapse min-w-[700px]">
             <thead>
-              <tr className="border-b border-neutral-800 bg-neutral-950 text-[11px] font-semibold text-neutral-400 uppercase tracking-wider">
+              <tr className="border-b border-border bg-muted/20 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
                 <th className="py-2.5 px-4">Date</th>
                 <th className="py-2.5 px-4">Partner</th>
                 <th className="py-2.5 px-4">Payout Amount</th>
@@ -475,22 +475,22 @@ export default function PayoutsPage() {
                 <th className="py-2.5 px-4 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-neutral-800 text-xs">
+            <tbody className="divide-y divide-border text-xs">
               {filteredPayouts.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="py-16 text-center text-neutral-500 space-y-3">
-                    <div className="w-10 h-10 mx-auto rounded-lg bg-neutral-950 border border-neutral-800 flex items-center justify-center text-neutral-400 mb-2">
-                      <Banknote size={18} className="text-neutral-400" />
+                  <td colSpan={7} className="py-16 text-center text-muted-foreground space-y-3">
+                    <div className="w-10 h-10 mx-auto rounded-lg bg-muted border border-border flex items-center justify-center text-muted-foreground mb-2">
+                      <Banknote size={18} className="text-muted-foreground" />
                     </div>
-                    <div className="text-sm font-medium text-neutral-300">
+                    <div className="text-sm font-medium text-foreground">
                       No payout records found
                     </div>
-                    <p className="text-xs text-neutral-500 max-w-sm mx-auto">
+                    <p className="text-xs text-muted-foreground max-w-sm mx-auto">
                       Record profit distributions and partner payouts to see them logged in this ledger.
                     </p>
                     <button
                       onClick={() => handleOpenAddPayout()}
-                      className="mt-2 inline-flex items-center justify-center gap-1.5 px-4 py-2 min-h-[38px] bg-white hover:bg-neutral-200 text-black rounded-lg text-xs font-semibold transition-colors"
+                      className="mt-2 inline-flex items-center justify-center gap-1.5 px-4 py-2 min-h-[38px] bg-primary text-primary-foreground hover:opacity-90 rounded-lg text-xs font-semibold transition-opacity"
                     >
                       <Plus size={14} />
                       <span>Record First Payout</span>
@@ -499,44 +499,44 @@ export default function PayoutsPage() {
                 </tr>
               ) : (
                 filteredPayouts.map((txn) => (
-                  <tr key={txn.id} className="hover:bg-neutral-800/40 transition-colors group">
-                    <td className="py-3 px-4 text-neutral-400 whitespace-nowrap text-xs font-mono">
+                  <tr key={txn.id} className="hover:bg-muted/40 transition-colors group">
+                    <td className="py-3 px-4 text-muted-foreground whitespace-nowrap text-xs font-mono">
                       {formatDisplayDate(txn.transactionDate)}
                     </td>
-                    <td className="py-3 px-4 font-semibold text-white whitespace-nowrap">
+                    <td className="py-3 px-4 font-semibold text-foreground whitespace-nowrap">
                       {txn.partnerName || '—'}
                     </td>
-                    <td className="py-3 px-4 font-bold font-mono whitespace-nowrap text-white">
+                    <td className="py-3 px-4 font-bold font-mono whitespace-nowrap text-foreground">
                       {formatCurrency(txn.amount)}
                     </td>
-                    <td className="py-3 px-4 text-neutral-400 whitespace-nowrap text-xs">
+                    <td className="py-3 px-4 text-muted-foreground whitespace-nowrap text-xs">
                       {txn.paymentMethodName ? (
                         <span className="inline-flex items-center gap-1">
-                          <CreditCard size={11} className="text-neutral-500" />
+                          <CreditCard size={11} className="text-muted-foreground" />
                           {txn.paymentMethodName}
                         </span>
                       ) : (
                         '—'
                       )}
                     </td>
-                    <td className="py-3 px-4 text-neutral-400 font-mono text-xs whitespace-nowrap">
+                    <td className="py-3 px-4 text-muted-foreground font-mono text-xs whitespace-nowrap">
                       {txn.referenceNumber ? (
                         <span className="inline-flex items-center gap-1">
-                          <Hash size={11} className="text-neutral-500" />
+                          <Hash size={11} className="text-muted-foreground" />
                           {txn.referenceNumber}
                         </span>
                       ) : (
                         '—'
                       )}
                     </td>
-                    <td className="py-3 px-4 text-neutral-400 text-xs max-w-xs truncate">
+                    <td className="py-3 px-4 text-muted-foreground text-xs max-w-xs truncate">
                       {txn.notes || '—'}
                     </td>
                     <td className="py-3 px-4 text-right whitespace-nowrap">
                       <div className="flex items-center justify-end gap-1">
                         <button
                           onClick={() => handleOpenEditPayout(txn)}
-                          className="p-1.5 text-neutral-400 hover:text-white rounded-lg hover:bg-neutral-800 transition-colors"
+                          className="p-1.5 text-muted-foreground hover:text-foreground rounded-lg hover:bg-muted transition-colors"
                           title="Edit payout"
                         >
                           <Pencil size={13} />
@@ -550,7 +550,7 @@ export default function PayoutsPage() {
                               partnerName: txn.partnerName || 'Partner',
                             });
                           }}
-                          className="p-1.5 text-neutral-400 hover:text-rose-400 rounded-lg hover:bg-rose-500/10 transition-colors"
+                          className="p-1.5 text-muted-foreground hover:text-rose-500 rounded-lg hover:bg-rose-500/10 transition-colors"
                           title="Delete payout"
                         >
                           <Trash2 size={13} />
@@ -567,20 +567,20 @@ export default function PayoutsPage() {
 
       {/* Record / Edit Payout Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-3 sm:p-4 overflow-y-auto">
-          <div className="bg-neutral-900 border border-neutral-800 rounded-xl w-full max-w-lg shadow-2xl overflow-hidden my-auto max-h-[90dvh] flex flex-col">
-            <div className="p-4 sm:p-5 border-b border-neutral-800 flex items-center justify-between bg-neutral-950 flex-shrink-0">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-3 sm:p-4 overflow-y-auto">
+          <div className="bg-card border border-border rounded-xl w-full max-w-lg shadow-2xl overflow-hidden my-auto max-h-[90dvh] flex flex-col">
+            <div className="p-4 sm:p-5 border-b border-border flex items-center justify-between bg-muted/30 flex-shrink-0">
               <div className="flex items-center gap-2.5">
-                <div className="p-1.5 rounded-lg bg-neutral-800 text-neutral-300 border border-neutral-700">
+                <div className="p-1.5 rounded-lg bg-muted text-foreground border border-border">
                   <Banknote size={15} />
                 </div>
-                <h3 className="text-sm sm:text-base font-bold text-white">
+                <h3 className="text-sm sm:text-base font-bold text-foreground">
                   {editingPayout ? 'Edit Partner Payout' : 'Record Partner Payout'}
                 </h3>
               </div>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="w-8 h-8 flex items-center justify-center text-neutral-400 hover:text-white rounded-lg bg-neutral-800 hover:bg-neutral-700 transition-colors"
+                className="w-8 h-8 flex items-center justify-center text-muted-foreground hover:text-foreground rounded-lg bg-muted hover:bg-muted/80 transition-colors"
               >
                 <X size={15} />
               </button>
@@ -588,18 +588,18 @@ export default function PayoutsPage() {
 
             <form onSubmit={handleSubmitPayout} className="p-4 sm:p-5 space-y-3.5 overflow-y-auto flex-1">
               <div>
-                <label className="block text-xs font-semibold text-neutral-300 mb-1.5">
-                  Select Partner <span className="text-rose-400">*</span>
+                <label className="block text-xs font-semibold text-foreground mb-1.5">
+                  Select Partner <span className="text-rose-500">*</span>
                 </label>
                 <select
                   required
                   value={formData.partnerId}
                   onChange={(e) => setFormData({ ...formData, partnerId: e.target.value })}
-                  className="w-full min-h-[38px] px-3 bg-neutral-950 border border-neutral-800 rounded-lg text-xs text-white focus:outline-none focus:border-neutral-500 transition-colors"
+                  className="w-full min-h-[38px] px-3 bg-card border border-border rounded-lg text-xs text-foreground focus:outline-none focus:border-border-hover transition-colors"
                 >
-                  <option value="" disabled className="bg-neutral-900 text-neutral-500">Select a partner</option>
+                  <option value="" disabled className="bg-card text-muted-foreground">Select a partner</option>
                   {partners.map((p) => (
-                    <option key={p.id} value={p.id} className="bg-neutral-900 text-white">
+                    <option key={p.id} value={p.id} className="bg-card text-foreground">
                       {p.name} ({p.equityPercentage}% Equity)
                     </option>
                   ))}
@@ -608,8 +608,8 @@ export default function PayoutsPage() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-neutral-300 mb-1.5">
-                    Payout Amount (₹) <span className="text-rose-400">*</span>
+                  <label className="block text-xs font-semibold text-foreground mb-1.5">
+                    Payout Amount (₹) <span className="text-rose-500">*</span>
                   </label>
                   <input
                     type="number"
@@ -620,32 +620,32 @@ export default function PayoutsPage() {
                     placeholder="e.g. 50000"
                     value={formData.amount}
                     onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                    className="w-full min-h-[38px] px-3 bg-neutral-950 border border-neutral-800 rounded-lg text-xs text-white placeholder:text-neutral-500 focus:outline-none focus:border-neutral-500 transition-colors font-mono"
+                    className="w-full min-h-[38px] px-3 bg-card border border-border rounded-lg text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-border-hover transition-colors font-mono"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-neutral-300 mb-1.5">Payout Date</label>
+                  <label className="block text-xs font-semibold text-foreground mb-1.5">Payout Date</label>
                   <input
                     type="date"
                     required
                     value={formData.transactionDate}
                     onChange={(e) => setFormData({ ...formData, transactionDate: e.target.value })}
-                    className="w-full min-h-[38px] px-3 bg-neutral-950 border border-neutral-800 rounded-lg text-xs text-white focus:outline-none focus:border-neutral-500 transition-colors"
+                    className="w-full min-h-[38px] px-3 bg-card border border-border rounded-lg text-xs text-foreground focus:outline-none focus:border-border-hover transition-colors"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-neutral-300 mb-1.5">Payment Method</label>
+                <label className="block text-xs font-semibold text-foreground mb-1.5">Payment Method</label>
                 <select
                   value={formData.paymentMethodId}
                   onChange={(e) => setFormData({ ...formData, paymentMethodId: e.target.value })}
-                  className="w-full min-h-[38px] px-3 bg-neutral-950 border border-neutral-800 rounded-lg text-xs text-white focus:outline-none focus:border-neutral-500 transition-colors"
+                  className="w-full min-h-[38px] px-3 bg-card border border-border rounded-lg text-xs text-foreground focus:outline-none focus:border-border-hover transition-colors"
                 >
-                  <option value="" className="bg-neutral-900 text-white">None / Cash</option>
+                  <option value="" className="bg-card text-foreground">None / Cash</option>
                   {paymentMethods.map((pm) => (
-                    <option key={pm.id} value={pm.id} className="bg-neutral-900 text-white">
+                    <option key={pm.id} value={pm.id} className="bg-card text-foreground">
                       {pm.name}
                     </option>
                   ))}
@@ -653,39 +653,39 @@ export default function PayoutsPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-neutral-300 mb-1.5">Reference Number / UTR / Txn ID</label>
+                <label className="block text-xs font-semibold text-foreground mb-1.5">Reference Number / UTR / Txn ID</label>
                 <input
                   type="text"
                   placeholder="e.g. UPI/2026/10/123456 or Bank Ref"
                   value={formData.referenceNumber}
                   onChange={(e) => setFormData({ ...formData, referenceNumber: e.target.value })}
-                  className="w-full min-h-[38px] px-3 bg-neutral-950 border border-neutral-800 rounded-lg text-xs text-white placeholder:text-neutral-500 focus:outline-none focus:border-neutral-500 font-mono transition-colors"
+                  className="w-full min-h-[38px] px-3 bg-card border border-border rounded-lg text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-border-hover font-mono transition-colors"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-neutral-300 mb-1.5">Notes &amp; Remarks</label>
+                <label className="block text-xs font-semibold text-foreground mb-1.5">Notes &amp; Remarks</label>
                 <textarea
                   rows={2}
                   placeholder="e.g. Monthly dividend transfer / profit payout..."
                   value={formData.notes}
                   onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                  className="w-full p-2.5 bg-neutral-950 border border-neutral-800 rounded-lg text-xs text-white placeholder:text-neutral-500 focus:outline-none focus:border-neutral-500 resize-none transition-colors"
+                  className="w-full p-2.5 bg-card border border-border rounded-lg text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-border-hover resize-none transition-colors"
                 />
               </div>
 
-              <div className="pt-3 border-t border-neutral-800 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2.5">
+              <div className="pt-3 border-t border-border flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2.5">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-3.5 py-2 min-h-[38px] rounded-lg text-xs font-medium text-neutral-300 bg-neutral-800 hover:bg-neutral-700 border border-neutral-700 transition-colors"
+                  className="px-3.5 py-2 min-h-[38px] rounded-lg text-xs font-medium text-foreground bg-muted hover:bg-muted/80 border border-border transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="px-4 py-2 min-h-[38px] bg-white hover:bg-neutral-200 text-black text-xs font-semibold rounded-lg flex items-center justify-center gap-1.5 transition-colors disabled:opacity-50"
+                  className="px-4 py-2 min-h-[38px] bg-primary text-primary-foreground hover:opacity-90 text-xs font-semibold rounded-lg flex items-center justify-center gap-1.5 transition-opacity disabled:opacity-50"
                 >
                   {isSubmitting ? <Loader2 size={13} className="animate-spin" /> : <Check size={13} />}
                   <span>{editingPayout ? 'Save Changes' : 'Record Payout'}</span>

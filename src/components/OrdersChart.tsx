@@ -10,6 +10,8 @@ import {
   Legend,
 } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
+import { useTheme } from 'next-themes';
+import { useSyncExternalStore } from 'react';
 
 ChartJS.register(
   CategoryScale,
@@ -20,14 +22,19 @@ ChartJS.register(
   Legend
 );
 
+const emptySubscribe = () => () => {};
+
 export default function OrdersChart({
   data,
 }: {
   data: { date: string; count: number }[];
 }) {
+  const { resolvedTheme } = useTheme();
+  const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
+  const isDark = mounted ? resolvedTheme === 'dark' : true;
+
   const chartData = {
     labels: data.map((d) => {
-      // Format date
       const dateObj = new Date(d.date);
       return dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     }),
@@ -35,7 +42,7 @@ export default function OrdersChart({
       {
         label: 'Orders',
         data: data.map((d) => d.count),
-        backgroundColor: 'rgba(255, 255, 255, 0.8)',
+        backgroundColor: isDark ? 'rgba(255, 255, 255, 0.85)' : 'rgba(15, 23, 42, 0.85)',
         borderRadius: 4,
         maxBarThickness: 40,
       },
@@ -53,27 +60,31 @@ export default function OrdersChart({
         display: false,
       },
       tooltip: {
-        backgroundColor: 'rgba(0, 0, 0, 0.8)',
-        titleColor: '#fff',
-        bodyColor: '#fff',
+        backgroundColor: isDark ? 'rgba(15, 15, 15, 0.95)' : 'rgba(255, 255, 255, 0.95)',
+        titleColor: isDark ? '#fff' : '#0f172a',
+        bodyColor: isDark ? '#fff' : '#0f172a',
+        borderColor: isDark ? 'rgba(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.1)',
+        borderWidth: 1,
+        padding: 10,
+        boxPadding: 4,
       }
     },
     scales: {
       x: {
         grid: {
           display: false,
-          color: 'rgba(255, 255, 255, 0.1)',
+          color: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)',
         },
         ticks: {
-          color: 'rgba(255, 255, 255, 0.6)',
+          color: isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(15, 23, 42, 0.6)',
         },
       },
       y: {
         grid: {
-          color: 'rgba(255, 255, 255, 0.1)',
+          color: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)',
         },
         ticks: {
-          color: 'rgba(255, 255, 255, 0.6)',
+          color: isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(15, 23, 42, 0.6)',
           stepSize: 1,
         },
       },

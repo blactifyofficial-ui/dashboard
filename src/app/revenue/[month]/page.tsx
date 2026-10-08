@@ -22,7 +22,7 @@ export default async function MonthRevenuePage(props: {
   const month = parseInt(monthStr, 10);
   
   if (isNaN(year) || isNaN(month)) {
-    return <div>Invalid month</div>;
+    return <div className="text-foreground">Invalid month</div>;
   }
 
   const startDate = new Date(year, month - 1, 1);
@@ -31,18 +31,18 @@ export default async function MonthRevenuePage(props: {
   const monthDisplay = startDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 
   return (
-    <div className="space-y-4 sm:space-y-6 relative z-10">
+    <div className="space-y-4 sm:space-y-6 relative z-10 text-foreground">
       <header className="flex items-center gap-2.5 sm:gap-3">
         <Link 
           href="/revenue" 
           aria-label="Back to Revenue"
-          className="min-h-[38px] min-w-[38px] flex items-center justify-center rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-200 transition-colors border border-neutral-700 shrink-0"
+          className="min-h-[38px] min-w-[38px] flex items-center justify-center rounded-lg bg-card hover:bg-muted text-foreground transition-colors border border-border shrink-0 shadow-xs"
         >
-          <ArrowLeft size={16} className="text-white" />
+          <ArrowLeft size={16} />
         </Link>
         <div className="space-y-0.5">
-          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white">{monthDisplay} Revenue</h1>
-          <p className="text-neutral-400 text-xs">Overview and order breakdown for this month</p>
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">{monthDisplay} Revenue</h1>
+          <p className="text-muted-foreground text-xs">Overview and order breakdown for this month</p>
         </div>
       </header>
 
@@ -132,79 +132,79 @@ async function MonthRevenueContent({ year, month, startDate, endDate }: {
       {/* Summary Cards Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3.5">
         {/* Total Revenue */}
-        <div className="bg-neutral-900/60 border border-neutral-800 rounded-xl p-3.5 sm:p-4 shadow-sm relative overflow-hidden flex flex-col justify-between">
+        <div className="bg-card border border-border rounded-xl p-3.5 sm:p-4 shadow-xs relative overflow-hidden flex flex-col justify-between">
           <div className="flex items-center justify-between gap-2">
-            <p className="text-[10px] sm:text-[11px] font-semibold text-neutral-400 uppercase tracking-wider">Total Revenue</p>
-            <CalendarDays size={16} className="text-neutral-500 shrink-0" />
+            <p className="text-[10px] sm:text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Total Revenue</p>
+            <CalendarDays size={16} className="text-muted-foreground shrink-0" />
           </div>
           <div className="my-1.5">
-            <p className="text-base sm:text-lg md:text-xl font-bold text-white tracking-tight font-mono">
+            <p className="text-base sm:text-lg md:text-xl font-bold text-foreground tracking-tight font-mono">
               ₹{totalRevenue.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </p>
           </div>
-          <p className="text-[10px] sm:text-[11px] text-neutral-400 pt-1.5 border-t border-neutral-800 truncate">
+          <p className="text-[10px] sm:text-[11px] text-muted-foreground pt-1.5 border-t border-border truncate">
             Across {monthOrders.length} orders
           </p>
         </div>
         
         {/* Total Orders */}
-        <div className="bg-neutral-900/60 border border-neutral-800 rounded-xl p-3.5 sm:p-4 shadow-sm relative overflow-hidden flex flex-col justify-between">
+        <div className="bg-card border border-border rounded-xl p-3.5 sm:p-4 shadow-xs relative overflow-hidden flex flex-col justify-between">
           <div className="flex items-center justify-between gap-2">
-            <p className="text-[10px] sm:text-[11px] font-semibold text-neutral-400 uppercase tracking-wider">Total Orders</p>
-            <Inbox size={16} className="text-neutral-500 shrink-0" />
+            <p className="text-[10px] sm:text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Total Orders</p>
+            <Inbox size={16} className="text-muted-foreground shrink-0" />
           </div>
           <div className="my-1.5">
-            <p className="text-base sm:text-lg md:text-xl font-bold text-white tracking-tight font-mono">
+            <p className="text-base sm:text-lg md:text-xl font-bold text-foreground tracking-tight font-mono">
               {monthOrders.length}
             </p>
           </div>
-          <p className="text-[10px] sm:text-[11px] text-neutral-400 pt-1.5 border-t border-neutral-800 truncate">
+          <p className="text-[10px] sm:text-[11px] text-muted-foreground pt-1.5 border-t border-border truncate">
             Avg: ₹{(monthOrders.length > 0 ? totalRevenue / monthOrders.length : 0).toLocaleString('en-IN', { maximumFractionDigits: 0 })} / order
           </p>
         </div>
 
         {/* Normal / Prepaid Orders */}
-        <div className="bg-neutral-900/60 border border-emerald-500/30 rounded-xl p-3.5 sm:p-4 shadow-sm relative overflow-hidden flex flex-col justify-between">
+        <div className="bg-card border border-emerald-500/30 rounded-xl p-3.5 sm:p-4 shadow-xs relative overflow-hidden flex flex-col justify-between">
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-1.5 min-w-0">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0"></span>
-              <p className="text-[10px] sm:text-[11px] font-semibold text-emerald-400 uppercase tracking-wider truncate">Normal (Prepaid)</p>
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"></span>
+              <p className="text-[10px] sm:text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider truncate">Normal (Prepaid)</p>
             </div>
-            <CreditCard size={16} className="text-emerald-400 shrink-0" />
+            <CreditCard size={16} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
           </div>
           <div className="my-1.5">
-            <p className="text-base sm:text-lg md:text-xl font-bold text-emerald-400 tracking-tight font-mono">
+            <p className="text-base sm:text-lg md:text-xl font-bold text-emerald-600 dark:text-emerald-400 tracking-tight font-mono">
               ₹{normalRevenue.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </p>
           </div>
-          <p className="text-[10px] sm:text-[11px] text-neutral-400 pt-1.5 border-t border-neutral-800 truncate">
-            <strong className="text-emerald-300 font-semibold">{normalOrdersCount}</strong> {normalOrdersCount === 1 ? 'order' : 'orders'} ({monthOrders.length > 0 ? Math.round((normalOrdersCount / monthOrders.length) * 100) : 0}%)
+          <p className="text-[10px] sm:text-[11px] text-muted-foreground pt-1.5 border-t border-border truncate">
+            <strong className="text-emerald-700 dark:text-emerald-300 font-semibold">{normalOrdersCount}</strong> {normalOrdersCount === 1 ? 'order' : 'orders'} ({monthOrders.length > 0 ? Math.round((normalOrdersCount / monthOrders.length) * 100) : 0}%)
           </p>
         </div>
 
         {/* COD Orders */}
-        <div className="bg-neutral-900/60 border border-amber-500/30 rounded-xl p-3.5 sm:p-4 shadow-sm relative overflow-hidden flex flex-col justify-between">
+        <div className="bg-card border border-amber-500/30 rounded-xl p-3.5 sm:p-4 shadow-xs relative overflow-hidden flex flex-col justify-between">
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-1.5 min-w-0">
-              <span className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0"></span>
-              <p className="text-[10px] sm:text-[11px] font-semibold text-amber-400 uppercase tracking-wider truncate">COD Orders</p>
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0"></span>
+              <p className="text-[10px] sm:text-[11px] font-semibold text-amber-600 dark:text-amber-400 uppercase tracking-wider truncate">COD Orders</p>
             </div>
-            <Banknote size={16} className="text-amber-400 shrink-0" />
+            <Banknote size={16} className="text-amber-600 dark:text-amber-400 shrink-0" />
           </div>
           <div className="my-1.5">
-            <p className="text-base sm:text-lg md:text-xl font-bold text-amber-400 tracking-tight font-mono">
+            <p className="text-base sm:text-lg md:text-xl font-bold text-amber-600 dark:text-amber-400 tracking-tight font-mono">
               ₹{codRevenue.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </p>
           </div>
-          <p className="text-[10px] sm:text-[11px] text-neutral-400 pt-1.5 border-t border-neutral-800 truncate">
-            <strong className="text-amber-300 font-semibold">{codOrdersCount}</strong> {codOrdersCount === 1 ? 'order' : 'orders'} ({monthOrders.length > 0 ? Math.round((codOrdersCount / monthOrders.length) * 100) : 0}%)
+          <p className="text-[10px] sm:text-[11px] text-muted-foreground pt-1.5 border-t border-border truncate">
+            <strong className="text-amber-700 dark:text-amber-300 font-semibold">{codOrdersCount}</strong> {codOrdersCount === 1 ? 'order' : 'orders'} ({monthOrders.length > 0 ? Math.round((codOrdersCount / monthOrders.length) * 100) : 0}%)
           </p>
         </div>
       </div>
 
       {/* Chart Section */}
-      <div className="bg-neutral-900/60 border border-neutral-800 rounded-xl p-3.5 sm:p-5 shadow-sm relative overflow-hidden">
-        <h2 className="text-sm sm:text-base font-semibold text-white tracking-tight mb-2 sm:mb-3">Daily Revenue</h2>
+      <div className="bg-card border border-border rounded-xl p-3.5 sm:p-5 shadow-xs relative overflow-hidden">
+        <h2 className="text-sm sm:text-base font-semibold text-foreground tracking-tight mb-2 sm:mb-3">Daily Revenue</h2>
         <RevenueChart data={chartData} />
       </div>
 
@@ -213,4 +213,3 @@ async function MonthRevenueContent({ year, month, startDate, endDate }: {
     </div>
   );
 }
-

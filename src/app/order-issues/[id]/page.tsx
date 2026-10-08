@@ -75,12 +75,12 @@ type ShopifyOrder = {
 
 function StatusBadge({ status }: { status: string }) {
   const map: Record<string, string> = {
-    OPEN: 'bg-blue-500/15 text-blue-300 border border-blue-500/30',
-    IN_PROGRESS: 'bg-amber-500/15 text-amber-300 border border-amber-500/30',
-    WAITING: 'bg-purple-500/15 text-purple-300 border border-purple-500/30',
-    RESOLVED: 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30',
-    CLOSED: 'bg-neutral-800 text-neutral-400 border border-neutral-700',
-    CANCELLED: 'bg-rose-500/15 text-rose-300 border border-rose-500/30',
+    OPEN: 'bg-blue-500/15 text-blue-600 dark:text-blue-300 border border-blue-500/30',
+    IN_PROGRESS: 'bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30',
+    WAITING: 'bg-purple-500/15 text-purple-700 dark:text-purple-300 border border-purple-500/30',
+    RESOLVED: 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30',
+    CLOSED: 'bg-muted text-muted-foreground border border-border',
+    CANCELLED: 'bg-rose-500/15 text-rose-600 dark:text-rose-300 border border-rose-500/30',
   };
   return (
     <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium tracking-wide ${map[status] || map.OPEN}`}>
@@ -217,12 +217,12 @@ export default function IssueDetail() {
   if (loading) return <LoadingSpinner />;
   if (!issue) return (
     <div className="flex items-center justify-center min-h-[60vh]">
-      <p className="text-neutral-400">Issue not found.</p>
+      <p className="text-muted-foreground">Issue not found.</p>
     </div>
   );
 
   return (
-    <div className="min-h-screen text-white">
+    <div className="min-h-screen text-foreground">
       <ConfirmModal
         isOpen={deleteModalOpen}
         title="Delete Order Issue"
@@ -235,16 +235,16 @@ export default function IssueDetail() {
 
       {/* Order Modal */}
       {isOrderModalOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 p-3 sm:p-4">
-          <div className="bg-neutral-900 border border-neutral-800 rounded-xl w-full max-w-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90dvh]">
-            <div className="px-4 py-3 sm:px-5 sm:py-4 border-b border-neutral-800 flex justify-between items-center shrink-0">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-xs p-3 sm:p-4">
+          <div className="bg-card border border-border rounded-xl w-full max-w-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90dvh]">
+            <div className="px-4 py-3 sm:px-5 sm:py-4 border-b border-border bg-muted/20 flex justify-between items-center shrink-0">
               <div>
-                <h2 className="text-sm sm:text-base font-semibold text-white">Order Details</h2>
-                <p className="text-xs text-neutral-400 mt-0.5">Full Shopify order information</p>
+                <h2 className="text-sm sm:text-base font-semibold text-foreground">Order Details</h2>
+                <p className="text-xs text-muted-foreground mt-0.5">Full Shopify order information</p>
               </div>
               <button
                 onClick={() => setIsOrderModalOpen(false)}
-                className="w-8 h-8 flex items-center justify-center rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-400 hover:text-white transition-colors"
+                className="w-8 h-8 flex items-center justify-center rounded-lg bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground transition-colors"
               >
                 <X size={15} />
               </button>
@@ -255,62 +255,62 @@ export default function IssueDetail() {
               ) : shopifyOrder ? (
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div className="bg-neutral-950 border border-neutral-800 rounded-lg p-3.5 space-y-2.5">
-                      <p className="text-[11px] font-semibold text-neutral-400 uppercase tracking-wider">Order Info</p>
+                    <div className="bg-background border border-border rounded-lg p-3.5 space-y-2.5">
+                      <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Order Info</p>
                       <div className="space-y-2">
                         <div className="flex justify-between items-start">
-                          <span className="text-xs text-neutral-400">Number</span>
-                          <span className="text-xs font-mono font-medium text-white">{shopifyOrder.order_number || shopifyOrder.name}</span>
+                          <span className="text-xs text-muted-foreground">Number</span>
+                          <span className="text-xs font-mono font-medium text-foreground">{shopifyOrder.order_number || shopifyOrder.name}</span>
                         </div>
                         <div className="flex justify-between items-start">
-                          <span className="text-xs text-neutral-400">Date</span>
-                          <span className="text-xs text-neutral-300 text-right">{new Date(shopifyOrder.created_at).toLocaleString()}</span>
+                          <span className="text-xs text-muted-foreground">Date</span>
+                          <span className="text-xs text-foreground text-right">{new Date(shopifyOrder.created_at).toLocaleString()}</span>
                         </div>
                         <div className="flex justify-between items-center">
-                          <span className="text-xs text-neutral-400">Payment</span>
-                          <span className="text-[11px] font-medium px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 uppercase">
+                          <span className="text-xs text-muted-foreground">Payment</span>
+                          <span className="text-[11px] font-medium px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 uppercase">
                             {shopifyOrder.financial_status}
                           </span>
                         </div>
                         <div className="flex justify-between items-center">
-                          <span className="text-xs text-neutral-400">Fulfillment</span>
-                          <span className="text-[11px] font-medium px-2 py-0.5 rounded bg-blue-500/15 text-blue-300 border border-blue-500/30 uppercase">
+                          <span className="text-xs text-muted-foreground">Fulfillment</span>
+                          <span className="text-[11px] font-medium px-2 py-0.5 rounded bg-blue-500/15 text-blue-700 dark:text-blue-300 border border-blue-500/30 uppercase">
                             {shopifyOrder.fulfillment_status || 'UNFULFILLED'}
                           </span>
                         </div>
                       </div>
                     </div>
-                    <div className="bg-neutral-950 border border-neutral-800 rounded-lg p-3.5 space-y-2.5">
-                      <p className="text-[11px] font-semibold text-neutral-400 uppercase tracking-wider">Customer & Shipping</p>
+                    <div className="bg-background border border-border rounded-lg p-3.5 space-y-2.5">
+                      <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Customer & Shipping</p>
                       <div>
-                        <span className="text-xs text-neutral-400">Customer</span>
-                        <div className="text-xs font-medium text-white mt-0.5">
+                        <span className="text-xs text-muted-foreground">Customer</span>
+                        <div className="text-xs font-medium text-foreground mt-0.5">
                           {shopifyOrder.customer ? `${shopifyOrder.customer.first_name || ''} ${shopifyOrder.customer.last_name || ''}` : 'N/A'}
                         </div>
                         {shopifyOrder.customer?.email && (
-                          <div className="flex items-center gap-2 text-xs text-neutral-400 mt-1">
+                          <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
                             <span className="truncate">{shopifyOrder.customer.email}</span>
-                            <a href={`mailto:${shopifyOrder.customer.email}`} className="p-1 text-neutral-300 hover:text-white shrink-0" title="Mail">
+                            <a href={`mailto:${shopifyOrder.customer.email}`} className="p-1 text-muted-foreground hover:text-foreground shrink-0" title="Mail">
                               <Mail size={13} />
                             </a>
                           </div>
                         )}
                         {shopifyOrder.customer?.phone && (
-                          <div className="flex items-center gap-2 text-xs text-neutral-400 mt-1">
+                          <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
                             <span>{shopifyOrder.customer.phone}</span>
-                            <a href={`tel:${shopifyOrder.customer.phone}`} className="p-1 text-neutral-300 hover:text-white" title="Call">
+                            <a href={`tel:${shopifyOrder.customer.phone}`} className="p-1 text-muted-foreground hover:text-foreground" title="Call">
                               <Phone size={13} />
                             </a>
-                            <a href={`https://wa.me/${shopifyOrder.customer.phone.replace(/[^0-9]/g, '')}`} target="_blank" rel="noopener noreferrer" className="p-1 text-emerald-400 hover:text-emerald-300" title="WhatsApp">
+                            <a href={`https://wa.me/${shopifyOrder.customer.phone.replace(/[^0-9]/g, '')}`} target="_blank" rel="noopener noreferrer" className="p-1 text-emerald-600 dark:text-emerald-400 hover:opacity-80" title="WhatsApp">
                               <MessageCircle size={13} />
                             </a>
                           </div>
                         )}
                       </div>
                       {shopifyOrder.shipping_address && (
-                        <div className="pt-1 border-t border-neutral-800/80">
-                          <span className="text-xs text-neutral-400">Shipping Address</span>
-                          <div className="text-xs text-neutral-300 mt-1 leading-snug">
+                        <div className="pt-1 border-t border-border">
+                          <span className="text-xs text-muted-foreground">Shipping Address</span>
+                          <div className="text-xs text-foreground mt-1 leading-snug">
                             {shopifyOrder.shipping_address.name}<br/>
                             {shopifyOrder.shipping_address.address1}<br/>
                             {shopifyOrder.shipping_address.address2 && <>{shopifyOrder.shipping_address.address2}<br/></>}
@@ -323,27 +323,27 @@ export default function IssueDetail() {
                   </div>
 
                   <div>
-                    <p className="text-[11px] font-semibold text-neutral-400 uppercase tracking-wider mb-2">Line Items</p>
-                    <div className="border border-neutral-800 rounded-lg overflow-x-auto">
+                    <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">Line Items</p>
+                    <div className="border border-border rounded-lg overflow-x-auto">
                       <table className="w-full min-w-[360px] text-xs text-left">
-                        <thead className="bg-neutral-950 border-b border-neutral-800">
+                        <thead className="bg-muted/30 border-b border-border">
                           <tr>
-                            <th className="px-3 py-2 text-neutral-400 font-medium">Product</th>
-                            <th className="px-3 py-2 text-neutral-400 font-medium">SKU</th>
-                            <th className="px-3 py-2 text-neutral-400 font-medium text-right">Qty</th>
-                            <th className="px-3 py-2 text-neutral-400 font-medium text-right">Total</th>
+                            <th className="px-3 py-2 text-muted-foreground font-medium">Product</th>
+                            <th className="px-3 py-2 text-muted-foreground font-medium">SKU</th>
+                            <th className="px-3 py-2 text-muted-foreground font-medium text-right">Qty</th>
+                            <th className="px-3 py-2 text-muted-foreground font-medium text-right">Total</th>
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-neutral-800">
+                        <tbody className="divide-y divide-border">
                           {shopifyOrder.line_items?.map((item: ShopifyLineItem) => (
-                            <tr key={item.id} className="hover:bg-neutral-800/40 transition-colors">
+                            <tr key={item.id} className="hover:bg-muted/30 transition-colors">
                               <td className="px-3 py-2.5">
-                                <div className="text-neutral-200 font-medium">{item.title}</div>
-                                {item.variant_title && <div className="text-[11px] text-neutral-500 mt-0.5">{item.variant_title}</div>}
+                                <div className="text-foreground font-medium">{item.title}</div>
+                                {item.variant_title && <div className="text-[11px] text-muted-foreground mt-0.5">{item.variant_title}</div>}
                               </td>
-                              <td className="px-3 py-2.5 text-neutral-400 font-mono">{item.sku || '—'}</td>
-                              <td className="px-3 py-2.5 text-right text-neutral-300">{item.quantity}</td>
-                              <td className="px-3 py-2.5 text-right font-medium text-white">
+                              <td className="px-3 py-2.5 text-muted-foreground font-mono">{item.sku || '—'}</td>
+                              <td className="px-3 py-2.5 text-right text-foreground">{item.quantity}</td>
+                              <td className="px-3 py-2.5 text-right font-medium text-foreground">
                                 {(Number(item.price) * item.quantity).toLocaleString('en-US', { style: 'currency', currency: shopifyOrder.currency || 'USD' })}
                               </td>
                             </tr>
@@ -355,8 +355,8 @@ export default function IssueDetail() {
 
                   <div className="flex justify-end items-center gap-4 pt-1">
                     <div className="text-right">
-                      <div className="text-xs text-neutral-400 mb-0.5">Total Price</div>
-                      <div className="text-lg font-bold text-white">
+                      <div className="text-xs text-muted-foreground mb-0.5">Total Price</div>
+                      <div className="text-lg font-bold text-foreground">
                         {Number(shopifyOrder.current_total_price).toLocaleString('en-US', { style: 'currency', currency: shopifyOrder.currency || 'USD' })}
                       </div>
                     </div>
@@ -364,14 +364,14 @@ export default function IssueDetail() {
                 </div>
               ) : (
                 <div className="flex flex-col items-center justify-center py-10 gap-2">
-                  <p className="text-neutral-400 text-sm">Order not found in Shopify.</p>
+                  <p className="text-muted-foreground text-sm">Order not found in Shopify.</p>
                 </div>
               )}
             </div>
-            <div className="px-4 py-3 sm:px-5 sm:py-3.5 border-t border-neutral-800 flex justify-end shrink-0">
+            <div className="px-4 py-3 sm:px-5 sm:py-3.5 border-t border-border flex justify-end shrink-0">
               <button
                 onClick={() => setIsOrderModalOpen(false)}
-                className="px-4 py-2 min-h-[38px] bg-neutral-800 hover:bg-neutral-700 text-neutral-200 rounded-lg transition-colors text-xs font-medium border border-neutral-700"
+                className="px-4 py-2 min-h-[38px] bg-muted hover:bg-muted/80 text-foreground rounded-lg transition-colors text-xs font-medium border border-border"
               >
                 Close
               </button>
@@ -385,18 +385,18 @@ export default function IssueDetail() {
         <div className="mb-6 flex flex-col sm:flex-row sm:items-start justify-between gap-4">
           <div>
             <div className="flex flex-wrap items-center gap-2 mb-2.5">
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-neutral-800 text-neutral-300 border border-neutral-700">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-muted text-foreground border border-border">
                 <Tag size={11} />
                 {issue.category}
               </span>
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-neutral-800 text-neutral-300 border border-neutral-700">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-muted text-foreground border border-border">
                 <PriorityDot priority={issue.priority} />
                 {issue.priority}
               </span>
               <StatusBadge status={issue.status} />
             </div>
-            <h1 className="text-lg sm:text-xl lg:text-2xl font-bold tracking-tight text-white mb-1">{issue.title}</h1>
-            <p className="text-xs text-neutral-400 font-mono flex items-center gap-1.5">
+            <h1 className="text-lg sm:text-xl lg:text-2xl font-bold tracking-tight text-foreground mb-1">{issue.title}</h1>
+            <p className="text-xs text-muted-foreground font-mono flex items-center gap-1.5">
               <Hash size={12} />
               {issue.id.slice(0, 8)}
             </p>
@@ -404,7 +404,7 @@ export default function IssueDetail() {
           
           <button
             onClick={() => setDeleteModalOpen(true)}
-            className="flex items-center justify-center gap-1.5 px-3.5 py-2 min-h-[38px] border border-rose-500/30 bg-rose-500/10 text-rose-300 rounded-lg hover:bg-rose-500/20 text-xs font-medium transition-colors shrink-0 w-full sm:w-auto"
+            className="flex items-center justify-center gap-1.5 px-3.5 py-2 min-h-[38px] border border-rose-500/30 bg-rose-500/10 text-rose-600 dark:text-rose-300 rounded-lg hover:bg-rose-500/20 text-xs font-medium transition-colors shrink-0 w-full sm:w-auto"
           >
             <Trash2 size={13} />
             <span>Delete Issue</span>
@@ -416,24 +416,24 @@ export default function IssueDetail() {
           <div className="lg:col-span-2 space-y-4 sm:space-y-5">
 
             {/* Description */}
-            <section className="bg-neutral-900/60 border border-neutral-800 rounded-xl overflow-hidden">
-              <div className="px-4 sm:px-5 py-3 border-b border-neutral-800">
-                <h2 className="text-xs font-semibold uppercase tracking-wider text-neutral-300">Description</h2>
+            <section className="bg-card border border-border rounded-xl overflow-hidden shadow-xs">
+              <div className="px-4 sm:px-5 py-3 border-b border-border bg-muted/20">
+                <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Description</h2>
               </div>
               <div className="px-4 sm:px-5 py-4">
-                <p className="text-neutral-300 whitespace-pre-wrap leading-relaxed text-sm">{issue.description}</p>
+                <p className="text-foreground whitespace-pre-wrap leading-relaxed text-sm">{issue.description}</p>
               </div>
             </section>
 
             {/* Activity timeline */}
-            <section className="bg-neutral-900/60 border border-neutral-800 rounded-xl overflow-hidden">
-              <div className="px-4 sm:px-5 py-3 border-b border-neutral-800">
-                <h2 className="text-xs font-semibold uppercase tracking-wider text-neutral-300">Activity</h2>
+            <section className="bg-card border border-border rounded-xl overflow-hidden shadow-xs">
+              <div className="px-4 sm:px-5 py-3 border-b border-border bg-muted/20">
+                <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Activity</h2>
               </div>
               <div className="px-4 sm:px-5 py-4">
                 <div className="relative">
                   {/* Vertical line */}
-                  <div className="absolute left-[7px] top-2 bottom-0 w-px bg-neutral-800" />
+                  <div className="absolute left-[7px] top-2 bottom-0 w-px bg-border" />
 
                   <div className="space-y-0">
                     {issue.activities.map((activity, idx) => (
@@ -441,46 +441,46 @@ export default function IssueDetail() {
                         {/* Dot */}
                         <div className="relative z-10 shrink-0 mt-1">
                           {activity.activityType === 'CREATED' && (
-                            <div className="w-3.5 h-3.5 rounded-full bg-blue-500 ring-4 ring-neutral-900" />
+                            <div className="w-3.5 h-3.5 rounded-full bg-blue-500 ring-4 ring-card" />
                           )}
                           {activity.activityType === 'STATUS_CHANGED' && (
-                            <div className="w-3.5 h-3.5 rounded-full bg-purple-500 ring-4 ring-neutral-900" />
+                            <div className="w-3.5 h-3.5 rounded-full bg-purple-500 ring-4 ring-card" />
                           )}
                           {activity.activityType === 'REMARK_ADDED' && (
-                            <div className="w-3.5 h-3.5 rounded-full bg-neutral-500 ring-4 ring-neutral-900" />
+                            <div className="w-3.5 h-3.5 rounded-full bg-muted-foreground ring-4 ring-card" />
                           )}
                           {!['CREATED', 'STATUS_CHANGED', 'REMARK_ADDED'].includes(activity.activityType) && (
-                            <div className="w-3.5 h-3.5 rounded-full bg-neutral-600 ring-4 ring-neutral-900" />
+                            <div className="w-3.5 h-3.5 rounded-full bg-muted-foreground ring-4 ring-card" />
                           )}
                         </div>
 
                         <div className="flex-1 min-w-0" style={{ marginTop: idx === 0 ? 0 : undefined }}>
                           <div className="flex items-center gap-2 mb-1">
-                            <span className="text-xs text-neutral-400">
+                            <span className="text-xs text-muted-foreground">
                               {new Date(activity.createdAt).toLocaleString()}
                             </span>
-                            <span className="text-neutral-600">·</span>
-                            <span className="text-xs text-neutral-400 flex items-center gap-1">
+                            <span className="text-border">·</span>
+                            <span className="text-xs text-muted-foreground flex items-center gap-1">
                               <User size={11} />
                               {activity.actorId === 'unassigned' ? 'System' : 'Staff'}
                             </span>
                           </div>
 
                           {activity.activityType === 'CREATED' && (
-                            <p className="text-xs text-neutral-200">
-                              Issue created and marked as <span className="text-blue-300 font-medium">{activity.newStatus}</span>
+                            <p className="text-xs text-foreground">
+                              Issue created and marked as <span className="text-blue-600 dark:text-blue-300 font-medium">{activity.newStatus}</span>
                             </p>
                           )}
                           {activity.activityType === 'STATUS_CHANGED' && (
-                            <div className="text-xs text-neutral-200 flex items-center gap-2 flex-wrap">
+                            <div className="text-xs text-foreground flex items-center gap-2 flex-wrap">
                               <span>Status changed</span>
-                              <span className="text-neutral-500 line-through text-xs">{activity.oldStatus}</span>
-                              <span className="text-neutral-400">→</span>
+                              <span className="text-muted-foreground line-through text-xs">{activity.oldStatus}</span>
+                              <span className="text-muted-foreground">→</span>
                               <StatusBadge status={activity.newStatus || ''} />
                             </div>
                           )}
                           {activity.activityType === 'REMARK_ADDED' && (
-                            <div className="mt-1.5 bg-neutral-950 border border-neutral-800 rounded-lg px-3.5 py-2.5 text-xs text-neutral-300 leading-relaxed">
+                            <div className="mt-1.5 bg-muted/40 border border-border rounded-lg px-3.5 py-2.5 text-xs text-foreground leading-relaxed">
                               &quot;{activity.remark}&quot;
                             </div>
                           )}
@@ -491,11 +491,11 @@ export default function IssueDetail() {
                 </div>
 
                 {/* Add remark */}
-                <div className="mt-5 pt-4 border-t border-neutral-800">
-                  <h3 className="text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-2.5">Add Remark</h3>
+                <div className="mt-5 pt-4 border-t border-border">
+                  <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2.5">Add Remark</h3>
                   <textarea
                     rows={3}
-                    className="w-full bg-neutral-900 border border-neutral-800 rounded-lg px-3.5 py-2.5 text-xs text-white placeholder-neutral-500 focus:outline-none focus:border-neutral-500 transition-colors resize-none mb-2.5"
+                    className="w-full bg-background border border-border rounded-lg px-3.5 py-2.5 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring transition-colors resize-none mb-2.5"
                     placeholder="Leave a note on this issue..."
                     value={newRemark}
                     onChange={e => setNewRemark(e.target.value)}
@@ -503,7 +503,7 @@ export default function IssueDetail() {
                   <button
                     onClick={handleAddRemark}
                     disabled={isSubmitting || !newRemark.trim()}
-                    className="px-4 py-2 min-h-[38px] bg-white text-black rounded-lg text-xs font-semibold hover:bg-neutral-200 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                    className="px-4 py-2 min-h-[38px] bg-primary text-primary-foreground rounded-lg text-xs font-semibold hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition-opacity shadow-xs"
                   >
                     {isSubmitting ? 'Posting...' : 'Post Remark'}
                   </button>
@@ -515,40 +515,40 @@ export default function IssueDetail() {
           {/* Sidebar — 1/3 */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-4 sm:gap-5">
             {/* Properties */}
-            <section className="bg-neutral-900/60 border border-neutral-800 rounded-xl overflow-hidden">
-              <div className="px-4 sm:px-5 py-3 border-b border-neutral-800">
-                <h3 className="text-xs font-semibold text-neutral-400 uppercase tracking-wider">Properties</h3>
+            <section className="bg-card border border-border rounded-xl overflow-hidden shadow-xs">
+              <div className="px-4 sm:px-5 py-3 border-b border-border bg-muted/20">
+                <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Properties</h3>
               </div>
               <div className="px-4 sm:px-5 py-3.5 space-y-3.5">
                 <div>
-                  <label className="block text-xs text-neutral-400 mb-1.5">Status</label>
+                  <label className="block text-xs text-muted-foreground mb-1.5">Status</label>
                   <select
-                    className="w-full min-h-[38px] bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-neutral-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full min-h-[38px] bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-ring transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     value={issue.status}
                     onChange={e => handleStatusChange(e.target.value)}
                     disabled={isSubmitting || issue.status === 'CLOSED'}
                   >
-                    <option value="OPEN" className="bg-neutral-900">Open</option>
-                    <option value="IN_PROGRESS" className="bg-neutral-900">In Progress</option>
-                    <option value="WAITING" className="bg-neutral-900">Waiting</option>
-                    <option value="RESOLVED" className="bg-neutral-900">Resolved</option>
-                    <option value="CLOSED" className="bg-neutral-900">Closed</option>
-                    <option value="CANCELLED" className="bg-neutral-900">Cancelled</option>
+                    <option value="OPEN" className="bg-popover text-popover-foreground">Open</option>
+                    <option value="IN_PROGRESS" className="bg-popover text-popover-foreground">In Progress</option>
+                    <option value="WAITING" className="bg-popover text-popover-foreground">Waiting</option>
+                    <option value="RESOLVED" className="bg-popover text-popover-foreground">Resolved</option>
+                    <option value="CLOSED" className="bg-popover text-popover-foreground">Closed</option>
+                    <option value="CANCELLED" className="bg-popover text-popover-foreground">Cancelled</option>
                   </select>
                 </div>
 
                 <div>
-                  <label className="block text-xs text-neutral-400 mb-1.5">Assigned To</label>
-                  <div className="flex items-center gap-2 px-3 py-2 min-h-[38px] bg-neutral-950 border border-neutral-800 rounded-lg">
-                    <User size={13} className="text-neutral-500 shrink-0" />
-                    <span className="text-xs text-neutral-300">{issue.assignedToId ? 'Staff Assigned' : 'Unassigned'}</span>
+                  <label className="block text-xs text-muted-foreground mb-1.5">Assigned To</label>
+                  <div className="flex items-center gap-2 px-3 py-2 min-h-[38px] bg-muted/30 border border-border rounded-lg">
+                    <User size={13} className="text-muted-foreground shrink-0" />
+                    <span className="text-xs text-foreground">{issue.assignedToId ? 'Staff Assigned' : 'Unassigned'}</span>
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs text-neutral-400 mb-1.5">Last Updated</label>
-                  <div className="flex items-center gap-2 text-xs text-neutral-300 min-h-[32px]">
-                    <Clock size={13} className="text-neutral-500 shrink-0" />
+                  <label className="block text-xs text-muted-foreground mb-1.5">Last Updated</label>
+                  <div className="flex items-center gap-2 text-xs text-foreground min-h-[32px]">
+                    <Clock size={13} className="text-muted-foreground shrink-0" />
                     <span>{new Date(issue.updatedAt).toLocaleString()}</span>
                   </div>
                 </div>
@@ -556,12 +556,12 @@ export default function IssueDetail() {
             </section>
 
             {/* Order Details */}
-            <section className="bg-neutral-900/60 border border-neutral-800 rounded-xl overflow-hidden">
-              <div className="px-4 sm:px-5 py-3 border-b border-neutral-800 flex justify-between items-center">
-                <h3 className="text-xs font-semibold text-neutral-400 uppercase tracking-wider">Order</h3>
+            <section className="bg-card border border-border rounded-xl overflow-hidden shadow-xs">
+              <div className="px-4 sm:px-5 py-3 border-b border-border bg-muted/20 flex justify-between items-center">
+                <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Order</h3>
                 <button
                   onClick={handleOpenOrderModal}
-                  className="flex items-center gap-1.5 text-xs text-neutral-300 hover:text-white transition-colors p-1"
+                  className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors p-1"
                 >
                   <span>View full</span>
                   <ExternalLink size={12} />
@@ -569,22 +569,22 @@ export default function IssueDetail() {
               </div>
               <div className="px-4 sm:px-5 py-3.5 space-y-3.5">
                 <div>
-                  <label className="block text-xs text-neutral-400 mb-1">Order Number</label>
-                  <div className="text-xs font-mono font-medium text-white">{issue.orderNumber || issue.orderId}</div>
+                  <label className="block text-xs text-muted-foreground mb-1">Order Number</label>
+                  <div className="text-xs font-mono font-medium text-foreground">{issue.orderNumber || issue.orderId}</div>
                 </div>
 
                 {issue.customerName && (
                   <div>
-                    <label className="block text-xs text-neutral-400 mb-1">Customer</label>
-                    <div className="text-xs font-medium text-white">{issue.customerName}</div>
-                    {issue.customerEmail && <div className="text-[11px] text-neutral-400 mt-0.5">{issue.customerEmail}</div>}
+                    <label className="block text-xs text-muted-foreground mb-1">Customer</label>
+                    <div className="text-xs font-medium text-foreground">{issue.customerName}</div>
+                    {issue.customerEmail && <div className="text-[11px] text-muted-foreground mt-0.5">{issue.customerEmail}</div>}
                   </div>
                 )}
 
                 {issue.totalPrice && (
                   <div>
-                    <label className="block text-xs text-neutral-400 mb-1">Total</label>
-                    <div className="text-sm font-semibold text-white">
+                    <label className="block text-xs text-muted-foreground mb-1">Total</label>
+                    <div className="text-sm font-semibold text-foreground">
                       {Number(issue.totalPrice).toLocaleString('en-US', {
                         style: 'currency',
                         currency: issue.currency || 'USD'

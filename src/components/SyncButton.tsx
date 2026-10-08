@@ -105,28 +105,28 @@ export default function SyncButton() {
         <button
           onClick={handleSync}
           disabled={isSyncing}
-          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-white text-black px-6 py-3 min-h-[44px] rounded-xl font-semibold text-sm hover:bg-neutral-200 active:bg-neutral-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground px-6 py-3 min-h-[44px] rounded-xl font-semibold text-sm hover:opacity-90 active:opacity-80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
         >
           <RefreshCw size={18} className={`shrink-0 ${isSyncing ? 'animate-spin' : ''}`} />
           <span>{isSyncing ? 'Syncing Orders...' : 'Sync Orders & Products Now'}</span>
         </button>
 
-        <div className="flex items-center gap-2 text-xs text-neutral-400">
+        <div className="flex items-center gap-2 text-xs text-muted-foreground">
           <span className="flex h-2 w-2 relative">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
             <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
           </span>
-          <span className="text-neutral-300 font-medium">Auto-sync active</span>
-          <span className="text-neutral-500">•</span>
-          <span className="flex items-center gap-1 text-neutral-400">
+          <span className="text-foreground font-medium">Auto-sync active</span>
+          <span className="text-muted-foreground">•</span>
+          <span className="flex items-center gap-1 text-muted-foreground">
             <Clock size={12} />
             {timeAgo || 'Checking...'}
           </span>
         </div>
       </div>
 
-      <div className="flex items-center gap-2 text-xs text-neutral-400 bg-white/[0.03] border border-white/5 px-3 py-2 rounded-lg">
-        <CheckCircle2 size={14} className="text-emerald-400 shrink-0" />
+      <div className="flex items-center gap-2 text-xs text-muted-foreground bg-muted/60 border border-border px-3 py-2 rounded-lg">
+        <CheckCircle2 size={14} className="text-emerald-500 shrink-0" />
         <span>
           Orders automatically sync in the background on page load and every 3 minutes while the dashboard is open.
         </span>

@@ -41,12 +41,16 @@ export default function SidebarNav({ onClose }: { onClose?: () => void }) {
             key={link.href}
             href={link.href}
             onClick={onClose}
-            className={`flex items-center gap-2.5 px-3 py-2 min-h-[38px] text-xs sm:text-sm font-medium rounded-lg transition-colors whitespace-nowrap ${isActive
-              ? 'bg-neutral-800 text-white font-semibold'
-              : 'text-neutral-400 hover:text-white hover:bg-neutral-900 active:bg-neutral-800/60'
+            className={`group flex items-center gap-2.5 px-3 py-2 min-h-[38px] text-xs sm:text-sm font-medium rounded-lg transition-colors whitespace-nowrap ${isActive
+              ? 'bg-primary text-primary-foreground font-semibold shadow-xs'
+              : 'text-muted-foreground hover:text-foreground hover:bg-muted active:bg-muted'
               }`}
           >
-            <Icon size={17} className={`shrink-0 ${isActive ? 'text-white' : 'text-neutral-500'}`} />
+            <Icon
+              size={17}
+              className={`shrink-0 transition-colors ${isActive ? 'text-primary-foreground' : 'text-muted-foreground group-hover:text-foreground'
+                }`}
+            />
             <span>{link.label}</span>
           </Link>
         );
@@ -54,5 +58,3 @@ export default function SidebarNav({ onClose }: { onClose?: () => void }) {
     </>
   );
 }
-
-

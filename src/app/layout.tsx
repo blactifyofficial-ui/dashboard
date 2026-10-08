@@ -10,6 +10,7 @@ import { allowedUsers, customRoles, UserRole, userRoles } from "@/db/schema";
 import { ilike, eq } from "drizzle-orm";
 import AutoSyncManager from "@/components/AutoSyncManager";
 import { AuthProvider } from "@/context/AuthContext";
+import { ThemeProvider } from "@/components/theme/ThemeProvider";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -33,7 +34,10 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#000000",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#000000" },
+  ],
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
@@ -59,11 +63,13 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
     if (!allowed) {
       return (
-        <html lang="en" className={`${inter.variable} h-full antialiased dark`}>
-          <body className="min-h-full bg-black text-white flex flex-col items-center justify-center font-sans gap-4">
-            <div className="text-xl">You are not authorized to view this dashboard.</div>
-            <SignOutLink />
-            <Toaster position="bottom-right" />
+        <html lang="en" suppressHydrationWarning className={`${inter.variable} h-full antialiased`}>
+          <body className="min-h-full bg-background text-foreground flex flex-col items-center justify-center font-sans gap-4">
+            <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+              <div className="text-xl font-medium">You are not authorized to view this dashboard.</div>
+              <SignOutLink />
+              <Toaster position="bottom-right" />
+            </ThemeProvider>
           </body>
         </html>
       );
@@ -92,39 +98,42 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html
       lang="en"
-      className={`${inter.variable} h-full antialiased dark`}
+      suppressHydrationWarning
+      className={`${inter.variable} h-full antialiased`}
     >
-      <body className="h-[100dvh] overflow-hidden bg-black text-neutral-100 flex flex-col md:flex-row relative selection:bg-white/30 font-sans">
-        <AuthProvider
-          initialUser={session?.user || null}
-          initialRole={userRole}
-          initialPartnerId={partnerId}
-          initialPermissions={userPermissions}
-        >
-          {/* Sidebar */}
-          {session?.user && (
-            <>
-              <ResponsiveSidebar />
-              <AutoSyncManager />
-            </>
-          )}
+      <body className="h-[100dvh] overflow-hidden bg-background text-foreground flex flex-col md:flex-row relative selection:bg-foreground/20 font-sans transition-colors duration-150">
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <AuthProvider
+            initialUser={session?.user || null}
+            initialRole={userRole}
+            initialPartnerId={partnerId}
+            initialPermissions={userPermissions}
+          >
+            {/* Sidebar */}
+            {session?.user && (
+              <>
+                <ResponsiveSidebar />
+                <AutoSyncManager />
+              </>
+            )}
 
-          {/* Main Content */}
-          {session?.user ? (
-            <main className="flex-1 w-full min-w-0 px-3 sm:px-6 lg:px-8 pt-3 sm:pt-6 lg:pt-8 pb-[max(1rem,env(safe-area-inset-bottom))] z-10 relative h-full flex flex-col overflow-y-auto">
-              <div className="mx-auto w-full max-w-7xl h-full flex flex-col min-h-0">
-                <div className="flex-1 min-h-0 pb-2 sm:pb-6 lg:pb-8 flex flex-col">
-                  {children}
+            {/* Main Content */}
+            {session?.user ? (
+              <main className="flex-1 w-full min-w-0 px-3 sm:px-6 lg:px-8 pt-3 sm:pt-6 lg:pt-8 pb-[max(1rem,env(safe-area-inset-bottom))] z-10 relative h-full flex flex-col overflow-y-auto">
+                <div className="mx-auto w-full max-w-7xl h-full flex flex-col min-h-0">
+                  <div className="flex-1 min-h-0 pb-2 sm:pb-6 lg:pb-8 flex flex-col">
+                    {children}
+                  </div>
                 </div>
-              </div>
-            </main>
-          ) : (
-            <main className="flex-1 w-full h-full bg-black pb-[env(safe-area-inset-bottom)]">
-              {children}
-            </main>
-          )}
-          <Toaster position="bottom-right" />
-        </AuthProvider>
+              </main>
+            ) : (
+              <main className="flex-1 w-full h-full bg-background pb-[env(safe-area-inset-bottom)]">
+                {children}
+              </main>
+            )}
+            <Toaster position="bottom-right" />
+          </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

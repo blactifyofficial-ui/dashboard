@@ -58,28 +58,28 @@ function getDueDayBadge(dueDayStr: string | null | undefined, monthStr: string, 
 
   if (diffDays < 0) {
     return (
-      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium bg-rose-500/10 text-rose-400 border border-rose-500/20">
+      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20">
         <AlertTriangle size={11} />
         Overdue {Math.abs(diffDays)}d
       </span>
     );
   } else if (diffDays === 0) {
     return (
-      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium bg-amber-500/10 text-amber-300 border border-amber-500/20">
+      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/20">
         <Clock size={11} />
         Due Today
       </span>
     );
   } else if (diffDays <= 5) {
     return (
-      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium bg-white/10 text-neutral-300 border border-white/15">
+      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium bg-muted text-foreground border border-border">
         <Clock size={11} />
         Due in {diffDays}d
       </span>
     );
   } else {
     return (
-      <span className="text-xs text-white/50">
+      <span className="text-xs text-muted-foreground">
         Due {dueDay}th
       </span>
     );
@@ -116,30 +116,30 @@ export default function MonthlyExpenseList({
   const paidCount = entries.filter((e) => e.status === 'PAID').length;
 
   return (
-    <div className="flex-1 min-h-0 flex flex-col bg-neutral-900/60 border border-neutral-800 rounded-xl overflow-hidden">
+    <div className="flex-1 min-h-0 flex flex-col bg-card border border-border rounded-xl overflow-hidden shadow-xs">
       {/* Search & Filter Toolbar */}
-      <div className="flex-none p-3 sm:p-4 border-b border-neutral-800 flex flex-col md:flex-row justify-between items-stretch md:items-center gap-3 bg-neutral-900/80">
+      <div className="flex-none p-3 sm:p-4 border-b border-border flex flex-col md:flex-row justify-between items-stretch md:items-center gap-3 bg-muted/20">
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
           {/* Search Box */}
           <div className="relative flex-1 sm:w-64">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500 w-4 h-4 pointer-events-none" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4 pointer-events-none" />
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search expenses..."
-              className="w-full pl-9 pr-3.5 py-1.5 min-h-[38px] bg-neutral-900 border border-neutral-800 rounded-lg text-xs text-white placeholder:text-neutral-500 focus:outline-none focus:border-neutral-600 transition-colors"
+              className="w-full pl-9 pr-3.5 py-1.5 min-h-[38px] bg-background border border-border rounded-lg text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring transition-colors"
             />
           </div>
 
           {/* Filter Pills */}
-          <div className="flex items-center bg-neutral-950 border border-neutral-800 p-0.5 rounded-lg overflow-x-auto no-scrollbar">
+          <div className="flex items-center bg-muted/50 border border-border p-0.5 rounded-lg overflow-x-auto no-scrollbar">
             <button
               onClick={() => setFilter('ALL')}
               className={`flex-1 sm:flex-none px-3 py-1 text-xs font-medium rounded-md transition-colors whitespace-nowrap ${
                 filter === 'ALL'
-                  ? 'bg-neutral-800 text-white font-semibold'
-                  : 'text-neutral-400 hover:text-white'
+                  ? 'bg-card text-foreground font-semibold shadow-xs'
+                  : 'text-muted-foreground hover:text-foreground'
               }`}
             >
               All ({entries.length})
@@ -148,8 +148,8 @@ export default function MonthlyExpenseList({
               onClick={() => setFilter('PENDING')}
               className={`flex-1 sm:flex-none px-3 py-1 text-xs font-medium rounded-md transition-colors whitespace-nowrap ${
                 filter === 'PENDING'
-                  ? 'bg-neutral-800 text-white font-semibold'
-                  : 'text-neutral-400 hover:text-white'
+                  ? 'bg-card text-foreground font-semibold shadow-xs'
+                  : 'text-muted-foreground hover:text-foreground'
               }`}
             >
               Pending ({pendingCount})
@@ -158,8 +158,8 @@ export default function MonthlyExpenseList({
               onClick={() => setFilter('PAID')}
               className={`flex-1 sm:flex-none px-3 py-1 text-xs font-medium rounded-md transition-colors whitespace-nowrap ${
                 filter === 'PAID'
-                  ? 'bg-neutral-800 text-white font-semibold'
-                  : 'text-neutral-400 hover:text-white'
+                  ? 'bg-card text-foreground font-semibold shadow-xs'
+                  : 'text-muted-foreground hover:text-foreground'
               }`}
             >
               Paid ({paidCount})
@@ -171,7 +171,7 @@ export default function MonthlyExpenseList({
         <div className="flex items-center gap-2 w-full md:w-auto justify-end">
           <button
             onClick={onOpenTemplates}
-            className="flex-1 sm:flex-none px-3 py-1.5 min-h-[36px] text-xs font-medium text-neutral-300 hover:text-white bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 rounded-lg transition-colors flex items-center justify-center gap-1.5"
+            className="flex-1 sm:flex-none px-3 py-1.5 min-h-[36px] text-xs font-medium text-foreground bg-card hover:bg-muted border border-border rounded-lg transition-colors flex items-center justify-center gap-1.5"
           >
             <SlidersHorizontal size={14} />
             <span>Templates</span>
@@ -179,7 +179,7 @@ export default function MonthlyExpenseList({
 
           <button
             onClick={onAddClick}
-            className="flex-1 sm:flex-none px-3.5 py-1.5 min-h-[36px] text-xs font-semibold text-black bg-white hover:bg-neutral-200 rounded-lg transition-colors flex items-center justify-center gap-1.5"
+            className="flex-1 sm:flex-none px-3.5 py-1.5 min-h-[36px] text-xs font-semibold text-primary-foreground bg-primary hover:opacity-90 rounded-lg transition-opacity flex items-center justify-center gap-1.5"
           >
             <Plus size={14} />
             <span>Add Bill</span>
@@ -190,24 +190,24 @@ export default function MonthlyExpenseList({
       {/* Table Content */}
       <div className="flex-1 overflow-x-auto min-h-0">
         {filteredEntries.length === 0 ? (
-          <div className="py-16 text-center text-neutral-500 space-y-2 px-4">
-            <div className="w-10 h-10 mx-auto rounded-lg bg-neutral-900 border border-neutral-800 flex items-center justify-center text-neutral-500">
+          <div className="py-16 text-center text-muted-foreground space-y-2 px-4">
+            <div className="w-10 h-10 mx-auto rounded-lg bg-muted border border-border flex items-center justify-center text-muted-foreground">
               <FileText size={18} />
             </div>
-            <p className="text-sm font-medium text-white">
+            <p className="text-sm font-medium text-foreground">
               {entries.length === 0 ? 'No recurring bills found for this month.' : 'No bills match your search filter.'}
             </p>
             {entries.length === 0 && (
               <div className="flex items-center justify-center gap-2 pt-2">
                 <button
                   onClick={onAddClick}
-                  className="px-3.5 py-1.5 text-xs font-semibold text-black bg-white hover:bg-neutral-200 rounded-lg transition-colors flex items-center gap-1.5"
+                  className="px-3.5 py-1.5 text-xs font-semibold text-primary-foreground bg-primary hover:opacity-90 rounded-lg transition-opacity flex items-center gap-1.5"
                 >
                   <Plus size={14} /> Add Bill
                 </button>
                 <button
                   onClick={onOpenTemplates}
-                  className="px-3.5 py-1.5 text-xs font-medium text-neutral-300 hover:text-white bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 rounded-lg transition-colors"
+                  className="px-3.5 py-1.5 text-xs font-medium text-foreground bg-card hover:bg-muted border border-border rounded-lg transition-colors"
                 >
                   Configure Templates
                 </button>
@@ -216,7 +216,7 @@ export default function MonthlyExpenseList({
           </div>
         ) : (
           <table className="w-full text-sm text-left min-w-[700px]">
-            <thead className="sticky top-0 bg-neutral-900 text-xs text-neutral-400 uppercase tracking-wider border-b border-neutral-800 z-10">
+            <thead className="sticky top-0 bg-muted/40 text-xs text-muted-foreground uppercase tracking-wider border-b border-border z-10">
               <tr>
                 <th className="w-12 px-4 py-3 text-center">Status</th>
                 <th className="px-4 py-3 font-medium">Expense</th>
@@ -227,7 +227,7 @@ export default function MonthlyExpenseList({
                 <th className="px-4 py-3 font-medium text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-neutral-800/60">
+            <tbody className="divide-y divide-border/60">
               {filteredEntries.map((entry) => {
                 const isPaid = entry.status === 'PAID';
                 const expected = parseFloat(entry.expectedAmount || '0') || 0;
@@ -237,7 +237,7 @@ export default function MonthlyExpenseList({
                 return (
                   <tr
                     key={entry.id}
-                    className={`hover:bg-neutral-800/30 transition-colors group ${
+                    className={`hover:bg-muted/30 transition-colors group ${
                       isPaid ? 'opacity-75 hover:opacity-100' : ''
                     }`}
                   >
@@ -253,8 +253,8 @@ export default function MonthlyExpenseList({
                         }}
                         className={`w-7 h-7 flex items-center justify-center mx-auto rounded-md border transition-colors ${
                           isPaid
-                            ? 'bg-white text-black border-white hover:bg-neutral-200'
-                            : 'bg-neutral-900 border-neutral-700 text-neutral-500 hover:text-white hover:border-neutral-500'
+                            ? 'bg-primary text-primary-foreground border-primary hover:opacity-90'
+                            : 'bg-background border-border text-muted-foreground hover:text-foreground hover:border-foreground'
                         }`}
                         title={isPaid ? 'Click to mark as pending' : 'Click to mark as paid'}
                       >
@@ -265,11 +265,11 @@ export default function MonthlyExpenseList({
                     {/* Expense Name & Notes */}
                     <td className="px-4 py-3 align-middle">
                       <div className="flex flex-col">
-                        <span className={`font-medium ${isPaid ? 'text-neutral-400 line-through decoration-neutral-600' : 'text-white'}`}>
+                        <span className={`font-medium ${isPaid ? 'text-muted-foreground line-through decoration-border' : 'text-foreground'}`}>
                           {entry.name}
                         </span>
                         {entry.notes && (
-                          <span className="text-xs text-neutral-400 truncate max-w-xs sm:max-w-sm" title={entry.notes}>
+                          <span className="text-xs text-muted-foreground truncate max-w-xs sm:max-w-sm" title={entry.notes}>
                             {entry.notes}
                           </span>
                         )}
@@ -278,7 +278,7 @@ export default function MonthlyExpenseList({
 
                     {/* Category */}
                     <td className="px-4 py-3 align-middle">
-                      <span className="bg-neutral-800 px-2 py-0.5 rounded text-xs text-neutral-300">
+                      <span className="bg-muted border border-border/70 px-2 py-0.5 rounded text-xs text-foreground">
                         {entry.category || 'General'}
                       </span>
                     </td>
@@ -286,13 +286,13 @@ export default function MonthlyExpenseList({
                     {/* Due Date */}
                     <td className="px-4 py-3 align-middle">
                       {isPaid ? (
-                        <span className="text-xs text-neutral-500 font-mono">
+                        <span className="text-xs text-muted-foreground font-mono">
                           Settled
                         </span>
                       ) : (
                         <div className="flex items-center gap-1.5">
                           {dueBadge || (
-                            <span className="text-xs text-neutral-400">
+                            <span className="text-xs text-muted-foreground">
                               {entry.dueDay ? `${entry.dueDay}th of month` : '—'}
                             </span>
                           )}
@@ -301,31 +301,31 @@ export default function MonthlyExpenseList({
                     </td>
 
                     {/* Payment Info */}
-                    <td className="px-4 py-3 align-middle text-xs text-neutral-400">
+                    <td className="px-4 py-3 align-middle text-xs text-muted-foreground">
                       {isPaid ? (
                         <div className="space-y-1">
-                          <div className="flex items-center gap-1.5 text-neutral-300 font-medium flex-wrap">
-                            <CheckCircle2 size={12} className="text-emerald-400" />
+                          <div className="flex items-center gap-1.5 text-foreground font-medium flex-wrap">
+                            <CheckCircle2 size={12} className="text-emerald-500" />
                             <span>Paid on {entry.paidDate ? new Date(entry.paidDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' }) : 'Done'}</span>
                           </div>
                           {(entry.paymentMethodName || entry.referenceNumber) && (
-                            <div className="text-[11px] text-neutral-500 font-mono">
+                            <div className="text-[11px] text-muted-foreground font-mono">
                               {[entry.paymentMethodName, entry.referenceNumber].filter(Boolean).join(' • ')}
                             </div>
                           )}
                         </div>
                       ) : (
-                        <span className="text-neutral-600">—</span>
+                        <span className="text-muted-foreground/60">—</span>
                       )}
                     </td>
 
                     {/* Amount */}
                     <td className="px-4 py-3 text-right align-middle font-mono font-medium">
-                      <div className={isPaid ? 'text-neutral-300' : 'text-white'}>
+                      <div className={isPaid ? 'text-muted-foreground' : 'text-foreground'}>
                         {formatCurrency(isPaid && actual > 0 ? actual : expected)}
                       </div>
                       {isPaid && actual > 0 && expected > 0 && actual !== expected && (
-                        <div className="text-[11px] text-neutral-500 font-mono">
+                        <div className="text-[11px] text-muted-foreground font-mono">
                           Exp: {formatCurrency(expected)}
                         </div>
                       )}
@@ -337,14 +337,14 @@ export default function MonthlyExpenseList({
                         {!isPaid ? (
                           <button
                             onClick={() => onMarkPaidClick(entry)}
-                            className="px-2.5 py-1 text-xs font-semibold text-white bg-neutral-800 hover:bg-neutral-700 border border-neutral-700 rounded-md transition-colors"
+                            className="px-2.5 py-1 text-xs font-semibold text-foreground bg-muted hover:bg-muted/80 border border-border rounded-md transition-colors"
                           >
                             Mark Paid
                           </button>
                         ) : (
                           <button
                             onClick={() => onMarkPaidClick(entry)}
-                            className="px-2.5 py-1 text-xs text-neutral-400 hover:text-white rounded-md hover:bg-neutral-800 transition-colors"
+                            className="px-2.5 py-1 text-xs text-muted-foreground hover:text-foreground rounded-md hover:bg-muted transition-colors"
                             title="Edit payment"
                           >
                             Edit Payment
@@ -353,7 +353,7 @@ export default function MonthlyExpenseList({
 
                         <button
                           onClick={() => onEditClick(entry)}
-                          className="w-7 h-7 flex items-center justify-center text-neutral-400 hover:text-white rounded-md hover:bg-neutral-800 transition-colors"
+                          className="w-7 h-7 flex items-center justify-center text-muted-foreground hover:text-foreground rounded-md hover:bg-muted transition-colors"
                           title="Edit bill"
                         >
                           <Pencil size={13} />
@@ -365,7 +365,7 @@ export default function MonthlyExpenseList({
                               onDeleteEntry(entry.id);
                             }
                           }}
-                          className="w-7 h-7 flex items-center justify-center text-neutral-400 hover:text-rose-400 rounded-md hover:bg-rose-500/10 transition-colors"
+                          className="w-7 h-7 flex items-center justify-center text-muted-foreground hover:text-rose-500 rounded-md hover:bg-rose-500/10 transition-colors"
                           title="Delete bill"
                         >
                           <Trash2 size={13} />
@@ -381,11 +381,11 @@ export default function MonthlyExpenseList({
       </div>
 
       {/* Table Footer Summary */}
-      <div className="flex-none px-4 py-3 border-t border-neutral-800 bg-neutral-900/80 flex items-center justify-between text-xs text-neutral-400">
+      <div className="flex-none px-4 py-3 border-t border-border bg-muted/20 flex items-center justify-between text-xs text-muted-foreground">
         <div>
-          <span className="text-white font-medium">{entries.length}</span> {entries.length === 1 ? 'record' : 'records'} total
+          <span className="text-foreground font-medium">{entries.length}</span> {entries.length === 1 ? 'record' : 'records'} total
           <span className="mx-2">•</span>
-          <span className="text-white font-medium">{paidCount}</span> settled, <span className="text-white font-medium">{pendingCount}</span> pending
+          <span className="text-foreground font-medium">{paidCount}</span> settled, <span className="text-foreground font-medium">{pendingCount}</span> pending
         </div>
       </div>
     </div>

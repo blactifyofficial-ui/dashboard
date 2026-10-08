@@ -491,8 +491,8 @@ export default function MetaAdsPage() {
       {/* Header */}
       <header className="flex-none flex flex-col md:flex-row md:items-end justify-between gap-4 sm:gap-6">
         <div className="space-y-1 sm:space-y-2">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-white">Meta Ads</h1>
-          <p className="text-neutral-400 text-xs sm:text-sm md:text-base">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-foreground">Meta Ads</h1>
+          <p className="text-muted-foreground text-xs sm:text-sm md:text-base">
             Daily campaign planning, budget allocation, and billing ledger
           </p>
         </div>
@@ -500,7 +500,7 @@ export default function MetaAdsPage() {
           <div className="flex items-center gap-3 w-full sm:w-auto">
             <button
               onClick={handleOpenPaymentModal}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-white text-black px-4 py-2.5 min-h-[44px] rounded-xl font-semibold hover:bg-neutral-200 active:bg-neutral-300 transition-colors text-xs sm:text-sm shadow-sm"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground px-4 py-2.5 min-h-[44px] rounded-xl font-semibold hover:opacity-90 active:opacity-80 transition-opacity text-xs sm:text-sm shadow-sm"
             >
               <Plus size={18} className="shrink-0" />
               <span>Mark {currentDaysNum === 7 ? 'Weekly' : `${currentDaysNum}-Day`} Budget Paid</span>
@@ -510,14 +510,14 @@ export default function MetaAdsPage() {
       </header>
 
       {/* Tab Switcher */}
-      <div className="flex items-center gap-1 bg-neutral-900 border border-neutral-800 p-1 rounded-lg w-fit">
+      <div className="flex items-center gap-1 bg-card border border-border p-1 rounded-lg w-fit">
         <button
           type="button"
           onClick={() => setActiveTab('planner')}
           className={`px-3.5 py-1.5 text-xs sm:text-sm font-medium rounded-md transition-colors flex items-center gap-2 whitespace-nowrap ${
             activeTab === 'planner'
-              ? 'bg-neutral-800 text-white font-semibold'
-              : 'text-neutral-400 hover:text-white'
+              ? 'bg-muted text-foreground font-semibold'
+              : 'text-muted-foreground hover:text-foreground'
           }`}
         >
           <CalendarIcon size={15} />
@@ -528,8 +528,8 @@ export default function MetaAdsPage() {
           onClick={() => setActiveTab('billing')}
           className={`px-3.5 py-1.5 text-xs sm:text-sm font-medium rounded-md transition-colors flex items-center gap-2 whitespace-nowrap ${
             activeTab === 'billing'
-              ? 'bg-neutral-800 text-white font-semibold'
-              : 'text-neutral-400 hover:text-white'
+              ? 'bg-muted text-foreground font-semibold'
+              : 'text-muted-foreground hover:text-foreground'
           }`}
         >
           <Wallet size={15} />
@@ -544,62 +544,62 @@ export default function MetaAdsPage() {
           {/* Top Row: 4 Uniform KPI Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             {/* Card 1: Daily Budget */}
-            <div className="bg-neutral-900/60 border border-neutral-800 rounded-xl p-5 flex flex-col justify-between">
+            <div className="bg-card border border-border rounded-xl p-5 flex flex-col justify-between">
               <div className="flex items-center justify-between mb-2">
-                <h2 className="text-xs font-medium text-neutral-400 uppercase tracking-wider">Daily Budget</h2>
-                <CalendarIcon size={16} className="text-neutral-500 shrink-0" />
+                <h2 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Daily Budget</h2>
+                <CalendarIcon size={16} className="text-muted-foreground/60 shrink-0" />
               </div>
               <div>
-                <p className="text-2xl sm:text-3xl font-semibold font-mono text-white tracking-tight truncate">
+                <p className="text-2xl sm:text-3xl font-semibold font-mono text-foreground tracking-tight truncate">
                   ₹{currentDailyBudgetNum.toLocaleString('en-IN')}
                 </p>
-                <p className="text-xs text-neutral-500 mt-1">Active daily target</p>
+                <p className="text-xs text-muted-foreground mt-1">Active daily target</p>
               </div>
             </div>
 
             {/* Card 2: Period Budget Target */}
-            <div className="bg-neutral-900/60 border border-neutral-800 rounded-xl p-5 flex flex-col justify-between">
+            <div className="bg-card border border-border rounded-xl p-5 flex flex-col justify-between">
               <div className="flex items-center justify-between mb-2">
-                <h2 className="text-xs font-medium text-neutral-400 uppercase tracking-wider">
+                <h2 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   Period Budget ({currentDaysNum}d)
                 </h2>
-                <TrendingUp size={16} className="text-neutral-500 shrink-0" />
+                <TrendingUp size={16} className="text-muted-foreground/60 shrink-0" />
               </div>
               <div>
-                <p className="text-2xl sm:text-3xl font-semibold font-mono text-white tracking-tight truncate">
+                <p className="text-2xl sm:text-3xl font-semibold font-mono text-foreground tracking-tight truncate">
                   ₹{livePeriodBudget.toLocaleString('en-IN')}
                 </p>
-                <p className="text-xs text-neutral-500 mt-1">
+                <p className="text-xs text-muted-foreground mt-1">
                   {currentDaysNum}d × ₹{currentDailyBudgetNum.toLocaleString('en-IN')}/day
                 </p>
               </div>
             </div>
 
             {/* Card 3: Monthly Budget */}
-            <div className="bg-neutral-900/60 border border-neutral-800 rounded-xl p-5 flex flex-col justify-between">
+            <div className="bg-card border border-border rounded-xl p-5 flex flex-col justify-between">
               <div className="flex items-center justify-between mb-2">
-                <h2 className="text-xs font-medium text-neutral-400 uppercase tracking-wider">Monthly Budget</h2>
-                <Clock size={16} className="text-neutral-500 shrink-0" />
+                <h2 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Monthly Budget</h2>
+                <Clock size={16} className="text-muted-foreground/60 shrink-0" />
               </div>
               <div>
-                <p className="text-2xl sm:text-3xl font-semibold font-mono text-white tracking-tight truncate">
+                <p className="text-2xl sm:text-3xl font-semibold font-mono text-foreground tracking-tight truncate">
                   ₹{liveMonthlyBudget.toLocaleString('en-IN')}
                 </p>
-                <p className="text-xs text-neutral-500 mt-1">30 Days estimated spend</p>
+                <p className="text-xs text-muted-foreground mt-1">30 Days estimated spend</p>
               </div>
             </div>
 
             {/* Card 4: Monthly Balance */}
-            <div className="bg-neutral-900/60 border border-neutral-800 rounded-xl p-5 flex flex-col justify-between">
+            <div className="bg-card border border-border rounded-xl p-5 flex flex-col justify-between">
               <div className="flex items-center justify-between mb-2">
-                <h2 className="text-xs font-medium text-neutral-400 uppercase tracking-wider">Monthly Balance</h2>
-                <Scale size={16} className="text-neutral-500 shrink-0" />
+                <h2 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Monthly Balance</h2>
+                <Scale size={16} className="text-muted-foreground/60 shrink-0" />
               </div>
               <div>
-                <p className="text-2xl sm:text-3xl font-semibold font-mono text-white tracking-tight truncate">
+                <p className="text-2xl sm:text-3xl font-semibold font-mono text-foreground tracking-tight truncate">
                   ₹{monthlyBalanceRemaining.toLocaleString('en-IN')}
                 </p>
-                <p className="text-xs text-neutral-500 mt-1">
+                <p className="text-xs text-muted-foreground mt-1">
                   ₹{thisMonthSpent.toLocaleString('en-IN')} spent this month
                 </p>
               </div>
@@ -610,7 +610,7 @@ export default function MetaAdsPage() {
           {activeTab === 'planner' && (
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
               {/* Left Side: Daily Campaign Planner */}
-              <div className="lg:col-span-6 xl:col-span-6 bg-neutral-900/60 border border-neutral-800 rounded-xl p-5 sm:p-6 flex flex-col justify-between">
+              <div className="lg:col-span-6 xl:col-span-6 bg-card border border-border rounded-xl p-5 sm:p-6 flex flex-col justify-between">
                 <DailyCampaignPlanner
                   key={selectedDate}
                   selectedDate={selectedDate}
@@ -624,7 +624,7 @@ export default function MetaAdsPage() {
               </div>
 
               {/* Right Side: Interactive Calendar */}
-              <div className="lg:col-span-6 xl:col-span-6 bg-neutral-900/60 border border-neutral-800 rounded-xl p-5 sm:p-6 flex flex-col justify-between">
+              <div className="lg:col-span-6 xl:col-span-6 bg-card border border-border rounded-xl p-5 sm:p-6 flex flex-col justify-between">
                 <MetaAdsCalendar
                   currentMonth={currentMonth}
                   onMonthChange={(m) => setCurrentMonth(m)}
@@ -642,14 +642,14 @@ export default function MetaAdsPage() {
           {activeTab === 'billing' && (
             <div className="space-y-6">
               {/* Budget Configuration Panel */}
-              <div className="bg-neutral-900/60 border border-neutral-800 rounded-xl p-5 sm:p-6">
+              <div className="bg-card border border-border rounded-xl p-5 sm:p-6">
                 <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5 sm:gap-6">
                   <div className="space-y-1 max-w-md">
                     <div className="flex items-center gap-2">
                       <span className="h-2 w-2 rounded-full bg-emerald-500 shrink-0" />
-                      <h2 className="text-base sm:text-lg font-semibold text-white tracking-tight">Base Target Settings</h2>
+                      <h2 className="text-base sm:text-lg font-semibold text-foreground tracking-tight">Base Target Settings</h2>
                     </div>
-                    <p className="text-xs sm:text-sm text-neutral-400 leading-relaxed">
+                    <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
                       Enter baseline daily spend &amp; number of days to set the period budget target.
                     </p>
                   </div>
@@ -657,7 +657,7 @@ export default function MetaAdsPage() {
                   <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
                     {/* Daily Budget Input */}
                     <div className="relative flex-1 sm:flex-initial">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 font-medium text-sm">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground font-medium text-sm">
                         ₹
                       </span>
                       <input
@@ -668,14 +668,14 @@ export default function MetaAdsPage() {
                         value={dailyBudgetInput}
                         onChange={(e) => setDailyBudgetInput(e.target.value)}
                         placeholder="400"
-                        className="w-full sm:w-32 bg-neutral-900 border border-neutral-800 rounded-lg pl-7 pr-12 py-2 min-h-[40px] text-sm font-medium text-white focus:outline-none focus:border-neutral-600 transition-colors"
+                        className="w-full sm:w-32 bg-card border border-border rounded-lg pl-7 pr-12 py-2 min-h-[40px] text-sm font-medium text-foreground focus:outline-none focus:border-border-hover transition-colors"
                       />
-                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-neutral-500 font-medium">
+                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground font-medium">
                         / day
                       </span>
                     </div>
 
-                    <span className="text-neutral-500 font-bold text-sm hidden sm:inline">×</span>
+                    <span className="text-muted-foreground font-bold text-sm hidden sm:inline">×</span>
 
                     {/* Number of Days Input */}
                     <div className="relative flex-1 sm:flex-initial">
@@ -688,17 +688,17 @@ export default function MetaAdsPage() {
                         value={daysInput}
                         onChange={(e) => setDaysInput(e.target.value)}
                         placeholder="7"
-                        className="w-full sm:w-24 bg-neutral-900 border border-neutral-800 rounded-lg pl-3 pr-10 py-2 min-h-[40px] text-sm font-medium text-white focus:outline-none focus:border-neutral-600 transition-colors"
+                        className="w-full sm:w-24 bg-card border border-border rounded-lg pl-3 pr-10 py-2 min-h-[40px] text-sm font-medium text-foreground focus:outline-none focus:border-border-hover transition-colors"
                       />
-                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-neutral-500 font-medium">
+                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground font-medium">
                         days
                       </span>
                     </div>
 
-                    <span className="text-neutral-500 font-bold text-sm hidden sm:inline">=</span>
+                    <span className="text-muted-foreground font-bold text-sm hidden sm:inline">=</span>
 
                     {/* Calculated Result Display */}
-                    <div className="w-full sm:w-auto bg-neutral-900 border border-neutral-800 rounded-lg px-3.5 py-2 min-h-[40px] flex items-center justify-center text-sm font-semibold text-white whitespace-nowrap">
+                    <div className="w-full sm:w-auto bg-muted/60 border border-border rounded-lg px-3.5 py-2 min-h-[40px] flex items-center justify-center text-sm font-semibold text-foreground whitespace-nowrap">
                       Target: ₹{livePeriodBudget.toLocaleString('en-IN')}
                     </div>
 
@@ -706,7 +706,7 @@ export default function MetaAdsPage() {
                       <button
                         onClick={handleSaveBudget}
                         disabled={savingBudget}
-                        className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-white text-black px-4 py-2 min-h-[40px] rounded-lg font-semibold hover:bg-neutral-200 active:bg-neutral-300 transition-colors text-sm disabled:opacity-50"
+                        className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground px-4 py-2 min-h-[40px] rounded-lg font-semibold hover:opacity-90 active:opacity-80 transition-opacity text-sm disabled:opacity-50"
                       >
                         {savingBudget ? (
                           <>
@@ -726,12 +726,12 @@ export default function MetaAdsPage() {
               </div>
 
               {/* Transactions & Payment History Table */}
-              <div className="bg-neutral-900/60 border border-neutral-800 rounded-xl overflow-hidden flex flex-col">
+              <div className="bg-card border border-border rounded-xl overflow-hidden flex flex-col">
                 {/* Table Header */}
-                <div className="p-4 md:px-6 md:py-4 border-b border-neutral-800 flex flex-col md:flex-row justify-between items-stretch md:items-center gap-4 bg-neutral-900/80">
+                <div className="p-4 md:px-6 md:py-4 border-b border-border flex flex-col md:flex-row justify-between items-stretch md:items-center gap-4 bg-muted/40">
                   <div className="flex items-center gap-2.5">
-                    <h2 className="text-base md:text-lg font-semibold text-white tracking-tight">Weekly Budget Payments</h2>
-                    <span className="text-xs px-2 py-0.5 rounded-md bg-neutral-800 text-neutral-300 font-medium">
+                    <h2 className="text-base md:text-lg font-semibold text-foreground tracking-tight">Weekly Budget Payments</h2>
+                    <span className="text-xs px-2 py-0.5 rounded-md bg-muted text-muted-foreground font-medium border border-border">
                       {transactions.length}
                     </span>
                   </div>
@@ -739,20 +739,20 @@ export default function MetaAdsPage() {
                   {/* Search and Action Bar */}
                   <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
                     <div className="relative flex-1 sm:w-64">
-                      <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" />
+                      <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                       <input
                         type="text"
                         placeholder="Search ref, notes, method..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full bg-neutral-900 border border-neutral-800 rounded-lg pl-9 pr-3 py-1.5 text-xs text-white placeholder:text-neutral-500 focus:outline-none focus:border-neutral-600 transition-colors"
+                        className="w-full bg-card border border-border rounded-lg pl-9 pr-3 py-1.5 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-border-hover transition-colors"
                       />
                     </div>
 
                     {canEditAds && (
                       <button
                         onClick={handleOpenPaymentModal}
-                        className="inline-flex items-center justify-center gap-2 bg-white text-black px-3.5 py-1.5 rounded-lg text-xs font-semibold hover:bg-neutral-200 transition-colors"
+                        className="inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground px-3.5 py-1.5 rounded-lg text-xs font-semibold hover:opacity-90 transition-opacity"
                       >
                         <Plus size={15} />
                         <span>Record Payment</span>
@@ -765,7 +765,7 @@ export default function MetaAdsPage() {
                 <div className="flex-1 overflow-x-auto">
                   <table className="w-full text-left border-collapse">
                     <thead>
-                      <tr className="border-b border-neutral-800 text-[11px] text-neutral-400 font-semibold uppercase tracking-wider bg-neutral-900">
+                      <tr className="border-b border-border text-[11px] text-muted-foreground font-semibold uppercase tracking-wider bg-muted/20">
                         <th className="py-3 px-4 md:px-6">Period</th>
                         <th className="py-3 px-4 md:px-6">Target Spend</th>
                         <th className="py-3 px-4 md:px-6">Amount Paid</th>
@@ -775,10 +775,10 @@ export default function MetaAdsPage() {
                         {canEditAds && <th className="py-3 px-4 md:px-6 text-right">Actions</th>}
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-neutral-800/60 text-sm">
+                    <tbody className="divide-y divide-border/60 text-sm">
                       {filteredTransactions.length === 0 ? (
                         <tr>
-                          <td colSpan={canEditAds ? 7 : 6} className="py-12 text-center text-neutral-500 text-sm">
+                          <td colSpan={canEditAds ? 7 : 6} className="py-12 text-center text-muted-foreground text-sm">
                             {searchQuery ? 'No payment records match your search.' : 'No weekly ad payments recorded yet.'}
                           </td>
                         </tr>
@@ -786,50 +786,50 @@ export default function MetaAdsPage() {
                         filteredTransactions.map((tx) => {
                           const daysInPeriod = calculateDays(tx.weekStartDate, tx.weekEndDate);
                           return (
-                            <tr key={tx.id} className="hover:bg-neutral-800/30 transition-colors group">
+                            <tr key={tx.id} className="hover:bg-muted/40 transition-colors group">
                               {/* Period Range */}
                               <td className="py-3.5 px-4 md:px-6">
-                                <div className="font-semibold text-white">
+                                <div className="font-semibold text-foreground">
                                   {tx.weekStartDate} to {tx.weekEndDate}
                                 </div>
-                                <div className="text-xs text-neutral-400">
+                                <div className="text-xs text-muted-foreground">
                                   {daysInPeriod} {daysInPeriod === 1 ? 'day' : 'days'}
                                 </div>
                               </td>
 
                               {/* Target Spend */}
                               <td className="py-3.5 px-4 md:px-6">
-                                <div className="text-neutral-300 font-medium">
+                                <div className="text-foreground font-medium">
                                   ₹{parseFloat(tx.calculatedWeeklyBudget).toLocaleString('en-IN')}
                                 </div>
-                                <div className="text-xs text-neutral-500">
+                                <div className="text-xs text-muted-foreground">
                                   ₹{parseFloat(tx.dailyBudget).toLocaleString('en-IN')}/day
                                 </div>
                               </td>
 
                               {/* Amount Paid */}
                               <td className="py-3.5 px-4 md:px-6">
-                                <div className="font-semibold text-emerald-400">
+                                <div className="font-semibold text-emerald-600 dark:text-emerald-400">
                                   ₹{parseFloat(tx.amountPaid).toLocaleString('en-IN')}
                                 </div>
-                                <div className="text-[11px] text-neutral-500 flex items-center gap-1">
-                                  <CheckCircle2 size={12} className="text-emerald-400" />
+                                <div className="text-[11px] text-muted-foreground flex items-center gap-1">
+                                  <CheckCircle2 size={12} className="text-emerald-600 dark:text-emerald-400" />
                                   <span>{tx.status}</span>
                                 </div>
                               </td>
 
                               {/* Payment Date */}
-                              <td className="py-3.5 px-4 md:px-6 text-neutral-300">
+                              <td className="py-3.5 px-4 md:px-6 text-muted-foreground">
                                 {tx.paymentDate}
                               </td>
 
                               {/* Method & Ref */}
                               <td className="py-3.5 px-4 md:px-6">
-                                <div className="text-white font-medium">
+                                <div className="text-foreground font-medium">
                                   {tx.paymentMethodName || tx.paymentMethodCode || 'Other'}
                                 </div>
                                 {tx.referenceNumber && (
-                                  <div className="text-xs text-neutral-400 font-mono">
+                                  <div className="text-xs text-muted-foreground font-mono">
                                     {tx.referenceNumber}
                                   </div>
                                 )}
@@ -840,13 +840,13 @@ export default function MetaAdsPage() {
                                 {tx.expenseId ? (
                                   <Link
                                     href="/expenses"
-                                    className="inline-flex items-center gap-1 text-xs text-neutral-300 hover:text-white bg-neutral-800 hover:bg-neutral-700 px-2 py-1 rounded-md border border-neutral-700 transition-colors"
+                                    className="inline-flex items-center gap-1 text-xs text-foreground hover:text-foreground bg-muted hover:bg-muted/80 px-2 py-1 rounded-md border border-border transition-colors"
                                   >
                                     <span>View Expense</span>
                                     <ExternalLink size={12} />
                                   </Link>
                                 ) : (
-                                  <span className="text-xs text-neutral-500">Unlinked</span>
+                                  <span className="text-xs text-muted-foreground">Unlinked</span>
                                 )}
                               </td>
 
@@ -855,7 +855,7 @@ export default function MetaAdsPage() {
                                 <td className="py-3.5 px-4 md:px-6 text-right">
                                   <button
                                     onClick={() => setTxToDelete(tx)}
-                                    className="p-1 text-neutral-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-md transition-colors"
+                                    className="p-1 text-muted-foreground hover:text-rose-500 hover:bg-rose-500/10 rounded-md transition-colors"
                                     title="Delete Transaction"
                                   >
                                     <Trash2 size={15} />
@@ -877,21 +877,21 @@ export default function MetaAdsPage() {
 
       {/* Payment Recording Modal */}
       {isPaymentModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75">
-          <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-6 max-w-lg w-full shadow-xl relative">
-            <h3 className="text-lg font-bold text-white mb-1">Record Meta Ads Budget Payment</h3>
-            <p className="text-xs text-neutral-400 mb-5">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+          <div className="bg-card border border-border rounded-xl p-6 max-w-lg w-full shadow-xl relative">
+            <h3 className="text-lg font-bold text-foreground mb-1">Record Meta Ads Budget Payment</h3>
+            <p className="text-xs text-muted-foreground mb-5">
               Confirm payment details for your selected ad period.
             </p>
 
             <form onSubmit={handleSubmitPayment} className="space-y-4">
               {/* Presets */}
-              <div className="flex items-center gap-1.5 bg-neutral-950 p-1 rounded-lg border border-neutral-800">
+              <div className="flex items-center gap-1.5 bg-muted/60 p-1 rounded-lg border border-border">
                 <button
                   type="button"
                   onClick={() => handleSelectPreset('current_week')}
                   className={`flex-1 py-1.5 text-xs font-semibold rounded-md transition-colors ${
-                    paymentPreset === 'current_week' ? 'bg-neutral-800 text-white' : 'text-neutral-400 hover:text-white'
+                    paymentPreset === 'current_week' ? 'bg-card text-foreground shadow-xs' : 'text-muted-foreground hover:text-foreground'
                   }`}
                 >
                   Current Period
@@ -900,7 +900,7 @@ export default function MetaAdsPage() {
                   type="button"
                   onClick={() => handleSelectPreset('previous_week')}
                   className={`flex-1 py-1.5 text-xs font-semibold rounded-md transition-colors ${
-                    paymentPreset === 'previous_week' ? 'bg-neutral-800 text-white' : 'text-neutral-400 hover:text-white'
+                    paymentPreset === 'previous_week' ? 'bg-card text-foreground shadow-xs' : 'text-muted-foreground hover:text-foreground'
                   }`}
                 >
                   Previous Period
@@ -909,7 +909,7 @@ export default function MetaAdsPage() {
                   type="button"
                   onClick={() => setPaymentPreset('custom')}
                   className={`flex-1 py-1.5 text-xs font-semibold rounded-md transition-colors ${
-                    paymentPreset === 'custom' ? 'bg-neutral-800 text-white' : 'text-neutral-400 hover:text-white'
+                    paymentPreset === 'custom' ? 'bg-card text-foreground shadow-xs' : 'text-muted-foreground hover:text-foreground'
                   }`}
                 >
                   Custom
@@ -919,23 +919,23 @@ export default function MetaAdsPage() {
               {/* Date Range Inputs */}
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="text-xs font-medium text-neutral-400">Start Date</label>
+                  <label className="text-xs font-medium text-foreground">Start Date</label>
                   <input
                     type="date"
                     required
                     value={weekStartDate}
                     onChange={(e) => handleStartDateChange(e.target.value)}
-                    className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-neutral-600"
+                    className="w-full bg-card border border-border rounded-lg px-3 py-1.5 text-xs text-foreground focus:outline-none focus:border-border-hover"
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-xs font-medium text-neutral-400">End Date</label>
+                  <label className="text-xs font-medium text-foreground">End Date</label>
                   <input
                     type="date"
                     required
                     value={weekEndDate}
                     onChange={(e) => handleEndDateChange(e.target.value)}
-                    className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-neutral-600"
+                    className="w-full bg-card border border-border rounded-lg px-3 py-1.5 text-xs text-foreground focus:outline-none focus:border-border-hover"
                   />
                 </div>
               </div>
@@ -943,7 +943,7 @@ export default function MetaAdsPage() {
               {/* Amount and Payment Date */}
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="text-xs font-medium text-neutral-400">Amount Paid (₹)</label>
+                  <label className="text-xs font-medium text-foreground">Amount Paid (₹)</label>
                   <input
                     type="number"
                     required
@@ -952,17 +952,17 @@ export default function MetaAdsPage() {
                     value={amountPaid}
                     onChange={(e) => setAmountPaid(e.target.value)}
                     placeholder="e.g. 2800"
-                    className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-1.5 text-xs font-semibold text-white focus:outline-none focus:border-neutral-600"
+                    className="w-full bg-card border border-border rounded-lg px-3 py-1.5 text-xs font-semibold text-foreground focus:outline-none focus:border-border-hover"
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-xs font-medium text-neutral-400">Payment Date</label>
+                  <label className="text-xs font-medium text-foreground">Payment Date</label>
                   <input
                     type="date"
                     required
                     value={paymentDate}
                     onChange={(e) => setPaymentDate(e.target.value)}
-                    className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-neutral-600"
+                    className="w-full bg-card border border-border rounded-lg px-3 py-1.5 text-xs text-foreground focus:outline-none focus:border-border-hover"
                   />
                 </div>
               </div>
@@ -970,59 +970,59 @@ export default function MetaAdsPage() {
               {/* Payment Method & Reference */}
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="text-xs font-medium text-neutral-400">Payment Method</label>
+                  <label className="text-xs font-medium text-foreground">Payment Method</label>
                   <select
                     required
                     value={paymentMethodId}
                     onChange={(e) => setPaymentMethodId(e.target.value)}
-                    className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-neutral-600"
+                    className="w-full bg-card border border-border rounded-lg px-3 py-1.5 text-xs text-foreground focus:outline-none focus:border-border-hover"
                   >
                     {paymentMethods.map((pm) => (
-                      <option key={pm.id} value={pm.id} className="bg-neutral-900 text-white">
+                      <option key={pm.id} value={pm.id} className="bg-card text-foreground">
                         {pm.name}
                       </option>
                     ))}
                   </select>
                 </div>
                 <div className="space-y-1">
-                  <label className="text-xs font-medium text-neutral-400">Reference / UTR (Optional)</label>
+                  <label className="text-xs font-medium text-foreground">Reference / UTR (Optional)</label>
                   <input
                     type="text"
                     value={referenceNumber}
                     onChange={(e) => setReferenceNumber(e.target.value)}
                     placeholder="e.g. UPI Ref #12345"
-                    className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-neutral-600"
+                    className="w-full bg-card border border-border rounded-lg px-3 py-1.5 text-xs text-foreground focus:outline-none focus:border-border-hover"
                   />
                 </div>
               </div>
 
               {/* Sync to Expenses Toggle */}
-              <div className="flex items-center gap-3 p-3 bg-neutral-950 border border-neutral-800 rounded-lg">
+              <div className="flex items-center gap-3 p-3 bg-muted/40 border border-border rounded-lg">
                 <input
                   type="checkbox"
                   id="syncExpenses"
                   checked={syncToExpenses}
                   onChange={(e) => setSyncToExpenses(e.target.checked)}
-                  className="rounded border-neutral-700 text-white focus:ring-0"
+                  className="rounded border-border text-foreground focus:ring-0"
                 />
-                <label htmlFor="syncExpenses" className="text-xs text-neutral-300 select-none cursor-pointer">
+                <label htmlFor="syncExpenses" className="text-xs text-foreground select-none cursor-pointer">
                   Automatically sync this payment to <strong>Expenses</strong> ledger
                 </label>
               </div>
 
               {/* Action Buttons */}
-              <div className="flex items-center justify-end gap-3 pt-4 border-t border-neutral-800">
+              <div className="flex items-center justify-end gap-3 pt-4 border-t border-border">
                 <button
                   type="button"
                   onClick={() => setIsPaymentModalOpen(false)}
-                  className="px-4 py-2 text-xs font-medium text-neutral-400 hover:text-white transition-colors"
+                  className="px-4 py-2 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmittingPayment}
-                  className="px-4 py-2 bg-white text-black font-semibold text-xs rounded-lg hover:bg-neutral-200 transition-colors disabled:opacity-50 flex items-center gap-2"
+                  className="px-4 py-2 bg-primary text-primary-foreground font-semibold text-xs rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center gap-2"
                 >
                   {isSubmittingPayment ? (
                     <>

@@ -98,7 +98,7 @@ export default function RoleForm({
       if (isEdit && initialData?.id) {
         // Edit existing custom role
         const res = await fetch(`/api/roles/${initialData.id}`, {
-          method: 'PUT',
+          method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             name: roleName.trim(),
@@ -111,17 +111,17 @@ export default function RoleForm({
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Failed to update role');
 
-        toast.success(`Role '${roleName}' updated successfully`);
+        toast.success(`Updated role ${roleName}`);
         router.push('/team');
         router.refresh();
       } else {
-        // Create new role
+        // Create new custom role
         const res = await fetch('/api/roles', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             name: roleName.trim(),
-            code: roleCode.trim() || undefined,
+            code: roleCode.trim().toUpperCase(),
             description: roleDescription.trim(),
             color: roleColor,
             permissions: selectedPermissions,
@@ -131,7 +131,7 @@ export default function RoleForm({
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Failed to create role');
 
-        toast.success(`Role '${roleName}' created successfully`);
+        toast.success(`Created role ${roleName}`);
         router.push('/team');
         router.refresh();
       }
@@ -142,7 +142,7 @@ export default function RoleForm({
     }
   };
 
-  const handleDeleteRole = async () => {
+  const handleConfirmDelete = async () => {
     if (!initialData?.id) return;
     try {
       setIsDeleting(true);
@@ -153,39 +153,41 @@ export default function RoleForm({
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to delete role');
 
-      toast.success(data.message || 'Role deleted');
+      toast.success('Role deleted');
       router.push('/team');
       router.refresh();
     } catch (err: unknown) {
       toast.error(err instanceof Error ? err.message : 'Error deleting role');
     } finally {
       setIsDeleting(false);
+      setIsDeleteModalOpen(false);
     }
   };
 
   const previewBadgeStyle = ROLE_COLOR_PALETTES[roleColor]?.badge || ROLE_COLOR_PALETTES.blue.badge;
 
   return (
-    <div className="space-y-6 pb-20 max-w-5xl mx-auto w-full">
-      {/* Top Header & Breadcrumb */}
+    <div className="space-y-6 max-w-4xl mx-auto pb-16 text-foreground">
+      {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
+        <div className="flex items-center gap-3">
           <Link
             href="/team"
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-neutral-400 hover:text-white transition-colors mb-2 group"
+            className="p-2 rounded-lg bg-card border border-border text-muted-foreground hover:text-foreground hover:bg-muted transition-colors shadow-xs"
+            title="Back to Team & Roles"
           >
-            <ArrowLeft size={14} className="group-hover:-translate-x-0.5 transition-transform" />
-            <span>Back to Team &amp; Roles</span>
+            <ArrowLeft size={18} />
           </Link>
+
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-lg bg-neutral-800 border border-neutral-700 text-neutral-300">
+            <div className="p-2.5 rounded-lg bg-muted border border-border text-foreground">
               <ShieldCheck size={20} />
             </div>
             <div>
-              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white">
+              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
                 {isEdit ? `Edit Role: ${initialData?.name}` : 'Create Custom Role'}
               </h1>
-              <p className="text-xs sm:text-sm text-neutral-400 mt-0.5">
+              <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
                 Configure role identity, visual badge styling, and module-level feature permissions.
               </p>
             </div>
@@ -193,8 +195,8 @@ export default function RoleForm({
         </div>
 
         {/* Live Badge Preview */}
-        <div className="bg-neutral-900/90 border border-neutral-800 rounded-lg px-3.5 py-2 flex items-center gap-2.5 self-start sm:self-auto">
-          <span className="text-xs text-neutral-400 font-medium">Badge Preview:</span>
+        <div className="bg-card border border-border rounded-lg px-3.5 py-2 flex items-center gap-2.5 self-start sm:self-auto shadow-xs">
+          <span className="text-xs text-muted-foreground font-medium">Badge Preview:</span>
           <span className={`px-2.5 py-0.5 rounded-md text-xs font-semibold border ${previewBadgeStyle}`}>
             {roleName.trim() || 'Role Name'}
           </span>
@@ -203,10 +205,10 @@ export default function RoleForm({
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* CARD 1: Basic Role Details */}
-        <div className="bg-neutral-900/60 p-5 sm:p-6 rounded-xl border border-neutral-800 shadow-sm space-y-5">
-          <div className="pb-3 border-b border-neutral-800">
-            <h2 className="text-base font-semibold text-white">1. Role Information</h2>
-            <p className="text-xs text-neutral-400">
+        <div className="bg-card p-5 sm:p-6 rounded-xl border border-border shadow-xs space-y-5">
+          <div className="pb-3 border-b border-border">
+            <h2 className="text-base font-semibold text-foreground">1. Role Information</h2>
+            <p className="text-xs text-muted-foreground">
               Set the public name, unique internal code, and description for this role.
             </p>
           </div>
@@ -214,7 +216,7 @@ export default function RoleForm({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             {/* Role Name */}
             <div>
-              <label className="block text-xs font-medium text-neutral-300 mb-1.5">Role Name *</label>
+              <label className="block text-xs font-medium text-muted-foreground mb-1.5">Role Name *</label>
               <input
                 type="text"
                 required
@@ -226,13 +228,13 @@ export default function RoleForm({
                     setRoleCode(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '_'));
                   }
                 }}
-                className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3.5 py-2 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-neutral-500"
+                className="w-full bg-muted/40 border border-input rounded-lg px-3.5 py-2 text-sm text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary transition-colors"
               />
             </div>
 
             {/* Role Code */}
             <div>
-              <label className="block text-xs font-medium text-neutral-300 mb-1.5">
+              <label className="block text-xs font-medium text-muted-foreground mb-1.5">
                 Role Code {isEdit ? '(Immutable)' : '*'}
               </label>
               <input
@@ -242,26 +244,26 @@ export default function RoleForm({
                 placeholder="e.g. WAREHOUSE_LEAD"
                 value={roleCode}
                 onChange={(e) => setRoleCode(e.target.value.toUpperCase().replace(/[^A-Z0-9_]/g, '_'))}
-                className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3.5 py-2 text-sm text-white font-mono uppercase placeholder-neutral-500 focus:outline-none focus:border-neutral-500 disabled:opacity-50"
+                className="w-full bg-muted/40 border border-input rounded-lg px-3.5 py-2 text-sm text-foreground font-mono uppercase placeholder-muted-foreground focus:outline-none focus:border-primary disabled:opacity-50 transition-colors"
               />
             </div>
           </div>
 
           {/* Description */}
           <div>
-            <label className="block text-xs font-medium text-neutral-300 mb-1.5">Description</label>
+            <label className="block text-xs font-medium text-muted-foreground mb-1.5">Description</label>
             <input
               type="text"
               placeholder="e.g. Handles product inventory, stock sync, and resolves order issues"
               value={roleDescription}
               onChange={(e) => setRoleDescription(e.target.value)}
-              className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3.5 py-2 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-neutral-500"
+              className="w-full bg-muted/40 border border-input rounded-lg px-3.5 py-2 text-sm text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary transition-colors"
             />
           </div>
 
           {/* Color Palette Selector */}
           <div>
-            <label className="block text-xs font-medium text-neutral-300 mb-2">Badge Color Palette</label>
+            <label className="block text-xs font-medium text-muted-foreground mb-2">Badge Color Palette</label>
             <div className="flex items-center gap-2 flex-wrap">
               {COLOR_CHOICES.map((c) => {
                 const isSelected = roleColor === c.id;
@@ -272,8 +274,8 @@ export default function RoleForm({
                     onClick={() => setRoleColor(c.id)}
                     className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors ${
                       isSelected
-                        ? 'border-neutral-500 bg-neutral-800 text-white ring-1 ring-neutral-500'
-                        : 'border-neutral-800 bg-neutral-950 text-neutral-400 hover:border-neutral-700'
+                        ? 'border-primary bg-muted text-foreground ring-1 ring-primary'
+                        : 'border-border bg-card text-muted-foreground hover:border-muted-foreground hover:text-foreground'
                     }`}
                   >
                     <span className={`w-2.5 h-2.5 rounded-full ${c.bg}`} />
@@ -286,11 +288,11 @@ export default function RoleForm({
         </div>
 
         {/* CARD 2: Module Permissions */}
-        <div className="bg-neutral-900/60 p-5 sm:p-6 rounded-xl border border-neutral-800 shadow-sm space-y-5">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-neutral-800">
+        <div className="bg-card p-5 sm:p-6 rounded-xl border border-border shadow-xs space-y-5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-border">
             <div>
-              <h2 className="text-base font-semibold text-white">2. Module Permissions</h2>
-              <p className="text-xs text-neutral-400 mt-0.5">
+              <h2 className="text-base font-semibold text-foreground">2. Module Permissions</h2>
+              <p className="text-xs text-muted-foreground mt-0.5">
                 Toggle access rights across individual dashboard views and functional capabilities ({selectedPermissions.length} of {PERMISSION_CATALOG.length} granted).
               </p>
             </div>
@@ -298,7 +300,7 @@ export default function RoleForm({
             <button
               type="button"
               onClick={handleSelectAll}
-              className="inline-flex items-center justify-center px-3 py-1.5 rounded-lg border border-neutral-700 bg-neutral-800 text-xs font-semibold text-neutral-200 hover:bg-neutral-700 transition-colors shrink-0"
+              className="inline-flex items-center justify-center px-3 py-1.5 rounded-lg border border-border bg-muted text-xs font-semibold text-foreground hover:bg-accent transition-colors shrink-0"
             >
               {selectedPermissions.length === PERMISSION_CATALOG.length ? 'Deselect All' : 'Grant All Permissions'}
             </button>
@@ -311,14 +313,14 @@ export default function RoleForm({
               const someCatSelected = items.some((i) => selectedPermissions.includes(i.key));
 
               return (
-                <div key={category} className="rounded-xl border border-neutral-800 bg-neutral-950/60 p-4 flex flex-col justify-between">
+                <div key={category} className="rounded-xl border border-border bg-muted/30 p-4 flex flex-col justify-between">
                   <div>
-                    <div className="flex items-center justify-between pb-2.5 border-b border-neutral-800 mb-3">
-                      <span className="text-xs font-semibold text-white uppercase tracking-wider">{category}</span>
+                    <div className="flex items-center justify-between pb-2.5 border-b border-border mb-3">
+                      <span className="text-xs font-semibold text-foreground uppercase tracking-wider">{category}</span>
                       <button
                         type="button"
                         onClick={() => toggleCategoryPermissions(items)}
-                        className="text-[11px] font-medium text-neutral-400 hover:text-white transition-colors"
+                        className="text-[11px] font-medium text-muted-foreground hover:text-foreground transition-colors"
                       >
                         {allCatSelected ? 'Clear Module' : someCatSelected ? 'Select All in Module' : 'Select All'}
                       </button>
@@ -333,22 +335,22 @@ export default function RoleForm({
                             onClick={() => togglePermission(item.key)}
                             className={`p-2.5 rounded-lg border cursor-pointer transition-colors flex items-start gap-3 ${
                               isChecked
-                                ? 'bg-neutral-800/80 border-neutral-700 text-white'
-                                : 'bg-neutral-950/40 border-neutral-800/80 text-neutral-400 hover:border-neutral-700'
+                                ? 'bg-card border-primary/40 text-foreground shadow-xs'
+                                : 'bg-card/50 border-border text-muted-foreground hover:border-muted-foreground/60'
                             }`}
                           >
                             <div
                               className={`w-4 h-4 rounded mt-0.5 flex items-center justify-center border shrink-0 transition-colors ${
                                 isChecked
-                                  ? 'bg-white border-white text-black'
-                                  : 'border-neutral-700 bg-neutral-900'
+                                  ? 'bg-primary border-primary text-primary-foreground'
+                                  : 'border-border bg-muted'
                               }`}
                             >
                               {isChecked && <Check size={12} strokeWidth={3} />}
                             </div>
                             <div className="min-w-0">
-                              <div className="text-xs font-medium text-neutral-200">{item.label}</div>
-                              <div className="text-[11px] text-neutral-400 mt-0.5 leading-snug">
+                              <div className="text-xs font-medium text-foreground">{item.label}</div>
+                              <div className="text-[11px] text-muted-foreground mt-0.5 leading-snug">
                                 {item.description}
                               </div>
                             </div>
@@ -364,13 +366,13 @@ export default function RoleForm({
         </div>
 
         {/* Sticky Action Footer */}
-        <div className="bg-neutral-900/95 backdrop-blur-md p-4 rounded-xl border border-neutral-800 flex items-center justify-between gap-4 shadow-xl sticky bottom-4 z-20">
+        <div className="bg-card/95 backdrop-blur-md p-4 rounded-xl border border-border flex items-center justify-between gap-4 shadow-xl sticky bottom-4 z-20">
           <div>
             {isEdit && !initialData?.isSystem && (
               <button
                 type="button"
                 onClick={() => setIsDeleteModalOpen(true)}
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 rounded-lg transition-colors border border-transparent hover:border-rose-500/20"
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors border border-transparent hover:border-rose-500/20"
               >
                 <Trash2 size={15} />
                 <span>Delete Role</span>
@@ -381,31 +383,31 @@ export default function RoleForm({
           <div className="flex items-center gap-3">
             <Link
               href="/team"
-              className="px-3.5 py-2 text-xs font-medium text-neutral-400 hover:text-white transition-colors"
+              className="px-4 py-2 rounded-lg text-xs sm:text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
             >
               Cancel
             </Link>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="inline-flex items-center justify-center gap-2 px-5 py-2 bg-white text-black text-xs sm:text-sm font-semibold rounded-lg hover:bg-neutral-200 transition-colors disabled:opacity-50"
+              className="inline-flex items-center justify-center gap-2 px-5 py-2 bg-primary text-primary-foreground text-xs sm:text-sm font-semibold rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 shadow-xs"
             >
-              {isSubmitting && <Loader2 size={16} className="animate-spin" />}
+              {isSubmitting && <Loader2 size={15} className="animate-spin" />}
               <span>{isEdit ? 'Save Changes' : 'Create Role'}</span>
             </button>
           </div>
         </div>
       </form>
 
-      {/* Delete Modal */}
+      {/* Delete Role Modal */}
       {isEdit && (
         <ConfirmModal
           isOpen={isDeleteModalOpen}
-          title={`Delete Role: ${roleName}`}
-          message={`Are you sure you want to delete the role '${roleName}' (${roleCode})? Any members currently holding this role will need to be reassigned.`}
+          title={`Delete Role: ${initialData?.name}`}
+          message={`Are you sure you want to delete the custom role '${initialData?.name}'? Any assigned members will need to be assigned to another role.`}
           confirmText="Delete Role"
           isLoading={isDeleting}
-          onConfirm={handleDeleteRole}
+          onConfirm={handleConfirmDelete}
           onCancel={() => setIsDeleteModalOpen(false)}
         />
       )}

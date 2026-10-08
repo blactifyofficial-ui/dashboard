@@ -115,35 +115,35 @@ export default function CategoryManager() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
       {/* Expense Categories */}
-      <div className="bg-neutral-900/60 p-4 sm:p-6 rounded-xl border border-neutral-800 shadow-sm text-white flex flex-col gap-6">
+      <div className="bg-card p-4 sm:p-6 rounded-xl border border-border shadow-xs text-card-foreground flex flex-col gap-6">
         <div>
-          <h2 className="text-base sm:text-lg font-semibold mb-4 border-b border-neutral-800 pb-2">Add Expense Category</h2>
+          <h2 className="text-base sm:text-lg font-semibold mb-4 border-b border-border pb-2 text-card-foreground">Add Expense Category</h2>
           <form onSubmit={handleAddExpenseCategory} className="space-y-4">
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-neutral-300">Category Name</label>
+              <label className="text-xs font-medium text-muted-foreground">Category Name</label>
               <input
                 type="text"
                 required
                 value={expenseName}
                 onChange={(e) => setExpenseName(e.target.value)}
                 placeholder="e.g. Travel"
-                className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:border-neutral-500 transition-colors"
+                className="w-full bg-muted/50 border border-input rounded-lg px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors"
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-neutral-300">Description (Optional)</label>
+              <label className="text-xs font-medium text-muted-foreground">Description (Optional)</label>
               <input
                 type="text"
                 value={expenseDesc}
                 onChange={(e) => setExpenseDesc(e.target.value)}
                 placeholder="e.g. Travel and commuting expenses"
-                className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:border-neutral-500 transition-colors"
+                className="w-full bg-muted/50 border border-input rounded-lg px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors"
               />
             </div>
             <button
               type="submit"
               disabled={isExpenseLoading}
-              className="flex items-center justify-center gap-2 bg-white text-black px-4 h-10 rounded-lg text-xs sm:text-sm font-semibold hover:bg-neutral-200 transition-colors w-full disabled:opacity-50"
+              className="flex items-center justify-center gap-2 bg-primary text-primary-foreground px-4 h-10 rounded-lg text-xs sm:text-sm font-semibold hover:opacity-90 transition-colors w-full disabled:opacity-50 shadow-xs"
             >
               {isExpenseLoading ? <Loader2 size={16} className="animate-spin" /> : 'Add Expense Category'}
             </button>
@@ -151,17 +151,17 @@ export default function CategoryManager() {
         </div>
 
         <div>
-          <h3 className="text-sm sm:text-base font-semibold mb-3 flex items-center gap-2 text-neutral-200"><List size={16} /> Current Expense Categories</h3>
+          <h3 className="text-sm sm:text-base font-semibold mb-3 flex items-center gap-2 text-foreground"><List size={16} /> Current Expense Categories</h3>
           {isLoadingCategories ? (
             <LoadingSpinner size="small" />
           ) : expenseCategories.length === 0 ? (
-            <p className="text-neutral-500 text-xs italic">No expense categories added yet.</p>
+            <p className="text-muted-foreground text-xs italic">No expense categories added yet.</p>
           ) : (
             <ul className={`space-y-2 max-h-64 overflow-y-auto pr-1 transition-opacity duration-200 ${isRefreshing ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
               {expenseCategories.map(cat => (
-                <li key={cat.id} className="bg-neutral-950 border border-neutral-800 rounded-lg p-3">
-                  <p className="font-medium text-xs sm:text-sm text-white">{cat.name}</p>
-                  {cat.description && <p className="text-xs text-neutral-400 mt-0.5">{cat.description}</p>}
+                <li key={cat.id} className="bg-muted/40 border border-border rounded-lg p-3">
+                  <p className="font-medium text-xs sm:text-sm text-foreground">{cat.name}</p>
+                  {cat.description && <p className="text-xs text-muted-foreground mt-0.5">{cat.description}</p>}
                 </li>
               ))}
             </ul>
@@ -170,35 +170,35 @@ export default function CategoryManager() {
       </div>
 
       {/* Issue Categories */}
-      <div className="bg-neutral-900/60 p-4 sm:p-6 rounded-xl border border-neutral-800 shadow-sm text-white flex flex-col gap-6">
+      <div className="bg-card p-4 sm:p-6 rounded-xl border border-border shadow-xs text-card-foreground flex flex-col gap-6">
         <div>
-          <h2 className="text-base sm:text-lg font-semibold mb-4 border-b border-neutral-800 pb-2">Add Issue Category</h2>
+          <h2 className="text-base sm:text-lg font-semibold mb-4 border-b border-border pb-2 text-card-foreground">Add Issue Category</h2>
           <form onSubmit={handleAddIssueCategory} className="space-y-4">
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-neutral-300">Category Name</label>
+              <label className="text-xs font-medium text-muted-foreground">Category Name</label>
               <input
                 type="text"
                 required
                 value={issueName}
                 onChange={(e) => setIssueName(e.target.value)}
                 placeholder="e.g. Missing Item"
-                className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:border-neutral-500 transition-colors"
+                className="w-full bg-muted/50 border border-input rounded-lg px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors"
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-neutral-300">Description (Optional)</label>
+              <label className="text-xs font-medium text-muted-foreground">Description (Optional)</label>
               <input
                 type="text"
                 value={issueDesc}
                 onChange={(e) => setIssueDesc(e.target.value)}
                 placeholder="e.g. Order arrived without some items"
-                className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:border-neutral-500 transition-colors"
+                className="w-full bg-muted/50 border border-input rounded-lg px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors"
               />
             </div>
             <button
               type="submit"
               disabled={isIssueLoading}
-              className="flex items-center justify-center gap-2 bg-white text-black px-4 h-10 rounded-lg text-xs sm:text-sm font-semibold hover:bg-neutral-200 transition-colors w-full disabled:opacity-50"
+              className="flex items-center justify-center gap-2 bg-primary text-primary-foreground px-4 h-10 rounded-lg text-xs sm:text-sm font-semibold hover:opacity-90 transition-colors w-full disabled:opacity-50 shadow-xs"
             >
               {isIssueLoading ? <Loader2 size={16} className="animate-spin" /> : 'Add Issue Category'}
             </button>
@@ -206,17 +206,17 @@ export default function CategoryManager() {
         </div>
 
         <div>
-          <h3 className="text-sm sm:text-base font-semibold mb-3 flex items-center gap-2 text-neutral-200"><List size={16} /> Current Issue Categories</h3>
+          <h3 className="text-sm sm:text-base font-semibold mb-3 flex items-center gap-2 text-foreground"><List size={16} /> Current Issue Categories</h3>
           {isLoadingCategories ? (
             <LoadingSpinner size="small" />
           ) : issueCategories.length === 0 ? (
-            <p className="text-neutral-500 text-xs italic">No issue categories added yet.</p>
+            <p className="text-muted-foreground text-xs italic">No issue categories added yet.</p>
           ) : (
             <ul className={`space-y-2 max-h-64 overflow-y-auto pr-1 transition-opacity duration-200 ${isRefreshing ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
               {issueCategories.map(cat => (
-                <li key={cat.id} className="bg-neutral-950 border border-neutral-800 rounded-lg p-3">
-                  <p className="font-medium text-xs sm:text-sm text-white">{cat.name}</p>
-                  {cat.description && <p className="text-xs text-neutral-400 mt-0.5">{cat.description}</p>}
+                <li key={cat.id} className="bg-muted/40 border border-border rounded-lg p-3">
+                  <p className="font-medium text-xs sm:text-sm text-foreground">{cat.name}</p>
+                  {cat.description && <p className="text-xs text-muted-foreground mt-0.5">{cat.description}</p>}
                 </li>
               ))}
             </ul>

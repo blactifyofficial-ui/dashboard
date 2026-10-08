@@ -22,16 +22,16 @@ export default async function TeamPage() {
   }
 
   return (
-    <div className="flex flex-col space-y-4 sm:space-y-6 max-w-5xl mx-auto w-full pb-12">
+    <div className="flex flex-col space-y-4 sm:space-y-6 max-w-5xl mx-auto w-full pb-12 text-foreground">
       {/* Page Header */}
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4 flex-shrink-0">
         <div>
           <div className="flex items-center gap-2.5">
-            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white">
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
               Team &amp; Roles
             </h1>
           </div>
-          <p className="text-xs sm:text-sm text-neutral-400 mt-1">
+          <p className="text-xs sm:text-sm text-muted-foreground mt-1">
             Invite members, assign permission tiers, and configure partner-scoped views across the dashboard.
           </p>
         </div>

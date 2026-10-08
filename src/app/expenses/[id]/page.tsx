@@ -182,7 +182,7 @@ export default function ExpenseDetailPage() {
 
   if (!expense) {
     return (
-      <div className="flex h-[50vh] items-center justify-center text-white/60">
+      <div className="flex h-[50vh] items-center justify-center text-muted-foreground">
         Expense not found.
       </div>
     );
@@ -205,13 +205,13 @@ export default function ExpenseDetailPage() {
         <div className="flex items-center gap-3 sm:gap-4">
           <Link
             href="/expenses"
-            className="w-9 h-9 flex items-center justify-center bg-neutral-800 hover:bg-neutral-700 rounded-lg transition-colors text-neutral-300 hover:text-white border border-neutral-700 shrink-0"
+            className="w-9 h-9 flex items-center justify-center bg-card hover:bg-muted rounded-lg transition-colors text-muted-foreground hover:text-foreground border border-border shrink-0"
           >
             <ArrowLeft size={16} />
           </Link>
           <div className="min-w-0">
-            <h1 className="text-xl sm:text-2xl font-bold truncate text-white">{isEditing ? 'Edit Expense' : expense.title}</h1>
-            <p className="text-xs sm:text-sm text-neutral-400 truncate">
+            <h1 className="text-xl sm:text-2xl font-bold truncate text-foreground">{isEditing ? 'Edit Expense' : expense.title}</h1>
+            <p className="text-xs sm:text-sm text-muted-foreground truncate">
               {isEditing ? 'Modify expense details below' : `Created ${new Date(expense.createdAt).toLocaleDateString()}`}
             </p>
           </div>
@@ -221,13 +221,13 @@ export default function ExpenseDetailPage() {
           <div className="flex items-center gap-2 self-start sm:self-auto">
             <button
               onClick={() => setIsEditing(true)}
-              className="flex items-center justify-center gap-1.5 px-3.5 h-9 bg-neutral-800 hover:bg-neutral-700 text-neutral-200 border border-neutral-700 rounded-lg text-xs font-semibold transition-colors"
+              className="flex items-center justify-center gap-1.5 px-3.5 h-9 bg-card hover:bg-muted text-foreground border border-border rounded-lg text-xs font-semibold transition-colors"
             >
               <Pencil size={14} /> Edit
             </button>
             <button
               onClick={() => setShowDeleteModal(true)}
-              className="flex items-center justify-center gap-1.5 px-3.5 h-9 bg-rose-600/15 hover:bg-rose-600/25 text-rose-300 border border-rose-500/30 rounded-lg text-xs font-semibold transition-colors"
+              className="flex items-center justify-center gap-1.5 px-3.5 h-9 bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-500/30 rounded-lg text-xs font-semibold transition-colors"
             >
               <Trash2 size={14} /> Delete
             </button>
@@ -240,20 +240,20 @@ export default function ExpenseDetailPage() {
         <div className="lg:col-span-2 space-y-6">
           {isEditing ? (
             /* ── Edit Form ── */
-            <div className="bg-neutral-900/60 border border-neutral-800 rounded-xl p-4 sm:p-6 space-y-5">
+            <div className="bg-card border border-border rounded-xl p-4 sm:p-6 space-y-5 shadow-xs">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-neutral-300">Title</label>
+                  <label className="text-xs font-medium text-foreground">Title</label>
                   <input
                     required
                     type="text"
                     value={formData.title}
                     onChange={e => setFormData({ ...formData, title: e.target.value })}
-                    className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:border-neutral-500 transition-colors"
+                    className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring transition-colors"
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-neutral-300">Amount (₹)</label>
+                  <label className="text-xs font-medium text-foreground">Amount (₹)</label>
                   <input
                     required
                     type="number"
@@ -261,83 +261,83 @@ export default function ExpenseDetailPage() {
                     min="0"
                     value={formData.amount}
                     onChange={e => setFormData({ ...formData, amount: e.target.value })}
-                    className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:border-neutral-500 font-mono transition-colors"
+                    className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring font-mono transition-colors"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-neutral-300">Category</label>
+                  <label className="text-xs font-medium text-foreground">Category</label>
                   <select
                     required
                     value={formData.categoryId}
                     onChange={e => setFormData({ ...formData, categoryId: e.target.value })}
-                    className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-neutral-500 transition-colors"
+                    className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-ring transition-colors"
                   >
-                    <option value="" className="bg-neutral-900 text-white">Select Category</option>
+                    <option value="" className="bg-popover text-popover-foreground">Select Category</option>
                     {categories.map(c => (
-                      <option key={c.id} value={c.id} className="bg-neutral-900 text-white">{c.name}</option>
+                      <option key={c.id} value={c.id} className="bg-popover text-popover-foreground">{c.name}</option>
                     ))}
                   </select>
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-neutral-300">Payment Method</label>
+                  <label className="text-xs font-medium text-foreground">Payment Method</label>
                   <select
                     required
                     value={formData.paymentMethodId}
                     onChange={e => setFormData({ ...formData, paymentMethodId: e.target.value })}
-                    className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-neutral-500 transition-colors"
+                    className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-ring transition-colors"
                   >
-                    <option value="" className="bg-neutral-900 text-white">Select Payment</option>
+                    <option value="" className="bg-popover text-popover-foreground">Select Payment</option>
                     {paymentMethods.map(p => (
-                      <option key={p.id} value={p.id} className="bg-neutral-900 text-white">{p.name}</option>
+                      <option key={p.id} value={p.id} className="bg-popover text-popover-foreground">{p.name}</option>
                     ))}
                   </select>
                 </div>
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-neutral-300">Expense Date</label>
+                <label className="text-xs font-medium text-foreground">Expense Date</label>
                 <input
                   required
                   type="date"
                   value={formData.expenseDate}
                   onChange={e => setFormData({ ...formData, expenseDate: e.target.value })}
-                  className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-neutral-500 transition-colors"
+                  className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-ring transition-colors"
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-neutral-300">Description (Optional)</label>
+                <label className="text-xs font-medium text-foreground">Description (Optional)</label>
                 <textarea
                   value={formData.description}
                   onChange={e => setFormData({ ...formData, description: e.target.value })}
-                  className="w-full bg-neutral-950 border border-neutral-800 rounded-lg p-3 text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:border-neutral-500 h-24 resize-none transition-colors"
+                  className="w-full bg-background border border-border rounded-lg p-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring h-24 resize-none transition-colors"
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-neutral-300">Reference Number (Optional)</label>
+                <label className="text-xs font-medium text-foreground">Reference Number (Optional)</label>
                 <input
                   type="text"
                   value={formData.referenceNumber}
                   onChange={e => setFormData({ ...formData, referenceNumber: e.target.value })}
-                  className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:border-neutral-500 font-mono transition-colors"
+                  className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring font-mono transition-colors"
                 />
               </div>
 
-              <div className="flex flex-col-reverse sm:flex-row gap-2.5 sm:justify-end pt-4 border-t border-neutral-800">
+              <div className="flex flex-col-reverse sm:flex-row gap-2.5 sm:justify-end pt-4 border-t border-border">
                 <button
                   onClick={cancelEdit}
-                  className="w-full sm:w-auto flex items-center justify-center gap-1.5 px-3.5 h-9 text-xs font-medium text-neutral-400 hover:text-white transition-colors"
+                  className="w-full sm:w-auto flex items-center justify-center gap-1.5 px-3.5 h-9 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
                 >
                   <X size={15} /> Cancel
                 </button>
                 <button
                   onClick={handleSave}
                   disabled={isSubmitting}
-                  className="w-full sm:w-auto flex items-center justify-center gap-1.5 bg-white text-black px-4 h-9 rounded-lg text-xs font-semibold hover:bg-neutral-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full sm:w-auto flex items-center justify-center gap-1.5 bg-primary text-primary-foreground px-4 h-9 rounded-lg text-xs font-semibold hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isSubmitting ? (
                     <><Loader2 size={14} className="animate-spin" /> Saving...</>
@@ -349,14 +349,14 @@ export default function ExpenseDetailPage() {
             </div>
           ) : (
             /* ── Read-only Detail ── */
-            <div className="bg-neutral-900/60 border border-neutral-800 rounded-xl p-5 sm:p-6">
+            <div className="bg-card border border-border rounded-xl p-5 sm:p-6 shadow-xs">
               <div className="flex flex-wrap items-center gap-2 mb-5">
-                <span className="bg-neutral-800 border border-neutral-700 px-2.5 py-0.5 rounded-md text-xs font-medium text-neutral-300">{expense.category}</span>
-                <span className="bg-neutral-800 border border-neutral-700 px-2.5 py-0.5 rounded-md text-xs font-medium text-neutral-300">{expense.paymentMethod}</span>
+                <span className="bg-muted border border-border px-2.5 py-0.5 rounded-md text-xs font-medium text-foreground">{expense.category}</span>
+                <span className="bg-muted border border-border px-2.5 py-0.5 rounded-md text-xs font-medium text-foreground">{expense.paymentMethod}</span>
                 {expense.category?.toLowerCase().includes('meta') && (
                   <Link
                     href="/meta-ads"
-                    className="bg-neutral-800 border border-neutral-700 text-neutral-200 px-2.5 py-0.5 rounded-md text-xs font-medium hover:bg-neutral-700 transition-colors flex items-center gap-1.5"
+                    className="bg-muted border border-border text-foreground px-2.5 py-0.5 rounded-md text-xs font-medium hover:bg-muted/80 transition-colors flex items-center gap-1.5"
                   >
                     <span>Meta Ads Tracker</span>
                     <ExternalLink size={12} />
@@ -366,69 +366,69 @@ export default function ExpenseDetailPage() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div>
-                  <p className="text-xs text-neutral-400 uppercase tracking-wider mb-1">Amount</p>
-                  <p className="text-2xl sm:text-3xl font-bold font-mono text-white">₹{parseFloat(expense.amount).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</p>
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1 font-medium">Amount</p>
+                  <p className="text-2xl sm:text-3xl font-bold font-mono text-foreground">₹{parseFloat(expense.amount).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-neutral-400 uppercase tracking-wider mb-1">Expense Date</p>
-                  <p className="text-base sm:text-lg font-medium text-neutral-200">{new Date(expense.expenseDate).toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1 font-medium">Expense Date</p>
+                  <p className="text-base sm:text-lg font-medium text-foreground">{new Date(expense.expenseDate).toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
                 </div>
               </div>
 
               {expense.description && (
-                <div className="mt-6 pt-5 border-t border-neutral-800">
-                  <p className="text-xs text-neutral-400 uppercase tracking-wider mb-2">Description</p>
-                  <p className="text-neutral-300 text-sm leading-relaxed whitespace-pre-wrap">{expense.description}</p>
+                <div className="mt-6 pt-5 border-t border-border">
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2 font-medium">Description</p>
+                  <p className="text-foreground text-sm leading-relaxed whitespace-pre-wrap">{expense.description}</p>
                 </div>
               )}
 
               {expense.referenceNumber && (
-                <div className="mt-4 pt-4 border-t border-neutral-800">
-                  <p className="text-xs text-neutral-400 uppercase tracking-wider mb-1">Reference Number</p>
-                  <p className="font-mono text-sm text-neutral-300">{expense.referenceNumber}</p>
+                <div className="mt-4 pt-4 border-t border-border">
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1 font-medium">Reference Number</p>
+                  <p className="font-mono text-sm text-foreground">{expense.referenceNumber}</p>
                 </div>
               )}
             </div>
           )}
 
           {/* Activity Timeline */}
-          <div className="bg-neutral-900/60 border border-neutral-800 rounded-xl p-5 sm:p-6">
-            <h2 className="text-base font-semibold text-white mb-4">Activity Timeline</h2>
+          <div className="bg-card border border-border rounded-xl p-5 sm:p-6 shadow-xs">
+            <h2 className="text-base font-semibold text-foreground mb-4">Activity Timeline</h2>
             {expense.activities.length === 0 ? (
-              <p className="text-neutral-500 text-xs">No activity recorded.</p>
+              <p className="text-muted-foreground text-xs">No activity recorded.</p>
             ) : (
               <div className="space-y-4">
                 {expense.activities.map((activity) => (
                   <div key={activity.id} className="flex gap-3">
                     <div className="flex flex-col items-center">
                       <div className={`w-2 h-2 rounded-full mt-1.5 ${
-                        activity.activityType === 'CREATED' ? 'bg-emerald-400' :
-                        activity.activityType === 'DELETED' ? 'bg-rose-400' :
-                        activity.activityType === 'UPDATED' ? 'bg-amber-400' :
-                        'bg-neutral-400'
+                        activity.activityType === 'CREATED' ? 'bg-emerald-500' :
+                        activity.activityType === 'DELETED' ? 'bg-rose-500' :
+                        activity.activityType === 'UPDATED' ? 'bg-amber-500' :
+                        'bg-muted-foreground'
                       }`} />
-                      <div className="w-px h-full bg-neutral-800 mt-2" />
+                      <div className="w-px h-full bg-border mt-2" />
                     </div>
                     <div className="flex-1 pb-3">
-                      <p className="text-xs text-neutral-400 mb-0.5">
+                      <p className="text-xs text-muted-foreground mb-0.5">
                         {new Date(activity.createdAt).toLocaleString()} • {activity.actorName || 'System'}
                       </p>
                       {activity.activityType === 'CREATED' && (
-                        <p className="text-sm text-neutral-200">Expense created — ₹{parseFloat(activity.newValue || '0').toFixed(2)}</p>
+                        <p className="text-sm text-foreground">Expense created — ₹{parseFloat(activity.newValue || '0').toFixed(2)}</p>
                       )}
                       {activity.activityType === 'UPDATED' && (
-                        <p className="text-sm text-neutral-200">
+                        <p className="text-sm text-foreground">
                           Expense updated
                           {activity.oldValue && activity.newValue && activity.oldValue !== activity.newValue && (
-                            <span className="text-neutral-400"> — amount changed from ₹{parseFloat(activity.oldValue).toFixed(2)} to ₹{parseFloat(activity.newValue).toFixed(2)}</span>
+                            <span className="text-muted-foreground"> — amount changed from ₹{parseFloat(activity.oldValue).toFixed(2)} to ₹{parseFloat(activity.newValue).toFixed(2)}</span>
                           )}
                         </p>
                       )}
                       {activity.activityType === 'DELETED' && (
-                        <p className="text-sm text-rose-400">Expense deleted</p>
+                        <p className="text-sm text-rose-500">Expense deleted</p>
                       )}
                       {activity.activityType === 'REMARK_ADDED' && activity.remark && (
-                        <div className="mt-1 bg-neutral-950 p-2.5 rounded-lg border border-neutral-800 text-neutral-300 text-xs">
+                        <div className="mt-1 bg-muted p-2.5 rounded-lg border border-border text-foreground text-xs">
                           &quot;{activity.remark}&quot;
                         </div>
                       )}
@@ -442,44 +442,44 @@ export default function ExpenseDetailPage() {
 
         {/* Sidebar */}
         <div className="space-y-6">
-          <div className="bg-neutral-900/60 border border-neutral-800 rounded-xl p-5 sm:p-6">
-            <h3 className="text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-4">Details</h3>
+          <div className="bg-card border border-border rounded-xl p-5 sm:p-6 shadow-xs">
+            <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">Details</h3>
             <div className="space-y-3 text-sm">
               <div className="flex justify-between">
-                <span className="text-neutral-400 text-xs">Category</span>
-                <span className="font-medium text-xs text-white">{expense.category}</span>
+                <span className="text-muted-foreground text-xs">Category</span>
+                <span className="font-medium text-xs text-foreground">{expense.category}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-neutral-400 text-xs">Payment</span>
-                <span className="font-medium text-xs text-white">{expense.paymentMethod}</span>
+                <span className="text-muted-foreground text-xs">Payment</span>
+                <span className="font-medium text-xs text-foreground">{expense.paymentMethod}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-neutral-400 text-xs">Date</span>
-                <span className="text-xs text-white">{new Date(expense.expenseDate).toLocaleDateString()}</span>
+                <span className="text-muted-foreground text-xs">Date</span>
+                <span className="text-xs text-foreground">{new Date(expense.expenseDate).toLocaleDateString()}</span>
               </div>
               {expense.referenceNumber && (
                 <div className="flex justify-between">
-                  <span className="text-neutral-400 text-xs">Reference</span>
-                  <span className="font-mono text-xs text-neutral-300">{expense.referenceNumber}</span>
+                  <span className="text-muted-foreground text-xs">Reference</span>
+                  <span className="font-mono text-xs text-foreground">{expense.referenceNumber}</span>
                 </div>
               )}
-              <div className="pt-3 border-t border-neutral-800 flex justify-between items-center">
-                <span className="text-neutral-400 text-xs">Amount</span>
-                <span className="font-bold text-base font-mono text-white">₹{parseFloat(expense.amount).toFixed(2)}</span>
+              <div className="pt-3 border-t border-border flex justify-between items-center">
+                <span className="text-muted-foreground text-xs">Amount</span>
+                <span className="font-bold text-base font-mono text-foreground">₹{parseFloat(expense.amount).toFixed(2)}</span>
               </div>
             </div>
           </div>
 
-          <div className="bg-neutral-900/60 border border-neutral-800 rounded-xl p-5 sm:p-6">
-            <h3 className="text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-4">Timestamps</h3>
+          <div className="bg-card border border-border rounded-xl p-5 sm:p-6 shadow-xs">
+            <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">Timestamps</h3>
             <div className="space-y-3 text-sm">
               <div>
-                <p className="text-neutral-400 text-xs mb-0.5">Created</p>
-                <p className="text-xs text-neutral-200">{new Date(expense.createdAt).toLocaleString()}</p>
+                <p className="text-muted-foreground text-xs mb-0.5">Created</p>
+                <p className="text-xs text-foreground">{new Date(expense.createdAt).toLocaleString()}</p>
               </div>
               <div>
-                <p className="text-neutral-400 text-xs mb-0.5">Last Updated</p>
-                <p className="text-xs text-neutral-200">{new Date(expense.updatedAt).toLocaleString()}</p>
+                <p className="text-muted-foreground text-xs mb-0.5">Last Updated</p>
+                <p className="text-xs text-foreground">{new Date(expense.updatedAt).toLocaleString()}</p>
               </div>
             </div>
           </div>

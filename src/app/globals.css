@@ -1,18 +1,88 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
+  --background: #f8f9fa;
+  --foreground: #09090b;
+  --card: #ffffff;
+  --card-foreground: #09090b;
+  --popover: #ffffff;
+  --popover-foreground: #09090b;
+  --primary: #18181b;
+  --primary-foreground: #ffffff;
+  --secondary: #f4f4f5;
+  --secondary-foreground: #18181b;
+  --muted: #f1f3f5;
+  --muted-foreground: #64748b;
+  --accent: #f1f5f9;
+  --accent-foreground: #0f172a;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --border: #e2e8f0;
+  --input: #e2e8f0;
+  --ring: #18181b;
+  --sidebar: #ffffff;
+  --sidebar-border: #e2e8f0;
+  --sidebar-foreground: #09090b;
+  --sidebar-muted: #f1f3f5;
+  --sidebar-muted-foreground: #64748b;
+  color-scheme: light;
+}
+
+.dark {
   --background: #000000;
   --foreground: #ededed;
   --card: #0d0d0d;
   --card-foreground: #ededed;
-  --border: rgba(255, 255, 255, 0.08);
+  --popover: #0d0d0d;
+  --popover-foreground: #ededed;
+  --primary: #ffffff;
+  --primary-foreground: #000000;
+  --secondary: #171717;
+  --secondary-foreground: #ededed;
   --muted: rgba(255, 255, 255, 0.05);
   --muted-foreground: #a1a1aa;
+  --accent: #171717;
+  --accent-foreground: #ededed;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --border: rgba(255, 255, 255, 0.08);
+  --input: rgba(255, 255, 255, 0.12);
+  --ring: rgba(255, 255, 255, 0.35);
+  --sidebar: #09090b;
+  --sidebar-border: rgba(255, 255, 255, 0.08);
+  --sidebar-foreground: #ededed;
+  --sidebar-muted: rgba(255, 255, 255, 0.05);
+  --sidebar-muted-foreground: #a1a1aa;
+  color-scheme: dark;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-muted: var(--sidebar-muted);
+  --color-sidebar-muted-foreground: var(--sidebar-muted-foreground);
   --font-sans: var(--font-inter);
 }
 
@@ -26,13 +96,12 @@ body {
 
 html {
   -webkit-tap-highlight-color: transparent;
-  color-scheme: dark;
 }
 
-/* Focused elements: clear, non-glowing outline ring */
+/* Focused elements: clear outline ring */
 :focus-visible {
   outline: none;
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.35);
+  box-shadow: 0 0 0 1px var(--ring);
 }
 
 /* Ensure smooth touch scrolling on iOS */
@@ -49,9 +118,9 @@ html {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.12);
+  background: var(--border);
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.22);
+  background: var(--muted-foreground);
 }

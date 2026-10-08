@@ -164,24 +164,24 @@ export default function TemplateManagerModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70">
-      <div className="bg-neutral-900 border border-neutral-800 rounded-xl w-full max-w-2xl max-h-[90dvh] flex flex-col overflow-hidden shadow-2xl">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+      <div className="bg-card border border-border rounded-xl w-full max-w-2xl max-h-[90dvh] flex flex-col overflow-hidden shadow-2xl">
         {/* Header */}
-        <div className="flex items-center justify-between px-4 sm:px-5 py-3.5 border-b border-neutral-800 bg-neutral-950 shrink-0">
+        <div className="flex items-center justify-between px-4 sm:px-5 py-3.5 border-b border-border bg-muted/20 shrink-0">
           <div className="flex items-center gap-2.5">
-            <div className="p-1.5 rounded-lg bg-neutral-800 text-neutral-300 border border-neutral-700 shrink-0">
+            <div className="p-1.5 rounded-lg bg-muted text-foreground border border-border shrink-0">
               <Layers size={16} />
             </div>
             <div>
-              <h3 className="text-sm sm:text-base font-semibold text-white">Master Monthly Templates</h3>
-              <p className="text-xs text-neutral-400">
+              <h3 className="text-sm sm:text-base font-semibold text-foreground">Master Monthly Templates</h3>
+              <p className="text-xs text-muted-foreground">
                 These recurring items automatically populate when every new month unlocks.
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 flex items-center justify-center text-neutral-400 hover:text-white rounded-lg bg-neutral-800 hover:bg-neutral-700 transition-colors shrink-0"
+            className="w-8 h-8 flex items-center justify-center text-muted-foreground hover:text-foreground rounded-lg bg-muted hover:bg-muted/80 transition-colors shrink-0"
           >
             <X size={15} />
           </button>
@@ -193,7 +193,7 @@ export default function TemplateManagerModal({
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5">
             <button
               onClick={startAdd}
-              className="px-3.5 py-2 min-h-[38px] text-xs font-semibold text-black bg-white hover:bg-neutral-200 rounded-lg transition-colors flex items-center justify-center gap-1.5"
+              className="px-3.5 py-2 min-h-[38px] text-xs font-semibold text-primary-foreground bg-primary hover:opacity-90 rounded-lg transition-opacity flex items-center justify-center gap-1.5"
             >
               <Plus size={14} /> Add Recurring Bill
             </button>
@@ -201,24 +201,24 @@ export default function TemplateManagerModal({
             <button
               onClick={handleSync}
               disabled={isSyncing}
-              className="px-3.5 py-2 min-h-[38px] text-xs font-medium text-neutral-300 hover:text-white bg-neutral-800 hover:bg-neutral-700 border border-neutral-700 rounded-lg transition-colors flex items-center justify-center gap-1.5 disabled:opacity-50"
+              className="px-3.5 py-2 min-h-[38px] text-xs font-medium text-foreground bg-muted hover:bg-muted/80 border border-border rounded-lg transition-colors flex items-center justify-center gap-1.5 disabled:opacity-50"
               title={`Add any missing template items to ${activeMonth}`}
             >
-              <RotateCcw size={13} className={isSyncing ? 'animate-spin text-white' : ''} />
+              <RotateCcw size={13} className={isSyncing ? 'animate-spin text-foreground' : ''} />
               {isSyncing ? 'Syncing...' : `Sync missing to ${activeMonth}`}
             </button>
           </div>
 
           {/* Form when adding or editing */}
           {(isAdding || editingId) && (
-            <form onSubmit={handleSave} className="bg-neutral-950 border border-neutral-800 rounded-lg p-3.5 space-y-3">
-              <div className="text-xs font-semibold text-white">
+            <form onSubmit={handleSave} className="bg-background border border-border rounded-lg p-3.5 space-y-3">
+              <div className="text-xs font-semibold text-foreground">
                 {editingId ? 'Edit Recurring Template Item' : 'Create New Recurring Bill Template'}
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="sm:col-span-2">
-                  <label className="block text-xs font-medium text-neutral-300 mb-1">
+                  <label className="block text-xs font-medium text-foreground mb-1">
                     Bill / Expense Name *
                   </label>
                   <input
@@ -227,12 +227,12 @@ export default function TemplateManagerModal({
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="e.g. Shop Rent, EB Bill, Wi-Fi"
-                    className="w-full px-3 py-2 min-h-[38px] bg-neutral-900 border border-neutral-800 rounded-lg text-white text-xs focus:outline-none focus:border-neutral-500"
+                    className="w-full px-3 py-2 min-h-[38px] bg-background border border-border rounded-lg text-foreground text-xs focus:outline-none focus:ring-1 focus:ring-ring"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-neutral-300 mb-1">
+                  <label className="block text-xs font-medium text-foreground mb-1">
                     Default Expected Amount (₹)
                   </label>
                   <input
@@ -241,12 +241,12 @@ export default function TemplateManagerModal({
                     value={defaultAmount}
                     onChange={(e) => setDefaultAmount(e.target.value)}
                     placeholder="0.00"
-                    className="w-full px-3 py-2 min-h-[38px] bg-neutral-900 border border-neutral-800 rounded-lg text-white text-xs font-mono focus:outline-none focus:border-neutral-500"
+                    className="w-full px-3 py-2 min-h-[38px] bg-background border border-border rounded-lg text-foreground text-xs font-mono focus:outline-none focus:ring-1 focus:ring-ring"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-neutral-300 mb-1">
+                  <label className="block text-xs font-medium text-foreground mb-1">
                     Due Day of Month (1 - 31)
                   </label>
                   <input
@@ -256,21 +256,21 @@ export default function TemplateManagerModal({
                     value={dueDay}
                     onChange={(e) => setDueDay(e.target.value)}
                     placeholder="5"
-                    className="w-full px-3 py-2 min-h-[38px] bg-neutral-900 border border-neutral-800 rounded-lg text-white text-xs font-mono focus:outline-none focus:border-neutral-500"
+                    className="w-full px-3 py-2 min-h-[38px] bg-background border border-border rounded-lg text-foreground text-xs font-mono focus:outline-none focus:ring-1 focus:ring-ring"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-neutral-300 mb-1">
+                  <label className="block text-xs font-medium text-foreground mb-1">
                     Category
                   </label>
                   <select
                     value={category}
                     onChange={(e) => setCategory(e.target.value)}
-                    className="w-full px-3 py-2 min-h-[38px] bg-neutral-900 border border-neutral-800 rounded-lg text-white text-xs focus:outline-none focus:border-neutral-500"
+                    className="w-full px-3 py-2 min-h-[38px] bg-background border border-border rounded-lg text-foreground text-xs focus:outline-none focus:ring-1 focus:ring-ring"
                   >
                     {EXPENSE_CATEGORIES.map((c) => (
-                      <option key={c.value} value={c.value} className="bg-neutral-900 text-white">
+                      <option key={c.value} value={c.value} className="bg-popover text-popover-foreground">
                         {c.label}
                       </option>
                     ))}
@@ -278,17 +278,17 @@ export default function TemplateManagerModal({
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-neutral-300 mb-1">
+                  <label className="block text-xs font-medium text-foreground mb-1">
                     Default Payment Method
                   </label>
                   <select
                     value={paymentMethodId}
                     onChange={(e) => setPaymentMethodId(e.target.value)}
-                    className="w-full px-3 py-2 min-h-[38px] bg-neutral-900 border border-neutral-800 rounded-lg text-white text-xs focus:outline-none focus:border-neutral-500"
+                    className="w-full px-3 py-2 min-h-[38px] bg-background border border-border rounded-lg text-foreground text-xs focus:outline-none focus:ring-1 focus:ring-ring"
                   >
-                    <option value="" className="bg-neutral-900 text-white">Unspecified</option>
+                    <option value="" className="bg-popover text-popover-foreground">Unspecified</option>
                     {paymentMethods.map((pm) => (
-                      <option key={pm.id} value={pm.id} className="bg-neutral-900 text-white">
+                      <option key={pm.id} value={pm.id} className="bg-popover text-popover-foreground">
                         {pm.name}
                       </option>
                     ))}
@@ -296,7 +296,7 @@ export default function TemplateManagerModal({
                 </div>
 
                 <div className="sm:col-span-2">
-                  <label className="block text-xs font-medium text-neutral-300 mb-1">
+                  <label className="block text-xs font-medium text-foreground mb-1">
                     Notes / Description
                   </label>
                   <input
@@ -304,23 +304,23 @@ export default function TemplateManagerModal({
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
                     placeholder="e.g. Account number, vendor info"
-                    className="w-full px-3 py-2 min-h-[38px] bg-neutral-900 border border-neutral-800 rounded-lg text-white text-xs focus:outline-none focus:border-neutral-500"
+                    className="w-full px-3 py-2 min-h-[38px] bg-background border border-border rounded-lg text-foreground text-xs focus:outline-none focus:ring-1 focus:ring-ring"
                   />
                 </div>
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-2 border-t border-neutral-800">
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-border">
                 <button
                   type="button"
                   onClick={cancelForm}
-                  className="px-3.5 py-1.5 min-h-[36px] text-xs text-neutral-300 hover:text-white rounded-lg bg-neutral-800 hover:bg-neutral-700 border border-neutral-700 transition-colors"
+                  className="px-3.5 py-1.5 min-h-[36px] text-xs text-muted-foreground hover:text-foreground rounded-lg bg-muted hover:bg-muted/80 border border-border transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="px-4 py-1.5 min-h-[36px] text-xs font-semibold text-black bg-white hover:bg-neutral-200 rounded-lg flex items-center gap-1.5"
+                  className="px-4 py-1.5 min-h-[36px] text-xs font-semibold text-primary-foreground bg-primary hover:opacity-90 rounded-lg flex items-center gap-1.5"
                 >
                   <Check size={13} />
                   {isSubmitting ? 'Saving...' : 'Save Template Item'}
@@ -338,8 +338,8 @@ export default function TemplateManagerModal({
                   key={tpl.id}
                   className={`flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 rounded-lg border transition-colors ${
                     isActive
-                      ? 'bg-neutral-950 border-neutral-800'
-                      : 'bg-neutral-950/40 border-neutral-800/40 opacity-60'
+                      ? 'bg-card border-border shadow-xs'
+                      : 'bg-muted/30 border-border/50 opacity-60'
                   }`}
                 >
                   <div className="flex items-start sm:items-center gap-2.5 min-w-0">
@@ -347,8 +347,8 @@ export default function TemplateManagerModal({
                       onClick={() => handleToggleActive(tpl)}
                       className={`w-8 h-8 min-w-[32px] min-h-[32px] flex items-center justify-center rounded-lg border transition-colors shrink-0 ${
                         isActive
-                          ? 'bg-white text-black border-white'
-                          : 'bg-neutral-900 border-neutral-800 text-neutral-500'
+                          ? 'bg-primary text-primary-foreground border-primary'
+                          : 'bg-muted border-border text-muted-foreground'
                       }`}
                       title={isActive ? 'Active: will auto-populate upcoming months' : 'Inactive'}
                     >
@@ -357,23 +357,23 @@ export default function TemplateManagerModal({
 
                     <div className="min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-xs sm:text-sm font-semibold text-white truncate">
+                        <span className="text-xs sm:text-sm font-semibold text-foreground truncate">
                           {tpl.name}
                         </span>
-                        <span className="text-[10px] px-2 py-0.5 rounded bg-neutral-800 text-neutral-400 font-medium border border-neutral-700">
+                        <span className="text-[10px] px-2 py-0.5 rounded bg-muted text-muted-foreground font-medium border border-border">
                           Due day: {tpl.dueDay}th
                         </span>
                       </div>
-                      <div className="text-xs text-neutral-400 flex items-center gap-2 mt-0.5 flex-wrap">
-                        <span className="font-mono text-white">
+                      <div className="text-xs text-muted-foreground flex items-center gap-2 mt-0.5 flex-wrap">
+                        <span className="font-mono text-foreground font-medium">
                           ₹{Number(tpl.defaultAmount || 0).toLocaleString('en-IN')}
                         </span>
                         <span>•</span>
-                        <span className="text-[11px] text-neutral-400">{tpl.category}</span>
+                        <span className="text-[11px] text-muted-foreground">{tpl.category}</span>
                         {tpl.notes && (
                           <>
                             <span>•</span>
-                            <span className="text-[11px] text-neutral-400 truncate max-w-[200px]">
+                            <span className="text-[11px] text-muted-foreground truncate max-w-[200px]">
                               {tpl.notes}
                             </span>
                           </>
@@ -386,14 +386,14 @@ export default function TemplateManagerModal({
                   <div className="flex items-center gap-1 self-end sm:self-auto shrink-0">
                     <button
                       onClick={() => startEdit(tpl)}
-                      className="w-8 h-8 flex items-center justify-center text-neutral-400 hover:text-white rounded-lg bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 transition-colors"
+                      className="w-8 h-8 flex items-center justify-center text-muted-foreground hover:text-foreground rounded-lg bg-muted hover:bg-muted/80 border border-border transition-colors"
                       title="Edit template"
                     >
                       <Pencil size={13} />
                     </button>
                     <button
                       onClick={() => handleDelete(tpl.id, tpl.name)}
-                      className="w-8 h-8 flex items-center justify-center text-rose-300 hover:text-rose-200 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 transition-colors"
+                      className="w-8 h-8 flex items-center justify-center text-rose-600 dark:text-rose-300 hover:text-rose-700 dark:hover:text-rose-200 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 transition-colors"
                       title="Delete template"
                     >
                       <Trash2 size={13} />
@@ -406,13 +406,13 @@ export default function TemplateManagerModal({
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between px-4 sm:px-5 py-3 border-t border-neutral-800 bg-neutral-950 shrink-0">
-          <span className="text-xs text-neutral-400">
+        <div className="flex items-center justify-between px-4 sm:px-5 py-3 border-t border-border bg-muted/20 shrink-0">
+          <span className="text-xs text-muted-foreground">
             {templates.filter((t) => t.isActive === 'true').length} of {templates.length} active templates
           </span>
           <button
             onClick={onClose}
-            className="px-4 py-2 min-h-[38px] text-xs font-semibold text-black bg-white hover:bg-neutral-200 rounded-lg transition-colors"
+            className="px-4 py-2 min-h-[38px] text-xs font-semibold text-primary-foreground bg-primary hover:opacity-90 rounded-lg transition-opacity"
           >
             Done
           </button>

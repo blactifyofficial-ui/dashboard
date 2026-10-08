@@ -18,19 +18,19 @@ export default function MasterLedgerTab({
   onDeleteTxn,
 }: MasterLedgerTabProps) {
   return (
-    <div className="bg-neutral-900/60 border border-neutral-800 rounded-xl overflow-hidden flex flex-col flex-1 min-h-0">
-      <div className="p-4 sm:p-5 border-b border-neutral-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-neutral-950">
+    <div className="bg-card border border-border rounded-xl overflow-hidden flex flex-col flex-1 min-h-0">
+      <div className="p-4 sm:p-5 border-b border-border flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-muted/40">
         <div className="flex items-center gap-2">
-          <h3 className="text-sm sm:text-base font-semibold text-white">
+          <h3 className="text-sm sm:text-base font-semibold text-foreground">
             Master Capital Ledger
           </h3>
-          <span className="px-2 py-0.5 rounded-md text-xs font-medium bg-neutral-800 text-neutral-300 border border-neutral-700">
+          <span className="px-2 py-0.5 rounded-md text-xs font-medium bg-muted text-foreground border border-border">
             {transactions.length} {transactions.length === 1 ? 'entry' : 'entries'}
           </span>
         </div>
         <button
           onClick={onOpenAddTxn}
-          className="px-3.5 py-2 min-h-[38px] bg-white hover:bg-neutral-200 text-black text-xs font-semibold rounded-lg flex items-center gap-1.5 transition-colors self-start sm:self-auto"
+          className="px-3.5 py-2 min-h-[38px] bg-primary text-primary-foreground hover:opacity-90 text-xs font-semibold rounded-lg flex items-center gap-1.5 transition-opacity self-start sm:self-auto"
         >
           <Plus size={14} />
           <span>Record Transaction</span>
@@ -40,7 +40,7 @@ export default function MasterLedgerTab({
       <div className="overflow-x-auto">
         <table className="w-full text-left text-xs sm:text-sm border-collapse min-w-[700px]">
           <thead>
-            <tr className="border-b border-neutral-800 bg-neutral-950 text-[11px] font-semibold text-neutral-400 uppercase tracking-wider">
+            <tr className="border-b border-border bg-muted/20 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
               <th className="py-2.5 px-4">Date</th>
               <th className="py-2.5 px-4">Partner</th>
               <th className="py-2.5 px-4">Type</th>
@@ -51,17 +51,17 @@ export default function MasterLedgerTab({
               <th className="py-2.5 px-4 text-right">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-neutral-800 text-xs">
+          <tbody className="divide-y divide-border text-xs">
             {transactions.length === 0 ? (
               <tr>
-                <td colSpan={8} className="py-16 text-center text-neutral-500 space-y-3">
-                  <div className="w-10 h-10 mx-auto rounded-lg bg-neutral-950 border border-neutral-800 flex items-center justify-center text-neutral-400 mb-2">
+                <td colSpan={8} className="py-16 text-center text-muted-foreground space-y-3">
+                  <div className="w-10 h-10 mx-auto rounded-lg bg-muted border border-border flex items-center justify-center text-muted-foreground mb-2">
                     <FileText size={18} />
                   </div>
-                  <div className="text-sm font-medium text-neutral-300">
+                  <div className="text-sm font-medium text-foreground">
                     No transactions recorded matching the filters
                   </div>
-                  <p className="text-xs text-neutral-500 max-w-sm mx-auto">
+                  <p className="text-xs text-muted-foreground max-w-sm mx-auto">
                     Record capital injections, withdrawals, profit shares, or dividends to see them in this ledger.
                   </p>
                 </td>
@@ -73,8 +73,8 @@ export default function MasterLedgerTab({
                 const isWithdrawal = txn.type === 'WITHDRAWAL';
 
                 const typeBadgeStyles = isPayout
-                  ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30'
-                  : 'bg-neutral-800 text-neutral-300 border-neutral-700';
+                  ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-500/30'
+                  : 'bg-muted text-foreground border-border';
 
                 const typeLabels = {
                   INVESTMENT: 'Capital In',
@@ -84,11 +84,11 @@ export default function MasterLedgerTab({
                 }[txn.type] || txn.type;
 
                 return (
-                  <tr key={txn.id} className="hover:bg-neutral-800/40 transition-colors group">
-                    <td className="py-3 px-4 text-neutral-400 whitespace-nowrap text-xs font-mono">
+                  <tr key={txn.id} className="hover:bg-muted/40 transition-colors group">
+                    <td className="py-3 px-4 text-muted-foreground whitespace-nowrap text-xs font-mono">
                       {formatDisplayDate(txn.transactionDate)}
                     </td>
-                    <td className="py-3 px-4 font-semibold text-white whitespace-nowrap">
+                    <td className="py-3 px-4 font-semibold text-foreground whitespace-nowrap">
                       {txn.partnerName || '—'}
                     </td>
                     <td className="py-3 px-4 whitespace-nowrap">
@@ -97,48 +97,48 @@ export default function MasterLedgerTab({
                       >
                         {isPositive && <ArrowUpRight size={11} />}
                         {isWithdrawal && <ArrowDownLeft size={11} />}
-                        {isPayout && <ArrowDownLeft size={11} className="text-emerald-400" />}
+                        {isPayout && <ArrowDownLeft size={11} className="text-emerald-600 dark:text-emerald-400" />}
                         {typeLabels}
                       </span>
                     </td>
-                    <td className={`py-3 px-4 font-bold font-mono whitespace-nowrap ${isPayout ? 'text-emerald-400' : 'text-white'}`}>
+                    <td className={`py-3 px-4 font-bold font-mono whitespace-nowrap ${isPayout ? 'text-emerald-600 dark:text-emerald-400' : 'text-foreground'}`}>
                       {isPositive ? '+' : '-'} {formatCurrency(txn.amount)}
                     </td>
-                    <td className="py-3 px-4 text-neutral-400 whitespace-nowrap text-xs">
+                    <td className="py-3 px-4 text-muted-foreground whitespace-nowrap text-xs">
                       {txn.paymentMethodName ? (
                         <span className="inline-flex items-center gap-1">
-                          <CreditCard size={11} className="text-neutral-500" />
+                          <CreditCard size={11} className="text-muted-foreground" />
                           {txn.paymentMethodName}
                         </span>
                       ) : (
                         '—'
                       )}
                     </td>
-                    <td className="py-3 px-4 text-neutral-400 font-mono text-xs whitespace-nowrap">
+                    <td className="py-3 px-4 text-muted-foreground font-mono text-xs whitespace-nowrap">
                       {txn.referenceNumber ? (
                         <span className="inline-flex items-center gap-1">
-                          <Hash size={11} className="text-neutral-500" />
+                          <Hash size={11} className="text-muted-foreground" />
                           {txn.referenceNumber}
                         </span>
                       ) : (
                         '—'
                       )}
                     </td>
-                    <td className="py-3 px-4 text-neutral-400 text-xs max-w-xs truncate">
+                    <td className="py-3 px-4 text-muted-foreground text-xs max-w-xs truncate">
                       {txn.notes || '—'}
                     </td>
                     <td className="py-3 px-4 text-right whitespace-nowrap">
                       <div className="flex items-center justify-end gap-1">
                         <button
                           onClick={() => onEditTxn(txn)}
-                          className="p-1.5 text-neutral-400 hover:text-white rounded-lg hover:bg-neutral-800 transition-colors"
+                          className="p-1.5 text-muted-foreground hover:text-foreground rounded-lg hover:bg-muted transition-colors"
                           title="Edit transaction"
                         >
                           <Pencil size={13} />
                         </button>
                         <button
                           onClick={() => onDeleteTxn(txn)}
-                          className="p-1.5 text-neutral-400 hover:text-rose-400 rounded-lg hover:bg-rose-500/10 transition-colors"
+                          className="p-1.5 text-muted-foreground hover:text-rose-500 rounded-lg hover:bg-rose-500/10 transition-colors"
                           title="Delete transaction"
                         >
                           <Trash2 size={13} />

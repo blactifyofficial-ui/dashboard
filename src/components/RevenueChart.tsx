@@ -9,6 +9,10 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts';
+import { useTheme } from 'next-themes';
+import { useSyncExternalStore } from 'react';
+
+const emptySubscribe = () => () => {};
 
 export interface RevenueData {
   day: string;
@@ -20,19 +24,20 @@ interface CustomTooltipProps {
   active?: boolean;
   payload?: Array<{ payload: RevenueData }>;
   label?: string;
+  isDark?: boolean;
 }
 
 function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
   if (active && payload && payload.length) {
     const data = payload[0].payload;
     return (
-      <div style={{ backgroundColor: '#111', border: '1px solid #333', borderRadius: '8px', padding: '10px 14px' }}>
-        <p style={{ color: '#888', margin: '0 0 6px 0', fontSize: '13px' }}>{label}</p>
-        <p style={{ color: '#fff', margin: '0 0 4px 0', fontSize: '14px', fontWeight: 500 }}>
-          Revenue : ₹{Number(data.revenue).toLocaleString('en-IN')}
+      <div className="p-3 rounded-lg border border-border shadow-lg bg-popover text-popover-foreground">
+        <p className="text-xs mb-1.5 text-muted-foreground">{label}</p>
+        <p className="text-sm font-semibold mb-1">
+          Revenue: ₹{Number(data.revenue).toLocaleString('en-IN')}
         </p>
-        <p style={{ color: '#fff', margin: 0, fontSize: '14px', fontWeight: 500 }}>
-          Orders : {Number(data.ordersCount ?? 0).toLocaleString('en-IN')}
+        <p className="text-sm font-medium">
+          Orders: {Number(data.ordersCount ?? 0).toLocaleString('en-IN')}
         </p>
       </div>
     );
@@ -41,6 +46,14 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
 }
 
 export default function RevenueChart({ data }: { data: RevenueData[] }) {
+  const { resolvedTheme } = useTheme();
+  const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
+  const isDark = mounted ? resolvedTheme === 'dark' : true;
+
+  const gridStroke = isDark ? '#262626' : '#e2e8f0';
+  const axisColor = isDark ? '#a1a1aa' : '#64748b';
+  const lineColor = isDark ? '#ffffff' : '#0f172a';
+
   return (
     <div className="h-[260px] sm:h-[300px] md:h-[340px] w-full">
       <ResponsiveContainer width="100%" height="100%">
@@ -53,31 +66,31 @@ export default function RevenueChart({ data }: { data: RevenueData[] }) {
             bottom: 20,
           }}
         >
-          <CartesianGrid strokeDasharray="3 3" stroke="#333" vertical={false} />
+          <CartesianGrid strokeDasharray="3 3" stroke={gridStroke} vertical={false} />
           <XAxis 
             dataKey="day" 
-            stroke="#888" 
-            tick={{ fill: '#888' }} 
+            stroke={axisColor} 
+            tick={{ fill: axisColor, fontSize: 12 }} 
             tickMargin={10}
             axisLine={false}
             tickLine={false}
           />
           <YAxis 
-            stroke="#888" 
-            tick={{ fill: '#888' }} 
+            stroke={axisColor} 
+            tick={{ fill: axisColor, fontSize: 12 }} 
             tickFormatter={(value) => `₹${value}`}
             axisLine={false}
             tickLine={false}
             tickMargin={10}
           />
-          <Tooltip content={<CustomTooltip />} />
+          <Tooltip content={<CustomTooltip isDark={isDark} />} />
           <Line 
             type="monotone" 
             dataKey="revenue" 
-            stroke="#fff" 
+            stroke={lineColor} 
             strokeWidth={3}
-            dot={{ fill: '#fff', r: 4 }}
-            activeDot={{ r: 6, fill: '#fff', stroke: '#333', strokeWidth: 2 }}
+            dot={{ fill: lineColor, r: 4 }}
+            activeDot={{ r: 6, fill: lineColor, stroke: gridStroke, strokeWidth: 2 }}
           />
         </LineChart>
       </ResponsiveContainer>

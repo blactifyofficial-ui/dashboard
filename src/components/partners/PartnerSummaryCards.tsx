@@ -30,50 +30,50 @@ export default function PartnerSummaryCards({ summary, partners }: PartnerSummar
       {/* 4 KPI Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {/* Card 1: Total Invested */}
-        <div className="bg-neutral-900/60 border border-neutral-800 rounded-xl p-4 sm:p-5">
-          <p className="text-[11px] font-semibold text-neutral-400 mb-1 uppercase tracking-wider">Total Capital In</p>
-          <p className="text-xl sm:text-2xl font-bold font-mono text-white tracking-tight">
+        <div className="bg-card border border-border rounded-xl p-4 sm:p-5">
+          <p className="text-[11px] font-semibold text-muted-foreground mb-1 uppercase tracking-wider">Total Capital In</p>
+          <p className="text-xl sm:text-2xl font-bold font-mono text-foreground tracking-tight">
             {formatCurrency(totalFund)}
           </p>
-          <p className="mt-1 text-xs text-neutral-500">
+          <p className="mt-1 text-xs text-muted-foreground">
             {partners.length} {partners.length === 1 ? 'partner' : 'partners'} total
           </p>
         </div>
 
         {/* Card 2: Total Payouts Taken */}
-        <div className="bg-neutral-900/60 border border-neutral-800 rounded-xl p-4 sm:p-5">
-          <p className="text-[11px] font-semibold text-emerald-400 mb-1 uppercase tracking-wider">Total Payouts Taken</p>
-          <p className="text-xl sm:text-2xl font-bold font-mono text-emerald-400 tracking-tight">
+        <div className="bg-card border border-border rounded-xl p-4 sm:p-5">
+          <p className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 mb-1 uppercase tracking-wider">Total Payouts Taken</p>
+          <p className="text-xl sm:text-2xl font-bold font-mono text-emerald-600 dark:text-emerald-400 tracking-tight">
             {formatCurrency(totalPayouts)}
           </p>
-          <p className="mt-1 text-xs text-neutral-500">
+          <p className="mt-1 text-xs text-muted-foreground">
             Distributed to partners
           </p>
         </div>
 
         {/* Card 3: Net Active Capital */}
-        <div className="bg-neutral-900/60 border border-neutral-800 rounded-xl p-4 sm:p-5">
-          <p className="text-[11px] font-semibold text-neutral-400 mb-1 uppercase tracking-wider">Net Capital Pool</p>
-          <p className="text-xl sm:text-2xl font-bold font-mono text-white tracking-tight">
+        <div className="bg-card border border-border rounded-xl p-4 sm:p-5">
+          <p className="text-[11px] font-semibold text-muted-foreground mb-1 uppercase tracking-wider">Net Capital Pool</p>
+          <p className="text-xl sm:text-2xl font-bold font-mono text-foreground tracking-tight">
             {formatCurrency(netCapital)}
           </p>
-          <p className="mt-1 text-xs text-neutral-500">
+          <p className="mt-1 text-xs text-muted-foreground">
             {summary?.activePartnerCount || 0} active {summary?.activePartnerCount === 1 ? 'contributor' : 'contributors'}
           </p>
         </div>
 
         {/* Card 4: Equity Stake */}
-        <div className="bg-neutral-900/60 border border-neutral-800 rounded-xl p-4 sm:p-5">
+        <div className="bg-card border border-border rounded-xl p-4 sm:p-5">
           <div className="flex items-center justify-between mb-1">
-            <p className="text-[11px] font-semibold text-neutral-400 uppercase tracking-wider">Equity Allocated</p>
-            <span className="text-xs font-mono text-neutral-400">{allocatedEquity}%</span>
+            <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Equity Allocated</p>
+            <span className="text-xs font-mono text-muted-foreground">{allocatedEquity}%</span>
           </div>
-          <p className="text-xl sm:text-2xl font-bold font-mono text-white tracking-tight">
+          <p className="text-xl sm:text-2xl font-bold font-mono text-foreground tracking-tight">
             {allocatedEquity}%
           </p>
-          <div className="w-full bg-neutral-800 h-1.5 rounded-full mt-2 overflow-hidden">
+          <div className="w-full bg-muted h-1.5 rounded-full mt-2 overflow-hidden">
             <div 
-              className="h-full bg-white transition-all duration-300"
+              className="h-full bg-primary transition-all duration-300"
               style={{ width: `${Math.min(allocatedEquity, 100)}%` }}
             />
           </div>
@@ -82,21 +82,21 @@ export default function PartnerSummaryCards({ summary, partners }: PartnerSummar
 
       {/* Capital Contribution Breakdown Bar */}
       {partners.length > 0 && totalFund > 0 && (
-        <div className="bg-neutral-900/60 border border-neutral-800 rounded-xl p-4 sm:p-5">
+        <div className="bg-card border border-border rounded-xl p-4 sm:p-5">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
-              <h2 className="text-xs font-semibold uppercase tracking-wider text-neutral-400">Capital Pool Distribution</h2>
-              <span className="px-2 py-0.5 rounded-md text-[10px] font-medium bg-neutral-800 text-neutral-300 border border-neutral-700">
+              <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Capital Pool Distribution</h2>
+              <span className="px-2 py-0.5 rounded-md text-[10px] font-medium bg-muted text-foreground border border-border">
                 {partners.filter(p => p.totalInvested > 0).length} {partners.filter(p => p.totalInvested > 0).length === 1 ? 'Contributor' : 'Contributors'}
               </span>
             </div>
-            <span className="text-xs text-neutral-400 font-mono">
-              Total: <strong className="text-white font-semibold">{formatCurrency(totalFund)}</strong>
+            <span className="text-xs text-muted-foreground font-mono">
+              Total: <strong className="text-foreground font-semibold">{formatCurrency(totalFund)}</strong>
             </span>
           </div>
 
           {/* Progress Stack Bar */}
-          <div className="w-full h-2 rounded-full bg-neutral-800 overflow-hidden flex gap-0.5">
+          <div className="w-full h-2 rounded-full bg-muted overflow-hidden flex gap-0.5">
             {partners
               .filter((p) => p.totalInvested > 0)
               .map((partner, index) => {
@@ -125,8 +125,8 @@ export default function PartnerSummaryCards({ summary, partners }: PartnerSummar
                 return (
                   <div key={partner.id} className="flex items-center gap-1.5">
                     <span className={`w-2 h-2 rounded-full ${colorObj.dot}`} />
-                    <span className="text-neutral-200 font-medium">{partner.name}</span>
-                    <span className="text-neutral-500 font-mono">({percentage}%)</span>
+                    <span className="text-foreground font-medium">{partner.name}</span>
+                    <span className="text-muted-foreground font-mono">({percentage}%)</span>
                   </div>
                 );
               })}

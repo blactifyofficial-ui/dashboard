@@ -40,7 +40,7 @@ export default function InstallPWA() {
 
   if (!isInstallable) {
     return (
-      <div className="text-gray-400 text-sm mt-4">
+      <div className="text-muted-foreground text-sm mt-4">
         The app is either already installed, or your browser doesn&apos;t support PWA installation on this device.
       </div>
     );
@@ -49,7 +49,7 @@ export default function InstallPWA() {
   return (
     <button
       onClick={handleInstallClick}
-      className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-white text-black px-6 py-3 min-h-[44px] rounded-xl font-semibold text-sm hover:bg-neutral-200 active:bg-neutral-300 transition-colors mt-4 shadow-sm"
+      className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground px-6 py-3 min-h-[44px] rounded-xl font-semibold text-sm hover:opacity-90 active:opacity-80 transition-colors mt-4 shadow-sm"
     >
       <Download size={18} className="shrink-0" />
       <span>Install App</span>

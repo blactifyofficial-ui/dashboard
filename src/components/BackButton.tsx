@@ -32,7 +32,7 @@ export default function BackButton({
       onClick={handleBack}
       aria-label={label}
       title={label}
-      className={`inline-flex items-center justify-center transition-colors cursor-pointer text-neutral-300 hover:text-white bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 shrink-0 ${
+      className={`inline-flex items-center justify-center transition-colors cursor-pointer text-muted-foreground hover:text-foreground bg-card hover:bg-muted border border-border shrink-0 shadow-xs ${
         iconOnly 
           ? 'h-9 w-9 rounded-lg' 
           : 'gap-1.5 text-xs sm:text-sm font-medium py-1.5 px-3 rounded-lg'
@@ -43,4 +43,3 @@ export default function BackButton({
     </button>
   );
 }
-

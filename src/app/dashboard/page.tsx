@@ -16,10 +16,10 @@ export default async function Dashboard() {
     <div className="space-y-6 relative z-10">
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4">
         <div className="space-y-1">
-          <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-white">Sales Overview</h1>
-          <p className="text-neutral-400 text-xs sm:text-sm flex items-center gap-2">
+          <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-foreground">Sales Overview</h1>
+          <p className="text-muted-foreground text-xs sm:text-sm flex items-center gap-2">
             <span className="relative flex h-2 w-2 shrink-0">
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
             </span>
             <span>Real-time sync with Shopify via Webhooks</span>
           </p>
@@ -63,40 +63,38 @@ async function DashboardContent() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {canViewRevenue && <RevenueCard totalSales={totalSales} />}
 
-        <div className="bg-neutral-900/60 border border-neutral-800 rounded-xl p-5 flex flex-col justify-between">
-          <h2 className="text-xs font-medium text-neutral-400 uppercase tracking-wider mb-3">Total Orders (All Time)</h2>
-          <p className="text-2xl sm:text-3xl font-semibold font-mono text-white tracking-tight truncate mt-auto">
+        <div className="bg-card border border-border rounded-xl p-5 flex flex-col justify-between shadow-xs">
+          <h2 className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3">Total Orders (All Time)</h2>
+          <p className="text-2xl sm:text-3xl font-semibold font-mono text-foreground tracking-tight truncate mt-auto">
             {totalOrders.toLocaleString('en-IN')}
           </p>
         </div>
 
         {canViewStatus && (
-          <div className="bg-neutral-900/60 border border-neutral-800 rounded-xl p-5 flex flex-col justify-between sm:col-span-2 lg:col-span-1">
-            <h2 className="text-xs font-medium text-neutral-400 uppercase tracking-wider mb-3">System Status</h2>
+          <div className="bg-card border border-border rounded-xl p-5 flex flex-col justify-between sm:col-span-2 lg:col-span-1 shadow-xs">
+            <h2 className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3">System Status</h2>
             <div className="flex items-center gap-2.5 mt-auto">
-              <span className="flex h-2.5 w-2.5 rounded-full bg-emerald-400 shrink-0" />
-              <p className="text-base sm:text-lg font-medium text-white">Listening for Webhooks</p>
+              <span className="flex h-2.5 w-2.5 rounded-full bg-emerald-500 shrink-0" />
+              <p className="text-base sm:text-lg font-medium text-foreground">Listening for Webhooks</p>
             </div>
           </div>
         )}
       </div>
 
       {/* Chart Row */}
-      <div className="bg-neutral-900/60 border border-neutral-800 rounded-xl p-5 sm:p-6">
-        <h2 className="text-sm font-medium text-neutral-300 mb-4">Orders per Day (Current Month)</h2>
+      <div className="bg-card border border-border rounded-xl p-5 sm:p-6 shadow-xs">
+        <h2 className="text-sm font-medium text-foreground mb-4">Orders per Day (Current Month)</h2>
         {ordersPerDayResult.length > 0 ? (
           <DynamicOrdersChart data={ordersPerDayResult} />
         ) : (
           <div className="flex flex-col items-center justify-center space-y-3 py-12">
-            <div className="w-12 h-12 rounded-lg bg-neutral-900 border border-neutral-800 flex items-center justify-center text-neutral-500">
+            <div className="w-12 h-12 rounded-lg bg-muted border border-border flex items-center justify-center text-muted-foreground">
               <Inbox size={24} />
             </div>
-            <p className="text-sm text-neutral-400">No chart data available yet.</p>
+            <p className="text-sm text-muted-foreground">No chart data available yet.</p>
           </div>
         )}
       </div>
     </div>
   );
 }
-
-

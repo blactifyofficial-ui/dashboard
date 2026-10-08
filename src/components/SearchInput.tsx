@@ -36,13 +36,13 @@ function SearchInputInner({ initialQuery }: { initialQuery: string }) {
 
   return (
     <div className="relative w-full md:w-auto">
-      <Search size={15} className={`absolute left-3 top-1/2 -translate-y-1/2 transition-colors pointer-events-none ${isPending ? 'text-white' : 'text-neutral-500'}`} />
+      <Search size={15} className={`absolute left-3 top-1/2 -translate-y-1/2 transition-colors pointer-events-none ${isPending ? 'text-primary' : 'text-muted-foreground'}`} />
       <input 
         type="text" 
         value={value}
         onChange={(e) => handleSearch(e.target.value)}
         placeholder="Search..." 
-        className="w-full md:w-64 bg-neutral-900 border border-neutral-800 rounded-lg pl-9 pr-3.5 py-2 text-xs sm:text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:border-neutral-600 transition-colors"
+        className="w-full md:w-64 bg-card border border-input rounded-lg pl-9 pr-3.5 py-2 text-xs sm:text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors shadow-xs"
       />
     </div>
   );
@@ -50,9 +50,8 @@ function SearchInputInner({ initialQuery }: { initialQuery: string }) {
 
 export default function SearchInput({ initialQuery }: { initialQuery: string }) {
   return (
-    <Suspense fallback={<div className="w-full md:w-64 h-9 bg-neutral-900 border border-neutral-800 rounded-lg" />}>
+    <Suspense fallback={<div className="w-full md:w-64 h-9 bg-muted border border-border rounded-lg" />}>
       <SearchInputInner initialQuery={initialQuery} />
     </Suspense>
   );
 }
-

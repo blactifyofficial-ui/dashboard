@@ -358,18 +358,18 @@ export default function ExpensesPage() {
     return (
       <div 
         key={dateKey} 
-        className="bg-neutral-900/60 border border-neutral-800 rounded-xl overflow-hidden"
+        className="bg-card border border-border rounded-xl overflow-hidden shadow-xs"
       >
         {/* Date Group Header (Clickable to Toggle Collapse) */}
         <div 
           onClick={() => toggleExpandDate(dateKey)}
-          className={`p-3 sm:p-3.5 bg-neutral-900 flex flex-col sm:flex-row sm:items-center justify-between gap-3 cursor-pointer hover:bg-neutral-800/80 transition-colors select-none ${
-            isDateExpanded ? 'border-b border-neutral-800' : ''
+          className={`p-3 sm:p-3.5 bg-muted/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3 cursor-pointer hover:bg-muted/70 transition-colors select-none ${
+            isDateExpanded ? 'border-b border-border' : ''
           }`}
         >
           <div className="flex items-center flex-wrap gap-2.5">
             {/* Date chevron indicator */}
-            <div className="text-neutral-400 hover:text-white transition-colors">
+            <div className="text-muted-foreground hover:text-foreground transition-colors">
               {isDateExpanded ? (
                 <ChevronDown size={16} />
               ) : (
@@ -378,27 +378,27 @@ export default function ExpensesPage() {
             </div>
 
             <div className="flex items-center gap-2">
-              <Calendar size={15} className="text-neutral-400" />
-              <span className="font-semibold text-sm text-white">{displayDate}</span>
+              <Calendar size={15} className="text-muted-foreground" />
+              <span className="font-semibold text-sm text-foreground">{displayDate}</span>
             </div>
 
             {relative && (
-              <span className="px-2 py-0.5 rounded-md text-xs font-medium bg-neutral-800 text-neutral-300 border border-neutral-700">
+              <span className="px-2 py-0.5 rounded-md text-xs font-medium bg-muted text-foreground border border-border">
                 {relative}
               </span>
             )}
 
-            <span className="text-xs text-neutral-400">
+            <span className="text-xs text-muted-foreground">
               • {items.length} {items.length === 1 ? 'record' : 'records'}
             </span>
 
             {/* When collapsed, if a note exists, show a mini preview pill */}
             {!isDateExpanded && currentNote && (
               <span 
-                className="hidden sm:inline-flex items-center gap-1.5 text-xs text-amber-300/80 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20 max-w-xs truncate"
+                className="hidden sm:inline-flex items-center gap-1.5 text-xs text-amber-700 dark:text-amber-300/80 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20 max-w-xs truncate"
                 title={currentNote}
               >
-                <FileText size={12} className="shrink-0 text-amber-400" />
+                <FileText size={12} className="shrink-0 text-amber-500 dark:text-amber-400" />
                 <span className="truncate">{currentNote}</span>
               </span>
             )}
@@ -407,8 +407,8 @@ export default function ExpensesPage() {
           {/* Right: Daily total and Note edit action */}
           <div className="flex items-center gap-3">
             <div className="text-right">
-              <span className="text-xs text-neutral-400 block">Daily Total</span>
-              <span className="font-semibold text-sm sm:text-base text-white">₹{dayTotal}</span>
+              <span className="text-xs text-muted-foreground block">Daily Total</span>
+              <span className="font-semibold text-sm sm:text-base text-foreground">₹{dayTotal}</span>
             </div>
 
             {!isEditingThisNote && (
@@ -420,8 +420,8 @@ export default function ExpensesPage() {
                 }}
                 className={`flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-lg border transition-colors ${
                   currentNote 
-                    ? 'bg-amber-500/10 border-amber-500/30 text-amber-300 hover:bg-amber-500/20' 
-                    : 'bg-neutral-800 border-neutral-700 text-neutral-300 hover:text-white hover:bg-neutral-700'
+                    ? 'bg-amber-500/10 border-amber-500/30 text-amber-700 dark:text-amber-300 hover:bg-amber-500/20' 
+                    : 'bg-muted border-border text-foreground hover:bg-muted/80'
                 }`}
                 title={currentNote ? 'Edit note for this date' : 'Add note for this date'}
               >
@@ -439,24 +439,24 @@ export default function ExpensesPage() {
             {isEditingThisNote ? (
               <div className="p-3 bg-amber-500/5 border-b border-amber-500/20 space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-medium text-amber-300 flex items-center gap-1.5">
+                  <span className="text-xs font-medium text-amber-700 dark:text-amber-300 flex items-center gap-1.5">
                     <FileText size={14} /> Note for {displayDate}
                   </span>
-                  <span className="text-[11px] text-neutral-400">Visible to team</span>
+                  <span className="text-[11px] text-muted-foreground">Visible to team</span>
                 </div>
                 <textarea
                   value={tempNote}
                   onChange={(e) => setTempNote(e.target.value)}
                   placeholder="Add note or context about this day's expenses..."
                   rows={2}
-                  className="w-full bg-neutral-950 border border-neutral-800 rounded-lg p-2.5 text-xs text-white placeholder:text-neutral-500 focus:outline-none focus:border-neutral-600 transition-colors"
+                  className="w-full bg-background border border-border rounded-lg p-2.5 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring transition-colors"
                 />
                 <div className="flex items-center justify-end gap-2">
                   <button
                     type="button"
                     onClick={handleCancelEditNote}
                     disabled={isSavingThisNote}
-                    className="px-2.5 py-1 text-xs text-neutral-400 hover:text-white transition-colors"
+                    className="px-2.5 py-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
                   >
                     Cancel
                   </button>
@@ -464,7 +464,7 @@ export default function ExpensesPage() {
                     type="button"
                     onClick={() => handleSaveNote(dateKey)}
                     disabled={isSavingThisNote}
-                    className="px-3 py-1 bg-white text-black font-semibold text-xs rounded-lg hover:bg-neutral-200 transition-colors flex items-center gap-1"
+                    className="px-3 py-1 bg-primary text-primary-foreground font-semibold text-xs rounded-lg hover:opacity-90 transition-opacity flex items-center gap-1"
                   >
                     {isSavingThisNote ? (
                       <Loader2 size={12} className="animate-spin" />
@@ -476,16 +476,16 @@ export default function ExpensesPage() {
                 </div>
               </div>
             ) : currentNote ? (
-              <div className="p-3 bg-amber-500/5 border-b border-neutral-800 flex items-start justify-between gap-3 text-xs">
-                <div className="flex items-start gap-2 text-amber-300/90">
-                  <FileText size={14} className="mt-0.5 text-amber-400 shrink-0" />
+              <div className="p-3 bg-amber-500/5 border-b border-border flex items-start justify-between gap-3 text-xs">
+                <div className="flex items-start gap-2 text-amber-700 dark:text-amber-300/90">
+                  <FileText size={14} className="mt-0.5 text-amber-500 dark:text-amber-400 shrink-0" />
                   <p className="leading-relaxed whitespace-pre-wrap">{currentNote}</p>
                 </div>
                 {canEditExpenses && (
                   <button
                     type="button"
                     onClick={() => handleStartEditNote(dateKey)}
-                    className="text-neutral-400 hover:text-white text-xs shrink-0"
+                    className="text-muted-foreground hover:text-foreground text-xs shrink-0"
                   >
                     <Pencil size={12} />
                   </button>
@@ -496,7 +496,7 @@ export default function ExpensesPage() {
             {/* Expenses Table for this Date */}
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm whitespace-nowrap">
-                <thead className="bg-neutral-900 text-neutral-400 text-xs border-b border-neutral-800">
+                <thead className="bg-muted/30 text-muted-foreground text-xs border-b border-border">
                   <tr>
                     <th className="px-6 py-2.5 font-medium flex items-center gap-1">
                       <Clock size={12} />
@@ -509,33 +509,33 @@ export default function ExpensesPage() {
                     <th className="px-6 py-2.5 font-medium text-right">Action</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-neutral-800/60">
+                <tbody className="divide-y divide-border/60">
                   {items.map(expense => (
                     <tr 
                       key={expense.id} 
-                      className="hover:bg-neutral-800/30 transition-colors group"
+                      className="hover:bg-muted/30 transition-colors group"
                     >
-                      <td className="px-6 py-3 text-neutral-400 font-mono text-xs">
+                      <td className="px-6 py-3 text-muted-foreground font-mono text-xs">
                         {formatAddedTime(expense.createdAt)}
                       </td>
                       <td className="px-6 py-3">
-                        <span className="bg-neutral-800 px-2 py-0.5 rounded text-xs text-neutral-300">
+                        <span className="bg-muted border border-border/70 px-2 py-0.5 rounded text-xs text-foreground">
                           {expense.category || 'N/A'}
                         </span>
                       </td>
                       <td className="px-6 py-3">
-                        <span className="font-medium text-white">{expense.title}</span>
+                        <span className="font-medium text-foreground">{expense.title}</span>
                       </td>
-                      <td className="px-6 py-3 text-right font-medium text-white">
+                      <td className="px-6 py-3 text-right font-medium text-foreground">
                         ₹{parseFloat(expense.amount || '0').toFixed(2)}
                       </td>
-                      <td className="px-6 py-3 text-neutral-400 text-xs">
+                      <td className="px-6 py-3 text-muted-foreground text-xs">
                         {expense.paymentMethod || 'N/A'}
                       </td>
                       <td className="px-6 py-3 text-right">
                         <Link 
                           href={`/expenses/${expense.id}`} 
-                          className="inline-flex items-center justify-center text-neutral-400 group-hover:text-white transition-colors"
+                          className="inline-flex items-center justify-center text-muted-foreground group-hover:text-foreground transition-colors"
                         >
                           <ArrowRight size={15} />
                         </Link>
@@ -560,13 +560,13 @@ export default function ExpensesPage() {
       {/* Header */}
       <div className="flex-none flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white">Expenses</h1>
-          <p className="text-xs sm:text-sm text-neutral-400 mt-1">Manage and track your business expenses grouped by date</p>
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">Expenses</h1>
+          <p className="text-xs sm:text-sm text-muted-foreground mt-1">Manage and track your business expenses grouped by date</p>
         </div>
         <div className="flex items-center gap-2.5 w-full sm:w-auto">
           <Link
             href="/meta-ads"
-            className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 bg-neutral-900 border border-neutral-800 text-neutral-300 px-3.5 py-2 min-h-[40px] rounded-lg font-medium hover:bg-neutral-800 transition-colors text-xs"
+            className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 bg-card border border-border text-foreground px-3.5 py-2 min-h-[40px] rounded-lg font-medium hover:bg-muted transition-colors text-xs"
           >
             <Megaphone size={15} />
             <span>Meta Ads</span>
@@ -574,7 +574,7 @@ export default function ExpensesPage() {
           {canEditExpenses && (
             <Link
               href="/expenses/add"
-              className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 bg-white text-black px-3.5 py-2 min-h-[40px] rounded-lg font-semibold hover:bg-neutral-200 transition-colors text-xs"
+              className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground px-3.5 py-2 min-h-[40px] rounded-lg font-semibold hover:opacity-90 transition-opacity text-xs"
             >
               <Plus size={15} />
               <span>Add Expense</span>
@@ -589,32 +589,32 @@ export default function ExpensesPage() {
         <>
           {/* Top Metrics Cards */}
           <div className="flex-none grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-            <div className="bg-neutral-900/60 border border-neutral-800 rounded-xl p-4 sm:p-5">
-              <p className="text-xs text-neutral-400 mb-1 uppercase tracking-wider font-medium">Total Expenses</p>
-              <p className="text-xl sm:text-2xl font-bold text-white">₹{calculateTotal()}</p>
+            <div className="bg-card border border-border rounded-xl p-4 sm:p-5 shadow-xs">
+              <p className="text-xs text-muted-foreground mb-1 uppercase tracking-wider font-medium">Total Expenses</p>
+              <p className="text-xl sm:text-2xl font-bold text-foreground">₹{calculateTotal()}</p>
             </div>
-            <div className="bg-neutral-900/60 border border-neutral-800 rounded-xl p-4 sm:p-5">
-              <p className="text-xs text-neutral-400 mb-1 uppercase tracking-wider font-medium">Total Records</p>
-              <p className="text-xl sm:text-2xl font-bold text-white">{filteredExpenses.length}</p>
+            <div className="bg-card border border-border rounded-xl p-4 sm:p-5 shadow-xs">
+              <p className="text-xs text-muted-foreground mb-1 uppercase tracking-wider font-medium">Total Records</p>
+              <p className="text-xl sm:text-2xl font-bold text-foreground">{filteredExpenses.length}</p>
             </div>
-            <div className="bg-neutral-900/60 border border-neutral-800 rounded-xl p-4 sm:p-5">
-              <p className="text-xs text-neutral-400 mb-1 uppercase tracking-wider font-medium">Days Tracked</p>
-              <p className="text-xl sm:text-2xl font-bold text-white">{totalDaysTracked}</p>
+            <div className="bg-card border border-border rounded-xl p-4 sm:p-5 shadow-xs">
+              <p className="text-xs text-muted-foreground mb-1 uppercase tracking-wider font-medium">Days Tracked</p>
+              <p className="text-xl sm:text-2xl font-bold text-foreground">{totalDaysTracked}</p>
             </div>
           </div>
 
           {/* Main Card with Controls & Expenses */}
-          <div className="flex-1 min-h-0 flex flex-col bg-neutral-900/60 border border-neutral-800 rounded-xl overflow-hidden">
+          <div className="flex-1 min-h-0 flex flex-col bg-card border border-border rounded-xl overflow-hidden shadow-xs">
             {/* Filter & Search Bar */}
-            <div className="flex-none p-3 sm:p-4 border-b border-neutral-800 flex flex-col sm:flex-row gap-2.5 sm:gap-3 justify-between bg-neutral-900/80">
+            <div className="flex-none p-3 sm:p-4 border-b border-border flex flex-col sm:flex-row gap-2.5 sm:gap-3 justify-between bg-muted/20">
               <div className="relative w-full sm:max-w-xs">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500" size={15} />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={15} />
                 <input 
                   type="text" 
                   placeholder="Search expenses..." 
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-neutral-900 border border-neutral-800 rounded-lg pl-9 pr-3 py-1.5 text-xs text-white focus:outline-none focus:border-neutral-600 transition-colors"
+                  className="w-full bg-background border border-border rounded-lg pl-9 pr-3 py-1.5 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring transition-colors"
                 />
               </div>
               
@@ -624,7 +624,7 @@ export default function ExpensesPage() {
                   <button
                     onClick={toggleCollapseAll}
                     title={areAnyExpanded ? 'Collapse all' : 'Expand all'}
-                    className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 text-xs px-3 py-1.5 rounded-lg border bg-neutral-900 border-neutral-800 text-neutral-300 hover:text-white hover:bg-neutral-800 transition-colors"
+                    className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 text-xs px-3 py-1.5 rounded-lg border bg-card border-border text-foreground hover:bg-muted transition-colors"
                   >
                     <ChevronsUpDown size={14} />
                     <span>{areAnyExpanded ? 'Collapse All' : 'Expand All'}</span>
@@ -635,7 +635,7 @@ export default function ExpensesPage() {
                 <button
                   onClick={() => setTimeSortOrder(prev => prev === 'desc' ? 'asc' : 'desc')}
                   title="Toggle order by adding time"
-                  className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 text-xs px-3 py-1.5 rounded-lg border bg-neutral-900 border-neutral-800 text-neutral-300 hover:text-white hover:bg-neutral-800 transition-colors"
+                  className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 text-xs px-3 py-1.5 rounded-lg border bg-card border-border text-foreground hover:bg-muted transition-colors"
                 >
                   <ArrowUpDown size={14} />
                   <span>Time: {timeSortOrder === 'desc' ? 'Newest' : 'Oldest'}</span>
@@ -645,14 +645,14 @@ export default function ExpensesPage() {
                 <div className="relative flex-1 sm:flex-initial">
                   <button 
                     onClick={() => setShowFilter(!showFilter)}
-                    className={`w-full sm:w-auto inline-flex items-center justify-center gap-2 text-xs px-3 py-1.5 rounded-lg border transition-colors ${showFilter || selectedCategory !== 'All' ? 'bg-neutral-800 border-neutral-700 text-white' : 'text-neutral-400 hover:text-white bg-neutral-900 border-neutral-800'}`}
+                    className={`w-full sm:w-auto inline-flex items-center justify-center gap-2 text-xs px-3 py-1.5 rounded-lg border transition-colors ${showFilter || selectedCategory !== 'All' ? 'bg-muted border-border text-foreground font-medium' : 'text-muted-foreground hover:text-foreground bg-card border-border'}`}
                   >
                     <Filter size={14} />
                     <span>{selectedCategory !== 'All' ? selectedCategory : 'Category'}</span>
                   </button>
 
                   {showFilter && (
-                    <div className="absolute right-0 top-full mt-2 w-48 bg-neutral-900 border border-neutral-800 rounded-lg shadow-xl z-30 py-1 max-h-60 overflow-y-auto">
+                    <div className="absolute right-0 top-full mt-2 w-48 bg-popover text-popover-foreground border border-border rounded-lg shadow-xl z-30 py-1 max-h-60 overflow-y-auto">
                       {categories.map(category => (
                         <button
                           key={category as string}
@@ -660,7 +660,7 @@ export default function ExpensesPage() {
                             setSelectedCategory(category as string);
                             setShowFilter(false);
                           }}
-                          className={`w-full text-left px-3.5 py-2 text-xs hover:bg-neutral-800 transition-colors ${selectedCategory === category ? 'text-white bg-neutral-800 font-semibold' : 'text-neutral-400'}`}
+                          className={`w-full text-left px-3.5 py-2 text-xs hover:bg-muted transition-colors ${selectedCategory === category ? 'text-foreground bg-muted font-semibold' : 'text-muted-foreground'}`}
                         >
                           {category as string}
                         </button>
@@ -674,10 +674,10 @@ export default function ExpensesPage() {
             {/* Scrollable Grouped Content */}
             <div className="flex-1 min-h-0 overflow-y-auto p-4 space-y-4">
               {totalDaysTracked === 0 ? (
-                <div className="py-16 text-center text-neutral-500">
+                <div className="py-16 text-center text-muted-foreground">
                   <Calendar className="mx-auto mb-3 opacity-40" size={32} />
                   <p>No expenses found.</p>
-                  <p className="text-xs text-neutral-600 mt-1">Try adjusting your search or click &apos;Add Expense&apos; to create one.</p>
+                  <p className="text-xs text-muted-foreground/80 mt-1">Try adjusting your search or click &apos;Add Expense&apos; to create one.</p>
                 </div>
               ) : (
                 <>
@@ -687,8 +687,8 @@ export default function ExpensesPage() {
                   {/* Divider if both current month dates and past months exist */}
                   {currentMonthDateKeys.length > 0 && pastMonthKeys.length > 0 && (
                     <div className="pt-2 pb-1 flex items-center gap-3">
-                      <span className="text-xs font-semibold uppercase tracking-wider text-neutral-500">Ended Months</span>
-                      <div className="flex-1 h-px bg-neutral-800" />
+                      <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Ended Months</span>
+                      <div className="flex-1 h-px bg-border" />
                     </div>
                   )}
 
@@ -700,17 +700,17 @@ export default function ExpensesPage() {
                     return (
                       <div 
                         key={monthKey} 
-                        className="bg-neutral-900/60 border border-neutral-800 rounded-xl overflow-hidden"
+                        className="bg-card border border-border rounded-xl overflow-hidden shadow-xs"
                       >
                         {/* Month Header (Clickable to Toggle Month Expansion) */}
                         <div
                           onClick={() => toggleExpandMonth(monthKey)}
-                          className={`p-3.5 sm:p-4 bg-neutral-900 hover:bg-neutral-800/80 cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3 select-none transition-colors ${
-                            isMonthExpanded ? 'border-b border-neutral-800' : ''
+                          className={`p-3.5 sm:p-4 bg-muted/30 hover:bg-muted/60 cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3 select-none transition-colors ${
+                            isMonthExpanded ? 'border-b border-border' : ''
                           }`}
                         >
                           <div className="flex items-center flex-wrap gap-2.5">
-                            <div className="text-neutral-400 hover:text-white transition-colors">
+                            <div className="text-muted-foreground hover:text-foreground transition-colors">
                               {isMonthExpanded ? (
                                 <ChevronDown size={18} />
                               ) : (
@@ -719,11 +719,11 @@ export default function ExpensesPage() {
                             </div>
 
                             <div className="flex items-center gap-2">
-                              <Calendar size={16} className="text-neutral-400" />
-                              <span className="font-semibold text-base text-white">{monthGroup.monthLabel}</span>
+                              <Calendar size={16} className="text-muted-foreground" />
+                              <span className="font-semibold text-base text-foreground">{monthGroup.monthLabel}</span>
                             </div>
 
-                            <span className="text-xs text-neutral-400 bg-neutral-800 px-2 py-0.5 rounded-md border border-neutral-700">
+                            <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-md border border-border">
                               {monthGroup.totalRecords} {monthGroup.totalRecords === 1 ? 'record' : 'records'} • {monthGroup.daysCount} {monthGroup.daysCount === 1 ? 'day' : 'days'}
                             </span>
                           </div>
@@ -731,15 +731,15 @@ export default function ExpensesPage() {
                           {/* Monthly total */}
                           <div className="flex items-center gap-3">
                             <div className="text-right">
-                              <span className="text-xs text-neutral-400 block">Monthly Total</span>
-                              <span className="font-semibold text-base text-emerald-400">₹{monthGroup.totalAmount.toFixed(2)}</span>
+                              <span className="text-xs text-muted-foreground block">Monthly Total</span>
+                              <span className="font-semibold text-base text-emerald-600 dark:text-emerald-400">₹{monthGroup.totalAmount.toFixed(2)}</span>
                             </div>
                           </div>
                         </div>
 
                         {/* Month Content: List of Dates in this Past Month (when expanded) */}
                         {isMonthExpanded && (
-                          <div className="p-3 sm:p-4 space-y-3 bg-neutral-950/60">
+                          <div className="p-3 sm:p-4 space-y-3 bg-muted/10">
                             {monthGroup.dateKeys.map(dateKey => renderDateCard(dateKey))}
                           </div>
                         )}
@@ -755,4 +755,3 @@ export default function ExpensesPage() {
     </div>
   );
 }
-

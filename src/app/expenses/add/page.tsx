@@ -107,76 +107,76 @@ export default function AddExpensePage() {
       <div className="flex items-center gap-3 sm:gap-4">
         <Link 
           href="/expenses" 
-          className="w-9 h-9 flex items-center justify-center bg-neutral-800 hover:bg-neutral-700 rounded-lg transition-colors text-neutral-300 hover:text-white border border-neutral-700 shrink-0"
+          className="w-9 h-9 flex items-center justify-center bg-card hover:bg-muted rounded-lg transition-colors text-muted-foreground hover:text-foreground border border-border shrink-0"
         >
           <ArrowLeft size={16} />
         </Link>
         <div className="min-w-0">
-          <h1 className="text-xl sm:text-2xl font-bold truncate text-white">Add Expense</h1>
-          <p className="text-xs sm:text-sm text-neutral-400">Create a new business expense record</p>
+          <h1 className="text-xl sm:text-2xl font-bold truncate text-foreground">Add Expense</h1>
+          <p className="text-xs sm:text-sm text-muted-foreground">Create a new business expense record</p>
         </div>
       </div>
 
-      <div className="bg-neutral-900/60 border border-neutral-800 rounded-xl p-4 sm:p-6">
+      <div className="bg-card border border-border rounded-xl p-4 sm:p-6 shadow-xs">
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-neutral-300">Category</label>
+                <label className="text-xs font-medium text-foreground">Category</label>
                 <select
                   required
                   value={formData.categoryId}
                   onChange={e => setFormData({ ...formData, categoryId: e.target.value })}
-                  className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-neutral-500 transition-colors"
+                  className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-ring transition-colors"
                 >
-                  <option value="" className="bg-neutral-900 text-white">Select Category</option>
+                  <option value="" className="bg-popover text-popover-foreground">Select Category</option>
                   {categories.map(c => (
-                    <option key={c.id} value={c.id} className="bg-neutral-900 text-white">{c.name}</option>
+                    <option key={c.id} value={c.id} className="bg-popover text-popover-foreground">{c.name}</option>
                   ))}
                 </select>
               </div>
               
               {isOtherCategory && (
                 <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-neutral-300">Custom Category Name</label>
+                  <label className="text-xs font-medium text-foreground">Custom Category Name</label>
                   <input
                     required
                     type="text"
                     placeholder="E.g., Software Subscriptions"
                     value={formData.customCategoryName}
                     onChange={e => setFormData({ ...formData, customCategoryName: e.target.value })}
-                    className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:border-neutral-500 transition-colors"
+                    className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring transition-colors"
                   />
                 </div>
               )}
               
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-neutral-300">Expense Date</label>
+                <label className="text-xs font-medium text-foreground">Expense Date</label>
                 <input
                   required
                   type="date"
                   value={formData.expenseDate}
                   onChange={e => setFormData({ ...formData, expenseDate: e.target.value })}
-                  className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-neutral-500 transition-colors"
+                  className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-ring transition-colors"
                 />
               </div>
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-neutral-300">Title</label>
+              <label className="text-xs font-medium text-foreground">Title</label>
               <input
                 required
                 type="text"
                 placeholder="E.g., Petrol for delivery"
                 value={formData.title}
                 onChange={e => setFormData({ ...formData, title: e.target.value })}
-                className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:border-neutral-500 transition-colors"
+                className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring transition-colors"
               />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-neutral-300">Amount (₹)</label>
+                <label className="text-xs font-medium text-foreground">Amount (₹)</label>
                 <input
                   required
                   type="number"
@@ -185,69 +185,69 @@ export default function AddExpensePage() {
                   placeholder="0.00"
                   value={formData.amount}
                   onChange={e => setFormData({ ...formData, amount: e.target.value })}
-                  className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:border-neutral-500 font-mono transition-colors"
+                  className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring font-mono transition-colors"
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-neutral-300">Payment Method</label>
+                <label className="text-xs font-medium text-foreground">Payment Method</label>
                 <select
                   required
                   value={formData.paymentMethodId}
                   onChange={e => setFormData({ ...formData, paymentMethodId: e.target.value })}
-                  className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-neutral-500 transition-colors"
+                  className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-ring transition-colors"
                 >
-                  <option value="" className="bg-neutral-900 text-white">Select Payment</option>
+                  <option value="" className="bg-popover text-popover-foreground">Select Payment</option>
                   {paymentMethods.map(p => (
-                    <option key={p.id} value={p.id} className="bg-neutral-900 text-white">{p.name}</option>
+                    <option key={p.id} value={p.id} className="bg-popover text-popover-foreground">{p.name}</option>
                   ))}
                 </select>
               </div>
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-neutral-300">Description (Optional)</label>
+              <label className="text-xs font-medium text-foreground">Description (Optional)</label>
               <textarea
                 placeholder="Enter additional details..."
                 value={formData.description}
                 onChange={e => setFormData({ ...formData, description: e.target.value })}
-                className="w-full bg-neutral-950 border border-neutral-800 rounded-lg p-3 text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:border-neutral-500 h-24 resize-none transition-colors"
+                className="w-full bg-background border border-border rounded-lg p-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring h-24 resize-none transition-colors"
               />
             </div>
             
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-neutral-300">Initial Remark (Optional)</label>
+              <label className="text-xs font-medium text-foreground">Initial Remark (Optional)</label>
               <input
                 type="text"
                 placeholder="E.g., Added via web portal"
                 value={formData.initialRemark}
                 onChange={e => setFormData({ ...formData, initialRemark: e.target.value })}
-                className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:border-neutral-500 transition-colors"
+                className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring transition-colors"
               />
             </div>
             
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-neutral-300">Reference Number (Optional)</label>
+              <label className="text-xs font-medium text-foreground">Reference Number (Optional)</label>
               <input
                 type="text"
                 placeholder="E.g., UPI123456789"
                 value={formData.referenceNumber}
                 onChange={e => setFormData({ ...formData, referenceNumber: e.target.value })}
-                className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:border-neutral-500 font-mono transition-colors"
+                className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring font-mono transition-colors"
               />
             </div>
           </div>
 
-          <div className="flex flex-col-reverse sm:flex-row gap-2.5 sm:justify-end pt-4 border-t border-neutral-800">
+          <div className="flex flex-col-reverse sm:flex-row gap-2.5 sm:justify-end pt-4 border-t border-border">
             <Link
               href="/expenses"
-              className="w-full sm:w-auto px-4 h-9 flex items-center justify-center text-xs font-medium text-neutral-400 hover:text-white hover:bg-neutral-800 rounded-lg transition-colors"
+              className="w-full sm:w-auto px-4 h-9 flex items-center justify-center text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
             >
               Cancel
             </Link>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full sm:w-auto h-9 flex items-center justify-center bg-white text-black px-5 rounded-lg text-xs font-semibold hover:bg-neutral-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full sm:w-auto h-9 flex items-center justify-center bg-primary text-primary-foreground px-5 rounded-lg text-xs font-semibold hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSubmitting ? 'Saving...' : 'Save Expense'}
             </button>

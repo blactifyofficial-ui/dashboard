@@ -82,7 +82,7 @@ export default function MetaAdsCalendar({
     calendarCells.push(
       <div
         key={`empty-${i}`}
-        className="h-14 sm:h-16 md:h-20 rounded-lg bg-neutral-950/40 border border-neutral-900 opacity-20 pointer-events-none"
+        className="h-14 sm:h-16 md:h-20 rounded-lg bg-muted/20 border border-border/40 opacity-20 pointer-events-none"
       />
     );
   }
@@ -95,28 +95,28 @@ export default function MetaAdsCalendar({
     const isToday = todayStr === dayStr;
 
     let statusBadge = null;
-    let borderClass = 'border-neutral-800/80';
-    let bgClass = 'bg-neutral-950/60 hover:bg-neutral-900/60';
+    let borderClass = 'border-border/60';
+    let bgClass = 'bg-card hover:bg-muted/50';
 
     if (plan) {
       if (plan.status === 'DONE') {
         statusBadge = (
-          <span className="flex items-center gap-1 text-[10px] text-emerald-400 font-medium truncate">
+          <span className="flex items-center gap-1 text-[10px] text-emerald-600 dark:text-emerald-400 font-medium truncate">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
             <span className="hidden sm:inline">₹{parseFloat(plan.totalBudget).toLocaleString('en-IN')}</span>
           </span>
         );
       } else if (plan.status === 'IN_PROGRESS') {
         statusBadge = (
-          <span className="flex items-center gap-1 text-[10px] text-amber-400 font-medium truncate">
+          <span className="flex items-center gap-1 text-[10px] text-amber-600 dark:text-amber-400 font-medium truncate">
             <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
             <span className="hidden sm:inline">₹{parseFloat(plan.totalBudget).toLocaleString('en-IN')}</span>
           </span>
         );
       } else {
         statusBadge = (
-          <span className="flex items-center gap-1 text-[10px] text-neutral-400 font-medium truncate">
-            <span className="w-1.5 h-1.5 rounded-full bg-neutral-600 shrink-0" />
+          <span className="flex items-center gap-1 text-[10px] text-muted-foreground font-medium truncate">
+            <span className="w-1.5 h-1.5 rounded-full bg-neutral-400 dark:bg-neutral-600 shrink-0" />
             <span className="hidden sm:inline">Not Done</span>
           </span>
         );
@@ -124,10 +124,10 @@ export default function MetaAdsCalendar({
     }
 
     if (isSelected) {
-      borderClass = 'border-neutral-400 bg-neutral-900';
-      bgClass = 'bg-neutral-900';
+      borderClass = 'border-foreground/80 bg-muted/80 ring-1 ring-foreground/20';
+      bgClass = 'bg-muted/80';
     } else if (isToday) {
-      borderClass = 'border-neutral-600';
+      borderClass = 'border-foreground/40';
     }
 
     calendarCells.push(
@@ -141,16 +141,16 @@ export default function MetaAdsCalendar({
           <span
             className={`text-xs font-semibold rounded px-1 py-0.5 ${
               isToday
-                ? 'bg-neutral-800 text-white font-bold'
+                ? 'bg-muted text-foreground font-bold'
                 : isSelected
-                ? 'text-white'
-                : 'text-neutral-400 group-hover:text-white'
+                ? 'text-foreground'
+                : 'text-muted-foreground group-hover:text-foreground'
             }`}
           >
             {day}
           </span>
           {isToday && (
-            <span className="text-[9px] font-semibold uppercase tracking-wider text-neutral-400 hidden sm:inline">
+            <span className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground hidden sm:inline">
               Today
             </span>
           )}
@@ -158,7 +158,7 @@ export default function MetaAdsCalendar({
 
         <div className="w-full mt-auto">
           {statusBadge || (
-            <span className="text-[10px] text-neutral-600 group-hover:text-neutral-500 hidden sm:block">
+            <span className="text-[10px] text-muted-foreground/60 group-hover:text-muted-foreground hidden sm:block">
               + Plan
             </span>
           )}
@@ -170,14 +170,14 @@ export default function MetaAdsCalendar({
   return (
     <div className="flex flex-col h-full">
       {/* Calendar Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 mb-4 border-b border-neutral-800">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 mb-4 border-b border-border">
         <div className="flex items-center gap-2.5">
-          <div className="p-2 bg-neutral-900 rounded-lg border border-neutral-800 text-white">
+          <div className="p-2 bg-muted rounded-lg border border-border text-foreground">
             <CalendarIcon size={16} />
           </div>
           <div>
-            <h3 className="text-base font-semibold text-white tracking-tight">{monthLabel}</h3>
-            <p className="text-xs text-neutral-400">Click a day to view or edit campaign planner</p>
+            <h3 className="text-base font-semibold text-foreground tracking-tight">{monthLabel}</h3>
+            <p className="text-xs text-muted-foreground">Click a day to view or edit campaign planner</p>
           </div>
         </div>
 
@@ -185,16 +185,16 @@ export default function MetaAdsCalendar({
           <button
             type="button"
             onClick={handleJumpToToday}
-            className="px-2.5 py-1 bg-neutral-900 hover:bg-neutral-800 active:bg-neutral-750 border border-neutral-800 rounded-lg text-xs font-medium text-neutral-200 transition-colors"
+            className="px-2.5 py-1 bg-muted hover:bg-muted/80 border border-border rounded-lg text-xs font-medium text-foreground transition-colors"
           >
             Today
           </button>
-          <div className="flex items-center bg-neutral-900 border border-neutral-800 rounded-lg p-0.5">
+          <div className="flex items-center bg-card border border-border rounded-lg p-0.5">
             <button
               type="button"
               onClick={handlePrevMonth}
               aria-label="Previous month"
-              className="p-1 text-neutral-400 hover:text-white hover:bg-neutral-800 rounded transition-colors"
+              className="p-1 text-muted-foreground hover:text-foreground hover:bg-muted rounded transition-colors"
             >
               <ChevronLeft size={16} />
             </button>
@@ -202,7 +202,7 @@ export default function MetaAdsCalendar({
               type="button"
               onClick={handleNextMonth}
               aria-label="Next month"
-              className="p-1 text-neutral-400 hover:text-white hover:bg-neutral-800 rounded transition-colors"
+              className="p-1 text-muted-foreground hover:text-foreground hover:bg-muted rounded transition-colors"
             >
               <ChevronRight size={16} />
             </button>
@@ -213,7 +213,7 @@ export default function MetaAdsCalendar({
       {/* Weekday Labels */}
       <div className="grid grid-cols-7 gap-1.5 sm:gap-2 mb-2 text-center">
         {WEEKDAYS.map((wd) => (
-          <div key={wd} className="text-[11px] font-semibold text-neutral-400 py-1 uppercase tracking-wider">
+          <div key={wd} className="text-[11px] font-semibold text-muted-foreground py-1 uppercase tracking-wider">
             {wd}
           </div>
         ))}
@@ -225,7 +225,7 @@ export default function MetaAdsCalendar({
       </div>
 
       {/* Calendar Status Summary Footer */}
-      <div className="mt-4 pt-3 border-t border-neutral-800 flex flex-wrap items-center justify-between gap-3 text-xs text-neutral-400">
+      <div className="mt-4 pt-3 border-t border-border flex flex-wrap items-center justify-between gap-3 text-xs text-muted-foreground">
         <div className="flex items-center gap-3 sm:gap-4 flex-wrap">
           <div className="flex items-center gap-1.5">
             <span className="w-2 h-2 rounded-full bg-emerald-500" />
@@ -236,13 +236,13 @@ export default function MetaAdsCalendar({
             <span>In Progress ({inProgressCount})</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-neutral-600" />
+            <span className="w-2 h-2 rounded-full bg-neutral-400 dark:bg-neutral-600" />
             <span>Not Done ({notDoneCount})</span>
           </div>
         </div>
 
-        <div className="font-semibold text-neutral-300">
-          Planned: <span className="text-white">₹{totalPlannedInMonth.toLocaleString('en-IN')}</span>
+        <div className="font-semibold text-foreground">
+          Planned: <span className="text-foreground">₹{totalPlannedInMonth.toLocaleString('en-IN')}</span>
         </div>
       </div>
     </div>

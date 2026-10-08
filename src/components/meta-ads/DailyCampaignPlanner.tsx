@@ -267,13 +267,13 @@ export default function DailyCampaignPlanner({
   return (
     <div className="flex flex-col h-full">
       {/* Date Header & Quick Navigation */}
-      <div className="flex items-center justify-between pb-4 mb-4 border-b border-neutral-800">
+      <div className="flex items-center justify-between pb-4 mb-4 border-b border-border">
         <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1 bg-neutral-900 border border-neutral-800 rounded-lg p-0.5">
+          <div className="flex items-center gap-1 bg-card border border-border rounded-lg p-0.5">
             <button
               type="button"
               onClick={() => navigateDay(-1)}
-              className="p-1 text-neutral-400 hover:text-white hover:bg-neutral-800 rounded transition-colors"
+              className="p-1 text-muted-foreground hover:text-foreground hover:bg-muted rounded transition-colors"
               title="Previous Day"
             >
               <ChevronLeft size={16} />
@@ -281,7 +281,7 @@ export default function DailyCampaignPlanner({
             <button
               type="button"
               onClick={() => navigateDay(1)}
-              className="p-1 text-neutral-400 hover:text-white hover:bg-neutral-800 rounded transition-colors"
+              className="p-1 text-muted-foreground hover:text-foreground hover:bg-muted rounded transition-colors"
               title="Next Day"
             >
               <ChevronRight size={16} />
@@ -290,35 +290,35 @@ export default function DailyCampaignPlanner({
 
           <div>
             <div className="flex items-center gap-2">
-              <h3 className="text-base font-semibold text-white tracking-tight">
+              <h3 className="text-base font-semibold text-foreground tracking-tight">
                 {formattedDateTitle}
               </h3>
               {isToday && (
-                <span className="px-2 py-0.5 bg-neutral-800 border border-neutral-700 text-neutral-200 text-[10px] font-semibold rounded-md uppercase tracking-wider">
+                <span className="px-2 py-0.5 bg-muted border border-border text-foreground text-[10px] font-semibold rounded-md uppercase tracking-wider">
                   Today
                 </span>
               )}
             </div>
-            <p className="text-xs text-neutral-400">Configure daily campaigns &amp; allocate budgets</p>
+            <p className="text-xs text-muted-foreground">Configure daily campaigns &amp; allocate budgets</p>
           </div>
         </div>
 
         {/* Status Pill Badge */}
         <div className="hidden sm:block">
           {status === 'DONE' && (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30">
               <CheckCircle2 size={13} />
               Done
             </span>
           )}
           {status === 'IN_PROGRESS' && (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-amber-500/15 text-amber-300 border border-amber-500/30">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30">
               <Clock size={13} />
               In Progress
             </span>
           )}
           {status === 'NOT_DONE' && (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-neutral-800 text-neutral-300 border border-neutral-700">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-muted text-muted-foreground border border-border">
               <XCircle size={13} />
               Not Done
             </span>
@@ -328,35 +328,35 @@ export default function DailyCampaignPlanner({
 
       {/* Campaign Controls: Count & Distribution Toggle */}
       <div className="space-y-4 mb-4">
-        <div className="bg-neutral-900/60 border border-neutral-800 rounded-lg p-3.5 space-y-3">
+        <div className="bg-card border border-border rounded-lg p-3.5 space-y-3">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
-              <span className="text-xs font-semibold text-neutral-200 flex items-center gap-1.5">
-                <Layers size={14} className="text-neutral-400" />
+              <span className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+                <Layers size={14} className="text-muted-foreground" />
                 Number of Campaigns
               </span>
-              <p className="text-[11px] text-neutral-400">Total active campaigns running on this date</p>
+              <p className="text-[11px] text-muted-foreground">Total active campaigns running on this date</p>
             </div>
 
             {/* Campaign Stepper */}
             <div className="flex items-center gap-2">
-              <div className="flex items-center bg-neutral-950 border border-neutral-800 rounded-lg p-0.5">
+              <div className="flex items-center bg-muted/60 border border-border rounded-lg p-0.5">
                 <button
                   type="button"
                   onClick={() => setCampaignCountDirect(campaigns.length - 1)}
                   disabled={campaigns.length <= 1}
-                  className="w-7 h-7 flex items-center justify-center rounded text-neutral-400 hover:text-white hover:bg-neutral-800 disabled:opacity-30 disabled:pointer-events-none transition-colors text-sm font-semibold"
+                  className="w-7 h-7 flex items-center justify-center rounded text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-30 disabled:pointer-events-none transition-colors text-sm font-semibold"
                 >
                   -
                 </button>
-                <span className="w-8 text-center text-xs font-semibold text-white">
+                <span className="w-8 text-center text-xs font-semibold text-foreground">
                   {campaigns.length}
                 </span>
                 <button
                   type="button"
                   onClick={() => setCampaignCountDirect(campaigns.length + 1)}
                   disabled={campaigns.length >= 10}
-                  className="w-7 h-7 flex items-center justify-center rounded text-neutral-400 hover:text-white hover:bg-neutral-800 disabled:opacity-30 disabled:pointer-events-none transition-colors text-sm font-semibold"
+                  className="w-7 h-7 flex items-center justify-center rounded text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-30 disabled:pointer-events-none transition-colors text-sm font-semibold"
                 >
                   +
                 </button>
@@ -371,8 +371,8 @@ export default function DailyCampaignPlanner({
                     onClick={() => setCampaignCountDirect(cnt)}
                     className={`w-7 h-7 rounded-lg text-xs font-medium transition-colors ${
                       campaigns.length === cnt
-                        ? 'bg-neutral-800 text-white font-semibold border border-neutral-700'
-                        : 'bg-neutral-950 border border-neutral-800 text-neutral-400 hover:text-white hover:bg-neutral-800'
+                        ? 'bg-primary text-primary-foreground font-semibold border border-primary'
+                        : 'bg-card border border-border text-muted-foreground hover:text-foreground hover:bg-muted'
                     }`}
                   >
                     {cnt}
@@ -383,20 +383,20 @@ export default function DailyCampaignPlanner({
           </div>
 
           {/* Budget Mode Selector */}
-          <div className="pt-3 border-t border-neutral-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <span className="text-xs font-semibold text-neutral-200 flex items-center gap-1.5">
-              <SlidersHorizontal size={14} className="text-neutral-400" />
+          <div className="pt-3 border-t border-border flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <span className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+              <SlidersHorizontal size={14} className="text-muted-foreground" />
               Budget Allocation Mode
             </span>
 
-            <div className="flex items-center bg-neutral-950 border border-neutral-800 p-0.5 rounded-lg">
+            <div className="flex items-center bg-muted/60 border border-border p-0.5 rounded-lg">
               <button
                 type="button"
                 onClick={() => handleModeChange('ALL_SAME')}
                 className={`px-3 py-1 text-xs font-medium rounded-md transition-colors flex items-center gap-1.5 ${
                   distributionMode === 'ALL_SAME'
-                    ? 'bg-neutral-800 text-white font-semibold'
-                    : 'text-neutral-400 hover:text-white'
+                    ? 'bg-primary text-primary-foreground font-semibold'
+                    : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
                 <Equal size={13} />
@@ -407,8 +407,8 @@ export default function DailyCampaignPlanner({
                 onClick={() => handleModeChange('DIFFERENT')}
                 className={`px-3 py-1 text-xs font-medium rounded-md transition-colors flex items-center gap-1.5 ${
                   distributionMode === 'DIFFERENT'
-                    ? 'bg-neutral-800 text-white font-semibold'
-                    : 'text-neutral-400 hover:text-white'
+                    ? 'bg-primary text-primary-foreground font-semibold'
+                    : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
                 <SlidersHorizontal size={13} />
@@ -419,10 +419,10 @@ export default function DailyCampaignPlanner({
 
           {/* If All Same is selected: Single common budget input */}
           {distributionMode === 'ALL_SAME' && (
-            <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-neutral-950 p-2.5 rounded-lg border border-neutral-800">
-              <span className="text-xs text-neutral-300">Set budget for each of {campaigns.length} campaigns:</span>
+            <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-muted/40 p-2.5 rounded-lg border border-border">
+              <span className="text-xs text-foreground">Set budget for each of {campaigns.length} campaigns:</span>
               <div className="relative w-full sm:w-44">
-                <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-neutral-400 font-medium text-xs">
+                <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground font-medium text-xs">
                   ₹
                 </span>
                 <input
@@ -432,9 +432,9 @@ export default function DailyCampaignPlanner({
                   value={sameBudgetAmount}
                   onChange={(e) => handleSameBudgetChange(e.target.value)}
                   placeholder="400"
-                  className="w-full bg-neutral-900 border border-neutral-800 rounded-md pl-6 pr-12 py-1 text-xs font-semibold text-white focus:outline-none focus:border-neutral-600"
+                  className="w-full bg-card border border-border rounded-md pl-6 pr-12 py-1 text-xs font-semibold text-foreground focus:outline-none focus:border-border-hover focus:ring-1 focus:ring-foreground/20"
                 />
-                <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-neutral-500 font-medium">
+                <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground font-medium">
                   / campaign
                 </span>
               </div>
@@ -447,10 +447,10 @@ export default function DailyCampaignPlanner({
           {campaigns.map((camp, idx) => (
             <div
               key={camp.id || idx}
-              className="bg-neutral-900/60 border border-neutral-800 rounded-lg p-2.5 flex items-center justify-between gap-3 transition-colors"
+              className="bg-card border border-border rounded-lg p-2.5 flex items-center justify-between gap-3 transition-colors"
             >
               <div className="flex items-center gap-2 flex-1 min-w-0">
-                <span className="w-5 h-5 rounded bg-neutral-800 text-neutral-300 font-semibold text-[11px] flex items-center justify-center shrink-0">
+                <span className="w-5 h-5 rounded bg-muted text-muted-foreground font-semibold text-[11px] flex items-center justify-center shrink-0">
                   {idx + 1}
                 </span>
                 <input
@@ -458,13 +458,13 @@ export default function DailyCampaignPlanner({
                   value={camp.name}
                   onChange={(e) => handleCampaignNameChange(idx, e.target.value)}
                   placeholder={`Campaign ${idx + 1}`}
-                  className="bg-transparent border-b border-transparent hover:border-neutral-700 focus:border-neutral-500 text-xs font-semibold text-white px-1 py-0.5 w-full focus:outline-none transition-colors"
+                  className="bg-transparent border-b border-transparent hover:border-border focus:border-foreground/40 text-xs font-semibold text-foreground px-1 py-0.5 w-full focus:outline-none transition-colors"
                 />
               </div>
 
               <div className="flex items-center gap-2">
                 <div className="relative w-28 sm:w-32">
-                  <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-neutral-400 text-xs font-medium">
+                  <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground text-xs font-medium">
                     ₹
                   </span>
                   <input
@@ -474,7 +474,7 @@ export default function DailyCampaignPlanner({
                     disabled={distributionMode === 'ALL_SAME'}
                     value={camp.budget}
                     onChange={(e) => handleIndividualBudgetChange(idx, e.target.value)}
-                    className="w-full bg-neutral-950 border border-neutral-800 rounded-md pl-6 pr-2 py-1 text-xs font-semibold text-white focus:outline-none focus:border-neutral-600 disabled:opacity-75 transition-colors"
+                    className="w-full bg-muted/40 border border-border rounded-md pl-6 pr-2 py-1 text-xs font-semibold text-foreground focus:outline-none focus:border-border-hover disabled:opacity-75 transition-colors"
                   />
                 </div>
 
@@ -482,7 +482,7 @@ export default function DailyCampaignPlanner({
                   <button
                     type="button"
                     onClick={() => handleRemoveCampaign(idx)}
-                    className="p-1 text-neutral-500 hover:text-rose-400 hover:bg-rose-500/10 rounded transition-colors"
+                    className="p-1 text-muted-foreground hover:text-rose-500 hover:bg-rose-500/10 rounded transition-colors"
                     title="Remove Campaign"
                   >
                     <Trash2 size={14} />
@@ -497,31 +497,31 @@ export default function DailyCampaignPlanner({
         <button
           type="button"
           onClick={handleAddCampaign}
-          className="w-full py-2 bg-neutral-900 hover:bg-neutral-850 border border-dashed border-neutral-800 rounded-lg text-xs font-medium text-neutral-300 hover:text-white flex items-center justify-center gap-1.5 transition-colors"
+          className="w-full py-2 bg-card hover:bg-muted border border-dashed border-border rounded-lg text-xs font-medium text-muted-foreground hover:text-foreground flex items-center justify-center gap-1.5 transition-colors"
         >
           <Plus size={14} />
           <span>Add Another Campaign</span>
         </button>
 
         {/* Daily Total Calculation Banner */}
-        <div className="bg-neutral-900 border border-neutral-800 rounded-lg p-3 flex items-center justify-between">
+        <div className="bg-card border border-border rounded-lg p-3 flex items-center justify-between">
           <div className="space-y-0.5">
-            <span className="text-[10px] font-semibold text-neutral-400 uppercase tracking-wider">
+            <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
               Total Spend for {formattedDateTitle}
             </span>
             <div className="flex items-center gap-2">
-              <span className="text-lg font-bold text-white tracking-tight">
+              <span className="text-lg font-bold text-foreground tracking-tight">
                 ₹{calculatedTotalBudget.toLocaleString('en-IN')}
               </span>
-              <span className="text-xs text-neutral-400">
+              <span className="text-xs text-muted-foreground">
                 ({campaigns.length} {campaigns.length === 1 ? 'campaign' : 'campaigns'})
               </span>
             </div>
           </div>
 
           <div className="text-right">
-            <span className="text-[10px] text-neutral-400 block">Default Base Target</span>
-            <span className="text-xs font-semibold text-neutral-300">
+            <span className="text-[10px] text-muted-foreground block">Default Base Target</span>
+            <span className="text-xs font-semibold text-foreground">
               ₹{defaultDailyBudget.toLocaleString('en-IN')}/day
             </span>
           </div>
@@ -529,7 +529,7 @@ export default function DailyCampaignPlanner({
 
         {/* Status Under That: In Progress / Done / Not Done */}
         <div className="space-y-1.5">
-          <label className="text-xs font-medium text-neutral-300 block">
+          <label className="text-xs font-medium text-foreground block">
             Execution Status
           </label>
           <div className="grid grid-cols-3 gap-2">
@@ -538,8 +538,8 @@ export default function DailyCampaignPlanner({
               onClick={() => setStatus('IN_PROGRESS')}
               className={`py-2 px-2 rounded-lg text-xs font-medium border flex items-center justify-center gap-1.5 transition-colors ${
                 status === 'IN_PROGRESS'
-                  ? 'bg-amber-500/15 border-amber-500/30 text-amber-300 font-semibold'
-                  : 'bg-neutral-950 border-neutral-800 text-neutral-400 hover:text-white hover:bg-neutral-900'
+                  ? 'bg-amber-500/15 border-amber-500/30 text-amber-700 dark:text-amber-300 font-semibold'
+                  : 'bg-card border-border text-muted-foreground hover:text-foreground hover:bg-muted'
               }`}
             >
               <Clock size={13} />
@@ -551,8 +551,8 @@ export default function DailyCampaignPlanner({
               onClick={() => setStatus('DONE')}
               className={`py-2 px-2 rounded-lg text-xs font-medium border flex items-center justify-center gap-1.5 transition-colors ${
                 status === 'DONE'
-                  ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-300 font-semibold'
-                  : 'bg-neutral-950 border-neutral-800 text-neutral-400 hover:text-white hover:bg-neutral-900'
+                  ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-700 dark:text-emerald-300 font-semibold'
+                  : 'bg-card border-border text-muted-foreground hover:text-foreground hover:bg-muted'
               }`}
             >
               <CheckCircle2 size={13} />
@@ -564,8 +564,8 @@ export default function DailyCampaignPlanner({
               onClick={() => setStatus('NOT_DONE')}
               className={`py-2 px-2 rounded-lg text-xs font-medium border flex items-center justify-center gap-1.5 transition-colors ${
                 status === 'NOT_DONE'
-                  ? 'bg-neutral-800 border-neutral-700 text-neutral-200 font-semibold'
-                  : 'bg-neutral-950 border-neutral-800 text-neutral-400 hover:text-white hover:bg-neutral-900'
+                  ? 'bg-muted border-border text-foreground font-semibold'
+                  : 'bg-card border-border text-muted-foreground hover:text-foreground hover:bg-muted'
               }`}
             >
               <XCircle size={13} />
@@ -576,7 +576,7 @@ export default function DailyCampaignPlanner({
 
         {/* Notes Textarea */}
         <div className="space-y-1">
-          <label className="text-xs font-medium text-neutral-300 block">
+          <label className="text-xs font-medium text-foreground block">
             Day Notes &amp; Observations (Optional)
           </label>
           <textarea
@@ -584,7 +584,7 @@ export default function DailyCampaignPlanner({
             onChange={(e) => setNotes(e.target.value)}
             rows={2}
             placeholder="e.g. Scaled Retargeting budget by 20%, turned off fatigued creative..."
-            className="w-full bg-neutral-950 border border-neutral-800 rounded-lg p-2.5 text-xs text-white placeholder:text-neutral-500 focus:outline-none focus:border-neutral-600 transition-colors"
+            className="w-full bg-card border border-border rounded-lg p-2.5 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-border-hover focus:ring-1 focus:ring-foreground/20 transition-colors"
           />
         </div>
 
@@ -593,7 +593,7 @@ export default function DailyCampaignPlanner({
           type="button"
           onClick={handleSave}
           disabled={isSaving || !canEdit}
-          className="w-full py-2.5 bg-white text-black hover:bg-neutral-200 active:bg-neutral-300 disabled:opacity-50 font-semibold text-xs rounded-lg flex items-center justify-center gap-2 transition-colors"
+          className="w-full py-2.5 bg-primary text-primary-foreground hover:opacity-90 active:opacity-80 disabled:opacity-50 font-semibold text-xs rounded-lg flex items-center justify-center gap-2 transition-opacity"
         >
           {isSaving ? (
             <>

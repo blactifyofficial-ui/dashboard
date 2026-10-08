@@ -304,22 +304,22 @@ export default function MonthlyExpensesPage() {
       {/* Top Header */}
       <div className="flex-none flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold">Monthly Expenses</h1>
-          <p className="text-xs sm:text-sm text-white/60">Manage recurring bills, salaries, rent, and overheads</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-foreground">Monthly Expenses</h1>
+          <p className="text-xs sm:text-sm text-muted-foreground">Manage recurring bills, salaries, rent, and overheads</p>
         </div>
 
         {canEditBills && (
           <div className="flex items-center gap-2.5 sm:gap-3 w-full sm:w-auto">
             <button
               onClick={() => setIsTemplateModalOpen(true)}
-              className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-white/5 border border-white/10 text-white/80 hover:text-white px-4 h-11 min-h-[44px] rounded-lg font-medium hover:bg-white/10 transition-colors text-sm"
+              className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-card border border-border text-foreground hover:bg-muted px-4 h-11 min-h-[44px] rounded-lg font-medium transition-colors text-sm shadow-xs"
             >
               <Layers size={16} />
               Templates
             </button>
             <button
               onClick={() => setIsAddModalOpen(true)}
-              className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-white text-black px-4 h-11 min-h-[44px] rounded-lg font-medium hover:bg-white/90 transition-colors text-sm shadow-sm"
+              className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-primary text-primary-foreground px-4 h-11 min-h-[44px] rounded-lg font-medium hover:opacity-90 transition-opacity text-sm shadow-xs"
             >
               <Plus size={16} />
               Add Bill
