@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import { requirePermission } from '@/lib/auth-utils';
-import { hasPermission } from '@/lib/rbac';
 
 export const dynamic = 'force-dynamic';
 

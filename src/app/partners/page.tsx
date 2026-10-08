@@ -31,7 +31,6 @@ export default function PartnersPage() {
   const canViewPartners = hasPermission('partners:view_self');
   const canManagePartners = hasPermission('partners:manage_partners');
   const canRecordTransaction = hasPermission('partners:record_transaction');
-  const canDeleteTransaction = hasPermission('partners:delete_transaction');
 
   const [loading, setLoading] = useState(true);
 

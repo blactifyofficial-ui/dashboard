@@ -3,14 +3,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { 
   Users, 
-  ShieldCheck, 
   Plus, 
   Trash2, 
   Loader2, 
   Mail, 
-  UserCheck, 
-  Handshake, 
-  ShieldAlert,
   ChevronDown
 } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -99,6 +95,7 @@ export default function UserRoleManager() {
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchUsers();
   }, [fetchUsers]);
 

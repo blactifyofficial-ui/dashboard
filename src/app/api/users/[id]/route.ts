@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/db';
 import { allowedUsers, userRoles, UserRole } from '@/db/schema';
-import { eq, ilike } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import { requirePermission } from '@/lib/auth-utils';
 
 export const dynamic = 'force-dynamic';

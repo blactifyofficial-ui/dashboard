@@ -27,7 +27,6 @@ export default function OrderIssuesDashboard() {
   const { hasPermission } = useAuth();
   const canViewIssues = hasPermission('issues:view');
   const canCreateIssues = hasPermission('issues:create');
-  const canDeleteIssues = hasPermission('issues:delete');
 
   const [issues, setIssues] = useState<Issue[]>([]);
   const [loading, setLoading] = useState(true);

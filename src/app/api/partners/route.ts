@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/db';
 import { partners, partnerTransactions, paymentMethods, users } from '@/db/schema';
-import { eq, desc, and } from 'drizzle-orm';
+import { eq, desc } from 'drizzle-orm';
 import { requirePermission } from '@/lib/auth-utils';
 import { enqueueSyncJob } from '@/lib/google-sheets';
 
