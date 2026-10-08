@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/db';
-import { allowedUsers, partners, userRoles, UserRole } from '@/db/schema';
+import { allowedUsers, customRoles, partners, userRoles, UserRole } from '@/db/schema';
 import { eq, ilike, desc } from 'drizzle-orm';
 import { requirePermission } from '@/lib/auth-utils';
 
@@ -39,10 +39,23 @@ export async function GET() {
       .where(eq(partners.status, 'ACTIVE'))
       .orderBy(partners.name);
 
+    // Fetch custom roles from database
+    const dbCustomRoles = await db
+      .select({
+        id: customRoles.id,
+        code: customRoles.code,
+        name: customRoles.name,
+        color: customRoles.color,
+        description: customRoles.description,
+      })
+      .from(customRoles)
+      .orderBy(desc(customRoles.createdAt));
+
     return NextResponse.json({
       users: usersList,
       partners: allPartners,
       roles: userRoles,
+      customRoles: dbCustomRoles,
       currentUserEmail: authResult.user.email,
     });
   } catch (error) {
@@ -66,7 +79,22 @@ export async function POST(req: Request) {
     }
 
     const cleanEmail = email.trim().toLowerCase();
-    const assignedRole: UserRole = userRoles.includes(role) ? role : 'VIEWER';
+    
+    // Check if role is valid (system role or existing custom role)
+    let assignedRole: UserRole = 'VIEWER';
+    if (userRoles.includes(role)) {
+      assignedRole = role;
+    } else {
+      const [customRoleFound] = await db
+        .select()
+        .from(customRoles)
+        .where(eq(customRoles.code, role))
+        .limit(1);
+
+      if (customRoleFound) {
+        assignedRole = customRoleFound.code;
+      }
+    }
 
     // Check if email already exists
     const [existing] = await db

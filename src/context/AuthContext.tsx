@@ -12,6 +12,7 @@ export interface UserAuthContextType {
   } | null;
   role: UserRole;
   partnerId: string | null;
+  permissions: string[];
   hasPermission: (permission: Permission) => boolean;
 }
 
@@ -19,6 +20,7 @@ const AuthContext = createContext<UserAuthContextType>({
   user: null,
   role: 'VIEWER',
   partnerId: null,
+  permissions: [],
   hasPermission: () => false,
 });
 
@@ -27,20 +29,24 @@ export function AuthProvider({
   initialUser,
   initialRole = 'VIEWER',
   initialPartnerId = null,
+  initialPermissions = [],
 }: {
   children: React.ReactNode;
   initialUser: UserAuthContextType['user'];
   initialRole?: UserRole;
   initialPartnerId?: string | null;
+  initialPermissions?: string[];
 }) {
   const value = useMemo<UserAuthContextType>(() => {
     return {
       user: initialUser,
       role: initialRole,
       partnerId: initialPartnerId,
-      hasPermission: (permission: Permission) => checkHasPermission(initialRole, permission),
+      permissions: initialPermissions,
+      hasPermission: (permission: Permission) =>
+        checkHasPermission(initialRole, permission, initialPermissions),
     };
-  }, [initialUser, initialRole, initialPartnerId]);
+  }, [initialUser, initialRole, initialPartnerId, initialPermissions]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

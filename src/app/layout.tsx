@@ -6,8 +6,8 @@ import SignOutLink from "@/components/SignOutLink";
 import { Toaster } from "react-hot-toast";
 import { auth } from "@/lib/auth/server";
 import { db } from "@/db";
-import { allowedUsers, UserRole } from "@/db/schema";
-import { ilike } from "drizzle-orm";
+import { allowedUsers, customRoles, UserRole, userRoles } from "@/db/schema";
+import { ilike, eq } from "drizzle-orm";
 import AutoSyncManager from "@/components/AutoSyncManager";
 import { AuthProvider } from "@/context/AuthContext";
 
@@ -47,6 +47,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
   let userRole: UserRole = 'VIEWER';
   let partnerId: string | null = null;
+  let userPermissions: string[] = [];
 
   // Check if they are logged in but not allowed
   if (session?.user?.email) {
@@ -70,6 +71,22 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
     userRole = allowed.role;
     partnerId = allowed.partnerId;
+
+    if (!userRoles.includes(userRole as typeof userRoles[number])) {
+      const [customRoleRecord] = await db
+        .select()
+        .from(customRoles)
+        .where(eq(customRoles.code, userRole))
+        .limit(1);
+
+      if (customRoleRecord?.permissions) {
+        try {
+          userPermissions = JSON.parse(customRoleRecord.permissions);
+        } catch (err) {
+          console.error("Failed to parse custom role permissions JSON in layout:", err);
+        }
+      }
+    }
   }
 
   return (
@@ -82,6 +99,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           initialUser={session?.user || null}
           initialRole={userRole}
           initialPartnerId={partnerId}
+          initialPermissions={userPermissions}
         >
           {/* Sidebar */}
           {session?.user && (

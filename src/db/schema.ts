@@ -28,13 +28,27 @@ export const orderItems = pgTable('order_items', {
 });
 
 export const userRoles = ['SUPER_ADMIN', 'ADMIN', 'STAFF', 'PARTNER', 'VIEWER'] as const;
-export type UserRole = typeof userRoles[number];
+export type SystemUserRole = typeof userRoles[number];
+export type UserRole = SystemUserRole | (string & {});
 
 export const allowedUsers = pgTable('allowed_users', {
   id: text('id').primaryKey(),
   email: text('email').notNull().unique(),
   role: text('role').$type<UserRole>().default('VIEWER').notNull(),
   partnerId: text('partner_id'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+export const customRoles = pgTable('custom_roles', {
+  id: text('id').primaryKey(),
+  code: text('code').notNull().unique(),
+  name: text('name').notNull(),
+  description: text('description'),
+  permissions: text('permissions').notNull(), // JSON array string e.g. ["overview:view_orders"]
+  color: text('color').default('blue').notNull(),
+  isSystem: text('is_system').default('false').notNull(),
+  createdById: text('created_by_id').references(() => users.id),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });

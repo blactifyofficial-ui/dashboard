@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/db';
-import { allowedUsers, userRoles, UserRole } from '@/db/schema';
+import { allowedUsers, customRoles, userRoles, UserRole } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { requirePermission } from '@/lib/auth-utils';
 
@@ -41,7 +41,20 @@ export async function PUT(
       );
     }
 
-    const updatedRole: UserRole = userRoles.includes(role) ? role : targetUser.role;
+    let updatedRole: UserRole = targetUser.role;
+    if (userRoles.includes(role)) {
+      updatedRole = role;
+    } else if (role) {
+      const [customRoleFound] = await db
+        .select()
+        .from(customRoles)
+        .where(eq(customRoles.code, role))
+        .limit(1);
+
+      if (customRoleFound) {
+        updatedRole = customRoleFound.code;
+      }
+    }
 
     const [updated] = await db
       .update(allowedUsers)
