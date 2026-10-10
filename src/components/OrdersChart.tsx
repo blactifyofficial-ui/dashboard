@@ -35,8 +35,11 @@ export default function OrdersChart({
 
   const chartData = {
     labels: data.map((d) => {
-      const dateObj = new Date(d.date);
-      return dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      if (!d.date) return '';
+      const dateObj = new Date(d.date.includes('T') ? d.date : `${d.date}T00:00:00`);
+      return !isNaN(dateObj.getTime())
+        ? dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+        : String(d.date);
     }),
     datasets: [
       {

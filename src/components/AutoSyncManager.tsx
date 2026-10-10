@@ -67,13 +67,13 @@ export default function AutoSyncManager() {
       lastSyncTimeRef.current = parseInt(storedLastSync, 10) || 0;
     }
 
-    // Initial background sync on mount if needed
+    // Initial background sync on mount if needed (only if more than SYNC_INTERVAL_MS has passed)
     const elapsed = Date.now() - lastSyncTimeRef.current;
-    if (elapsed > MIN_RETRY_INTERVAL_MS) {
-      // Delay slightly on startup to let critical page assets load first
+    if (elapsed > SYNC_INTERVAL_MS) {
+      // Delay on startup to let critical page assets and SSR settle first
       const startTimer = setTimeout(() => {
         performAutoSync('startup');
-      }, 2000);
+      }, 10000);
 
       return () => clearTimeout(startTimer);
     }

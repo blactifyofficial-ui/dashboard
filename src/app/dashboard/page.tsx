@@ -9,6 +9,8 @@ import LoadingSpinner from '@/components/LoadingSpinner';
 import { requireAuth } from '@/lib/auth-utils';
 import { hasPermission } from '@/lib/rbac';
 
+import { redirect } from 'next/navigation';
+
 export const dynamic = "force-dynamic";
 
 export default async function Dashboard() {
@@ -35,27 +37,57 @@ export default async function Dashboard() {
 
 async function DashboardContent() {
   const authRes = await requireAuth();
-  const role = 'role' in authRes ? authRes.role : 'VIEWER';
 
+  if (authRes.error) {
+    if (authRes.status === 401) {
+      redirect('/login');
+    }
+    return (
+      <div className="bg-card border border-border rounded-xl p-8 text-center text-muted-foreground">
+        <p className="text-base font-medium text-foreground mb-1">Access Restricted</p>
+        <p className="text-sm">{authRes.error}</p>
+      </div>
+    );
+  }
+
+  const role = authRes.role || 'VIEWER';
   const canViewRevenue = hasPermission(role, 'overview:view_revenue');
   const canViewStatus = hasPermission(role, 'overview:view_status');
 
-  const [totalResult] = await db.select({
-    totalOrders: count(),
-    totalSales: canViewRevenue ? sql<number>`COALESCE(SUM(CAST(${orders.totalPrice} AS NUMERIC)), 0)` : sql<number>`0`
-  }).from(orders);
+  let totalOrders = 0;
+  let totalSales = 0;
+  let ordersPerDayResult: { date: string; count: number }[] = [];
 
-  const totalOrders = totalResult.totalOrders;
-  const totalSales = Number(totalResult.totalSales);
+  try {
+    const totalResult = await db.select({
+      totalOrders: count(),
+      totalSales: canViewRevenue ? sql<number>`COALESCE(SUM(CAST(${orders.totalPrice} AS NUMERIC)), 0)` : sql<number>`0`
+    }).from(orders);
 
-  const ordersPerDayResult = await db.select({
-    date: sql<string>`DATE(${orders.createdAt})`,
-    count: sql<number>`CAST(COUNT(*) AS INTEGER)`
-  })
-    .from(orders)
-    .where(sql`date_trunc('month', ${orders.createdAt}) = date_trunc('month', CURRENT_DATE)`)
-    .groupBy(sql`DATE(${orders.createdAt})`)
-    .orderBy(sql`DATE(${orders.createdAt})`);
+    if (totalResult && totalResult[0]) {
+      totalOrders = totalResult[0].totalOrders ?? 0;
+      totalSales = Number(totalResult[0].totalSales ?? 0);
+    }
+
+    ordersPerDayResult = await db.select({
+      date: sql<string>`DATE(${orders.createdAt})`,
+      count: sql<number>`CAST(COUNT(*) AS INTEGER)`
+    })
+      .from(orders)
+      .where(sql`date_trunc('month', ${orders.createdAt}) = date_trunc('month', CURRENT_DATE)`)
+      .groupBy(sql`DATE(${orders.createdAt})`)
+      .orderBy(sql`DATE(${orders.createdAt})`);
+  } catch (error) {
+    console.error("Dashboard database query error:", error);
+    return (
+      <div className="bg-card border border-border rounded-xl p-8 text-center space-y-3">
+        <p className="text-base font-medium text-foreground">Database is reconnecting</p>
+        <p className="text-sm text-muted-foreground">
+          The database is waking up or reconnecting. Please refresh the page in a few moments.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

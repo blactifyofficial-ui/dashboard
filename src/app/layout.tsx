@@ -47,52 +47,64 @@ export const viewport: Viewport = {
 export const dynamic = 'force-dynamic';
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const { data: session } = await auth.getSession();
-
+  let session = null;
   let userRole: UserRole = 'VIEWER';
   let partnerId: string | null = null;
   let userPermissions: string[] = [];
 
-  // Check if they are logged in but not allowed
-  if (session?.user?.email) {
-    const [allowed] = await db
-      .select()
-      .from(allowedUsers)
-      .where(ilike(allowedUsers.email, session.user.email))
-      .limit(1);
+  let isNotAllowed = false;
 
-    if (!allowed) {
-      return (
-        <html lang="en" suppressHydrationWarning className={`${inter.variable} h-full antialiased`}>
-          <body className="min-h-full bg-background text-foreground flex flex-col items-center justify-center font-sans gap-4">
-            <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-              <div className="text-xl font-medium">You are not authorized to view this dashboard.</div>
-              <SignOutLink />
-              <Toaster position="bottom-right" />
-            </ThemeProvider>
-          </body>
-        </html>
-      );
-    }
+  try {
+    const sessionRes = await auth.getSession();
+    session = sessionRes?.data ?? null;
 
-    userRole = allowed.role;
-    partnerId = allowed.partnerId;
-
-    if (!userRoles.includes(userRole as typeof userRoles[number])) {
-      const [customRoleRecord] = await db
+    // Check if they are logged in but not allowed
+    if (session?.user?.email) {
+      const [allowed] = await db
         .select()
-        .from(customRoles)
-        .where(eq(customRoles.code, userRole))
+        .from(allowedUsers)
+        .where(ilike(allowedUsers.email, session.user.email))
         .limit(1);
 
-      if (customRoleRecord?.permissions) {
-        try {
-          userPermissions = JSON.parse(customRoleRecord.permissions);
-        } catch (err) {
-          console.error("Failed to parse custom role permissions JSON in layout:", err);
+      if (!allowed) {
+        isNotAllowed = true;
+      } else {
+        userRole = allowed.role;
+        partnerId = allowed.partnerId;
+
+        if (!userRoles.includes(userRole as typeof userRoles[number])) {
+          const [customRoleRecord] = await db
+            .select()
+            .from(customRoles)
+            .where(eq(customRoles.code, userRole))
+            .limit(1);
+
+          if (customRoleRecord?.permissions) {
+            try {
+              userPermissions = JSON.parse(customRoleRecord.permissions);
+            } catch (err) {
+              console.error("Failed to parse custom role permissions JSON in layout:", err);
+            }
+          }
         }
       }
     }
+  } catch (error) {
+    console.error("RootLayout session/auth verification error:", error);
+  }
+
+  if (isNotAllowed) {
+    return (
+      <html lang="en" suppressHydrationWarning className={`${inter.variable} h-full antialiased`}>
+        <body className="min-h-full bg-background text-foreground flex flex-col items-center justify-center font-sans gap-4">
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+            <div className="text-xl font-medium">You are not authorized to view this dashboard.</div>
+            <SignOutLink />
+            <Toaster position="bottom-right" />
+          </ThemeProvider>
+        </body>
+      </html>
+    );
   }
 
   return (

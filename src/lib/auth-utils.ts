@@ -14,49 +14,54 @@ export type AuthResult = {
 };
 
 export async function requireAuth(): Promise<AuthResult> {
-  const { data: session } = await auth.getSession();
-  
-  if (!session?.user?.email || !session.user) {
-    return { error: 'Unauthorized', status: 401 };
-  }
+  try {
+    const { data: session } = await auth.getSession();
+    
+    if (!session?.user?.email || !session.user) {
+      return { error: 'Unauthorized', status: 401 };
+    }
 
-  // Check if user is in allowed_users table
-  const [allowed] = await db
-    .select()
-    .from(allowedUsers)
-    .where(ilike(allowedUsers.email, session.user.email))
-    .limit(1);
-  
-  if (!allowed) {
-    return { error: 'Forbidden: User is not authorized to access this system', status: 403 };
-  }
-
-  const role = (allowed.role || 'VIEWER') as UserRole;
-  let permissions: string[] = [];
-
-  // If role is a custom role (not in built-in userRoles), fetch its permissions
-  if (!userRoles.includes(role as typeof userRoles[number])) {
-    const [customRoleRecord] = await db
+    // Check if user is in allowed_users table
+    const [allowed] = await db
       .select()
-      .from(customRoles)
-      .where(eq(customRoles.code, role))
+      .from(allowedUsers)
+      .where(ilike(allowedUsers.email, session.user.email))
       .limit(1);
+    
+    if (!allowed) {
+      return { error: 'Forbidden: User is not authorized to access this system', status: 403 };
+    }
 
-    if (customRoleRecord?.permissions) {
-      try {
-        permissions = JSON.parse(customRoleRecord.permissions);
-      } catch (err) {
-        console.error('Failed to parse custom role permissions JSON:', err);
+    const role = (allowed.role || 'VIEWER') as UserRole;
+    let permissions: string[] = [];
+
+    // If role is a custom role (not in built-in userRoles), fetch its permissions
+    if (!userRoles.includes(role as typeof userRoles[number])) {
+      const [customRoleRecord] = await db
+        .select()
+        .from(customRoles)
+        .where(eq(customRoles.code, role))
+        .limit(1);
+
+      if (customRoleRecord?.permissions) {
+        try {
+          permissions = JSON.parse(customRoleRecord.permissions);
+        } catch (err) {
+          console.error('Failed to parse custom role permissions JSON:', err);
+        }
       }
     }
-  }
 
-  return {
-    user: session.user,
-    role,
-    partnerId: allowed.partnerId || null,
-    permissions,
-  };
+    return {
+      user: session.user,
+      role,
+      partnerId: allowed.partnerId || null,
+      permissions,
+    };
+  } catch (err) {
+    console.error('requireAuth caught error:', err);
+    return { error: 'Authentication service temporarily unavailable', status: 401 };
+  }
 }
 
 export async function requirePermission(permission: Permission): Promise<AuthResult> {
