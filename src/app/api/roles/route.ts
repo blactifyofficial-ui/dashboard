@@ -56,7 +56,7 @@ export async function GET() {
             : roleKey === 'ADMIN'
             ? 'Operational manager: orders, inventory, revenue, expenses, and ads'
             : roleKey === 'STAFF'
-            ? 'Order issues and inventory stock counts (no financial figures)'
+            ? 'Inventory stock counts and fulfillment operations (no financial figures)'
             : roleKey === 'PARTNER'
             ? 'Investor view: overview metrics and strictly their own capital & payouts'
             : 'Read-only access across approved non-sensitive overview views',

@@ -87,9 +87,35 @@ async function MonthRevenueContent({ year, month, startDate, endDate }: {
   // Calculate daily data for the chart
   const dailyDataMap = new Map<number, { revenue: number; ordersCount: number }>();
   
-  // Initialize all days of the month to 0
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth() + 1;
+  const isCurrentMonth = year === currentYear && month === currentMonth;
+  const isFutureMonth = year > currentYear || (year === currentYear && month > currentMonth);
+
   const daysInMonth = new Date(year, month, 0).getDate();
-  for (let i = 1; i <= daysInMonth; i++) {
+
+  // Find the highest day that has an order in this month
+  let latestOrderDay = 0;
+  monthOrders.forEach((order) => {
+    if (order.createdAt) {
+      const d = new Date(order.createdAt).getDate();
+      if (d > latestOrderDay) latestOrderDay = d;
+    }
+  });
+
+  // For the current ongoing month, only plot days up to today (or latest order date)
+  // to avoid flatlining to ₹0 for future unelapsed dates.
+  // For past months, plot all days in the month.
+  let daysToShow = daysInMonth;
+  if (isCurrentMonth) {
+    const todayDate = now.getDate();
+    daysToShow = Math.min(daysInMonth, Math.max(todayDate, latestOrderDay));
+  } else if (isFutureMonth) {
+    daysToShow = latestOrderDay;
+  }
+
+  for (let i = 1; i <= daysToShow; i++) {
     dailyDataMap.set(i, { revenue: 0, ordersCount: 0 });
   }
   
@@ -123,7 +149,7 @@ async function MonthRevenueContent({ year, month, startDate, endDate }: {
   
   const chartData = Array.from(dailyDataMap.entries()).map(([day, val]) => ({
     day: `${day} ${startDate.toLocaleDateString('en-US', { month: 'short' })}`,
-    revenue: val.revenue,
+    revenue: Math.round(val.revenue * 100) / 100,
     ordersCount: val.ordersCount,
   }));
 
@@ -204,7 +230,14 @@ async function MonthRevenueContent({ year, month, startDate, endDate }: {
 
       {/* Chart Section */}
       <div className="bg-card border border-border rounded-xl p-3.5 sm:p-5 shadow-xs relative overflow-hidden">
-        <h2 className="text-sm sm:text-base font-semibold text-foreground tracking-tight mb-2 sm:mb-3">Daily Revenue</h2>
+        <div className="flex items-center justify-between gap-2 mb-2 sm:mb-3">
+          <h2 className="text-sm sm:text-base font-semibold text-foreground tracking-tight">Daily Revenue</h2>
+          {isCurrentMonth && (
+            <span className="text-[10px] sm:text-[11px] text-muted-foreground bg-muted border border-border/60 px-2 py-0.5 rounded-md font-medium">
+              Month-to-date
+            </span>
+          )}
+        </div>
         <RevenueChart data={chartData} />
       </div>
 

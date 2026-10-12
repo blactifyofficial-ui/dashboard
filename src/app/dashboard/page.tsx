@@ -1,6 +1,6 @@
 import { db } from '@/db';
 import { orders } from '@/db/schema';
-import { count, sql } from 'drizzle-orm';
+import { count, sql, and, gte, lt } from 'drizzle-orm';
 import { Inbox } from 'lucide-react';
 import RevenueCard from '@/components/RevenueCard';
 import DynamicOrdersChart from '@/components/DynamicOrdersChart';
@@ -56,7 +56,7 @@ async function DashboardContent() {
 
   let totalOrders = 0;
   let totalSales = 0;
-  let ordersPerDayResult: { date: string; count: number }[] = [];
+  let ordersPerDayResult: { date: string; day?: string; count: number; revenue?: number }[] = [];
 
   try {
     const totalResult = await db.select({
@@ -69,14 +69,68 @@ async function DashboardContent() {
       totalSales = Number(totalResult[0].totalSales ?? 0);
     }
 
-    ordersPerDayResult = await db.select({
-      date: sql<string>`DATE(${orders.createdAt})`,
-      count: sql<number>`CAST(COUNT(*) AS INTEGER)`
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth(); // 0-indexed (9 for Oct)
+    const startDate = new Date(currentYear, currentMonth, 1);
+    const endDate = new Date(currentYear, currentMonth + 1, 1);
+
+    const monthOrders = await db.select({
+      id: orders.id,
+      createdAt: orders.createdAt,
+      totalPrice: orders.totalPrice
     })
       .from(orders)
-      .where(sql`date_trunc('month', ${orders.createdAt}) = date_trunc('month', CURRENT_DATE)`)
-      .groupBy(sql`DATE(${orders.createdAt})`)
-      .orderBy(sql`DATE(${orders.createdAt})`);
+      .where(
+        and(
+          gte(orders.createdAt, startDate),
+          lt(orders.createdAt, endDate)
+        )
+      )
+      .orderBy(orders.createdAt);
+
+    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+    let latestOrderDay = 0;
+    monthOrders.forEach((o) => {
+      if (o.createdAt) {
+        const d = new Date(o.createdAt).getDate();
+        if (d > latestOrderDay) latestOrderDay = d;
+      }
+    });
+
+    const todayDate = now.getDate();
+    // For the ongoing current month, only plot days up to today (or latest order date)
+    // so future days don't appear and all past elapsed days are continuous without gaps.
+    const daysToShow = Math.min(daysInMonth, Math.max(todayDate, latestOrderDay));
+
+    const dailyMap = new Map<number, { count: number; revenue: number }>();
+    for (let day = 1; day <= daysToShow; day++) {
+      dailyMap.set(day, { count: 0, revenue: 0 });
+    }
+
+    monthOrders.forEach((o) => {
+      if (o.createdAt) {
+        const d = new Date(o.createdAt).getDate();
+        const existing = dailyMap.get(d) || { count: 0, revenue: 0 };
+        const price = parseFloat(o.totalPrice || '0') || 0;
+        dailyMap.set(d, {
+          count: existing.count + 1,
+          revenue: existing.revenue + price,
+        });
+      }
+    });
+
+    const monthShort = startDate.toLocaleDateString('en-US', { month: 'short' });
+    ordersPerDayResult = Array.from(dailyMap.entries()).map(([day, val]) => {
+      const paddedDay = day < 10 ? `0${day}` : `${day}`;
+      const paddedMonth = (currentMonth + 1) < 10 ? `0${currentMonth + 1}` : `${currentMonth + 1}`;
+      return {
+        date: `${currentYear}-${paddedMonth}-${paddedDay}`,
+        day: `${day} ${monthShort}`,
+        count: val.count,
+        revenue: canViewRevenue ? Math.round(val.revenue * 100) / 100 : undefined,
+      };
+    });
   } catch (error) {
     console.error("Dashboard database query error:", error);
     return (
@@ -115,7 +169,10 @@ async function DashboardContent() {
 
       {/* Chart Row */}
       <div className="bg-card border border-border rounded-xl p-5 sm:p-6 shadow-xs">
-        <h2 className="text-sm font-medium text-foreground mb-4">Orders per Day (Current Month)</h2>
+        <div className="mb-4">
+          <h2 className="text-sm font-semibold text-foreground tracking-tight">Orders per Day (Current Month)</h2>
+          <p className="text-xs text-muted-foreground mt-0.5">Daily order volume and distribution</p>
+        </div>
         {ordersPerDayResult.length > 0 ? (
           <DynamicOrdersChart data={ordersPerDayResult} />
         ) : (

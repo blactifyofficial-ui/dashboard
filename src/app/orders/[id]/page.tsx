@@ -1,6 +1,6 @@
 import { db } from '@/db';
-import { orders, orderItems, orderIssues, issueCategories, users } from '@/db/schema';
-import { eq, desc } from 'drizzle-orm';
+import { orders, orderItems } from '@/db/schema';
+import { eq } from 'drizzle-orm';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ArrowUpRight } from 'lucide-react';
@@ -34,19 +34,6 @@ async function OrderDetailContent({ orderId }: { orderId: string }) {
   const order = orderResult[0];
 
   const items = await db.select().from(orderItems).where(eq(orderItems.orderId, orderId));
-  
-  const issuesList = await db.select({
-    id: orderIssues.id,
-    title: orderIssues.title,
-    priority: orderIssues.priority,
-    status: orderIssues.status,
-    categoryName: issueCategories.name,
-    assignedToName: users.name,
-  }).from(orderIssues)
-    .leftJoin(issueCategories, eq(orderIssues.categoryId, issueCategories.id))
-    .leftJoin(users, eq(orderIssues.assignedToId, users.id))
-    .where(eq(orderIssues.orderId, orderId))
-    .orderBy(desc(orderIssues.createdAt));
 
   return (
     <>
@@ -96,50 +83,6 @@ async function OrderDetailContent({ orderId }: { orderId: string }) {
                   </li>
                 ))}
               </ul>
-            )}
-          </div>
-
-          <div className="bg-card border border-border rounded-xl p-5 sm:p-6 text-foreground shadow-xs">
-            <div className="flex items-center justify-between mb-4 border-b border-border pb-2.5">
-              <h2 className="text-base font-semibold">Issues ({issuesList.length})</h2>
-              <Link href="/order-issues" className="text-xs bg-muted hover:bg-muted/80 text-foreground border border-border px-2.5 py-1 rounded-md transition-colors">
-                Manage Issues
-              </Link>
-            </div>
-            {issuesList.length === 0 ? (
-              <div className="text-center py-6 text-muted-foreground text-sm">
-                <p>This order currently has no reported issues.</p>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {issuesList.map(issue => (
-                  <Link href={`/order-issues/${issue.id}`} key={issue.id} className="block bg-muted/30 p-3.5 rounded-lg hover:bg-muted/60 transition-colors border border-border">
-                    <div className="flex justify-between items-start mb-1.5">
-                      <h3 className="font-medium text-sm text-foreground">{issue.categoryName || 'Unknown Category'}</h3>
-                      <span className={`px-2 py-0.5 rounded text-[11px] font-medium ${
-                        issue.priority === 'URGENT' ? 'bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/25' :
-                        issue.priority === 'HIGH' ? 'bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/25' :
-                        'bg-blue-500/15 text-blue-700 dark:text-blue-400 border border-blue-500/25'
-                      }`}>
-                        {issue.priority}
-                      </span>
-                    </div>
-                    <p className="text-muted-foreground text-xs mb-2.5">{issue.title}</p>
-                    <div className="flex gap-2 text-xs">
-                      <span className={`px-2 py-0.5 rounded text-[11px] font-medium ${
-                        issue.status === 'OPEN' ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/25' :
-                        issue.status === 'IN_PROGRESS' ? 'bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/25' :
-                        'bg-muted text-foreground border border-border'
-                      }`}>
-                        {issue.status.replace('_', ' ')}
-                      </span>
-                      <span className="bg-muted text-foreground px-2 py-0.5 rounded text-[11px] border border-border">
-                        Assigned to {issue.assignedToName || 'Unassigned'}
-                      </span>
-                    </div>
-                  </Link>
-                ))}
-              </div>
             )}
           </div>
 

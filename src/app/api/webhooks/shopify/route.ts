@@ -27,7 +27,14 @@ export async function POST(req: Request) {
     
     // Check webhook topic
     const topic = req.headers.get('X-Shopify-Topic');
-    if (topic === 'orders/create' || topic === 'orders/updated' || topic === 'orders/fulfilled' || topic === 'orders/partially_fulfilled' || topic === 'orders/paid') {
+    if (
+      topic === 'orders/create' ||
+      topic === 'orders/updated' ||
+      topic === 'orders/fulfilled' ||
+      topic === 'orders/partially_fulfilled' ||
+      topic === 'orders/paid' ||
+      topic === 'orders/cancelled'
+    ) {
       const {
         id,
         order_number,

@@ -14,7 +14,6 @@ export const SHEET_TABS = {
   PARTNERS: 'Partners',
   PARTNER_TRANSACTIONS: 'Partner Transactions',
   PAYOUTS: 'Payouts',
-  ORDER_ISSUES: 'Order Issues',
   BACKUP_LOG: 'Backup Log',
 } as const;
 
@@ -166,25 +165,6 @@ export const SHEET_HEADERS: Record<string, string[]> = {
     'Created By',
     'Created At',
     'Updated At',
-    'Sync Status',
-  ],
-  [SHEET_TABS.ORDER_ISSUES]: [
-    'ID',
-    'Order ID',
-    'Order Number',
-    'Customer Name',
-    'Category',
-    'Title',
-    'Description',
-    'Status',
-    'Priority',
-    'Assigned To',
-    'Created By',
-    'Resolved By',
-    'Created At',
-    'Updated At',
-    'Resolved At',
-    'Closed At',
     'Sync Status',
   ],
   [SHEET_TABS.BACKUP_LOG]: [
@@ -403,28 +383,6 @@ export const RowMapper = {
     ];
   },
 
-  orderIssue(row: Record<string, unknown>, isDeleted: boolean = false): (string | number)[] {
-    return [
-      formatString(row.id),
-      formatString(row.orderId),
-      formatString(row.orderNumber),
-      formatString(row.customerName),
-      formatString(row.categoryName || row.categoryId),
-      formatString(row.title),
-      formatString(row.description),
-      formatString(row.status),
-      formatString(row.priority),
-      formatString(row.assignedToName || row.assignedToId),
-      formatString(row.creatorName || row.createdById),
-      formatString(row.resolverName || row.resolvedById),
-      formatDate(row.createdAt as Date | string),
-      formatDate(row.updatedAt as Date | string),
-      formatDate(row.resolvedAt as Date | string),
-      formatDate(row.closedAt as Date | string),
-      isDeleted ? 'DELETED' : 'ACTIVE',
-    ];
-  },
-
   backupLog(entry: BackupLogEntry): (string | number)[] {
     return [
       formatDate(entry.timestamp),
@@ -463,8 +421,6 @@ export function getTabNameForEntity(entity: SyncEntity): string {
       return SHEET_TABS.PARTNER_TRANSACTIONS;
     case 'payouts':
       return SHEET_TABS.PAYOUTS;
-    case 'order_issues':
-      return SHEET_TABS.ORDER_ISSUES;
     default:
       return entity;
   }

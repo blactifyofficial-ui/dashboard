@@ -1,6 +1,6 @@
 import { db } from '@/db';
 import { googleSheetsSyncQueue } from '@/db/schema';
-import { eq, or, and, lte, isNull, asc, desc } from 'drizzle-orm';
+import { eq, or, and, lte, isNull, asc, desc, sql } from 'drizzle-orm';
 import { syncRecordToGoogleSheets } from './sync';
 import { SyncEntity, SyncOperation, SyncStatus } from './types';
 import { incrementMetric, formatSheetsError, isQuotaExceededError } from './metrics';
@@ -22,6 +22,7 @@ const MAX_CONCURRENCY = Math.max(
 let activeWorkers = 0;
 let isQueueRunnerScheduled = false;
 let rateLimitCooldownUntil = 0;
+const inFlightJobIds = new Set<string>();
 
 /**
  * Calculates exponential backoff delay with randomized jitter in milliseconds
@@ -32,6 +33,29 @@ function getBackoffDelayWithJitter(attemptNumber: number, is429: boolean): numbe
   const exponential = Math.min(maxDelay, Math.pow(2, attemptNumber) * baseDelay);
   const jitter = Math.random() * 1500;
   return Math.round(exponential + jitter);
+}
+
+/**
+ * Automatically recovers zombie jobs stuck in SYNCING state for > 5 minutes
+ */
+async function recoverStaleSyncingJobs(): Promise<void> {
+  try {
+    const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+    await db
+      .update(googleSheetsSyncQueue)
+      .set({
+        status: 'PENDING',
+        updatedAt: new Date(),
+      })
+      .where(
+        and(
+          eq(googleSheetsSyncQueue.status, 'SYNCING'),
+          lte(googleSheetsSyncQueue.updatedAt, fiveMinutesAgo)
+        )
+      );
+  } catch (err) {
+    console.warn('[Google Sheets] Failed to recover stale syncing jobs:', formatSheetsError(err));
+  }
 }
 
 /**
@@ -65,11 +89,15 @@ async function runQueueProcessor(): Promise<void> {
     return;
   }
 
+  // Recover any zombie jobs that were interrupted
+  await recoverStaleSyncingJobs();
+
   while (activeWorkers < MAX_CONCURRENCY) {
     const slotsAvailable = MAX_CONCURRENCY - activeWorkers;
     if (slotsAvailable <= 0) break;
 
     try {
+      // Prioritize user-facing business entities (expenses, partners, etc.) over bulk Shopify orders
       const pendingJobs = await db
         .select()
         .from(googleSheetsSyncQueue)
@@ -82,21 +110,33 @@ async function runQueueProcessor(): Promise<void> {
             )
           )
         )
-        .orderBy(asc(googleSheetsSyncQueue.createdAt))
-        .limit(slotsAvailable);
+        .orderBy(
+          sql`CASE 
+            WHEN ${googleSheetsSyncQueue.entity} IN ('expenses', 'expense_attachments', 'monthly_expenses', 'monthly_expense_templates', 'meta_ads', 'partners', 'partner_transactions', 'payouts') THEN 1 
+            ELSE 2 
+          END ASC`,
+          asc(googleSheetsSyncQueue.createdAt)
+        )
+        .limit(slotsAvailable * 3);
 
-      if (pendingJobs.length === 0) {
+      const availableJobs = pendingJobs
+        .filter((job) => !inFlightJobIds.has(job.id))
+        .slice(0, slotsAvailable);
+
+      if (availableJobs.length === 0) {
         break;
       }
 
-      for (const job of pendingJobs) {
+      for (const job of availableJobs) {
         if (activeWorkers >= MAX_CONCURRENCY) break;
+        inFlightJobIds.add(job.id);
         activeWorkers++;
 
         void (async () => {
           try {
             await processSyncJob(job.id);
           } finally {
+            inFlightJobIds.delete(job.id);
             activeWorkers = Math.max(0, activeWorkers - 1);
             scheduleQueueProcessing();
           }

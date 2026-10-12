@@ -108,6 +108,11 @@ export async function PATCH(
           session.user.id,
           `Removed because monthly bill was marked as ${targetStatus.toLowerCase()}`
         );
+        void enqueueSyncJob({
+          entity: 'expenses',
+          databaseId: existing.expenseId,
+          operation: 'DELETE',
+        });
         updateData.expenseId = null;
       }
     }

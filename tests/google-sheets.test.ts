@@ -42,7 +42,6 @@ describe('Google Sheets Backup System', () => {
         'Partners',
         'Partner Transactions',
         'Payouts',
-        'Order Issues',
         'Backup Log',
       ];
 
@@ -66,7 +65,6 @@ describe('Google Sheets Backup System', () => {
       assert.equal(getTabNameForEntity('partners'), SHEET_TABS.PARTNERS);
       assert.equal(getTabNameForEntity('partner_transactions'), SHEET_TABS.PARTNER_TRANSACTIONS);
       assert.equal(getTabNameForEntity('payouts'), SHEET_TABS.PAYOUTS);
-      assert.equal(getTabNameForEntity('order_issues'), SHEET_TABS.ORDER_ISSUES);
     });
   });
 
@@ -144,35 +142,6 @@ describe('Google Sheets Backup System', () => {
       assert.equal(row[0], 'ptxn_001');
       assert.equal(row[3], 'PAYOUT');
       assert.equal(row[4], 50000);
-      assert.equal(row[row.length - 1], 'ACTIVE');
-    });
-
-    it('should format order issues with all tracking metadata', () => {
-      const mockIssue = {
-        id: 'iss_999',
-        orderId: 'ord_123',
-        orderNumber: '#1001',
-        customerName: 'Nithin Doe',
-        categoryName: 'Damaged Item',
-        title: 'Item crushed in transit',
-        description: 'Customer sent photos of damaged outer packaging',
-        status: 'IN_PROGRESS',
-        priority: 'HIGH',
-        assignedToName: 'Support Agent',
-        creatorName: 'Admin',
-        resolverName: null,
-        createdAt: new Date('2026-10-02T11:00:00Z'),
-        updatedAt: new Date('2026-10-02T11:30:00Z'),
-        resolvedAt: null,
-        closedAt: null,
-      };
-
-      const row = RowMapper.orderIssue(mockIssue, false);
-      const headers = SHEET_HEADERS[SHEET_TABS.ORDER_ISSUES];
-      assert.equal(row.length, headers.length);
-      assert.equal(row[0], 'iss_999');
-      assert.equal(row[7], 'IN_PROGRESS');
-      assert.equal(row[8], 'HIGH');
       assert.equal(row[row.length - 1], 'ACTIVE');
     });
 

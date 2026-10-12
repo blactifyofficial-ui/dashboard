@@ -33,13 +33,6 @@ export const PERMISSIONS = {
   'payouts:manage': ['SUPER_ADMIN'],
   'payouts:mark_paid': ['SUPER_ADMIN', 'ADMIN'],
 
-  // --- Issues ---
-  'issues:view': ['SUPER_ADMIN', 'ADMIN', 'STAFF', 'VIEWER'],
-  'issues:create': ['SUPER_ADMIN', 'ADMIN', 'STAFF'],
-  'issues:edit': ['SUPER_ADMIN', 'ADMIN', 'STAFF'],
-  'issues:delete': ['SUPER_ADMIN', 'ADMIN'],
-  'issues:manage_categories': ['SUPER_ADMIN', 'ADMIN'],
-
   // --- Expenses ---
   'expenses:view': ['SUPER_ADMIN', 'ADMIN', 'VIEWER'],
   'expenses:edit': ['SUPER_ADMIN', 'ADMIN'],
@@ -68,7 +61,6 @@ export interface PermissionItem {
     | 'Meta Ads'
     | 'Partners'
     | 'Payouts'
-    | 'Order Issues'
     | 'Expenses'
     | 'Monthly Bills'
     | 'Settings & Team';
@@ -106,13 +98,6 @@ export const PERMISSION_CATALOG: PermissionItem[] = [
   { key: 'payouts:view_self', label: 'View Own Payouts', description: 'See payouts belonging to the user', category: 'Payouts' },
   { key: 'payouts:manage', label: 'Manage Payouts', description: 'Calculate and generate new payout periods', category: 'Payouts' },
   { key: 'payouts:mark_paid', label: 'Mark Payouts Paid', description: 'Update status of pending payout records', category: 'Payouts' },
-
-  // Issues
-  { key: 'issues:view', label: 'View Order Issues', description: 'Browse customer order issues and resolution logs', category: 'Order Issues' },
-  { key: 'issues:create', label: 'Create Issues', description: 'Report new issues on customer orders', category: 'Order Issues' },
-  { key: 'issues:edit', label: 'Edit Issues', description: 'Update status, assignees, and issue activities', category: 'Order Issues' },
-  { key: 'issues:delete', label: 'Delete Issues', description: 'Remove issue records', category: 'Order Issues' },
-  { key: 'issues:manage_categories', label: 'Manage Issue Categories', description: 'Create and edit issue classification categories', category: 'Order Issues' },
 
   // Expenses
   { key: 'expenses:view', label: 'View Daily Expenses', description: 'See daily expense logs, receipts, and summaries', category: 'Expenses' },
@@ -218,7 +203,6 @@ export const ROUTE_PERMISSIONS: Record<string, Permission> = {
   '/meta-ads': 'meta_ads:view',
   '/partners': 'partners:view_self',
   '/payouts': 'payouts:view_self',
-  '/order-issues': 'issues:view',
   '/expenses': 'expenses:view',
   '/monthly-expenses': 'monthly_expenses:view',
   '/team': 'settings:manage_users',

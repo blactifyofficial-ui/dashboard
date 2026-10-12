@@ -12,8 +12,6 @@ import {
   metaAdsTransactions,
   partners,
   partnerTransactions,
-  orderIssues,
-  issueCategories,
 } from '@/db/schema';
 import { eq, desc } from 'drizzle-orm';
 import { getGoogleSheetsClient } from './client';
@@ -272,39 +270,6 @@ export async function syncRecordToGoogleSheets(
         }
         break;
       }
-
-      case 'order_issues': {
-        const [record] = await db
-          .select({
-            id: orderIssues.id,
-            orderId: orderIssues.orderId,
-            orderNumber: orders.orderNumber,
-            customerName: orders.customerName,
-            categoryName: issueCategories.name,
-            title: orderIssues.title,
-            description: orderIssues.description,
-            status: orderIssues.status,
-            priority: orderIssues.priority,
-            assignedToName: users.name,
-            creatorName: users.name,
-            resolverName: users.name,
-            createdAt: orderIssues.createdAt,
-            updatedAt: orderIssues.updatedAt,
-            resolvedAt: orderIssues.resolvedAt,
-            closedAt: orderIssues.closedAt,
-          })
-          .from(orderIssues)
-          .leftJoin(orders, eq(orderIssues.orderId, orders.id))
-          .leftJoin(issueCategories, eq(orderIssues.categoryId, issueCategories.id))
-          .leftJoin(users, eq(orderIssues.createdById, users.id))
-          .where(eq(orderIssues.id, databaseId))
-          .limit(1);
-
-        if (record) {
-          rowData = RowMapper.orderIssue(record as Record<string, unknown>, isDelete);
-        }
-        break;
-      }
     }
 
     // 3. Check if ID exists in Google Sheet (using cached row map)
@@ -327,7 +292,10 @@ export async function syncRecordToGoogleSheets(
       });
       const currentRow = currentValuesRes.data.values?.[0] || [];
       if (currentRow.length > 0) {
-        currentRow[currentRow.length - 1] = 'DELETED';
+        while (currentRow.length < headers.length) {
+          currentRow.push('');
+        }
+        currentRow[headers.length - 1] = 'DELETED';
         await updateSheetRow(sheets, spreadsheetId, tabName, existingRowNumber, currentRow as (string | number)[]);
       }
     }
@@ -850,61 +818,6 @@ export async function syncAllToGoogleSheets(): Promise<FullSyncStats> {
     const errorMsg = formatSheetsError(err);
     console.error('[Google Sheets] Error syncing Partner Transactions:', errorMsg);
     entityStats.push({ entity: 'partner_transactions', tabName: SHEET_TABS.PARTNER_TRANSACTIONS, count: 0, success: false, error: errorMsg });
-  }
-
-  // 10. Order Issues
-  try {
-    const tabName = SHEET_TABS.ORDER_ISSUES;
-    const headers = SHEET_HEADERS[tabName];
-    await ensureSheetWithHeaders(sheets, spreadsheetId, tabName, headers);
-
-    const allIssues = await db
-      .select({
-        id: orderIssues.id,
-        orderId: orderIssues.orderId,
-        orderNumber: orders.orderNumber,
-        customerName: orders.customerName,
-        categoryName: issueCategories.name,
-        title: orderIssues.title,
-        description: orderIssues.description,
-        status: orderIssues.status,
-        priority: orderIssues.priority,
-        assignedToName: users.name,
-        creatorName: users.name,
-        resolverName: users.name,
-        createdAt: orderIssues.createdAt,
-        updatedAt: orderIssues.updatedAt,
-        resolvedAt: orderIssues.resolvedAt,
-        closedAt: orderIssues.closedAt,
-      })
-      .from(orderIssues)
-      .leftJoin(orders, eq(orderIssues.orderId, orders.id))
-      .leftJoin(issueCategories, eq(orderIssues.categoryId, issueCategories.id))
-      .leftJoin(users, eq(orderIssues.createdById, users.id));
-
-    const existingIds = await getSheetRowIds(sheets, spreadsheetId, tabName, true);
-    const updates: { rowNumber: number; rowData: (string | number)[] }[] = [];
-    const appends: (string | number)[][] = [];
-
-    for (const issue of allIssues) {
-      const row = RowMapper.orderIssue(issue as Record<string, unknown>, false);
-      const existingRow = existingIds.get(issue.id);
-      if (existingRow) {
-        updates.push({ rowNumber: existingRow, rowData: row });
-      } else {
-        appends.push(row);
-      }
-    }
-
-    if (updates.length > 0) await batchUpdateSheetRows(sheets, spreadsheetId, tabName, updates);
-    if (appends.length > 0) await appendSheetRows(sheets, spreadsheetId, tabName, appends);
-
-    totalRecords += allIssues.length;
-    entityStats.push({ entity: 'order_issues', tabName, count: allIssues.length, success: true });
-  } catch (err: unknown) {
-    const errorMsg = formatSheetsError(err);
-    console.error('[Google Sheets] Error syncing Order Issues:', errorMsg);
-    entityStats.push({ entity: 'order_issues', tabName: SHEET_TABS.ORDER_ISSUES, count: 0, success: false, error: errorMsg });
   }
 
   const completedTime = new Date();

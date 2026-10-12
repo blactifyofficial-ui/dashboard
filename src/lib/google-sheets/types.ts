@@ -8,8 +8,7 @@ export type SyncEntity =
   | 'meta_ads'
   | 'partners'
   | 'partner_transactions'
-  | 'payouts'
-  | 'order_issues';
+  | 'payouts';
 
 export type SyncOperation = 'CREATE' | 'UPDATE' | 'DELETE' | 'FULL_SYNC';
 

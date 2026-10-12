@@ -254,7 +254,7 @@ export default function RoleForm({
             <label className="block text-xs font-medium text-muted-foreground mb-1.5">Description</label>
             <input
               type="text"
-              placeholder="e.g. Handles product inventory, stock sync, and resolves order issues"
+              placeholder="e.g. Handles product inventory and stock sync operations"
               value={roleDescription}
               onChange={(e) => setRoleDescription(e.target.value)}
               className="w-full bg-muted/40 border border-input rounded-lg px-3.5 py-2 text-sm text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary transition-colors"
