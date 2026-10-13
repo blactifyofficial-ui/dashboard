@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 
 import { isCodOrder } from '@/lib/order-utils';
+import { formatStoreDate, formatStoreTime } from '@/lib/date-utils';
 
 export interface MonthOrderDetail {
   id: string;
@@ -290,13 +291,8 @@ export default function MonthOrdersTable({ orders }: MonthOrdersTableProps) {
             ) : (
               paginatedOrders.map((order) => {
                 const isCod = isCodOrder(order);
-                const orderDate = order.createdAt ? new Date(order.createdAt) : null;
-                const formattedDate = orderDate
-                  ? orderDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
-                  : '-';
-                const formattedTime = orderDate
-                  ? orderDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })
-                  : '';
+                const formattedDate = formatStoreDate(order.createdAt);
+                const formattedTime = formatStoreTime(order.createdAt);
                 const amount = parseFloat(order.totalPrice || '0') || 0;
 
                 return (

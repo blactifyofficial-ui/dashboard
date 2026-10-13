@@ -68,17 +68,17 @@ async function RevenueContent({ searchParams, tab, q }: { searchParams: { [key: 
   const offset = (page - 1) * pageSize;
 
   if (tab === 'monthly') {
-    const whereClause = q ? ilike(sql<string>`to_char(${orders.createdAt}, 'FMMonth YYYY')`, `%${q}%`) : undefined;
+    const whereClause = q ? ilike(sql<string>`to_char(${orders.createdAt} AT TIME ZONE 'Asia/Kolkata', 'FMMonth YYYY')`, `%${q}%`) : undefined;
 
     const monthlyData = await db.select({
-      month: sql<string>`to_char(date_trunc('month', ${orders.createdAt}), 'YYYY-MM')`,
+      month: sql<string>`to_char(date_trunc('month', ${orders.createdAt} AT TIME ZONE 'Asia/Kolkata'), 'YYYY-MM')`,
       revenue: sql<number>`COALESCE(SUM(CAST(${orders.totalPrice} AS NUMERIC)), 0)`,
       orderCount: sql<number>`COUNT(*)`
     })
     .from(orders)
     .where(whereClause)
-    .groupBy(sql`date_trunc('month', ${orders.createdAt})`)
-    .orderBy(desc(sql`date_trunc('month', ${orders.createdAt})`));
+    .groupBy(sql`date_trunc('month', ${orders.createdAt} AT TIME ZONE 'Asia/Kolkata')`)
+    .orderBy(desc(sql`date_trunc('month', ${orders.createdAt} AT TIME ZONE 'Asia/Kolkata')`));
 
     const maxRevenue = Math.max(...monthlyData.map(d => Number(d.revenue)), 0);
 

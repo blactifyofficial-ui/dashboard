@@ -8,7 +8,7 @@ export const orders = pgTable('orders', {
   customerEmail: text('customer_email'),
   totalPrice: numeric('total_price'),
   currency: text('currency'),
-  createdAt: timestamp('created_at').defaultNow(),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
   financialStatus: text('financial_status'),
   fulfillmentStatus: text('fulfillment_status'),
   paymentGateway: text('payment_gateway'),

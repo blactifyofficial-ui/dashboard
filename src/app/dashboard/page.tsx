@@ -8,6 +8,7 @@ import { Suspense } from 'react';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { requireAuth } from '@/lib/auth-utils';
 import { hasPermission } from '@/lib/rbac';
+import { getStoreMonthRange, getStoreNow, getStoreDay } from '@/lib/date-utils';
 
 import { redirect } from 'next/navigation';
 
@@ -69,11 +70,8 @@ async function DashboardContent() {
       totalSales = Number(totalResult[0].totalSales ?? 0);
     }
 
-    const now = new Date();
-    const currentYear = now.getFullYear();
-    const currentMonth = now.getMonth(); // 0-indexed (9 for Oct)
-    const startDate = new Date(currentYear, currentMonth, 1);
-    const endDate = new Date(currentYear, currentMonth + 1, 1);
+    const storeNow = getStoreNow();
+    const { startDate, endDate } = getStoreMonthRange(storeNow.year, storeNow.month);
 
     const monthOrders = await db.select({
       id: orders.id,
@@ -89,16 +87,16 @@ async function DashboardContent() {
       )
       .orderBy(orders.createdAt);
 
-    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+    const daysInMonth = new Date(storeNow.year, storeNow.month, 0).getDate();
     let latestOrderDay = 0;
     monthOrders.forEach((o) => {
       if (o.createdAt) {
-        const d = new Date(o.createdAt).getDate();
+        const d = getStoreDay(o.createdAt);
         if (d > latestOrderDay) latestOrderDay = d;
       }
     });
 
-    const todayDate = now.getDate();
+    const todayDate = storeNow.day;
     // For the ongoing current month, only plot days up to today (or latest order date)
     // so future days don't appear and all past elapsed days are continuous without gaps.
     const daysToShow = Math.min(daysInMonth, Math.max(todayDate, latestOrderDay));
@@ -110,7 +108,7 @@ async function DashboardContent() {
 
     monthOrders.forEach((o) => {
       if (o.createdAt) {
-        const d = new Date(o.createdAt).getDate();
+        const d = getStoreDay(o.createdAt);
         const existing = dailyMap.get(d) || { count: 0, revenue: 0 };
         const price = parseFloat(o.totalPrice || '0') || 0;
         dailyMap.set(d, {
@@ -120,12 +118,12 @@ async function DashboardContent() {
       }
     });
 
-    const monthShort = startDate.toLocaleDateString('en-US', { month: 'short' });
+    const monthShort = new Date(storeNow.year, storeNow.month - 1, 1).toLocaleDateString('en-US', { month: 'short' });
     ordersPerDayResult = Array.from(dailyMap.entries()).map(([day, val]) => {
       const paddedDay = day < 10 ? `0${day}` : `${day}`;
-      const paddedMonth = (currentMonth + 1) < 10 ? `0${currentMonth + 1}` : `${currentMonth + 1}`;
+      const paddedMonth = storeNow.month < 10 ? `0${storeNow.month}` : `${storeNow.month}`;
       return {
-        date: `${currentYear}-${paddedMonth}-${paddedDay}`,
+        date: `${storeNow.year}-${paddedMonth}-${paddedDay}`,
         day: `${day} ${monthShort}`,
         count: val.count,
         revenue: canViewRevenue ? Math.round(val.revenue * 100) / 100 : undefined,

@@ -6,6 +6,7 @@ import Link from 'next/link';
 import RevenueChart from '@/components/RevenueChart';
 import MonthOrdersTable from '@/components/MonthOrdersTable';
 import { isCodOrder } from '@/lib/order-utils';
+import { getStoreMonthRange, getStoreNow, getStoreDay } from '@/lib/date-utils';
 import { Suspense } from 'react';
 import LoadingSpinner from '@/components/LoadingSpinner';
 
@@ -15,7 +16,7 @@ export default async function MonthRevenuePage(props: {
   params: Promise<{ month: string }>;
 }) {
   const params = await props.params;
-  const monthParam = params.month; // e.g. "2026-09"
+  const monthParam = params.month; // e.g. "2026-10"
   
   const [yearStr, monthStr] = monthParam.split('-');
   const year = parseInt(yearStr, 10);
@@ -25,10 +26,10 @@ export default async function MonthRevenuePage(props: {
     return <div className="text-foreground">Invalid month</div>;
   }
 
-  const startDate = new Date(year, month - 1, 1);
-  const endDate = new Date(year, month, 1);
+  // Calculate month boundaries in store timezone (Asia/Kolkata, UTC+05:30)
+  const { startDate, endDate } = getStoreMonthRange(year, month);
   
-  const monthDisplay = startDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+  const monthDisplay = new Date(year, month - 1, 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 
   return (
     <div className="space-y-4 sm:space-y-6 relative z-10 text-foreground">
@@ -59,7 +60,7 @@ async function MonthRevenueContent({ year, month, startDate, endDate }: {
   startDate: Date;
   endDate: Date;
 }) {
-  // Get orders for this month with all details
+  // Get orders for this month with all details, filtered by store 24h timezone boundaries
   const monthOrders = await db.select({
     id: orders.id,
     orderNumber: orders.orderNumber,
@@ -84,32 +85,28 @@ async function MonthRevenueContent({ year, month, startDate, endDate }: {
     )
     .orderBy(desc(orders.createdAt));
 
-  // Calculate daily data for the chart
+  // Calculate daily 24h data for the chart using store timezone (Asia/Kolkata)
   const dailyDataMap = new Map<number, { revenue: number; ordersCount: number }>();
   
-  const now = new Date();
-  const currentYear = now.getFullYear();
-  const currentMonth = now.getMonth() + 1;
-  const isCurrentMonth = year === currentYear && month === currentMonth;
-  const isFutureMonth = year > currentYear || (year === currentYear && month > currentMonth);
+  const now = getStoreNow();
+  const isCurrentMonth = year === now.year && month === now.month;
+  const isFutureMonth = year > now.year || (year === now.year && month > now.month);
 
   const daysInMonth = new Date(year, month, 0).getDate();
 
-  // Find the highest day that has an order in this month
+  // Find the highest day that has an order in this month in store timezone
   let latestOrderDay = 0;
   monthOrders.forEach((order) => {
     if (order.createdAt) {
-      const d = new Date(order.createdAt).getDate();
+      const d = getStoreDay(order.createdAt);
       if (d > latestOrderDay) latestOrderDay = d;
     }
   });
 
-  // For the current ongoing month, only plot days up to today (or latest order date)
-  // to avoid flatlining to ₹0 for future unelapsed dates.
-  // For past months, plot all days in the month.
+  // For the ongoing current month, only plot days up to today (or latest order date)
   let daysToShow = daysInMonth;
   if (isCurrentMonth) {
-    const todayDate = now.getDate();
+    const todayDate = now.day;
     daysToShow = Math.min(daysInMonth, Math.max(todayDate, latestOrderDay));
   } else if (isFutureMonth) {
     daysToShow = latestOrderDay;
@@ -130,7 +127,7 @@ async function MonthRevenueContent({ year, month, startDate, endDate }: {
     totalRevenue += revenue;
 
     if (order.createdAt) {
-      const day = new Date(order.createdAt).getDate();
+      const day = getStoreDay(order.createdAt);
       const current = dailyDataMap.get(day) || { revenue: 0, ordersCount: 0 };
       dailyDataMap.set(day, {
         revenue: current.revenue + revenue,
@@ -147,8 +144,9 @@ async function MonthRevenueContent({ year, month, startDate, endDate }: {
     }
   });
   
+  const monthShort = new Date(year, month - 1, 1).toLocaleDateString('en-US', { month: 'short' });
   const chartData = Array.from(dailyDataMap.entries()).map(([day, val]) => ({
-    day: `${day} ${startDate.toLocaleDateString('en-US', { month: 'short' })}`,
+    day: `${day} ${monthShort}`,
     revenue: Math.round(val.revenue * 100) / 100,
     ordersCount: val.ordersCount,
   }));
@@ -230,15 +228,7 @@ async function MonthRevenueContent({ year, month, startDate, endDate }: {
 
       {/* Chart Section */}
       <div className="bg-card border border-border rounded-xl p-3.5 sm:p-5 shadow-xs relative overflow-hidden">
-        <div className="flex items-center justify-between gap-2 mb-2 sm:mb-3">
-          <h2 className="text-sm sm:text-base font-semibold text-foreground tracking-tight">Daily Revenue</h2>
-          {isCurrentMonth && (
-            <span className="text-[10px] sm:text-[11px] text-muted-foreground bg-muted border border-border/60 px-2 py-0.5 rounded-md font-medium">
-              Month-to-date
-            </span>
-          )}
-        </div>
-        <RevenueChart data={chartData} />
+        <RevenueChart data={chartData} isCurrentMonth={isCurrentMonth} />
       </div>
 
       {/* Detailed Orders Breakdown Table */}

@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS "orders" (
     "customer_email" TEXT,
     "total_price" NUMERIC,
     "currency" TEXT,
-    "created_at" TIMESTAMP WITHOUT TIME ZONE DEFAULT NOW(),
+    "created_at" TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     "financial_status" TEXT,
     "fulfillment_status" TEXT,
     "payment_gateway" TEXT,
