@@ -264,3 +264,17 @@ export const googleSheetsSyncQueue = pgTable('google_sheets_sync_queue', {
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
+export const aiAnalysisReports = pgTable('ai_analysis_reports', {
+  id: text('id').primaryKey(),
+  timeframe: text('timeframe').notNull(), // '30d' | '90d' | 'ytd' | 'all'
+  focusArea: text('focus_area').default('ALL').notNull(), // 'ALL' | 'SALES' | 'EXPENSES' | 'MARKETING'
+  healthScore: numeric('health_score'),
+  healthStatus: text('health_status'),
+  summary: text('summary').notNull(),
+  reportJson: text('report_json').notNull(), // JSON string of complete structured report
+  metricsSnapshot: text('metrics_snapshot').notNull(), // JSON string of aggregated raw metrics
+  createdById: text('created_by_id').references(() => users.id),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+});
+
+

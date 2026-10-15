@@ -46,6 +46,10 @@ export const PERMISSIONS = {
   'settings:view': ['SUPER_ADMIN', 'ADMIN'],
   'settings:manage_integrations': ['SUPER_ADMIN'],
   'settings:manage_users': ['SUPER_ADMIN'],
+
+  // --- AI Strategy ---
+  'ai_analysis:view': ['SUPER_ADMIN', 'ADMIN', 'PARTNER'],
+  'ai_analysis:generate': ['SUPER_ADMIN', 'ADMIN'],
 } as const;
 
 export type Permission = keyof typeof PERMISSIONS;
@@ -63,6 +67,7 @@ export interface PermissionItem {
     | 'Payouts'
     | 'Expenses'
     | 'Monthly Bills'
+    | 'AI Strategy'
     | 'Settings & Team';
 }
 
@@ -107,6 +112,10 @@ export const PERMISSION_CATALOG: PermissionItem[] = [
   { key: 'monthly_expenses:view', label: 'View Monthly Bills', description: 'Access monthly recurring bills and budget tracking', category: 'Monthly Bills' },
   { key: 'monthly_expenses:edit', label: 'Edit Monthly Bills', description: 'Manage monthly budget caps, bill templates, and payment status', category: 'Monthly Bills' },
   { key: 'monthly_expenses:sync_sheets', label: 'Sync to Google Sheets', description: 'Trigger Google Sheets sync for expense records', category: 'Monthly Bills' },
+
+  // AI Strategy
+  { key: 'ai_analysis:view', label: 'View AI Strategic Analysis', description: 'Access financial diagnostics, health score, and strategic roadmap', category: 'AI Strategy' },
+  { key: 'ai_analysis:generate', label: 'Generate AI Reports & Advisor', description: 'Trigger new Gemini strategic audits and ask follow-up advisory questions', category: 'AI Strategy' },
 
   // Settings & Team
   { key: 'settings:view', label: 'View Settings', description: 'Access settings and configuration page', category: 'Settings & Team' },
@@ -205,6 +214,7 @@ export const ROUTE_PERMISSIONS: Record<string, Permission> = {
   '/payouts': 'payouts:view_self',
   '/expenses': 'expenses:view',
   '/monthly-expenses': 'monthly_expenses:view',
+  '/ai-analysis': 'ai_analysis:view',
   '/team': 'settings:manage_users',
   '/settings': 'settings:view',
 };

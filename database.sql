@@ -458,3 +458,24 @@ CREATE INDEX IF NOT EXISTS "idx_monthly_expense_entries_template_id" ON "monthly
 -- Google Sheets Sync Queue Indexes
 CREATE INDEX IF NOT EXISTS "idx_google_sheets_sync_queue_status_retry" ON "google_sheets_sync_queue" ("status", "next_retry_at");
 CREATE INDEX IF NOT EXISTS "idx_google_sheets_sync_queue_created_at" ON "google_sheets_sync_queue" ("created_at" DESC);
+
+-- ==============================================================================
+-- 10. AI ANALYSIS & STRATEGY REPORTS
+-- ==============================================================================
+
+CREATE TABLE IF NOT EXISTS "ai_analysis_reports" (
+    "id" TEXT PRIMARY KEY NOT NULL,
+    "timeframe" TEXT NOT NULL,
+    "focus_area" TEXT NOT NULL DEFAULT 'ALL',
+    "health_score" NUMERIC,
+    "health_status" TEXT,
+    "summary" TEXT NOT NULL,
+    "report_json" TEXT NOT NULL,
+    "metrics_snapshot" TEXT NOT NULL,
+    "created_by_id" TEXT REFERENCES "user"("id"),
+    "created_at" TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS "idx_ai_analysis_reports_created_at" ON "ai_analysis_reports" ("created_at" DESC);
+CREATE INDEX IF NOT EXISTS "idx_ai_analysis_reports_timeframe" ON "ai_analysis_reports" ("timeframe");
+
