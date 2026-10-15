@@ -1,31 +1,65 @@
 import { db } from '@/db';
-import { orders } from '@/db/schema';
-import { count, sql, and, gte, lt } from 'drizzle-orm';
-import { Inbox } from 'lucide-react';
-import RevenueCard from '@/components/RevenueCard';
+import { orders, orderItems } from '@/db/schema';
+import { count, sql, and, gte, lt, desc, eq } from 'drizzle-orm';
+import { Inbox, ArrowUpRight, BarChart3, Boxes } from 'lucide-react';
+import Link from 'next/link';
 import DynamicOrdersChart from '@/components/DynamicOrdersChart';
+import DashboardKpis from '@/components/dashboard/DashboardKpis';
+import PaymentAndFulfillmentCard from '@/components/dashboard/PaymentAndFulfillmentCard';
+import RecentOrdersWidget from '@/components/dashboard/RecentOrdersWidget';
+import TopProductsWidget from '@/components/dashboard/TopProductsWidget';
 import { Suspense } from 'react';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { requireAuth } from '@/lib/auth-utils';
 import { hasPermission } from '@/lib/rbac';
-import { getStoreMonthRange, getStoreNow, getStoreDay } from '@/lib/date-utils';
-
+import {
+  getStoreMonthRange,
+  getStoreNow,
+  getStoreDay,
+  getStoreTodayRange,
+  getStoreYesterdayRange,
+} from '@/lib/date-utils';
+import { isCodOrder } from '@/lib/order-utils';
 import { redirect } from 'next/navigation';
 
 export const dynamic = "force-dynamic";
 
 export default async function Dashboard() {
   return (
-    <div className="space-y-6 relative z-10">
+    <div className="space-y-6 relative z-10 pb-8">
+      {/* Header */}
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4">
         <div className="space-y-1">
-          <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-foreground">Sales Overview</h1>
+          <div className="flex items-center gap-2">
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">Sales Command Center</h1>
+            <span className="text-[10px] uppercase font-mono font-semibold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+              Live Overview
+            </span>
+          </div>
           <p className="text-muted-foreground text-xs sm:text-sm flex items-center gap-2">
             <span className="relative flex h-2 w-2 shrink-0">
               <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
             </span>
-            <span>Real-time sync with Shopify via Webhooks</span>
+            <span>Real-time operational metrics &amp; Shopify synchronization</span>
           </p>
+        </div>
+
+        {/* Quick Shortcut Buttons */}
+        <div className="flex items-center gap-2">
+          <Link
+            href="/revenue"
+            className="px-3 py-1.5 text-xs font-medium rounded-lg bg-card border border-border hover:bg-muted text-foreground transition-colors flex items-center gap-1.5 shadow-xs"
+          >
+            <BarChart3 size={14} className="text-muted-foreground" />
+            <span>Revenue Reports</span>
+          </Link>
+          <Link
+            href="/inventory"
+            className="px-3 py-1.5 text-xs font-medium rounded-lg bg-card border border-border hover:bg-muted text-foreground transition-colors flex items-center gap-1.5 shadow-xs"
+          >
+            <Boxes size={14} className="text-muted-foreground" />
+            <span>Inventory Stock</span>
+          </Link>
         </div>
       </header>
 
@@ -53,43 +87,156 @@ async function DashboardContent() {
 
   const role = authRes.role || 'VIEWER';
   const canViewRevenue = hasPermission(role, 'overview:view_revenue');
+  const canViewOrders = hasPermission(role, 'overview:view_orders');
   const canViewStatus = hasPermission(role, 'overview:view_status');
+  const canViewChart = hasPermission(role, 'overview:view_chart');
 
-  let totalOrders = 0;
-  let totalSales = 0;
+  // Dates in Store Timezone (IST Asia/Kolkata)
+  const storeNow = getStoreNow();
+  const todayRange = getStoreTodayRange();
+  const yesterdayRange = getStoreYesterdayRange();
+  const monthRange = getStoreMonthRange(storeNow.year, storeNow.month);
+
+  let totalAllTimeOrders = 0;
+  let totalAllTimeSales = 0;
+
+  let todayOrders = 0;
+  let todaySales = 0;
+
+  let yesterdayOrders = 0;
+  let yesterdaySales = 0;
+
   let ordersPerDayResult: { date: string; day?: string; count: number; revenue?: number }[] = [];
 
+  let prepaidCount = 0;
+  let prepaidRevenue = 0;
+  let codCount = 0;
+  let codRevenue = 0;
+  let fulfilledCount = 0;
+  let unfulfilledCount = 0;
+  let partiallyFulfilledCount = 0;
+  let mtdSales = 0;
+  let mtdOrders = 0;
+
+  let recentOrders: Array<{
+    id: string;
+    orderNumber: string | null;
+    customerName: string | null;
+    customerEmail: string | null;
+    totalPrice: string | null;
+    createdAt: Date | string | null;
+    financialStatus: string | null;
+    fulfillmentStatus: string | null;
+    paymentGateway: string | null;
+  }> = [];
+
+  let topProducts: Array<{
+    title: string | null;
+    imageUrl: string | null;
+    revenue: number;
+    unitsSold: number;
+  }> = [];
+
   try {
+    // 1. All-time totals query
     const totalResult = await db.select({
       totalOrders: count(),
       totalSales: canViewRevenue ? sql<number>`COALESCE(SUM(CAST(${orders.totalPrice} AS NUMERIC)), 0)` : sql<number>`0`
     }).from(orders);
 
     if (totalResult && totalResult[0]) {
-      totalOrders = totalResult[0].totalOrders ?? 0;
-      totalSales = Number(totalResult[0].totalSales ?? 0);
+      totalAllTimeOrders = totalResult[0].totalOrders ?? 0;
+      totalAllTimeSales = Number(totalResult[0].totalSales ?? 0);
     }
 
-    const storeNow = getStoreNow();
-    const { startDate, endDate } = getStoreMonthRange(storeNow.year, storeNow.month);
-
-    const monthOrders = await db.select({
-      id: orders.id,
-      createdAt: orders.createdAt,
-      totalPrice: orders.totalPrice
+    // 2. Today's orders & revenue
+    const [todayResult] = await db.select({
+      count: count(),
+      revenue: canViewRevenue ? sql<number>`COALESCE(SUM(CAST(${orders.totalPrice} AS NUMERIC)), 0)` : sql<number>`0`
     })
       .from(orders)
       .where(
         and(
-          gte(orders.createdAt, startDate),
-          lt(orders.createdAt, endDate)
+          gte(orders.createdAt, todayRange.startDate),
+          lt(orders.createdAt, todayRange.endDate)
+        )
+      );
+
+    if (todayResult) {
+      todayOrders = todayResult.count ?? 0;
+      todaySales = Number(todayResult.revenue ?? 0);
+    }
+
+    // 3. Yesterday's orders & revenue
+    const [yesterdayResult] = await db.select({
+      count: count(),
+      revenue: canViewRevenue ? sql<number>`COALESCE(SUM(CAST(${orders.totalPrice} AS NUMERIC)), 0)` : sql<number>`0`
+    })
+      .from(orders)
+      .where(
+        and(
+          gte(orders.createdAt, yesterdayRange.startDate),
+          lt(orders.createdAt, yesterdayRange.endDate)
+        )
+      );
+
+    if (yesterdayResult) {
+      yesterdayOrders = yesterdayResult.count ?? 0;
+      yesterdaySales = Number(yesterdayResult.revenue ?? 0);
+    }
+
+    // 4. Month orders with full breakdown (MTD, Chart, Payment Split, Fulfillment)
+    const monthOrders = await db.select({
+      id: orders.id,
+      orderNumber: orders.orderNumber,
+      customerName: orders.customerName,
+      customerEmail: orders.customerEmail,
+      totalPrice: orders.totalPrice,
+      currency: orders.currency,
+      createdAt: orders.createdAt,
+      financialStatus: orders.financialStatus,
+      fulfillmentStatus: orders.fulfillmentStatus,
+      paymentGateway: orders.paymentGateway,
+    })
+      .from(orders)
+      .where(
+        and(
+          gte(orders.createdAt, monthRange.startDate),
+          lt(orders.createdAt, monthRange.endDate)
         )
       )
       .orderBy(orders.createdAt);
 
+    mtdOrders = monthOrders.length;
+
     const daysInMonth = new Date(storeNow.year, storeNow.month, 0).getDate();
     let latestOrderDay = 0;
+
     monthOrders.forEach((o) => {
+      const price = parseFloat(o.totalPrice || '0') || 0;
+      mtdSales += price;
+
+      // Payment gateway split
+      const isCod = isCodOrder(o);
+      if (isCod) {
+        codCount++;
+        codRevenue += price;
+      } else {
+        prepaidCount++;
+        prepaidRevenue += price;
+      }
+
+      // Fulfillment status split
+      const fulfillment = (o.fulfillmentStatus || '').toLowerCase();
+      if (fulfillment === 'fulfilled') {
+        fulfilledCount++;
+      } else if (fulfillment === 'partial' || fulfillment === 'partially_fulfilled') {
+        partiallyFulfilledCount++;
+      } else {
+        unfulfilledCount++;
+      }
+
+      // Latest order day tracking
       if (o.createdAt) {
         const d = getStoreDay(o.createdAt);
         if (d > latestOrderDay) latestOrderDay = d;
@@ -97,8 +244,6 @@ async function DashboardContent() {
     });
 
     const todayDate = storeNow.day;
-    // For the ongoing current month, only plot days up to today (or latest order date)
-    // so future days don't appear and all past elapsed days are continuous without gaps.
     const daysToShow = Math.min(daysInMonth, Math.max(todayDate, latestOrderDay));
 
     const dailyMap = new Map<number, { count: number; revenue: number }>();
@@ -129,6 +274,70 @@ async function DashboardContent() {
         revenue: canViewRevenue ? Math.round(val.revenue * 100) / 100 : undefined,
       };
     });
+
+    // 5. Recent orders query (Last 6 orders)
+    recentOrders = await db.select({
+      id: orders.id,
+      orderNumber: orders.orderNumber,
+      customerName: orders.customerName,
+      customerEmail: orders.customerEmail,
+      totalPrice: orders.totalPrice,
+      createdAt: orders.createdAt,
+      financialStatus: orders.financialStatus,
+      fulfillmentStatus: orders.fulfillmentStatus,
+      paymentGateway: orders.paymentGateway,
+    })
+      .from(orders)
+      .orderBy(desc(orders.createdAt))
+      .limit(6);
+
+    // 6. Top Products Query for current month (falling back to all-time if month has no product lines yet)
+    const monthProductsResult = await db.select({
+      title: orderItems.title,
+      imageUrl: sql<string>`MAX(${orderItems.imageUrl})`,
+      revenue: sql<number>`COALESCE(SUM(CAST(${orderItems.price} AS NUMERIC) * CAST(${orderItems.quantity} AS NUMERIC)), 0)`,
+      unitsSold: sql<number>`COALESCE(SUM(CAST(${orderItems.quantity} AS NUMERIC)), 0)`
+    })
+      .from(orderItems)
+      .innerJoin(orders, eq(orderItems.orderId, orders.id))
+      .where(
+        and(
+          gte(orders.createdAt, monthRange.startDate),
+          lt(orders.createdAt, monthRange.endDate)
+        )
+      )
+      .groupBy(orderItems.title)
+      .orderBy(desc(sql`COALESCE(SUM(CAST(${orderItems.quantity} AS NUMERIC)), 0)`))
+      .limit(5);
+
+    if (monthProductsResult && monthProductsResult.length > 0) {
+      topProducts = monthProductsResult.map(p => ({
+        title: p.title,
+        imageUrl: p.imageUrl,
+        revenue: Number(p.revenue) || 0,
+        unitsSold: Number(p.unitsSold) || 0,
+      }));
+    } else {
+      // Fallback to all-time best sellers
+      const allTimeProducts = await db.select({
+        title: orderItems.title,
+        imageUrl: sql<string>`MAX(${orderItems.imageUrl})`,
+        revenue: sql<number>`COALESCE(SUM(CAST(${orderItems.price} AS NUMERIC) * CAST(${orderItems.quantity} AS NUMERIC)), 0)`,
+        unitsSold: sql<number>`COALESCE(SUM(CAST(${orderItems.quantity} AS NUMERIC)), 0)`
+      })
+        .from(orderItems)
+        .groupBy(orderItems.title)
+        .orderBy(desc(sql`COALESCE(SUM(CAST(${orderItems.quantity} AS NUMERIC)), 0)`))
+        .limit(5);
+
+      topProducts = allTimeProducts.map(p => ({
+        title: p.title,
+        imageUrl: p.imageUrl,
+        revenue: Number(p.revenue) || 0,
+        unitsSold: Number(p.unitsSold) || 0,
+      }));
+    }
+
   } catch (error) {
     console.error("Dashboard database query error:", error);
     return (
@@ -141,46 +350,88 @@ async function DashboardContent() {
     );
   }
 
+  // Calculate Average Order Values (AOV)
+  const aov = mtdOrders > 0 ? mtdSales / mtdOrders : 0;
+  const prepaidAov = prepaidCount > 0 ? prepaidRevenue / prepaidCount : 0;
+  const codAov = codCount > 0 ? codRevenue / codCount : 0;
+
   return (
     <div className="space-y-6">
-      {/* Stats Row */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {canViewRevenue && <RevenueCard totalSales={totalSales} />}
+      {/* 1. Primary Operational KPIs */}
+      <DashboardKpis
+        canViewRevenue={canViewRevenue}
+        canViewOrders={canViewOrders}
+        canViewStatus={canViewStatus}
+        todaySales={todaySales}
+        todayOrders={todayOrders}
+        yesterdaySales={yesterdaySales}
+        yesterdayOrders={yesterdayOrders}
+        mtdSales={mtdSales}
+        mtdOrders={mtdOrders}
+        aov={aov}
+        prepaidAov={prepaidAov}
+        codAov={codAov}
+        unfulfilledOrders={unfulfilledCount}
+        totalAllTimeSales={totalAllTimeSales}
+        totalAllTimeOrders={totalAllTimeOrders}
+      />
 
-        <div className="bg-card border border-border rounded-xl p-5 flex flex-col justify-between shadow-xs">
-          <h2 className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3">Total Orders (All Time)</h2>
-          <p className="text-2xl sm:text-3xl font-semibold font-mono text-foreground tracking-tight truncate mt-auto">
-            {totalOrders.toLocaleString('en-IN')}
-          </p>
-        </div>
+      {/* 2. Payment Channel & Fulfillment Health */}
+      {canViewStatus && (
+        <PaymentAndFulfillmentCard
+          canViewRevenue={canViewRevenue}
+          prepaidCount={prepaidCount}
+          prepaidRevenue={prepaidRevenue}
+          codCount={codCount}
+          codRevenue={codRevenue}
+          fulfilledCount={fulfilledCount}
+          unfulfilledCount={unfulfilledCount}
+          partiallyFulfilledCount={partiallyFulfilledCount}
+        />
+      )}
 
-        {canViewStatus && (
-          <div className="bg-card border border-border rounded-xl p-5 flex flex-col justify-between sm:col-span-2 lg:col-span-1 shadow-xs">
-            <h2 className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3">System Status</h2>
-            <div className="flex items-center gap-2.5 mt-auto">
-              <span className="flex h-2.5 w-2.5 rounded-full bg-emerald-500 shrink-0" />
-              <p className="text-base sm:text-lg font-medium text-foreground">Listening for Webhooks</p>
+      {/* 3. Daily Sales Chart */}
+      {canViewChart && (
+        <div className="bg-card border border-border rounded-xl p-5 sm:p-6 shadow-xs">
+          <div className="mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <h2 className="text-sm font-semibold text-foreground tracking-tight">Daily Performance Trend</h2>
+              <p className="text-xs text-muted-foreground mt-0.5">Order volume and daily distribution for current month</p>
             </div>
+            <Link
+              href="/revenue"
+              className="text-xs text-primary hover:underline font-medium flex items-center gap-1 w-fit"
+            >
+              <span>Full Analytics</span>
+              <ArrowUpRight size={13} />
+            </Link>
           </div>
-        )}
-      </div>
-
-      {/* Chart Row */}
-      <div className="bg-card border border-border rounded-xl p-5 sm:p-6 shadow-xs">
-        <div className="mb-4">
-          <h2 className="text-sm font-semibold text-foreground tracking-tight">Orders per Day (Current Month)</h2>
-          <p className="text-xs text-muted-foreground mt-0.5">Daily order volume and distribution</p>
-        </div>
-        {ordersPerDayResult.length > 0 ? (
-          <DynamicOrdersChart data={ordersPerDayResult} />
-        ) : (
-          <div className="flex flex-col items-center justify-center space-y-3 py-12">
-            <div className="w-12 h-12 rounded-lg bg-muted border border-border flex items-center justify-center text-muted-foreground">
-              <Inbox size={24} />
+          {ordersPerDayResult.length > 0 ? (
+            <DynamicOrdersChart data={ordersPerDayResult} />
+          ) : (
+            <div className="flex flex-col items-center justify-center space-y-3 py-12">
+              <div className="w-12 h-12 rounded-lg bg-muted border border-border flex items-center justify-center text-muted-foreground">
+                <Inbox size={24} />
+              </div>
+              <p className="text-sm text-muted-foreground">No chart data available yet.</p>
             </div>
-            <p className="text-sm text-muted-foreground">No chart data available yet.</p>
-          </div>
-        )}
+          )}
+        </div>
+      )}
+
+      {/* 4. Two-Column Operational Detail Grids: Recent Orders & Top Products */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Recent Orders Live Feed */}
+        <RecentOrdersWidget
+          orders={recentOrders}
+          canViewRevenue={canViewRevenue}
+        />
+
+        {/* Top Selling Products */}
+        <TopProductsWidget
+          products={topProducts}
+          canViewRevenue={canViewRevenue}
+        />
       </div>
     </div>
   );

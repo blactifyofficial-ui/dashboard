@@ -84,6 +84,35 @@ export function getStoreNow(): StoreDateParts {
 }
 
 /**
+ * Returns UTC Date objects for the start and end of a given calendar day in store timezone.
+ */
+export function getStoreDayRange(year: number, month: number, day: number): { startDate: Date; endDate: Date } {
+  const pad = (n: number) => (n < 10 ? `0${n}` : `${n}`);
+  const startIso = `${year}-${pad(month)}-${pad(day)}T00:00:00+05:30`;
+  const startDate = new Date(startIso);
+  const endDate = new Date(startDate.getTime() + 24 * 60 * 60 * 1000);
+  return { startDate, endDate };
+}
+
+/**
+ * Returns UTC Date objects for the start and end of today in store timezone (00:00:00 to 23:59:59.999).
+ */
+export function getStoreTodayRange(): { startDate: Date; endDate: Date } {
+  const now = getStoreNow();
+  return getStoreDayRange(now.year, now.month, now.day);
+}
+
+/**
+ * Returns UTC Date objects for the start and end of yesterday in store timezone.
+ */
+export function getStoreYesterdayRange(): { startDate: Date; endDate: Date } {
+  const todayRange = getStoreTodayRange();
+  const startDate = new Date(todayRange.startDate.getTime() - 24 * 60 * 60 * 1000);
+  const endDate = todayRange.startDate;
+  return { startDate, endDate };
+}
+
+/**
  * Formats a date for display in the store's timezone.
  */
 export function formatStoreDate(
