@@ -93,8 +93,10 @@ export default function ExpenseDetailPage() {
   }, [id, router]);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    fetchExpense();
+    const load = async () => {
+      await fetchExpense();
+    };
+    void load();
   }, [fetchExpense]);
 
   useEffect(() => {

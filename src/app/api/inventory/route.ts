@@ -56,6 +56,28 @@ export interface InventoryResponse {
   error?: string;
 }
 
+interface ShopifyProductVariant {
+  id: number;
+  title?: string;
+  price?: string;
+  compare_at_price?: string | null;
+  sku?: string | null;
+  barcode?: string | null;
+  inventory_quantity?: number;
+}
+
+interface ShopifyProduct {
+  id: number;
+  title: string;
+  vendor?: string;
+  product_type?: string;
+  status: string;
+  handle?: string;
+  variants?: ShopifyProductVariant[];
+  image?: { src?: string } | null;
+  images?: Array<{ src?: string }>;
+}
+
 export async function GET() {
   const authRes = await requirePermission('inventory:view');
   if ('error' in authRes) {
@@ -99,8 +121,7 @@ export async function GET() {
 
     // 2. Fetch all products (handle link header pagination)
     let url: string | null = `https://${shop}/admin/api/2024-01/products.json?limit=250`;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const rawProducts: any[] = [];
+    const rawProducts: ShopifyProduct[] = [];
 
     while (url) {
       const res: Response = await fetch(url, {
@@ -116,8 +137,7 @@ export async function GET() {
         throw new Error(`Shopify API error (${res.status}): ${errorText}`);
       }
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const data: any = await res.json();
+      const data = (await res.json()) as { products?: ShopifyProduct[] };
       if (Array.isArray(data.products)) {
         rawProducts.push(...data.products);
       }
@@ -151,11 +171,10 @@ export async function GET() {
       let minPrice = Infinity;
       let maxPrice = 0;
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const variants: ProductVariantData[] = (p.variants || []).map((v: any) => {
+      const variants: ProductVariantData[] = (p.variants || []).map((v: ShopifyProductVariant) => {
         totalVariants++;
         const qty = typeof v.inventory_quantity === 'number' ? v.inventory_quantity : 0;
-        const price = parseFloat(v.price) || 0;
+        const price = parseFloat(v.price || '0') || 0;
         const compareAtPrice = v.compare_at_price ? parseFloat(v.compare_at_price) : null;
         const effectiveMRP = compareAtPrice !== null && compareAtPrice > price ? compareAtPrice : price;
 
@@ -172,7 +191,7 @@ export async function GET() {
         return {
           id: v.id,
           productId: p.id,
-          title: v.title === 'Default Title' ? 'Standard' : v.title,
+          title: v.title === 'Default Title' ? 'Standard' : (v.title || 'Standard'),
           sku: v.sku || null,
           barcode: v.barcode || null,
           price,
@@ -202,7 +221,7 @@ export async function GET() {
       totalPotentialRevenue += productPotentialRevenue;
       totalMRPValuation += productPotentialMRP;
 
-      const imageUrl = p.image?.src || (p.images && p.images.length > 0 ? p.images[0].src : null);
+      const imageUrl = (p.image?.src || (p.images && p.images.length > 0 ? p.images[0].src : null)) || null;
       const shopifyAdminUrl = `https://admin.shopify.com/store/${storeShortName}/products/${p.id}`;
 
       return {

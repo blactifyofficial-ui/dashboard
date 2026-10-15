@@ -72,8 +72,10 @@ export default function InventoryPage() {
   }, []);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    fetchInventory();
+    const load = async () => {
+      await fetchInventory();
+    };
+    void load();
   }, [fetchInventory]);
 
   const toggleExpand = (productId: number) => {

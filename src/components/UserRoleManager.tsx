@@ -102,8 +102,10 @@ export default function UserRoleManager() {
   }, []);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    fetchRolesAndUsers();
+    const load = async () => {
+      await fetchRolesAndUsers();
+    };
+    void load();
   }, [fetchRolesAndUsers]);
 
   // Combined roles list

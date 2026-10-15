@@ -1,6 +1,6 @@
 import { db } from '@/db';
-import { orders, orderItems } from '@/db/schema';
-import { count, sql, and, gte, lt, desc, eq } from 'drizzle-orm';
+import { orders, orderItems, expenses, monthlyExpenseEntries } from '@/db/schema';
+import { count, sql, and, gte, lt, desc, eq, isNull, asc } from 'drizzle-orm';
 import { Inbox, ArrowUpRight, BarChart3, Boxes } from 'lucide-react';
 import Link from 'next/link';
 import DynamicOrdersChart from '@/components/DynamicOrdersChart';
@@ -90,6 +90,9 @@ async function DashboardContent() {
   const canViewOrders = hasPermission(role, 'overview:view_orders');
   const canViewStatus = hasPermission(role, 'overview:view_status');
   const canViewChart = hasPermission(role, 'overview:view_chart');
+  const canViewExpenses = hasPermission(role, 'expenses:view');
+  const canViewMonthlyExpenses = hasPermission(role, 'monthly_expenses:view');
+  const canSeeExpenseData = canViewRevenue && (canViewExpenses || canViewMonthlyExpenses);
 
   // Dates in Store Timezone (IST Asia/Kolkata)
   const storeNow = getStoreNow();
@@ -117,6 +120,22 @@ async function DashboardContent() {
   let partiallyFulfilledCount = 0;
   let mtdSales = 0;
   let mtdOrders = 0;
+
+  let totalMtdExpenses = 0;
+  let mtdExpensesCount = 0;
+  let monthlyBillsPaidAmount = 0;
+  let monthlyBillsPendingAmount = 0;
+  let monthlyBillsPaidCount = 0;
+  let monthlyBillsTotalCount = 0;
+  let recentMonthlyBills: Array<{
+    id: string;
+    name: string;
+    category: string;
+    expectedAmount: string;
+    actualAmount: string | null;
+    status: string;
+    dueDay: string | null;
+  }> = [];
 
   let recentOrders: Array<{
     id: string;
@@ -338,6 +357,56 @@ async function DashboardContent() {
       }));
     }
 
+    // 7. Monthly Expenses and Recurring Bills Query for current month
+    if (canSeeExpenseData) {
+      const [expensesResult] = await db
+        .select({
+          total: sql<number>`COALESCE(SUM(CAST(${expenses.amount} AS NUMERIC)), 0)`,
+          count: count(),
+        })
+        .from(expenses)
+        .where(
+          and(
+            isNull(expenses.deletedAt),
+            gte(expenses.expenseDate, monthRange.startDate),
+            lt(expenses.expenseDate, monthRange.endDate)
+          )
+        );
+
+      if (expensesResult) {
+        totalMtdExpenses = Number(expensesResult.total ?? 0);
+        mtdExpensesCount = Number(expensesResult.count ?? 0);
+      }
+
+      const currentMonthKey = `${storeNow.year}-${String(storeNow.month).padStart(2, '0')}`;
+      const bills = await db
+        .select({
+          id: monthlyExpenseEntries.id,
+          name: monthlyExpenseEntries.name,
+          category: monthlyExpenseEntries.category,
+          expectedAmount: monthlyExpenseEntries.expectedAmount,
+          actualAmount: monthlyExpenseEntries.actualAmount,
+          status: monthlyExpenseEntries.status,
+          dueDay: monthlyExpenseEntries.dueDay,
+        })
+        .from(monthlyExpenseEntries)
+        .where(eq(monthlyExpenseEntries.month, currentMonthKey))
+        .orderBy(asc(monthlyExpenseEntries.dueDay), asc(monthlyExpenseEntries.createdAt));
+
+      monthlyBillsTotalCount = bills.length;
+      for (const b of bills) {
+        const exp = parseFloat(b.expectedAmount || '0') || 0;
+        const act = parseFloat(b.actualAmount || '0') || 0;
+        if (b.status === 'PAID') {
+          monthlyBillsPaidCount++;
+          monthlyBillsPaidAmount += (act > 0 ? act : exp);
+        } else if (b.status === 'PENDING') {
+          monthlyBillsPendingAmount += (act > 0 ? act : exp);
+        }
+      }
+      recentMonthlyBills = bills.slice(0, 4);
+    }
+
   } catch (error) {
     console.error("Dashboard database query error:", error);
     return (
@@ -350,10 +419,11 @@ async function DashboardContent() {
     );
   }
 
-  // Calculate Average Order Values (AOV)
+  // Calculate Average Order Values (AOV) and Net Revenue
   const aov = mtdOrders > 0 ? mtdSales / mtdOrders : 0;
   const prepaidAov = prepaidCount > 0 ? prepaidRevenue / prepaidCount : 0;
   const codAov = codCount > 0 ? codRevenue / codCount : 0;
+  const netRevenue = mtdSales - totalMtdExpenses;
 
   return (
     <div className="space-y-6">
@@ -362,12 +432,17 @@ async function DashboardContent() {
         canViewRevenue={canViewRevenue}
         canViewOrders={canViewOrders}
         canViewStatus={canViewStatus}
+        canViewExpenses={canSeeExpenseData}
         todaySales={todaySales}
         todayOrders={todayOrders}
         yesterdaySales={yesterdaySales}
         yesterdayOrders={yesterdayOrders}
         mtdSales={mtdSales}
         mtdOrders={mtdOrders}
+        totalMtdExpenses={totalMtdExpenses}
+        netRevenue={netRevenue}
+        monthlyBillsPaidCount={monthlyBillsPaidCount}
+        monthlyBillsTotalCount={monthlyBillsTotalCount}
         aov={aov}
         prepaidAov={prepaidAov}
         codAov={codAov}
@@ -376,10 +451,11 @@ async function DashboardContent() {
         totalAllTimeOrders={totalAllTimeOrders}
       />
 
-      {/* 2. Payment Channel & Fulfillment Health */}
+      {/* 2. Payment Channel, Fulfillment Health & Monthly Expenses */}
       {canViewStatus && (
         <PaymentAndFulfillmentCard
           canViewRevenue={canViewRevenue}
+          canViewExpenses={canSeeExpenseData}
           prepaidCount={prepaidCount}
           prepaidRevenue={prepaidRevenue}
           codCount={codCount}
@@ -387,6 +463,13 @@ async function DashboardContent() {
           fulfilledCount={fulfilledCount}
           unfulfilledCount={unfulfilledCount}
           partiallyFulfilledCount={partiallyFulfilledCount}
+          totalMtdExpenses={totalMtdExpenses}
+          mtdExpensesCount={mtdExpensesCount}
+          monthlyBillsPaidAmount={monthlyBillsPaidAmount}
+          monthlyBillsPendingAmount={monthlyBillsPendingAmount}
+          monthlyBillsPaidCount={monthlyBillsPaidCount}
+          monthlyBillsTotalCount={monthlyBillsTotalCount}
+          recentMonthlyBills={recentMonthlyBills}
         />
       )}
 

@@ -1,6 +1,6 @@
 import { db } from '@/db';
-import { orders, orderItems } from '@/db/schema';
-import { sql, desc, ilike } from 'drizzle-orm';
+import { orders, orderItems, expenses } from '@/db/schema';
+import { sql, desc, ilike, isNull } from 'drizzle-orm';
 import { CalendarDays, ShoppingBag, ArrowUpRight } from 'lucide-react';
 import SearchInput from '@/components/SearchInput';
 import Link from 'next/link';
@@ -9,6 +9,7 @@ import { Suspense } from 'react';
 import LoadingSpinner from '@/components/LoadingSpinner';
 
 import { requirePermission } from '@/lib/auth-utils';
+import { hasPermission } from '@/lib/rbac';
 import AccessDenied from '@/components/AccessDenied';
 
 export const dynamic = "force-dynamic";
@@ -20,6 +21,8 @@ export default async function RevenuePage(props: {
   if ('error' in authRes) {
     return <AccessDenied message="You do not have permission to view revenue and sales performance." />;
   }
+
+  const canViewExpenses = hasPermission(authRes.role, 'expenses:view', authRes.permissions);
 
   const searchParams = await props.searchParams;
   const tab = (searchParams.tab as string) || 'monthly';
@@ -56,13 +59,23 @@ export default async function RevenuePage(props: {
       </div>
 
       <Suspense fallback={<LoadingSpinner />} key={`${tab}-${q}-${searchParams.page}`}>
-        <RevenueContent searchParams={searchParams} tab={tab} q={q} />
+        <RevenueContent searchParams={searchParams} tab={tab} q={q} canViewExpenses={canViewExpenses} />
       </Suspense>
     </div>
   );
 }
 
-async function RevenueContent({ searchParams, tab, q }: { searchParams: { [key: string]: string | string[] | undefined }, tab: string, q: string }) {
+async function RevenueContent({ 
+  searchParams, 
+  tab, 
+  q, 
+  canViewExpenses 
+}: { 
+  searchParams: { [key: string]: string | string[] | undefined }, 
+  tab: string, 
+  q: string, 
+  canViewExpenses: boolean 
+}) {
   const page = parseInt((searchParams.page as string) || '1', 10);
   const pageSize = 15;
   const offset = (page - 1) * pageSize;
@@ -80,12 +93,33 @@ async function RevenueContent({ searchParams, tab, q }: { searchParams: { [key: 
     .groupBy(sql`date_trunc('month', ${orders.createdAt} AT TIME ZONE 'Asia/Kolkata')`)
     .orderBy(desc(sql`date_trunc('month', ${orders.createdAt} AT TIME ZONE 'Asia/Kolkata')`));
 
+    // Fetch monthly expenses if the user has permission to view expenses
+    const monthlyExpensesMap = new Map<string, number>();
+    if (canViewExpenses) {
+      const expensesList = await db.select({
+        month: sql<string>`to_char(date_trunc('month', ${expenses.expenseDate} AT TIME ZONE 'Asia/Kolkata'), 'YYYY-MM')`,
+        totalExpense: sql<number>`COALESCE(SUM(CAST(${expenses.amount} AS NUMERIC)), 0)`
+      })
+      .from(expenses)
+      .where(isNull(expenses.deletedAt))
+      .groupBy(sql`date_trunc('month', ${expenses.expenseDate} AT TIME ZONE 'Asia/Kolkata')`);
+
+      for (const exp of expensesList) {
+        if (exp.month) {
+          monthlyExpensesMap.set(exp.month, Number(exp.totalExpense || 0));
+        }
+      }
+    }
+
     const maxRevenue = Math.max(...monthlyData.map(d => Number(d.revenue)), 0);
 
     return (
       <div className="flex-1 min-h-0 flex flex-col bg-card border border-border rounded-xl relative overflow-hidden shadow-xs">
         <div className="flex-none p-4 sm:px-6 sm:py-4 border-b border-border flex flex-col md:flex-row justify-between items-start md:items-center gap-3 bg-muted/40">
-          <h2 className="text-base font-semibold text-foreground">Monthly Breakdown</h2>
+          <div>
+            <h2 className="text-base font-semibold text-foreground">Monthly Breakdown</h2>
+            <p className="text-xs text-muted-foreground">Monthly sales, operational expenses, and net profit margins</p>
+          </div>
           <div className="w-full md:w-auto">
             <SearchInput initialQuery={q} />
           </div>
@@ -106,6 +140,9 @@ async function RevenueContent({ searchParams, tab, q }: { searchParams: { [key: 
               const monthShort = dateObj ? dateObj.toLocaleDateString('en-US', { month: 'short' }) : '-';
               
               const revenueNum = Number(data.revenue);
+              const expenseNum = monthlyExpensesMap.get(data.month) || 0;
+              const netProfitNum = revenueNum - expenseNum;
+              const profitMargin = revenueNum > 0 ? Math.round((netProfitNum / revenueNum) * 100) : 0;
               const percent = maxRevenue > 0 ? (revenueNum / maxRevenue) * 100 : 0;
 
               return (
@@ -121,8 +158,8 @@ async function RevenueContent({ searchParams, tab, q }: { searchParams: { [key: 
                   />
                   
                   {/* Content */}
-                  <div className="relative z-10 p-3.5 sm:px-5 sm:py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-                    <div className="flex items-center gap-3">
+                  <div className="relative z-10 p-3.5 sm:px-5 sm:py-3.5 flex flex-col md:flex-row md:items-center justify-between gap-3">
+                    <div className="flex items-center gap-3 min-w-[160px]">
                       <div className="w-10 h-10 rounded-lg bg-muted border border-border flex flex-col items-center justify-center shrink-0">
                         <span className="text-xs text-foreground font-semibold uppercase">{monthShort}</span>
                       </div>
@@ -134,11 +171,46 @@ async function RevenueContent({ searchParams, tab, q }: { searchParams: { [key: 
                       </div>
                     </div>
                     
-                    <div className="flex flex-col sm:items-end">
-                      <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Revenue</p>
-                      <p className="text-lg sm:text-xl font-semibold font-mono text-foreground tracking-tight">
-                        ₹{revenueNum.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                      </p>
+                    <div className="flex flex-wrap sm:flex-nowrap items-center gap-4 sm:gap-6 self-start md:self-auto">
+                      <div className="text-left md:text-right">
+                        <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Revenue</p>
+                        <p className="text-base sm:text-lg font-semibold font-mono text-foreground tracking-tight">
+                          ₹{revenueNum.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </p>
+                      </div>
+
+                      {canViewExpenses && (
+                        <>
+                          <div className="text-left md:text-right">
+                            <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Expenses</p>
+                            <p className="text-base sm:text-lg font-semibold font-mono text-muted-foreground tracking-tight">
+                              ₹{expenseNum.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            </p>
+                          </div>
+
+                          <div className="text-left md:text-right min-w-[120px]">
+                            <div className="flex items-center gap-1.5 justify-start md:justify-end">
+                              <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Net Profit</p>
+                              <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${
+                                netProfitNum >= 0 
+                                  ? 'text-emerald-700 bg-emerald-500/10 dark:text-emerald-400' 
+                                  : 'text-rose-700 bg-rose-500/10 dark:text-rose-400'
+                              }`}>
+                                {profitMargin >= 0 ? `+${profitMargin}%` : `${profitMargin}%`}
+                              </span>
+                            </div>
+                            <p className={`text-base sm:text-lg font-bold font-mono tracking-tight ${
+                              netProfitNum >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'
+                            }`}>
+                              ₹{netProfitNum.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            </p>
+                          </div>
+                        </>
+                      )}
+
+                      <div className="hidden sm:flex items-center text-muted-foreground group-hover:text-foreground transition-colors pl-1">
+                        <ArrowUpRight size={16} />
+                      </div>
                     </div>
                   </div>
                 </Link>

@@ -232,13 +232,17 @@ export default function MetaAdsPage() {
   }, []);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    fetchData(true);
+    const load = async () => {
+      await fetchData(true);
+    };
+    void load();
   }, [fetchData]);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    fetchPlannerData(currentMonth);
+    const load = async () => {
+      await fetchPlannerData(currentMonth);
+    };
+    void load();
   }, [currentMonth, fetchPlannerData]);
 
   // Recalculate default payment amount based on daily budget and date range

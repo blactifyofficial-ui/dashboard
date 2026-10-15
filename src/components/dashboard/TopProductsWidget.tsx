@@ -76,7 +76,7 @@ export default function TopProductsWidget({ products, canViewRevenue }: TopProdu
 
             return (
               <div
-                key={index}
+                key={prod.title || index}
                 className="p-3.5 sm:px-4 sm:py-3.5 flex items-center justify-between gap-3 hover:bg-muted/30 transition-colors"
               >
                 {/* Left: Rank & Image & Title */}

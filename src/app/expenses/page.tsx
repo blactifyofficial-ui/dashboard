@@ -179,8 +179,10 @@ export default function ExpensesPage() {
   };
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    fetchData();
+    const load = async () => {
+      await fetchData();
+    };
+    void load();
   }, []);
 
   const handleStartEditNote = (dateKey: string) => {

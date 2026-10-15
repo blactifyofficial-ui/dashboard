@@ -38,8 +38,10 @@ export default function CategoryManager() {
   }, []);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    fetchCategories();
+    const load = async () => {
+      await fetchCategories();
+    };
+    void load();
   }, [fetchCategories]);
 
   const handleAddExpenseCategory = async (e: React.FormEvent) => {

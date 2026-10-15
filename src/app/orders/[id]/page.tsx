@@ -2,6 +2,7 @@ import { db } from '@/db';
 import { orders, orderItems } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import Link from 'next/link';
+import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { ArrowUpRight } from 'lucide-react';
 import { Suspense } from 'react';
@@ -62,8 +63,16 @@ async function OrderDetailContent({ orderId }: { orderId: string }) {
                   <li key={item.id} className="py-3 flex justify-between items-center gap-4">
                     <div className="flex items-center gap-3">
                       {item.imageUrl ? (
-                        /* eslint-disable-next-line @next/next/no-img-element */
-                        <img src={item.imageUrl} alt={item.title || 'Product'} className="w-10 h-10 rounded-lg object-cover bg-muted border border-border shrink-0" />
+                        <div className="relative w-10 h-10 rounded-lg overflow-hidden bg-muted border border-border shrink-0">
+                          <Image
+                            src={item.imageUrl}
+                            alt={item.title || 'Product'}
+                            fill
+                            sizes="40px"
+                            className="object-cover"
+                            unoptimized
+                          />
+                        </div>
                       ) : (
                         <div className="w-10 h-10 rounded-lg bg-muted border border-border flex items-center justify-center text-foreground shrink-0 text-xs font-semibold">
                           {item.title ? item.title.charAt(0).toUpperCase() : '?'}
