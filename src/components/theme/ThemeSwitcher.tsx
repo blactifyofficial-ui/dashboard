@@ -37,7 +37,7 @@ export function ThemeSwitcher({ variant = 'compact', className = '' }: ThemeSwit
         className={`w-9 h-9 rounded-lg bg-muted border border-border flex items-center justify-center opacity-50 ${className}`}
         aria-hidden="true"
       >
-        <Sun size={17} className="text-muted-foreground" />
+        <Moon size={17} className="text-muted-foreground" />
       </div>
     );
   }
@@ -98,7 +98,7 @@ export function ThemeSwitcher({ variant = 'compact', className = '' }: ThemeSwit
   }
 
   // Compact Switcher (cycles through light -> dark -> system or toggles)
-  const isDark = theme === 'dark' || (theme === 'system' && typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  const isDark = theme === 'dark' || theme === undefined || (theme === 'system' && typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches);
 
   const toggleTheme = () => {
     if (theme === 'system') {
@@ -114,12 +114,12 @@ export function ThemeSwitcher({ variant = 'compact', className = '' }: ThemeSwit
     <button
       type="button"
       onClick={toggleTheme}
-      aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode (current: ${theme})`}
-      title={`Theme: ${theme}`}
+      aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode (current: ${theme || 'dark'})`}
+      title={`Theme: ${theme || 'dark'}`}
       className={`min-h-[40px] min-w-[40px] sm:min-h-[36px] sm:min-w-[36px] p-2 rounded-lg bg-card border border-border hover:bg-muted text-muted-foreground hover:text-foreground transition-colors flex items-center justify-center focus-visible:ring-1 focus-visible:ring-ring ${className}`}
     >
       {isDark ? (
-        <Moon size={17} className="text-blue-400" />
+        <Moon size={17} className="text-indigo-400" />
       ) : (
         <Sun size={17} className="text-amber-500" />
       )}

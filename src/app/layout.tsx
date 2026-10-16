@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import { Poppins } from "next/font/google";
 import "./globals.css";
 import ResponsiveSidebar from "@/components/ResponsiveSidebar";
 import SignOutLink from "@/components/SignOutLink";
@@ -12,10 +12,10 @@ import AutoSyncManager from "@/components/AutoSyncManager";
 import { AuthProvider } from "@/context/AuthContext";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 
-const inter = Inter({
-  variable: "--font-inter",
+const poppins = Poppins({
+  variable: "--font-poppins",
   subsets: ["latin"],
-  weight: ["400"],
+  weight: ["300", "400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -34,10 +34,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-    { media: "(prefers-color-scheme: dark)", color: "#000000" },
-  ],
+  themeColor: "#000000",
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
@@ -95,9 +92,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
   if (isNotAllowed) {
     return (
-      <html lang="en" suppressHydrationWarning className={`${inter.variable} h-full antialiased`}>
+      <html lang="en" suppressHydrationWarning className={`${poppins.variable} dark h-full antialiased`}>
         <body className="min-h-full bg-background text-foreground flex flex-col items-center justify-center font-sans gap-4">
-          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
             <div className="text-xl font-medium">You are not authorized to view this dashboard.</div>
             <SignOutLink />
             <Toaster position="bottom-right" />
@@ -111,10 +108,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${inter.variable} h-full antialiased`}
+      className={`${poppins.variable} dark h-full antialiased`}
     >
       <body className="h-[100dvh] overflow-hidden bg-background text-foreground flex flex-col md:flex-row relative selection:bg-foreground/20 font-sans transition-colors duration-150">
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
           <AuthProvider
             initialUser={session?.user || null}
             initialRole={userRole}

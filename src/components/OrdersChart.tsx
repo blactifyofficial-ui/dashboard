@@ -82,11 +82,11 @@ export default function OrdersChart({
   const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
   const isDark = mounted ? resolvedTheme === 'dark' : true;
 
-  const gridStroke = isDark ? 'rgba(255, 255, 255, 0.07)' : 'rgba(0, 0, 0, 0.06)';
-  const axisColor = isDark ? '#a1a1aa' : '#64748b';
-  const barFillTop = isDark ? '#ffffff' : '#0f172a';
-  const barFillBottom = isDark ? 'rgba(255, 255, 255, 0.45)' : 'rgba(15, 23, 42, 0.5)';
-  const dotRing = isDark ? '#0d0d0d' : '#ffffff';
+  const gridStroke = isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.06)';
+  const axisColor = isDark ? '#94a3b8' : '#64748b';
+  const barFillTop = isDark ? '#818cf8' : '#4f46e5';
+  const barFillBottom = isDark ? 'rgba(99, 102, 241, 0.35)' : 'rgba(79, 70, 229, 0.4)';
+  const dotRing = isDark ? '#0c0d10' : '#ffffff';
 
   const formattedData = (data || []).map((d) => {
     let label = d.day;

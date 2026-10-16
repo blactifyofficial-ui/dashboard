@@ -6,10 +6,11 @@ A comprehensive design system guide for the **Shopify / Blactify Real-Time Manag
 
 ## 1. Design Philosophy & Aesthetic
 
-* **Confident Dark Minimalist**: Pure `#000000` / `#0a0a0a` root background with solid, calm dark surfaces (`bg-neutral-900/60` and `bg-neutral-950`). Free of decorative glow blobs, floating radial gradients, and AI-generated SaaS noise.
+* **Pure Black OLED Aesthetic**: Pure `#000000` root background paired with elevated matte dark surfaces (`bg-card` / `#0c0d10`, `bg-sidebar` / `#050505`, `bg-popover` / `#111215`). Delivers high contrast, deep focus, and eliminates visual clutter.
+* **Modern Electric Indigo Accent**: Primary interactive elements powered by vibrant electric indigo (`#6366f1`) and crisp contrast for active states, focus rings, and metrics.
 * **Controlled Geometry & Restraint**: Standardized purposeful radii — `rounded-xl` for cards, modals, and tables; `rounded-lg` for interactive controls (buttons, inputs, dropdowns); `rounded-md` for status badges.
-* **Intentional Hierarchy & Typography**: Clean, high-legibility sans-serif (`Inter`) paired with tabular figures and monospace numbers for prices, metrics, and identifiers. Controlled weights (medium/semibold) rather than heavy bold/black everywhere.
-* **Subtle Interaction Feedback**: Micro-hover states communicate interactivity via subtle border/surface shifts (`hover:border-neutral-700`, `hover:bg-neutral-800`) without dramatic `scale()` or `translate-y` transforms.
+* **Intentional Hierarchy & Typography**: Clean, high-legibility sans-serif (`Inter`) paired with tabular figures and monospace numbers for prices, metrics, and identifiers.
+* **Subtle Hairline Borders**: Delicate hairline dividers and borders (`rgba(255, 255, 255, 0.08)`) that create structured layer elevation against the pitch black canvas.
 * **Functional Enterprise Iconography**: Clean, meaningful `lucide-react` icons sized purposefully (14px–18px) to aid scanning speed without decorative noise.
 
 ---
@@ -20,31 +21,31 @@ A comprehensive design system guide for the **Shopify / Blactify Real-Time Manag
 
 | Token / Class | Hex / RGBA Value | Usage Context |
 | :--- | :--- | :--- |
-| `bg-black` | `#000000` | Root document background, backdrop overlay |
-| `bg-neutral-950` | `#0a0a0a` | Deep surface, desktop sidebar, nested subcards, form inputs |
-| `bg-neutral-900/60` | `rgba(23, 23, 23, 0.60)` | Primary container surface for cards, dashboard panels, tables |
-| `bg-neutral-900` | `#171717` | Modal dialogue container, elevated action bars |
-| `bg-neutral-800` | `#262626` | Secondary button background, active tab pill, icon badge bases |
-| `bg-neutral-800/50` | `rgba(38, 38, 38, 0.50)` | Hover state for interactive items |
+| `bg-background` | `#000000` | Root document background, viewport shell |
+| `bg-sidebar` | `#050505` | Persistent desktop & mobile navigation sidebar |
+| `bg-card` | `#0c0d10` | Primary container surface for cards, dashboard panels, tables |
+| `bg-popover` | `#111215` | Modal dialogue container, dropdown menus, elevated flyouts |
+| `bg-secondary` | `#16181f` | Secondary button background, filter chip bases |
+| `bg-muted` | `#121418` | Recessed headers, table headings, tab bar track |
+| `bg-accent` | `#181b22` | Hover surface for interactive list items |
 
-### 2.2 Borders & Dividers
+### 2.2 Borders & Focus
 
 | Token / Class | RGBA / Hex Value | Usage Context |
 | :--- | :--- | :--- |
-| `border-neutral-800` | `#262626` | Standard structural borders, card outlines, table row dividers |
-| `border-neutral-700` | `#404040` | Secondary buttons, hovered container borders, focused controls |
-| `border-neutral-600` | `#525252` | Selected list items, active filter chips |
-| `border-neutral-500` | `#737373` | Focused inputs, primary focus outlines |
+| `border-border` | `rgba(255, 255, 255, 0.08)` | Standard structural borders, card outlines, table row dividers |
+| `border-sidebar-border` | `rgba(255, 255, 255, 0.08)` | Sidebar dividing line |
+| `border-input` | `rgba(255, 255, 255, 0.10)` | Form input borders |
+| `ring-ring` | `rgba(99, 102, 241, 0.45)` | Focused controls, focus-visible outlines |
 
 ### 2.3 Typography & Foreground Colors
 
 | Token / Class | Color Code | Usage Context |
 | :--- | :--- | :--- |
-| `text-white` | `#ffffff` | Primary headings, prominent values, active navigation items |
-| `text-neutral-200` | `#e5e5e5` | Primary body text, table cell content |
-| `text-neutral-300` | `#d4d4d4` | Form labels, secondary card content |
-| `text-neutral-400` | `#a3a3a3` | Card headers, subtitles, metadata, timestamps |
-| `text-neutral-500` | `#737373` | Placeholder text, secondary iconography |
+| `text-foreground` | `#f8fafc` | Primary headings, prominent values, active navigation items |
+| `text-card-foreground` | `#f8fafc` | Card titles and metrics |
+| `text-muted-foreground` | `#94a3b8` | Subtitles, helper text, timestamps, table column headers |
+| `text-primary` | `#6366f1` | Brand accents, active links, primary indicators |
 
 ### 2.4 Semantic & Status Accents
 
@@ -53,16 +54,17 @@ A comprehensive design system guide for the **Shopify / Blactify Real-Time Manag
 | **Normal / Success / Paid** | `bg-emerald-500/15` | `text-emerald-300` | `border-emerald-500/30` | Prepaid orders, positive cash balances, fulfilled items |
 | **Warning / Pending / COD** | `bg-amber-500/15` | `text-amber-300` | `border-amber-500/30` | Cash on delivery orders, pending payments, partial COD |
 | **Destructive / Error / High Priority** | `bg-rose-500/15` | `text-rose-300` | `border-rose-500/30` | Order issues, cancellations, refunds, deletions |
-| **Neutral / General Info** | `bg-neutral-800` | `text-neutral-300` | `border-neutral-700` | System defaults, tags, category labels |
+| **Info / System** | `bg-sky-500/15` | `text-sky-300` | `border-sky-500/30` | System notices, active filters, informational badges |
+| **Neutral / General Info** | `bg-muted` | `text-foreground` | `border-border` | System defaults, tags, category labels |
 
 ---
 
 ## 3. Typography Hierarchy
 
-The interface utilizes **Inter** (`var(--font-inter)`), loaded via Next.js Google Fonts optimization.
+The interface utilizes **Poppins** (`var(--font-poppins)`), loaded via Next.js Google Fonts optimization.
 
 ```
-Font Family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif
+Font Family: Poppins, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif
 ```
 
 ### Scale & Hierarchy
@@ -169,10 +171,10 @@ Font Family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-
 
 ### 5.4 Data Tables
 
-* **Container**: `bg-neutral-900/60 border border-neutral-800 rounded-xl shadow-sm overflow-hidden flex flex-col`
-* **Header**: `bg-neutral-950/80 border-b border-neutral-800 text-[11px] font-semibold uppercase tracking-wider text-neutral-400 px-4 py-3`
-* **Rows**: `hover:bg-neutral-900/50 transition-colors divide-y divide-neutral-800 px-4 py-3 text-xs sm:text-sm text-neutral-200`
-* **Numbers**: `font-mono font-medium text-white`
+* **Container**: `bg-card border border-border rounded-xl shadow-xs overflow-hidden flex flex-col`
+* **Header**: `bg-muted/70 border-b border-border text-[11px] font-semibold uppercase tracking-wider text-muted-foreground px-4 py-3`
+* **Rows**: `hover:bg-muted/40 transition-colors divide-y divide-border px-4 py-3 text-xs sm:text-sm text-foreground`
+* **Numbers**: `font-mono font-medium text-foreground`
 
 ---
 
@@ -180,15 +182,16 @@ Font Family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-
 
 For `recharts`:
 
-* **Grid Lines**: `stroke="#262626"` (neutral-800) with `strokeDasharray="3 3"`
-* **Axis Labels / Ticks**: `#737373` (neutral-500), font-size: `11px`, font-family: monospace
-* **Bars / Lines**: Solid clean tones (`#ffffff`, `#10b981`, `#f59e0b`)
+* **Grid Lines**: `stroke="rgba(255, 255, 255, 0.06)"` with `strokeDasharray="3 3"` (subtle, non-distracting)
+* **Axis Labels / Ticks**: `#94a3b8` (muted-foreground), font-size: `11px`, font-family: monospace
+* **Revenue Stroke & Glow**: `#10b981` (Emerald), translucent vertical gradient fill (`0.32` opacity to `0`)
+* **Orders Stroke & Bars**: `#818cf8` / `#6366f1` (Electric Indigo), vertical gradient fill (`0.35` opacity to `0`)
 * **Tooltip Container**:
-  * Background: `#171717` (neutral-900)
-  * Border: `1px solid #262626` (neutral-800)
-  * Shadow: `0 10px 15px -3px rgba(0, 0, 0, 0.5)`
-  * Border Radius: `8px`
-  * Text: `#ffffff`
+  * Background: `bg-card/95 backdrop-blur-md`
+  * Border: `1px solid var(--border)`
+  * Shadow: `shadow-xl`
+  * Border Radius: `rounded-xl`
+  * Text: `text-foreground`
 
 ---
 

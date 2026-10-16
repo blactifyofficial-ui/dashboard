@@ -81,12 +81,12 @@ export default function RevenueChart({
   const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
   const isDark = mounted ? resolvedTheme === 'dark' : true;
 
-  const gridStroke = isDark ? 'rgba(255, 255, 255, 0.07)' : 'rgba(0, 0, 0, 0.06)';
-  const axisColor = isDark ? '#a1a1aa' : '#64748b';
+  const gridStroke = isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.06)';
+  const axisColor = isDark ? '#94a3b8' : '#64748b';
   const strokeColor = metric === 'revenue' 
-    ? (isDark ? '#34d399' : '#059669') 
-    : (isDark ? '#60a5fa' : '#2563eb');
-  const dotRing = isDark ? '#0d0d0d' : '#ffffff';
+    ? (isDark ? '#10b981' : '#059669') 
+    : (isDark ? '#6366f1' : '#4f46e5');
+  const dotRing = isDark ? '#0c0d10' : '#ffffff';
 
   const stats = useMemo(() => {
     if (!data || data.length === 0) {

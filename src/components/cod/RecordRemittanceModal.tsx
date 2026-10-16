@@ -26,7 +26,7 @@ export default function RecordRemittanceModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-xs">
-      <div className="bg-neutral-900 border border-neutral-800 rounded-xl max-w-lg w-full p-5 sm:p-6 shadow-2xl relative text-foreground animate-in fade-in zoom-in-95 duration-150">
+      <div className="bg-card border border-border rounded-xl max-w-lg w-full p-5 sm:p-6 shadow-2xl relative text-foreground animate-in fade-in zoom-in-95 duration-150">
         <RecordRemittanceForm
           remittanceToEdit={remittanceToEdit}
           paymentMethods={paymentMethods}
@@ -128,19 +128,19 @@ function RecordRemittanceForm({
   return (
     <div>
       {/* Header */}
-      <div className="flex items-center justify-between pb-4 border-b border-neutral-800">
+      <div className="flex items-center justify-between pb-4 border-b border-border">
         <div>
-          <h2 className="text-base sm:text-lg font-semibold tracking-tight text-white flex items-center gap-2">
+          <h2 className="text-base sm:text-lg font-semibold tracking-tight text-foreground flex items-center gap-2">
             <HandCoins size={18} className="text-amber-400" />
             {remittanceToEdit ? 'Edit COD Payment Entry' : 'Record COD Payment Received'}
           </h2>
-          <p className="text-xs text-neutral-400 mt-0.5">
+          <p className="text-xs text-muted-foreground mt-0.5">
             Record lump-sum cash/bank remittance received from courier or post office
           </p>
         </div>
         <button
           onClick={onClose}
-          className="p-1.5 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-800 transition-colors"
+          className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
         >
           <X size={18} />
         </button>
@@ -150,11 +150,11 @@ function RecordRemittanceForm({
       <form onSubmit={handleSubmit} className="mt-4 space-y-4">
         {/* Amount Received (Large Hero Input) */}
         <div>
-          <label className="block text-xs font-semibold text-neutral-300 mb-1">
+          <label className="block text-xs font-semibold text-foreground mb-1">
             Amount Received (₹) <span className="text-rose-400">*</span>
           </label>
           <div className="relative">
-            <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400 font-mono text-base sm:text-lg">
+            <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground font-mono text-base sm:text-lg">
               ₹
             </span>
             <input
@@ -165,10 +165,10 @@ function RecordRemittanceForm({
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               placeholder="e.g. 15000"
-              className="w-full pl-8 pr-4 py-2.5 text-base sm:text-lg font-mono font-bold bg-neutral-950 border border-neutral-700 rounded-lg text-white placeholder:text-neutral-600 focus:outline-hidden focus:border-neutral-400 transition-colors"
+              className="w-full pl-8 pr-4 py-2.5 text-base sm:text-lg font-mono font-bold bg-background border border-border rounded-lg text-foreground placeholder:text-muted-foreground/60 focus:outline-hidden focus:border-ring transition-colors"
             />
           </div>
-          <p className="text-[11px] text-neutral-500 mt-1">
+          <p className="text-[11px] text-muted-foreground mt-1">
             Enter the exact lump-sum amount credited to your bank account or received in cash.
           </p>
         </div>
@@ -176,7 +176,7 @@ function RecordRemittanceForm({
         {/* Date and Courier */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
-            <label className="block text-xs font-semibold text-neutral-300 mb-1">
+            <label className="block text-xs font-semibold text-foreground mb-1">
               Date Received <span className="text-rose-400">*</span>
             </label>
             <input
@@ -184,12 +184,12 @@ function RecordRemittanceForm({
               required
               value={receivedDate}
               onChange={(e) => setReceivedDate(e.target.value)}
-              className="w-full px-3 py-2 text-xs sm:text-sm bg-neutral-950 border border-neutral-800 rounded-lg text-white font-mono focus:outline-hidden focus:border-neutral-500 transition-colors"
+              className="w-full px-3 py-2 text-xs sm:text-sm bg-background border border-border rounded-lg text-foreground font-mono focus:outline-hidden focus:border-ring transition-colors"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-neutral-300 mb-1">
+            <label className="block text-xs font-semibold text-foreground mb-1">
               Courier / Payout Source
             </label>
             {!isCustomCourier ? (
@@ -202,7 +202,7 @@ function RecordRemittanceForm({
                     setCourier(e.target.value);
                   }
                 }}
-                className="w-full px-3 py-2 text-xs sm:text-sm bg-neutral-950 border border-neutral-800 rounded-lg text-white focus:outline-hidden focus:border-neutral-500 transition-colors cursor-pointer"
+                className="w-full px-3 py-2 text-xs sm:text-sm bg-background border border-border rounded-lg text-foreground focus:outline-hidden focus:border-ring transition-colors cursor-pointer"
               >
                 {allCouriers.map((c) => (
                   <option key={c} value={c}>
@@ -217,12 +217,12 @@ function RecordRemittanceForm({
                   placeholder="Enter courier name"
                   value={customCourier}
                   onChange={(e) => setCustomCourier(e.target.value)}
-                  className="w-full px-3 py-2 text-xs sm:text-sm bg-neutral-950 border border-neutral-800 rounded-lg text-white focus:outline-hidden focus:border-neutral-500 transition-colors"
+                  className="w-full px-3 py-2 text-xs sm:text-sm bg-background border border-border rounded-lg text-foreground focus:outline-hidden focus:border-ring transition-colors"
                 />
                 <button
                   type="button"
                   onClick={() => setIsCustomCourier(false)}
-                  className="px-2 text-xs text-neutral-400 hover:text-white"
+                  className="px-2 text-xs text-muted-foreground hover:text-foreground"
                 >
                   List
                 </button>
@@ -234,13 +234,13 @@ function RecordRemittanceForm({
         {/* Deposited in Account and Number of Orders Covered */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
-            <label className="block text-xs font-semibold text-neutral-300 mb-1">
+            <label className="block text-xs font-semibold text-foreground mb-1">
               Deposited In / Payment Method
             </label>
             <select
               value={paymentMethodId}
               onChange={(e) => setPaymentMethodId(e.target.value)}
-              className="w-full px-3 py-2 text-xs sm:text-sm bg-neutral-950 border border-neutral-800 rounded-lg text-white focus:outline-hidden focus:border-neutral-500 transition-colors cursor-pointer"
+              className="w-full px-3 py-2 text-xs sm:text-sm bg-background border border-border rounded-lg text-foreground focus:outline-hidden focus:border-ring transition-colors cursor-pointer"
             >
               <option value="">Select bank / account (optional)...</option>
               {paymentMethods.map((pm) => (
@@ -252,7 +252,7 @@ function RecordRemittanceForm({
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-neutral-300 mb-1">
+            <label className="block text-xs font-semibold text-foreground mb-1">
               Parcels / Orders Covered
             </label>
             <input
@@ -261,14 +261,14 @@ function RecordRemittanceForm({
               value={ordersCount}
               onChange={(e) => setOrdersCount(e.target.value)}
               placeholder="e.g. 5 or 6 parcels"
-              className="w-full px-3 py-2 text-xs sm:text-sm bg-neutral-950 border border-neutral-800 rounded-lg text-white placeholder:text-neutral-600 focus:outline-hidden focus:border-neutral-500 transition-colors font-mono"
+              className="w-full px-3 py-2 text-xs sm:text-sm bg-background border border-border rounded-lg text-foreground placeholder:text-muted-foreground/60 focus:outline-hidden focus:border-ring transition-colors font-mono"
             />
           </div>
         </div>
 
         {/* Reference Number / UTR */}
         <div>
-          <label className="block text-xs font-semibold text-neutral-300 mb-1">
+          <label className="block text-xs font-semibold text-foreground mb-1">
             Remittance Reference / UTR / Cheque # (Optional)
           </label>
           <input
@@ -276,13 +276,13 @@ function RecordRemittanceForm({
             value={referenceNumber}
             onChange={(e) => setReferenceNumber(e.target.value)}
             placeholder="e.g. UTR-98218732 or India Post Slip #491"
-            className="w-full px-3 py-2 text-xs sm:text-sm bg-neutral-950 border border-neutral-800 rounded-lg text-white placeholder:text-neutral-600 focus:outline-hidden focus:border-neutral-500 transition-colors font-mono"
+            className="w-full px-3 py-2 text-xs sm:text-sm bg-background border border-border rounded-lg text-foreground placeholder:text-muted-foreground/60 focus:outline-hidden focus:border-ring transition-colors font-mono"
           />
         </div>
 
         {/* Notes */}
         <div>
-          <label className="block text-xs font-semibold text-neutral-300 mb-1">
+          <label className="block text-xs font-semibold text-foreground mb-1">
             Notes / Batch Remarks (Optional)
           </label>
           <textarea
@@ -290,17 +290,17 @@ function RecordRemittanceForm({
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             placeholder="e.g. Received for 6 packages delivered last weekend, post office deduction ₹50..."
-            className="w-full px-3 py-2 text-xs sm:text-sm bg-neutral-950 border border-neutral-800 rounded-lg text-white placeholder:text-neutral-600 focus:outline-hidden focus:border-neutral-500 transition-colors"
+            className="w-full px-3 py-2 text-xs sm:text-sm bg-background border border-border rounded-lg text-foreground placeholder:text-muted-foreground/60 focus:outline-hidden focus:border-ring transition-colors"
           />
         </div>
 
         {/* Actions */}
-        <div className="pt-3 border-t border-neutral-800 flex items-center justify-end gap-2">
+        <div className="pt-3 border-t border-border flex items-center justify-end gap-2">
           <button
             type="button"
             onClick={onClose}
             disabled={submitting}
-            className="px-4 py-2 text-xs font-medium text-neutral-300 hover:text-white bg-neutral-800 hover:bg-neutral-700 rounded-lg transition-colors"
+            className="px-4 py-2 text-xs font-medium text-muted-foreground hover:text-foreground bg-secondary hover:bg-muted rounded-lg transition-colors"
           >
             Cancel
           </button>

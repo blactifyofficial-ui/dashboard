@@ -132,7 +132,7 @@ export default function CodFilterToolbar({
             onClick={() => onTabChange('remittances')}
             className={`flex items-center gap-2 px-3.5 py-2 text-xs sm:text-sm font-semibold rounded-lg transition-colors cursor-pointer ${
               activeTab === 'remittances'
-                ? 'bg-neutral-800 text-white border border-neutral-700 shadow-xs'
+                ? 'bg-card text-foreground border border-border shadow-xs'
                 : 'text-muted-foreground hover:text-foreground hover:bg-muted'
             }`}
           >
@@ -148,7 +148,7 @@ export default function CodFilterToolbar({
             onClick={() => onTabChange('orders')}
             className={`flex items-center gap-2 px-3.5 py-2 text-xs sm:text-sm font-semibold rounded-lg transition-colors cursor-pointer ${
               activeTab === 'orders'
-                ? 'bg-neutral-800 text-white border border-neutral-700 shadow-xs'
+                ? 'bg-card text-foreground border border-border shadow-xs'
                 : 'text-muted-foreground hover:text-foreground hover:bg-muted'
             }`}
           >
