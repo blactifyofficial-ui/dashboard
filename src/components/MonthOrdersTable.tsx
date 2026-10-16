@@ -32,6 +32,7 @@ export interface MonthOrderDetail {
   trackingId?: string | null;
   trackingCompany?: string | null;
   trackingUrl?: string | null;
+  codStatus?: string | null;
 }
 
 interface MonthOrdersTableProps {
@@ -338,10 +339,21 @@ export default function MonthOrdersTable({ orders }: MonthOrdersTableProps) {
                     <td className="px-4 sm:px-6 py-3.5 whitespace-nowrap">
                       {isCod ? (
                         <div className="flex flex-col gap-1">
-                          <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-xs font-medium bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/25 w-fit">
-                            <Banknote size={12} className="text-amber-600 dark:text-amber-400 shrink-0" />
-                            <span>COD</span>
-                          </span>
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-xs font-medium bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/25 w-fit">
+                              <Banknote size={12} className="text-amber-600 dark:text-amber-400 shrink-0" />
+                              <span>COD</span>
+                            </span>
+                            {order.codStatus === 'COLLECTED' ? (
+                              <span className="inline-flex items-center gap-1 px-1.5 py-0.2 rounded text-[10px] font-semibold bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/25">
+                                Collected
+                              </span>
+                            ) : order.codStatus === 'RTO' ? (
+                              <span className="inline-flex items-center gap-1 px-1.5 py-0.2 rounded text-[10px] font-semibold bg-rose-500/15 text-rose-700 dark:text-rose-300 border border-rose-500/25">
+                                RTO
+                              </span>
+                            ) : null}
+                          </div>
                           <span className="text-[11px] text-muted-foreground">
                             {order.financialStatus === 'partially_paid' 
                               ? 'Partial COD (Advance Paid)' 

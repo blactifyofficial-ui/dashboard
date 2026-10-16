@@ -86,6 +86,7 @@ async function MonthRevenueContent({ year, month, startDate, endDate, canViewExp
     trackingId: orders.trackingId,
     trackingCompany: orders.trackingCompany,
     trackingUrl: orders.trackingUrl,
+    codStatus: orders.codStatus,
   })
     .from(orders)
     .where(

@@ -56,7 +56,48 @@ CREATE TABLE IF NOT EXISTS "orders" (
     "tracking_id" TEXT,
     "tracking_company" TEXT,
     "tracking_url" TEXT,
+    "courier" VARCHAR,
+    "cod_status" TEXT DEFAULT 'PENDING', -- 'PENDING', 'COLLECTED', 'RTO', 'CANCELLED'
+    "cod_collected_amount" NUMERIC,
+    "cod_collected_at" TIMESTAMP WITH TIME ZONE,
+    "cod_payment_method_id" TEXT,
+    "cod_remittance_ref" TEXT,
+    "cod_notes" TEXT,
+    "cod_collected_by_id" TEXT,
     CONSTRAINT "orders_shopify_order_id_unique" UNIQUE ("shopify_order_id")
+);
+
+-- COD Collection Activity & Audit Trail
+CREATE TABLE IF NOT EXISTS "cod_collection_activities" (
+    "id" TEXT PRIMARY KEY NOT NULL,
+    "order_id" TEXT NOT NULL,
+    "actor_id" TEXT,
+    "action" TEXT NOT NULL, -- 'MARKED_COLLECTED', 'REVERTED_PENDING', 'UPDATED_DETAILS', 'MARKED_RTO'
+    "amount" NUMERIC,
+    "payment_method_id" TEXT,
+    "remittance_ref" TEXT,
+    "note" TEXT,
+    "created_at" TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL,
+    CONSTRAINT "cod_collection_activities_order_id_orders_id_fk" FOREIGN KEY ("order_id") REFERENCES "orders"("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT "cod_collection_activities_payment_method_id_payment_methods_id_fk" FOREIGN KEY ("payment_method_id") REFERENCES "payment_methods"("id") ON DELETE SET NULL ON UPDATE NO ACTION,
+    CONSTRAINT "cod_collection_activities_actor_id_user_id_fk" FOREIGN KEY ("actor_id") REFERENCES "user"("id") ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+-- COD Lump-Sum Remittances & Courier Payout Entries
+CREATE TABLE IF NOT EXISTS "cod_remittances" (
+    "id" TEXT PRIMARY KEY NOT NULL,
+    "amount" NUMERIC NOT NULL,
+    "received_date" TIMESTAMP WITH TIME ZONE NOT NULL,
+    "courier" TEXT, -- e.g. 'India Post Domestic', 'Delhivery', 'Cash'
+    "payment_method_id" TEXT, -- linked bank account / payment method
+    "reference_number" TEXT, -- UTR / Remittance slip number
+    "orders_count" NUMERIC, -- estimated number of parcels covered (e.g. 5, 6)
+    "notes" TEXT,
+    "created_by_id" TEXT,
+    "created_at" TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL,
+    "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL,
+    CONSTRAINT "cod_remittances_payment_method_id_payment_methods_id_fk" FOREIGN KEY ("payment_method_id") REFERENCES "payment_methods"("id") ON DELETE SET NULL ON UPDATE NO ACTION,
+    CONSTRAINT "cod_remittances_created_by_id_user_id_fk" FOREIGN KEY ("created_by_id") REFERENCES "user"("id") ON DELETE SET NULL ON UPDATE CASCADE
 );
 
 -- Order Line Items
@@ -413,6 +454,8 @@ CREATE INDEX IF NOT EXISTS "idx_orders_created_at" ON "orders" ("created_at" DES
 CREATE INDEX IF NOT EXISTS "idx_orders_financial_status" ON "orders" ("financial_status");
 CREATE INDEX IF NOT EXISTS "idx_orders_fulfillment_status" ON "orders" ("fulfillment_status");
 CREATE INDEX IF NOT EXISTS "idx_orders_customer_email" ON "orders" ("customer_email");
+CREATE INDEX IF NOT EXISTS "idx_orders_cod_status" ON "orders" ("cod_status");
+CREATE INDEX IF NOT EXISTS "idx_cod_collection_activities_order_id" ON "cod_collection_activities" ("order_id");
 
 -- Order Items Indexes
 CREATE INDEX IF NOT EXISTS "idx_order_items_order_id" ON "order_items" ("order_id");
@@ -459,23 +502,4 @@ CREATE INDEX IF NOT EXISTS "idx_monthly_expense_entries_template_id" ON "monthly
 CREATE INDEX IF NOT EXISTS "idx_google_sheets_sync_queue_status_retry" ON "google_sheets_sync_queue" ("status", "next_retry_at");
 CREATE INDEX IF NOT EXISTS "idx_google_sheets_sync_queue_created_at" ON "google_sheets_sync_queue" ("created_at" DESC);
 
--- ==============================================================================
--- 10. AI ANALYSIS & STRATEGY REPORTS
--- ==============================================================================
-
-CREATE TABLE IF NOT EXISTS "ai_analysis_reports" (
-    "id" TEXT PRIMARY KEY NOT NULL,
-    "timeframe" TEXT NOT NULL,
-    "focus_area" TEXT NOT NULL DEFAULT 'ALL',
-    "health_score" NUMERIC,
-    "health_status" TEXT,
-    "summary" TEXT NOT NULL,
-    "report_json" TEXT NOT NULL,
-    "metrics_snapshot" TEXT NOT NULL,
-    "created_by_id" TEXT REFERENCES "user"("id"),
-    "created_at" TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL
-);
-
-CREATE INDEX IF NOT EXISTS "idx_ai_analysis_reports_created_at" ON "ai_analysis_reports" ("created_at" DESC);
-CREATE INDEX IF NOT EXISTS "idx_ai_analysis_reports_timeframe" ON "ai_analysis_reports" ("timeframe");
 

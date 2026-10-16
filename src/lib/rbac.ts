@@ -10,6 +10,10 @@ export const PERMISSIONS = {
   // --- Revenue Page ---
   'revenue:view': ['SUPER_ADMIN', 'ADMIN', 'PARTNER', 'VIEWER'],
 
+  // --- COD Collection Page ---
+  'cod:view': ['SUPER_ADMIN', 'ADMIN', 'STAFF', 'PARTNER', 'VIEWER'],
+  'cod:manage': ['SUPER_ADMIN', 'ADMIN', 'STAFF'],
+
   // --- Inventory Page ---
   'inventory:view': ['SUPER_ADMIN', 'ADMIN', 'STAFF', 'PARTNER', 'VIEWER'],
   'inventory:view_valuation': ['SUPER_ADMIN', 'ADMIN', 'PARTNER'],
@@ -46,10 +50,6 @@ export const PERMISSIONS = {
   'settings:view': ['SUPER_ADMIN', 'ADMIN'],
   'settings:manage_integrations': ['SUPER_ADMIN'],
   'settings:manage_users': ['SUPER_ADMIN'],
-
-  // --- AI Strategy ---
-  'ai_analysis:view': ['SUPER_ADMIN', 'ADMIN', 'PARTNER'],
-  'ai_analysis:generate': ['SUPER_ADMIN', 'ADMIN'],
 } as const;
 
 export type Permission = keyof typeof PERMISSIONS;
@@ -61,13 +61,13 @@ export interface PermissionItem {
   category:
     | 'Overview'
     | 'Revenue'
+    | 'COD Collection'
     | 'Inventory'
     | 'Meta Ads'
     | 'Partners'
     | 'Payouts'
     | 'Expenses'
     | 'Monthly Bills'
-    | 'AI Strategy'
     | 'Settings & Team';
 }
 
@@ -80,6 +80,10 @@ export const PERMISSION_CATALOG: PermissionItem[] = [
 
   // Revenue
   { key: 'revenue:view', label: 'View Revenue Analytics', description: 'Access revenue metrics, gross profit, and ad spend ROI', category: 'Revenue' },
+
+  // COD Collection
+  { key: 'cod:view', label: 'View COD Collections', description: 'Access the COD collection register and remittance overview', category: 'COD Collection' },
+  { key: 'cod:manage', label: 'Manage & Mark COD Collection', description: 'Mark orders as collected, update remittance refs, and edit amounts', category: 'COD Collection' },
 
   // Inventory
   { key: 'inventory:view', label: 'View Inventory', description: 'Browse stock levels, variants, and product items', category: 'Inventory' },
@@ -113,9 +117,6 @@ export const PERMISSION_CATALOG: PermissionItem[] = [
   { key: 'monthly_expenses:edit', label: 'Edit Monthly Bills', description: 'Manage monthly budget caps, bill templates, and payment status', category: 'Monthly Bills' },
   { key: 'monthly_expenses:sync_sheets', label: 'Sync to Google Sheets', description: 'Trigger Google Sheets sync for expense records', category: 'Monthly Bills' },
 
-  // AI Strategy
-  { key: 'ai_analysis:view', label: 'View AI Strategic Analysis', description: 'Access financial diagnostics, health score, and strategic roadmap', category: 'AI Strategy' },
-  { key: 'ai_analysis:generate', label: 'Generate AI Reports & Advisor', description: 'Trigger new Gemini strategic audits and ask follow-up advisory questions', category: 'AI Strategy' },
 
   // Settings & Team
   { key: 'settings:view', label: 'View Settings', description: 'Access settings and configuration page', category: 'Settings & Team' },
@@ -208,13 +209,13 @@ export function hasPermission(
 export const ROUTE_PERMISSIONS: Record<string, Permission> = {
   '/dashboard': 'overview:view_orders',
   '/revenue': 'revenue:view',
+  '/cod': 'cod:view',
   '/inventory': 'inventory:view',
   '/meta-ads': 'meta_ads:view',
   '/partners': 'partners:view_self',
   '/payouts': 'payouts:view_self',
   '/expenses': 'expenses:view',
   '/monthly-expenses': 'monthly_expenses:view',
-  '/ai-analysis': 'ai_analysis:view',
   '/team': 'settings:manage_users',
   '/settings': 'settings:view',
 };

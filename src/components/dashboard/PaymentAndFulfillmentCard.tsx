@@ -125,9 +125,18 @@ export default function PaymentAndFulfillmentCard({
 
           {/* COD */}
           <div className="bg-muted/40 border border-border/50 rounded-lg p-3">
-            <div className="flex items-center gap-1.5 text-xs font-semibold text-foreground mb-1">
-              <Banknote size={14} className="text-amber-500" />
-              <span>COD ({codOrdersPercent}%)</span>
+            <div className="flex items-center justify-between text-xs font-semibold text-foreground mb-1">
+              <div className="flex items-center gap-1.5">
+                <Banknote size={14} className="text-amber-500" />
+                <span>COD ({codOrdersPercent}%)</span>
+              </div>
+              <Link
+                href="/cod"
+                className="inline-flex items-center gap-0.5 text-[11px] text-amber-600 dark:text-amber-400 hover:underline font-medium"
+              >
+                <span>Manage</span>
+                <ArrowUpRight size={11} />
+              </Link>
             </div>
             <div className="space-y-0.5">
               {canViewRevenue && (

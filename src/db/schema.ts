@@ -15,6 +15,14 @@ export const orders = pgTable('orders', {
   trackingId: text('tracking_id'),
   trackingCompany: text('tracking_company'),
   trackingUrl: text('tracking_url'),
+  courier: text('courier'),
+  codStatus: text('cod_status').default('PENDING'),
+  codCollectedAmount: numeric('cod_collected_amount'),
+  codCollectedAt: timestamp('cod_collected_at', { withTimezone: true }),
+  codPaymentMethodId: text('cod_payment_method_id').references(() => paymentMethods.id),
+  codRemittanceRef: text('cod_remittance_ref'),
+  codNotes: text('cod_notes'),
+  codCollectedById: text('cod_collected_by_id').references(() => users.id),
 });
 
 export const orderItems = pgTable('order_items', {
@@ -264,17 +272,31 @@ export const googleSheetsSyncQueue = pgTable('google_sheets_sync_queue', {
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
-export const aiAnalysisReports = pgTable('ai_analysis_reports', {
+export const codCollectionActivities = pgTable('cod_collection_activities', {
   id: text('id').primaryKey(),
-  timeframe: text('timeframe').notNull(), // '30d' | '90d' | 'ytd' | 'all'
-  focusArea: text('focus_area').default('ALL').notNull(), // 'ALL' | 'SALES' | 'EXPENSES' | 'MARKETING'
-  healthScore: numeric('health_score'),
-  healthStatus: text('health_status'),
-  summary: text('summary').notNull(),
-  reportJson: text('report_json').notNull(), // JSON string of complete structured report
-  metricsSnapshot: text('metrics_snapshot').notNull(), // JSON string of aggregated raw metrics
-  createdById: text('created_by_id').references(() => users.id),
+  orderId: text('order_id').references(() => orders.id).notNull(),
+  actorId: text('actor_id').references(() => users.id),
+  action: text('action').notNull(), // 'MARKED_COLLECTED' | 'REVERTED_PENDING' | 'UPDATED_DETAILS' | 'MARKED_RTO'
+  amount: numeric('amount'),
+  paymentMethodId: text('payment_method_id').references(() => paymentMethods.id),
+  remittanceRef: text('remittance_ref'),
+  note: text('note'),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
 });
+
+export const codRemittances = pgTable('cod_remittances', {
+  id: text('id').primaryKey(),
+  amount: numeric('amount').notNull(),
+  receivedDate: timestamp('received_date', { withTimezone: true }).notNull(),
+  courier: text('courier'),
+  paymentMethodId: text('payment_method_id').references(() => paymentMethods.id),
+  referenceNumber: text('reference_number'),
+  ordersCount: numeric('orders_count'),
+  notes: text('notes'),
+  createdById: text('created_by_id').references(() => users.id),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+});
+
 
 

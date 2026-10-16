@@ -2,14 +2,14 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Settings, Wallet, BarChart3, Megaphone, Handshake, CalendarCheck, Banknote, Boxes, Users, BrainCircuit } from 'lucide-react';
+import { LayoutDashboard, Settings, Wallet, BarChart3, Megaphone, Handshake, CalendarCheck, Banknote, Boxes, Users, HandCoins } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { ROUTE_PERMISSIONS } from '@/lib/rbac';
 
 const NAV_LINKS = [
   { href: '/dashboard', label: 'Overview', icon: LayoutDashboard },
   { href: '/revenue', label: 'Revenue', icon: BarChart3 },
-  { href: '/ai-analysis', label: 'AI Strategy & Insights', icon: BrainCircuit },
+  { href: '/cod', label: 'COD Collection', icon: HandCoins },
   { href: '/inventory', label: 'Inventory & Stock Value', icon: Boxes },
   { href: '/meta-ads', label: 'Meta Ads', icon: Megaphone },
   { href: '/partners', label: 'Partners & Capital', icon: Handshake },

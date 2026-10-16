@@ -7,8 +7,9 @@ import { notFound } from 'next/navigation';
 import { ArrowUpRight } from 'lucide-react';
 import { Suspense } from 'react';
 import LoadingSpinner from '@/components/LoadingSpinner';
-
 import BackButton from '@/components/BackButton';
+import { isCodOrder } from '@/lib/order-utils';
+import OrderCodCard from '@/components/cod/OrderCodCard';
 
 export const dynamic = "force-dynamic";
 
@@ -35,6 +36,8 @@ async function OrderDetailContent({ orderId }: { orderId: string }) {
   const order = orderResult[0];
 
   const items = await db.select().from(orderItems).where(eq(orderItems.orderId, orderId));
+
+  const isCod = isCodOrder(order);
 
   return (
     <>
@@ -179,6 +182,10 @@ async function OrderDetailContent({ orderId }: { orderId: string }) {
               </div>
             </div>
           </div>
+
+          {isCod && (
+            <OrderCodCard order={order} />
+          )}
         </div>
       </div>
     </>

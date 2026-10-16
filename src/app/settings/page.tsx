@@ -3,7 +3,6 @@ import SyncButton from '@/components/SyncButton';
 import CategoryManager from '@/components/CategoryManager';
 import InstallPWA from '@/components/InstallPWA';
 import GoogleSheetsSettings from '@/components/GoogleSheetsSettings';
-import GeminiSettings from '@/components/GeminiSettings';
 import ThemeSwitcher from '@/components/theme/ThemeSwitcher';
 import { requirePermission } from '@/lib/auth-utils';
 import { hasPermission } from '@/lib/rbac';
@@ -39,9 +38,6 @@ export default async function SettingsPage() {
             </div>
           </div>
         </div>
-
-        {/* Gemini AI Integration Section */}
-        {canManageIntegrations && <GeminiSettings />}
 
         {/* Google Sheets Backup Section */}
         {canManageIntegrations && <GoogleSheetsSettings />}
