@@ -24,8 +24,8 @@ export default function ResponsiveSidebar() {
         
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none pt-[env(safe-area-inset-top)]">
           <Link href="/" className="pointer-events-auto flex items-center min-h-[44px] px-2">
-            <Image src="/blactify_logo_font.svg" alt="Blactify" width={218} height={22} className="h-5.5 w-auto object-contain hidden dark:block" style={{ width: 'auto' }} priority />
-            <Image src="/blactify_logo_dark.svg" alt="Blactify" width={218} height={22} className="h-5.5 w-auto object-contain block dark:hidden" style={{ width: 'auto' }} priority />
+            <Image src="/blactify_logo_font.svg" alt="Blactify" width={218} height={22} className="h-5.5 w-auto object-contain hidden dark:block" style={{ width: 'auto', height: 'auto' }} priority />
+            <Image src="/blactify_logo_dark.svg" alt="Blactify" width={218} height={22} className="h-5.5 w-auto object-contain block dark:hidden" style={{ width: 'auto', height: 'auto' }} priority />
           </Link>
         </div>
 
@@ -51,8 +51,8 @@ export default function ResponsiveSidebar() {
       `}>
         <div className="p-4 md:px-5 md:py-5 border-b border-sidebar-border hidden md:flex items-center">
           <Link href="/" className="block">
-            <Image src="/blactify_logo_font.svg" alt="Blactify" width={237} height={24} className="h-6 w-auto object-contain hidden dark:block" style={{ width: 'auto' }} priority />
-            <Image src="/blactify_logo_dark.svg" alt="Blactify" width={237} height={24} className="h-6 w-auto object-contain block dark:hidden" style={{ width: 'auto' }} priority />
+            <Image src="/blactify_logo_font.svg" alt="Blactify" width={237} height={24} className="h-6 w-auto object-contain hidden dark:block" style={{ width: 'auto', height: 'auto' }} priority />
+            <Image src="/blactify_logo_dark.svg" alt="Blactify" width={237} height={24} className="h-6 w-auto object-contain block dark:hidden" style={{ width: 'auto', height: 'auto' }} priority />
           </Link>
         </div>
         

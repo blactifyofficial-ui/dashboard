@@ -303,7 +303,7 @@ export default function MonthlyExpensesPage() {
   }
 
   return (
-    <div className="flex-1 flex flex-col min-h-0 space-y-4 p-4 sm:p-6 md:p-8">
+    <div className="flex-1 flex flex-col min-h-0 space-y-4 pb-12">
       {/* Top Header */}
       <div className="flex-none flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>

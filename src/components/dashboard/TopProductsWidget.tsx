@@ -97,7 +97,7 @@ export default function TopProductsWidget({
 
                   {/* Title & units sold */}
                   <div className="min-w-0 space-y-0.5">
-                    <p className="text-xs sm:text-sm font-semibold text-foreground truncate max-w-[180px] sm:max-w-xs md:max-w-sm">
+                    <p className="text-xs sm:text-sm font-semibold text-foreground truncate max-w-[170px] min-[400px]:max-w-[220px] sm:max-w-xs md:max-w-sm lg:max-w-md xl:max-w-lg 2xl:max-w-2xl" title={title}>
                       {title}
                     </p>
                     <p className="text-[11px] text-muted-foreground font-mono">

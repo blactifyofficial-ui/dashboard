@@ -128,8 +128,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
             {/* Main Content */}
             {session?.user ? (
-              <main className="flex-1 w-full min-w-0 px-3 sm:px-6 lg:px-8 pt-3 sm:pt-6 lg:pt-8 pb-[max(1rem,env(safe-area-inset-bottom))] z-10 relative h-full flex flex-col overflow-y-auto">
-                <div className="mx-auto w-full max-w-7xl h-full flex flex-col min-h-0">
+              <main className="flex-1 w-full min-w-0 px-3.5 sm:px-6 lg:px-8 2xl:px-10 pt-3.5 sm:pt-6 lg:pt-8 pb-[max(1rem,env(safe-area-inset-bottom))] z-10 relative h-full flex flex-col overflow-y-auto">
+                <div className="mx-auto w-full max-w-[1920px] h-full flex flex-col min-h-0">
                   <div className="flex-1 min-h-0 pb-2 sm:pb-6 lg:pb-8 flex flex-col">
                     {children}
                   </div>
