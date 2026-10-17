@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import Image from "next/image";
 import { authClient } from "@/lib/auth/client";
 import ThemeSwitcher from "@/components/theme/ThemeSwitcher";
 
@@ -23,7 +24,10 @@ export default function ClientLogin() {
       </div>
 
       <div className="z-10 flex flex-col items-center max-w-sm w-full px-6">
-        <h1 className="text-2xl font-bold tracking-tight text-foreground mb-1.5 uppercase">Blactify</h1>
+        <div className="mb-2 flex items-center justify-center">
+          <Image src="/blactify_logo_font.svg" alt="Blactify" width={237} height={24} className="h-7 w-auto object-contain hidden dark:block" style={{ width: 'auto' }} priority />
+          <Image src="/blactify_logo_dark.svg" alt="Blactify" width={237} height={24} className="h-7 w-auto object-contain block dark:hidden" style={{ width: 'auto' }} priority />
+        </div>
         <p className="text-xs sm:text-sm text-muted-foreground mb-6 text-center">Admin Dashboard Access</p>
         
         <button
