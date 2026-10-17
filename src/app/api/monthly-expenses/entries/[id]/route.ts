@@ -2,7 +2,8 @@ import { NextResponse } from 'next/server';
 import { db } from '@/db';
 import { monthlyExpenseEntries } from '@/db/schema';
 import { eq } from 'drizzle-orm';
-import { requireAuth } from '@/lib/auth-utils';
+import { requireAuth, requirePermission } from '@/lib/auth-utils';
+import { hasPermission } from '@/lib/rbac';
 import { enqueueSyncJob } from '@/lib/google-sheets';
 import { 
   syncMonthlyBillPaymentToExpenses, 
@@ -18,6 +19,11 @@ export async function PATCH(
     const authResult = await requireAuth();
     if (authResult.error) {
       return NextResponse.json({ error: authResult.error }, { status: authResult.status });
+    }
+    const canPay = hasPermission(authResult.role, 'monthly_expenses:pay', authResult.permissions);
+    const canEdit = hasPermission(authResult.role, 'monthly_expenses:edit', authResult.permissions);
+    if (!canPay && !canEdit) {
+      return NextResponse.json({ error: 'Forbidden: Insufficient permissions' }, { status: 403 });
     }
     const session = { user: authResult.user! };
     const { id } = await params;
@@ -145,16 +151,18 @@ export async function PATCH(
   }
 }
 
+export const PUT = PATCH;
+
 export async function DELETE(
-  req: Request,
+  _req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const authResult = await requireAuth();
-    if (authResult.error) {
+    const authResult = await requirePermission('monthly_expenses:edit');
+    if ('error' in authResult) {
       return NextResponse.json({ error: authResult.error }, { status: authResult.status });
     }
-    const session = { user: authResult.user! };
+    const session = { user: authResult.user };
     const { id } = await params;
 
     const [existing] = await db

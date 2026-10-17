@@ -7,6 +7,7 @@ import { ArrowLeft, Loader2, Pencil, Trash2, Save, X, ExternalLink } from 'lucid
 import toast from 'react-hot-toast';
 import ConfirmModal from '@/components/ConfirmModal';
 import LoadingSpinner from '@/components/LoadingSpinner';
+import { useAuth } from '@/context/AuthContext';
 
 type Activity = {
   id: string;
@@ -40,6 +41,9 @@ type PaymentMethod = { id: string; name: string };
 export default function ExpenseDetailPage() {
   const { id } = useParams();
   const router = useRouter();
+  const { hasPermission } = useAuth();
+  const canEditExpenses = hasPermission('expenses:edit');
+  const canDeleteExpenses = hasPermission('expenses:delete');
 
   const [expense, setExpense] = useState<Expense | null>(null);
   const [loading, setLoading] = useState(true);
@@ -221,18 +225,22 @@ export default function ExpenseDetailPage() {
 
         {!isEditing && (
           <div className="flex items-center gap-2 self-start sm:self-auto">
-            <button
-              onClick={() => setIsEditing(true)}
-              className="flex items-center justify-center gap-1.5 px-3.5 h-9 bg-card hover:bg-muted text-foreground border border-border rounded-lg text-xs font-semibold transition-colors"
-            >
-              <Pencil size={14} /> Edit
-            </button>
-            <button
-              onClick={() => setShowDeleteModal(true)}
-              className="flex items-center justify-center gap-1.5 px-3.5 h-9 bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-500/30 rounded-lg text-xs font-semibold transition-colors"
-            >
-              <Trash2 size={14} /> Delete
-            </button>
+            {canEditExpenses && (
+              <button
+                onClick={() => setIsEditing(true)}
+                className="flex items-center justify-center gap-1.5 px-3.5 h-9 bg-card hover:bg-muted text-foreground border border-border rounded-lg text-xs font-semibold transition-colors cursor-pointer"
+              >
+                <Pencil size={14} /> Edit
+              </button>
+            )}
+            {canDeleteExpenses && (
+              <button
+                onClick={() => setShowDeleteModal(true)}
+                className="flex items-center justify-center gap-1.5 px-3.5 h-9 bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-500/30 rounded-lg text-xs font-semibold transition-colors cursor-pointer"
+              >
+                <Trash2 size={14} /> Delete
+              </button>
+            )}
           </div>
         )}
       </div>

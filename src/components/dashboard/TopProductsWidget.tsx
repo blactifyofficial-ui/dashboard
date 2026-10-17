@@ -15,6 +15,7 @@ export interface TopProduct {
 interface TopProductsWidgetProps {
   products: TopProduct[];
   canViewRevenue: boolean;
+  canViewInventory?: boolean;
 }
 
 function ProductThumbnail({ src, title }: { src: string | null; title: string }) {
@@ -42,7 +43,11 @@ function ProductThumbnail({ src, title }: { src: string | null; title: string })
   );
 }
 
-export default function TopProductsWidget({ products, canViewRevenue }: TopProductsWidgetProps) {
+export default function TopProductsWidget({
+  products,
+  canViewRevenue,
+  canViewInventory = true,
+}: TopProductsWidgetProps) {
   return (
     <div className="bg-card border border-border rounded-xl shadow-xs overflow-hidden flex flex-col h-full">
       {/* Header */}
@@ -52,13 +57,15 @@ export default function TopProductsWidget({ products, canViewRevenue }: TopProdu
           <h3 className="text-sm font-semibold text-foreground tracking-tight">Top Selling Products</h3>
           <span className="text-xs text-muted-foreground font-mono">(This Month)</span>
         </div>
-        <Link
-          href="/inventory"
-          className="text-xs text-primary hover:underline font-medium flex items-center gap-1 group"
-        >
-          <span>Inventory</span>
-          <ArrowUpRight size={13} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-        </Link>
+        {canViewInventory && (
+          <Link
+            href="/inventory"
+            className="text-xs text-primary hover:underline font-medium flex items-center gap-1 group"
+          >
+            <span>Inventory</span>
+            <ArrowUpRight size={13} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+          </Link>
+        )}
       </div>
 
       {/* Product List */}

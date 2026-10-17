@@ -35,6 +35,7 @@ export default function PayoutsPage() {
   const { hasPermission } = useAuth();
   const canViewPayouts = hasPermission('payouts:view_self');
   const canManagePayouts = hasPermission('payouts:manage');
+  const canDeletePayouts = hasPermission('payouts:delete');
 
   const [loading, setLoading] = useState(true);
 
@@ -536,27 +537,31 @@ export default function PayoutsPage() {
                     </td>
                     <td className="py-3 px-4 text-right whitespace-nowrap">
                       <div className="flex items-center justify-end gap-1">
-                        <button
-                          onClick={() => handleOpenEditPayout(txn)}
-                          className="p-1.5 text-muted-foreground hover:text-foreground rounded-lg hover:bg-muted transition-colors"
-                          title="Edit payout"
-                        >
-                          <Pencil size={13} />
-                        </button>
-                        <button
-                          onClick={() => {
-                            setDeleteConfirm({
-                              isOpen: true,
-                              id: txn.id,
-                              amount: txn.amount,
-                              partnerName: txn.partnerName || 'Partner',
-                            });
-                          }}
-                          className="p-1.5 text-muted-foreground hover:text-rose-500 rounded-lg hover:bg-rose-500/10 transition-colors"
-                          title="Delete payout"
-                        >
-                          <Trash2 size={13} />
-                        </button>
+                        {canManagePayouts && (
+                          <button
+                            onClick={() => handleOpenEditPayout(txn)}
+                            className="p-1.5 text-muted-foreground hover:text-foreground rounded-lg hover:bg-muted transition-colors cursor-pointer"
+                            title="Edit payout"
+                          >
+                            <Pencil size={13} />
+                          </button>
+                        )}
+                        {canDeletePayouts && (
+                          <button
+                            onClick={() => {
+                              setDeleteConfirm({
+                                isOpen: true,
+                                id: txn.id,
+                                amount: txn.amount,
+                                partnerName: txn.partnerName || 'Partner',
+                              });
+                            }}
+                            className="p-1.5 text-muted-foreground hover:text-rose-500 rounded-lg hover:bg-rose-500/10 transition-colors cursor-pointer"
+                            title="Delete payout"
+                          >
+                            <Trash2 size={13} />
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>

@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
-import { requireAuth } from '@/lib/auth-utils';
+import { requirePermission } from '@/lib/auth-utils';
 
-export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
-  const authResult = await requireAuth();
-  if (authResult.error) {
+export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const authResult = await requirePermission('orders:view');
+  if ('error' in authResult) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.status });
   }
 

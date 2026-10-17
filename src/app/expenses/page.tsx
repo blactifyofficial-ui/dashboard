@@ -128,6 +128,7 @@ export default function ExpensesPage() {
   const { hasPermission } = useAuth();
   const canViewExpenses = hasPermission('expenses:view');
   const canEditExpenses = hasPermission('expenses:edit');
+  const canManageNotes = hasPermission('expenses:manage_notes');
 
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [dateNotes, setDateNotes] = useState<Record<string, string>>({});
@@ -413,7 +414,7 @@ export default function ExpensesPage() {
               <span className="font-semibold text-sm sm:text-base text-foreground">₹{dayTotal}</span>
             </div>
 
-            {!isEditingThisNote && (
+            {!isEditingThisNote && canManageNotes && (
               <button
                 type="button"
                 onClick={(e) => {
@@ -483,11 +484,11 @@ export default function ExpensesPage() {
                   <FileText size={14} className="mt-0.5 text-amber-500 dark:text-amber-400 shrink-0" />
                   <p className="leading-relaxed whitespace-pre-wrap">{currentNote}</p>
                 </div>
-                {canEditExpenses && (
+                {canManageNotes && (
                   <button
                     type="button"
                     onClick={() => handleStartEditNote(dateKey)}
-                    className="text-muted-foreground hover:text-foreground text-xs shrink-0"
+                    className="text-muted-foreground hover:text-foreground text-xs shrink-0 cursor-pointer"
                   >
                     <Pencil size={12} />
                   </button>

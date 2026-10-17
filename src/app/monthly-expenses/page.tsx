@@ -30,7 +30,10 @@ import AccessDenied from '@/components/AccessDenied';
 export default function MonthlyExpensesPage() {
   const { hasPermission } = useAuth();
   const canViewBills = hasPermission('monthly_expenses:view');
+  const canPayBills = hasPermission('monthly_expenses:pay');
   const canEditBills = hasPermission('monthly_expenses:edit');
+  const canManageTemplates = hasPermission('monthly_expenses:manage_templates');
+  const canUnlockMonth = hasPermission('monthly_expenses:unlock_month');
 
   const [loading, setLoading] = useState(true);
   const [activeMonth, setActiveMonth] = useState<string>('');
@@ -308,24 +311,26 @@ export default function MonthlyExpensesPage() {
           <p className="text-xs sm:text-sm text-muted-foreground">Manage recurring bills, salaries, rent, and overheads</p>
         </div>
 
-        {canEditBills && (
-          <div className="flex items-center gap-2.5 sm:gap-3 w-full sm:w-auto">
+        <div className="flex items-center gap-2.5 sm:gap-3 w-full sm:w-auto">
+          {canManageTemplates && (
             <button
               onClick={() => setIsTemplateModalOpen(true)}
-              className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-card border border-border text-foreground hover:bg-muted px-4 h-11 min-h-[44px] rounded-lg font-medium transition-colors text-sm shadow-xs"
+              className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-card border border-border text-foreground hover:bg-muted px-4 h-11 min-h-[44px] rounded-lg font-medium transition-colors text-sm shadow-xs cursor-pointer"
             >
               <Layers size={16} />
               Templates
             </button>
+          )}
+          {canEditBills && (
             <button
               onClick={() => setIsAddModalOpen(true)}
-              className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-primary text-primary-foreground px-4 h-11 min-h-[44px] rounded-lg font-medium hover:opacity-90 transition-opacity text-sm shadow-xs"
+              className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-primary text-primary-foreground px-4 h-11 min-h-[44px] rounded-lg font-medium hover:opacity-90 transition-opacity text-sm shadow-xs cursor-pointer"
             >
               <Plus size={16} />
               Add Bill
             </button>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       {/* Month Timeline / Selector */}
@@ -334,6 +339,10 @@ export default function MonthlyExpensesPage() {
         activeMonth={activeMonth}
         onSelectMonth={handleSelectMonth}
         onUnlockMonthPrompt={(m) => {
+          if (!canUnlockMonth) {
+            toast.error('You do not have permission to unlock past months');
+            return;
+          }
           setSelectedMonthForUnlock(m);
           setIsUnlockModalOpen(true);
         }}
@@ -358,6 +367,8 @@ export default function MonthlyExpensesPage() {
         onAddClick={() => setIsAddModalOpen(true)}
         onOpenTemplates={() => setIsTemplateModalOpen(true)}
         onDeleteEntry={handleDeleteEntry}
+        canPay={canPayBills}
+        canEdit={canEditBills}
       />
 
       {/* Modals */}

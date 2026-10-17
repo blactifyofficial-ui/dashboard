@@ -1,15 +1,15 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/db';
 import { metaAdsSettings, users } from '@/db/schema';
-import { requireAuth } from '@/lib/auth-utils';
+import { requirePermission } from '@/lib/auth-utils';
 
 export async function PUT(req: Request) {
   try {
-    const authResult = await requireAuth();
-    if (authResult.error) {
+    const authResult = await requirePermission('meta_ads:edit');
+    if ('error' in authResult) {
       return NextResponse.json({ error: authResult.error }, { status: authResult.status });
     }
-    const session = { user: authResult.user! };
+    const session = { user: authResult.user };
 
     const body = await req.json();
     const { dailyBudget, days = 7, currency = 'INR', notes = '' } = body;
@@ -72,3 +72,7 @@ export async function PUT(req: Request) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+
+export const POST = PUT;
+export const PATCH = PUT;
+

@@ -2,13 +2,14 @@ import { NextResponse } from 'next/server';
 import { db } from '@/db';
 import { partnerTransactions, partners, paymentMethods, users } from '@/db/schema';
 import { eq, desc } from 'drizzle-orm';
-import { requireAuth } from '@/lib/auth-utils';
+import { requireAuth, requirePermission } from '@/lib/auth-utils';
+import { hasPermission } from '@/lib/rbac';
 import { enqueueSyncJob } from '@/lib/google-sheets';
 
 export async function GET(req: Request) {
   try {
-    const authResult = await requireAuth();
-    if (authResult.error) {
+    const authResult = await requirePermission('partners:view_self');
+    if ('error' in authResult) {
       return NextResponse.json({ error: authResult.error }, { status: authResult.status });
     }
 
@@ -44,7 +45,9 @@ export async function GET(req: Request) {
     const transactions = await query;
 
     let filtered = transactions;
-    if (partnerId) {
+    if (authResult.role === 'PARTNER' && authResult.partnerId) {
+      filtered = filtered.filter((t) => t.partnerId === authResult.partnerId);
+    } else if (partnerId) {
       filtered = filtered.filter((t) => t.partnerId === partnerId);
     }
     if (type && type !== 'ALL') {
@@ -77,6 +80,15 @@ export async function POST(req: Request) {
       referenceNumber,
       notes,
     } = body;
+
+    const isPayout = type === 'PAYOUT';
+    const canCreate = isPayout
+      ? hasPermission(authResult.role, 'payouts:manage', authResult.permissions)
+      : hasPermission(authResult.role, 'partners:record_transaction', authResult.permissions);
+
+    if (!canCreate) {
+      return NextResponse.json({ error: 'Forbidden: Insufficient permissions' }, { status: 403 });
+    }
 
     if (!partnerId || !type || !amount || !transactionDate) {
       return NextResponse.json({ error: 'Missing required transaction fields' }, { status: 400 });

@@ -3,6 +3,7 @@ import { db } from '@/db';
 import { partnerTransactions } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { requireAuth } from '@/lib/auth-utils';
+import { hasPermission } from '@/lib/rbac';
 import { enqueueSyncJob } from '@/lib/google-sheets';
 
 export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -13,6 +14,26 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     }
 
     const { id } = await params;
+
+    const [existing] = await db
+      .select()
+      .from(partnerTransactions)
+      .where(eq(partnerTransactions.id, id))
+      .limit(1);
+
+    if (!existing) {
+      return NextResponse.json({ error: 'Transaction not found' }, { status: 404 });
+    }
+
+    const isPayout = existing.type === 'PAYOUT';
+    const canUpdate = isPayout
+      ? hasPermission(authResult.role, 'payouts:manage', authResult.permissions)
+      : hasPermission(authResult.role, 'partners:record_transaction', authResult.permissions);
+
+    if (!canUpdate) {
+      return NextResponse.json({ error: 'Forbidden: Insufficient permissions' }, { status: 403 });
+    }
+
     const body = await req.json();
     const {
       type,
@@ -39,10 +60,6 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
       .where(eq(partnerTransactions.id, id))
       .returning();
 
-    if (!updated) {
-      return NextResponse.json({ error: 'Transaction not found' }, { status: 404 });
-    }
-
     // Automatically sync partner transaction to Google Sheets
     void enqueueSyncJob({
       entity: 'partner_transactions',
@@ -65,7 +82,9 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
   }
 }
 
-export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
+export const PATCH = PUT;
+
+export async function DELETE(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const authResult = await requireAuth();
     if (authResult.error) {
@@ -74,14 +93,29 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
 
     const { id } = await params;
 
+    const [existing] = await db
+      .select()
+      .from(partnerTransactions)
+      .where(eq(partnerTransactions.id, id))
+      .limit(1);
+
+    if (!existing) {
+      return NextResponse.json({ error: 'Transaction not found' }, { status: 404 });
+    }
+
+    const isPayout = existing.type === 'PAYOUT';
+    const canDelete = isPayout
+      ? hasPermission(authResult.role, 'payouts:delete', authResult.permissions)
+      : hasPermission(authResult.role, 'partners:delete_transaction', authResult.permissions);
+
+    if (!canDelete) {
+      return NextResponse.json({ error: 'Forbidden: Insufficient permissions' }, { status: 403 });
+    }
+
     const [deleted] = await db
       .delete(partnerTransactions)
       .where(eq(partnerTransactions.id, id))
       .returning();
-
-    if (!deleted) {
-      return NextResponse.json({ error: 'Transaction not found' }, { status: 404 });
-    }
 
     // Automatically sync partner transaction deletion to Google Sheets
     void enqueueSyncJob({
@@ -104,4 +138,3 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
-

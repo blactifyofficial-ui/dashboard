@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { LayoutDashboard, Settings, Wallet, BarChart3, Megaphone, Handshake, CalendarCheck, Banknote, Boxes, Users, HandCoins } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
-import { ROUTE_PERMISSIONS } from '@/lib/rbac';
+import { canAccessRoute } from '@/lib/rbac';
 
 const NAV_LINKS = [
   { href: '/dashboard', label: 'Overview', icon: LayoutDashboard },
@@ -22,18 +22,16 @@ const NAV_LINKS = [
 
 export default function SidebarNav({ onClose }: { onClose?: () => void }) {
   const pathname = usePathname();
-  const { hasPermission } = useAuth();
+  const { role, permissions } = useAuth();
 
   const allowedNavLinks = NAV_LINKS.filter((link) => {
-    const requiredPermission = ROUTE_PERMISSIONS[link.href];
-    if (!requiredPermission) return true;
-    return hasPermission(requiredPermission);
+    return canAccessRoute(role, link.href, permissions);
   });
 
   return (
     <>
       {allowedNavLinks.map((link) => {
-        const isActive = pathname === link.href || (link.href !== '/' && pathname.startsWith(link.href));
+        const isActive = pathname === link.href || (link.href !== '/' && pathname.startsWith(link.href + '/'));
         const Icon = link.icon;
 
         return (

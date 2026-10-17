@@ -8,14 +8,14 @@ import {
   users 
 } from '@/db/schema';
 import { eq, asc } from 'drizzle-orm';
-import { requireAuth } from '@/lib/auth-utils';
+import { requirePermission } from '@/lib/auth-utils';
 import { getAvailableMonths, DEFAULT_TEMPLATES } from '@/lib/monthly-expenses-utils';
 import { syncMonthlyBillPaymentToExpenses } from '@/lib/monthly-expenses-sync';
 
 export async function GET(req: Request) {
   try {
-    const authResult = await requireAuth();
-    if (authResult.error) {
+    const authResult = await requirePermission('monthly_expenses:view');
+    if ('error' in authResult) {
       return NextResponse.json({ error: authResult.error }, { status: authResult.status });
     }
 
@@ -240,11 +240,11 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   try {
-    const authResult = await requireAuth();
-    if (authResult.error) {
+    const authResult = await requirePermission('monthly_expenses:edit');
+    if ('error' in authResult) {
       return NextResponse.json({ error: authResult.error }, { status: authResult.status });
     }
-    const session = { user: authResult.user! };
+    const session = { user: authResult.user };
 
     const body = await req.json();
     const { month, name, category, expectedAmount, dueDay, notes, paymentMethodId, status, actualAmount, paidDate, referenceNumber } = body;

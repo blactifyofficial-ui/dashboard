@@ -121,9 +121,11 @@ export async function PUT(req: Request) {
   }
 }
 
+export const PATCH = PUT;
+
 export async function DELETE(req: Request) {
   try {
-    const authResult = await requirePermission('cod:manage');
+    const authResult = await requirePermission('cod:delete');
     if (authResult.error) {
       return NextResponse.json({ error: authResult.error }, { status: authResult.status });
     }

@@ -2,9 +2,22 @@ import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { orderItems } from "@/db/schema";
 import { ilike } from "drizzle-orm";
+import { requireAuth } from "@/lib/auth-utils";
+import { hasPermission } from "@/lib/rbac";
 
 export async function GET(req: Request) {
   try {
+    const authResult = await requireAuth();
+    if (authResult.error) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.status });
+    }
+    const canView = hasPermission(authResult.role, 'revenue:view_products', authResult.permissions) ||
+      hasPermission(authResult.role, 'overview:view_top_products', authResult.permissions) ||
+      hasPermission(authResult.role, 'revenue:view', authResult.permissions);
+    if (!canView) {
+      return NextResponse.json({ error: 'Forbidden: Insufficient permissions' }, { status: 403 });
+    }
+
     const url = new URL(req.url);
     const q = url.searchParams.get("q");
 

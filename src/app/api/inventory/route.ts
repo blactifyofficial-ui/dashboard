@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { requirePermission } from '@/lib/auth-utils';
+import { hasPermission } from '@/lib/rbac';
 
 export const dynamic = 'force-dynamic';
 
@@ -242,6 +243,25 @@ export async function GET() {
         variants,
       };
     });
+
+    const canViewValuation = hasPermission(authRes.role, 'inventory:view_valuation', authRes.permissions);
+
+    if (!canViewValuation) {
+      totalPotentialRevenue = 0;
+      totalMRPValuation = 0;
+      for (const p of products) {
+        p.potentialRevenue = 0;
+        p.potentialMRPValue = 0;
+        p.minPrice = 0;
+        p.maxPrice = 0;
+        for (const v of p.variants) {
+          v.price = 0;
+          v.compareAtPrice = null;
+          v.potentialRevenue = 0;
+          v.potentialMRPValue = 0;
+        }
+      }
+    }
 
     const avgUnitSellingPrice = totalStockUnits > 0 ? totalPotentialRevenue / totalStockUnits : 0;
     const potentialDiscountValue = Math.max(0, totalMRPValuation - totalPotentialRevenue);

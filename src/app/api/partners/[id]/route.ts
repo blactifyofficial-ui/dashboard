@@ -2,17 +2,21 @@ import { NextResponse } from 'next/server';
 import { db } from '@/db';
 import { partners, partnerTransactions, paymentMethods, users } from '@/db/schema';
 import { eq, desc } from 'drizzle-orm';
-import { requireAuth } from '@/lib/auth-utils';
+import { requirePermission } from '@/lib/auth-utils';
 import { enqueueSyncJob } from '@/lib/google-sheets';
 
-export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const authResult = await requireAuth();
-    if (authResult.error) {
+    const authResult = await requirePermission('partners:view_self');
+    if ('error' in authResult) {
       return NextResponse.json({ error: authResult.error }, { status: authResult.status });
     }
 
     const { id } = await params;
+
+    if (authResult.role === 'PARTNER' && authResult.partnerId && authResult.partnerId !== id) {
+      return NextResponse.json({ error: 'Forbidden: You can only view your own partner profile' }, { status: 403 });
+    }
 
     const [partner] = await db.select().from(partners).where(eq(partners.id, id)).limit(1);
     if (!partner) {
@@ -77,8 +81,8 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 
 export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const authResult = await requireAuth();
-    if (authResult.error) {
+    const authResult = await requirePermission('partners:manage_partners');
+    if ('error' in authResult) {
       return NextResponse.json({ error: authResult.error }, { status: authResult.status });
     }
 
@@ -123,10 +127,12 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
   }
 }
 
-export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
+export const PATCH = PUT;
+
+export async function DELETE(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const authResult = await requireAuth();
-    if (authResult.error) {
+    const authResult = await requirePermission('partners:manage_partners');
+    if ('error' in authResult) {
       return NextResponse.json({ error: authResult.error }, { status: authResult.status });
     }
 

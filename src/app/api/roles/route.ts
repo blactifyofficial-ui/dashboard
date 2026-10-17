@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
-    const authResult = await requirePermission('settings:manage_users');
+    const authResult = await requirePermission('team:view');
     if ('error' in authResult) {
       return NextResponse.json({ error: authResult.error }, { status: authResult.status });
     }
@@ -111,7 +111,7 @@ export async function GET() {
 
 export async function POST(req: Request) {
   try {
-    const authResult = await requirePermission('settings:manage_users');
+    const authResult = await requirePermission('team:manage_roles');
     if ('error' in authResult) {
       return NextResponse.json({ error: authResult.error }, { status: authResult.status });
     }

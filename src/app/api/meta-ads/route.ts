@@ -10,7 +10,7 @@ import {
   users 
 } from '@/db/schema';
 import { eq, desc, ilike, or } from 'drizzle-orm';
-import { requireAuth } from '@/lib/auth-utils';
+import { requirePermission } from '@/lib/auth-utils';
 import { enqueueSyncJob } from '@/lib/google-sheets';
 
 async function getOrCreateMetaAdsCategory() {
@@ -37,8 +37,8 @@ async function getOrCreateMetaAdsCategory() {
 
 export async function GET() {
   try {
-    const authResult = await requireAuth();
-    if (authResult.error) {
+    const authResult = await requirePermission('meta_ads:view');
+    if ('error' in authResult) {
       return NextResponse.json({ error: authResult.error }, { status: authResult.status });
     }
 
@@ -141,11 +141,11 @@ export async function GET() {
 
 export async function POST(req: Request) {
   try {
-    const authResult = await requireAuth();
-    if (authResult.error) {
+    const authResult = await requirePermission('meta_ads:edit');
+    if ('error' in authResult) {
       return NextResponse.json({ error: authResult.error }, { status: authResult.status });
     }
-    const session = { user: authResult.user! };
+    const session = { user: authResult.user };
 
     const body = await req.json();
     const {

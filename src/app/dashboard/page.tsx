@@ -10,8 +10,8 @@ import RecentOrdersWidget from '@/components/dashboard/RecentOrdersWidget';
 import TopProductsWidget from '@/components/dashboard/TopProductsWidget';
 import { Suspense } from 'react';
 import LoadingSpinner from '@/components/LoadingSpinner';
-import { requireAuth } from '@/lib/auth-utils';
-import { hasPermission } from '@/lib/rbac';
+import { requireAuth, type AuthResult } from '@/lib/auth-utils';
+import { hasPermission, canAccessRoute, getDefaultRouteForUser } from '@/lib/rbac';
 import {
   getStoreMonthRange,
   getStoreNow,
@@ -25,6 +25,41 @@ import { redirect } from 'next/navigation';
 export const dynamic = "force-dynamic";
 
 export default async function Dashboard() {
+  const authRes = await requireAuth();
+
+  if (authRes.error) {
+    if (authRes.status === 401) {
+      redirect('/login');
+    }
+    return (
+      <div className="bg-card border border-border rounded-xl p-8 text-center text-muted-foreground">
+        <p className="text-base font-medium text-foreground mb-1">Access Restricted</p>
+        <p className="text-sm">{authRes.error}</p>
+      </div>
+    );
+  }
+
+  const role = authRes.role || 'VIEWER';
+  const customPerms = authRes.permissions;
+
+  if (!canAccessRoute(role, '/dashboard', customPerms)) {
+    const defaultRoute = getDefaultRouteForUser(role, customPerms);
+    if (defaultRoute && defaultRoute !== '/dashboard') {
+      redirect(defaultRoute);
+    }
+    return (
+      <div className="bg-card border border-border rounded-xl p-8 text-center text-muted-foreground">
+        <p className="text-base font-medium text-foreground mb-1">Access Restricted</p>
+        <p className="text-sm">You do not have permission to view the Overview dashboard.</p>
+      </div>
+    );
+  }
+
+  const canViewRevenueReports = hasPermission(role, 'revenue:view', customPerms) && hasPermission(role, 'overview:view_revenue', customPerms);
+  const canViewInventory = hasPermission(role, 'inventory:view', customPerms);
+  const canViewTopProducts = hasPermission(role, 'overview:view_top_products', customPerms);
+  const showInventoryShortcut = canViewInventory && canViewTopProducts;
+
   return (
     <div className="space-y-6 relative z-10 pb-8">
       {/* Header */}
@@ -45,33 +80,39 @@ export default async function Dashboard() {
         </div>
 
         {/* Quick Shortcut Buttons */}
-        <div className="flex items-center gap-2">
-          <Link
-            href="/revenue"
-            className="px-3 py-1.5 text-xs font-medium rounded-lg bg-card border border-border hover:bg-muted text-foreground transition-colors flex items-center gap-1.5 shadow-xs"
-          >
-            <BarChart3 size={14} className="text-muted-foreground" />
-            <span>Revenue Reports</span>
-          </Link>
-          <Link
-            href="/inventory"
-            className="px-3 py-1.5 text-xs font-medium rounded-lg bg-card border border-border hover:bg-muted text-foreground transition-colors flex items-center gap-1.5 shadow-xs"
-          >
-            <Boxes size={14} className="text-muted-foreground" />
-            <span>Inventory Stock</span>
-          </Link>
-        </div>
+        {(canViewRevenueReports || showInventoryShortcut) && (
+          <div className="flex items-center gap-2">
+            {canViewRevenueReports && (
+              <Link
+                href="/revenue"
+                className="px-3 py-1.5 text-xs font-medium rounded-lg bg-card border border-border hover:bg-muted text-foreground transition-colors flex items-center gap-1.5 shadow-xs"
+              >
+                <BarChart3 size={14} className="text-muted-foreground" />
+                <span>Revenue Reports</span>
+              </Link>
+            )}
+            {showInventoryShortcut && (
+              <Link
+                href="/inventory"
+                className="px-3 py-1.5 text-xs font-medium rounded-lg bg-card border border-border hover:bg-muted text-foreground transition-colors flex items-center gap-1.5 shadow-xs"
+              >
+                <Boxes size={14} className="text-muted-foreground" />
+                <span>Inventory Stock</span>
+              </Link>
+            )}
+          </div>
+        )}
       </header>
 
       <Suspense fallback={<LoadingSpinner />}>
-        <DashboardContent />
+        <DashboardContent authRes={authRes} />
       </Suspense>
     </div>
   );
 }
 
-async function DashboardContent() {
-  const authRes = await requireAuth();
+async function DashboardContent({ authRes: initialAuthRes }: { authRes?: AuthResult } = {}) {
+  const authRes = initialAuthRes || await requireAuth();
 
   if (authRes.error) {
     if (authRes.status === 401) {
@@ -86,12 +127,18 @@ async function DashboardContent() {
   }
 
   const role = authRes.role || 'VIEWER';
-  const canViewRevenue = hasPermission(role, 'overview:view_revenue');
-  const canViewOrders = hasPermission(role, 'overview:view_orders');
-  const canViewStatus = hasPermission(role, 'overview:view_status');
-  const canViewChart = hasPermission(role, 'overview:view_chart');
-  const canViewExpenses = hasPermission(role, 'expenses:view');
-  const canViewMonthlyExpenses = hasPermission(role, 'monthly_expenses:view');
+  const customPerms = authRes.permissions;
+  const canViewRevenue = hasPermission(role, 'overview:view_revenue', customPerms);
+  const canViewRevenueReports = hasPermission(role, 'revenue:view', customPerms) && canViewRevenue;
+  const canViewOrders = hasPermission(role, 'overview:view_orders', customPerms);
+  const canViewStatus = hasPermission(role, 'overview:view_status', customPerms);
+  const canViewChart = hasPermission(role, 'overview:view_chart', customPerms);
+  const canViewRecentOrders = hasPermission(role, 'overview:view_recent_orders', customPerms);
+  const canViewOrderDetails = hasPermission(role, 'orders:view', customPerms);
+  const canViewTopProducts = hasPermission(role, 'overview:view_top_products', customPerms);
+  const canViewExpenses = hasPermission(role, 'expenses:view', customPerms);
+  const canViewMonthlyExpenses = hasPermission(role, 'monthly_expenses:view', customPerms);
+  const canViewInventory = hasPermission(role, 'inventory:view', customPerms);
   const canSeeExpenseData = canViewRevenue && (canViewExpenses || canViewMonthlyExpenses);
 
   // Dates in Store Timezone (IST Asia/Kolkata)
@@ -160,7 +207,7 @@ async function DashboardContent() {
     // 1. All-time totals query
     const totalResult = await db.select({
       totalOrders: count(),
-      totalSales: canViewRevenue ? sql<number>`COALESCE(SUM(CAST(${orders.totalPrice} AS NUMERIC)), 0)` : sql<number>`0`
+      totalSales: canViewRevenueReports ? sql<number>`COALESCE(SUM(CAST(${orders.totalPrice} AS NUMERIC)), 0)` : sql<number>`0`
     }).from(orders);
 
     if (totalResult && totalResult[0]) {
@@ -430,6 +477,7 @@ async function DashboardContent() {
       {/* 1. Primary Operational KPIs */}
       <DashboardKpis
         canViewRevenue={canViewRevenue}
+        canViewRevenueReports={canViewRevenueReports}
         canViewOrders={canViewOrders}
         canViewStatus={canViewStatus}
         canViewExpenses={canSeeExpenseData}
@@ -481,13 +529,15 @@ async function DashboardContent() {
               <h2 className="text-sm font-semibold text-foreground tracking-tight">Daily Performance Trend</h2>
               <p className="text-xs text-muted-foreground mt-0.5">Order volume and daily distribution for current month</p>
             </div>
-            <Link
-              href="/revenue"
-              className="text-xs text-primary hover:underline font-medium flex items-center gap-1 w-fit"
-            >
-              <span>Full Analytics</span>
-              <ArrowUpRight size={13} />
-            </Link>
+            {canViewRevenueReports && (
+              <Link
+                href="/revenue"
+                className="text-xs text-primary hover:underline font-medium flex items-center gap-1 w-fit"
+              >
+                <span>Full Analytics</span>
+                <ArrowUpRight size={13} />
+              </Link>
+            )}
           </div>
           {ordersPerDayResult.length > 0 ? (
             <DynamicOrdersChart data={ordersPerDayResult} />
@@ -503,19 +553,27 @@ async function DashboardContent() {
       )}
 
       {/* 4. Two-Column Operational Detail Grids: Recent Orders & Top Products */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Recent Orders Live Feed */}
-        <RecentOrdersWidget
-          orders={recentOrders}
-          canViewRevenue={canViewRevenue}
-        />
+      {(canViewRecentOrders || canViewTopProducts) && (
+        <div className={`grid grid-cols-1 ${canViewRecentOrders && canViewTopProducts ? 'lg:grid-cols-2' : ''} gap-6`}>
+          {/* Recent Orders Live Feed */}
+          {canViewRecentOrders && (
+            <RecentOrdersWidget
+              orders={recentOrders}
+              canViewRevenue={canViewRevenue}
+              canViewOrderDetails={canViewOrderDetails}
+            />
+          )}
 
-        {/* Top Selling Products */}
-        <TopProductsWidget
-          products={topProducts}
-          canViewRevenue={canViewRevenue}
-        />
-      </div>
+          {/* Top Selling Products */}
+          {canViewTopProducts && (
+            <TopProductsWidget
+              products={topProducts}
+              canViewRevenue={canViewRevenue}
+              canViewInventory={canViewInventory}
+            />
+          )}
+        </div>
+      )}
     </div>
   );
 }

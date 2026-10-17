@@ -16,7 +16,9 @@ export default async function SettingsPage() {
     return <AccessDenied message="You do not have permission to view settings." />;
   }
 
-  const canManageIntegrations = hasPermission(authRes.role, 'settings:manage_integrations');
+  const canManageIntegrations = hasPermission(authRes.role, 'settings:manage_integrations', authRes.permissions);
+  const canSyncOrders = hasPermission(authRes.role, 'settings:sync_orders', authRes.permissions);
+  const canManageCategories = hasPermission(authRes.role, 'expenses:manage_categories', authRes.permissions);
 
   const shopifyAuthUrl = `https://admin.shopify.com/store/${process.env.SHOPIFY_SHOP_NAME?.replace('.myshopify.com', '')}/oauth/authorize?client_id=${process.env.SHOPIFY_CLIENT_ID}&scope=read_all_orders,read_assigned_fulfillment_orders,read_orders,read_product_feeds,read_product_listings,read_third_party_fulfillment_orders,read_products,read_inventory,read_locations&redirect_uri=https://dashboard.blactify.com/api/auth/callback`;
 
@@ -43,17 +45,19 @@ export default async function SettingsPage() {
         {canManageIntegrations && <GoogleSheetsSettings />}
 
         {/* Manual Sync Section */}
-        <div className="bg-card p-4 sm:p-6 rounded-xl border border-border shadow-xs text-card-foreground">
-          <h2 className="text-base sm:text-lg font-semibold mb-4 border-b border-border pb-2 text-card-foreground">Manual Sync</h2>
-          <div className="space-y-4 text-sm text-muted-foreground">
-            <p>
-              By default, webhooks should handle most of your order syncing. If you are missing recent orders or if new product images haven&apos;t loaded yet, you can trigger a manual sync to pull the latest data from Shopify.
-            </p>
-            <div className="mt-4">
-              <SyncButton />
+        {canSyncOrders && (
+          <div className="bg-card p-4 sm:p-6 rounded-xl border border-border shadow-xs text-card-foreground">
+            <h2 className="text-base sm:text-lg font-semibold mb-4 border-b border-border pb-2 text-card-foreground">Manual Sync</h2>
+            <div className="space-y-4 text-sm text-muted-foreground">
+              <p>
+                By default, webhooks should handle most of your order syncing. If you are missing recent orders or if new product images haven&apos;t loaded yet, you can trigger a manual sync to pull the latest data from Shopify.
+              </p>
+              <div className="mt-4">
+                <SyncButton />
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Authorization Section */}
         {canManageIntegrations && (
@@ -81,7 +85,7 @@ export default async function SettingsPage() {
         )}
         
         {/* Category Management */}
-        <CategoryManager />
+        {canManageCategories && <CategoryManager />}
 
         {/* Install App Section */}
         <div className="bg-card p-4 sm:p-6 rounded-xl border border-border shadow-xs text-card-foreground">

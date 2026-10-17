@@ -3,6 +3,7 @@ import { db } from '@/db';
 import { monthlyExpenseMonthSettings } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { requireAuth } from '@/lib/auth-utils';
+import { hasPermission } from '@/lib/rbac';
 
 export async function POST(req: Request) {
   try {
@@ -13,6 +14,14 @@ export async function POST(req: Request) {
 
     const body = await req.json();
     const { month, notes, budgetLimit, isUnlockedManual } = body;
+
+    const requiredPermission = isUnlockedManual !== undefined 
+      ? 'monthly_expenses:unlock_month' 
+      : 'monthly_expenses:manage_templates';
+
+    if (!hasPermission(authResult.role, requiredPermission, authResult.permissions)) {
+      return NextResponse.json({ error: 'Forbidden: Insufficient permissions' }, { status: 403 });
+    }
 
     if (!month) {
       return NextResponse.json({ error: 'Month is required' }, { status: 400 });
@@ -58,3 +67,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+
+export const PUT = POST;
+export const PATCH = POST;
+

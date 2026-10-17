@@ -311,16 +311,22 @@ export default function RoleForm({
             {Object.entries(permissionsByCategory).map(([category, items]) => {
               const allCatSelected = items.every((i) => selectedPermissions.includes(i.key));
               const someCatSelected = items.some((i) => selectedPermissions.includes(i.key));
+              const grantedInCat = items.filter((i) => selectedPermissions.includes(i.key)).length;
 
               return (
                 <div key={category} className="rounded-xl border border-border bg-muted/30 p-4 flex flex-col justify-between">
                   <div>
                     <div className="flex items-center justify-between pb-2.5 border-b border-border mb-3">
-                      <span className="text-xs font-semibold text-foreground uppercase tracking-wider">{category}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-semibold text-foreground uppercase tracking-wider">{category}</span>
+                        <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-muted border border-border text-muted-foreground">
+                          {grantedInCat}/{items.length}
+                        </span>
+                      </div>
                       <button
                         type="button"
                         onClick={() => toggleCategoryPermissions(items)}
-                        className="text-[11px] font-medium text-muted-foreground hover:text-foreground transition-colors"
+                        className="text-[11px] font-medium text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
                       >
                         {allCatSelected ? 'Clear Module' : someCatSelected ? 'Select All in Module' : 'Select All'}
                       </button>

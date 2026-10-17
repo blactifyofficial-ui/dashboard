@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/db';
 import { expenseCategories } from '@/db/schema';
-import { requireAuth } from '@/lib/auth-utils';
+import { requireAuth, requirePermission } from '@/lib/auth-utils';
 
 export async function GET() {
   try {
@@ -21,8 +21,8 @@ export async function GET() {
 
 export async function POST(req: Request) {
   try {
-    const authResult = await requireAuth();
-    if (authResult.error) {
+    const authResult = await requirePermission('expenses:manage_categories');
+    if ('error' in authResult) {
       return NextResponse.json({ error: authResult.error }, { status: authResult.status });
     }
 

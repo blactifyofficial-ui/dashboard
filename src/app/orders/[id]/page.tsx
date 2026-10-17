@@ -10,12 +10,19 @@ import LoadingSpinner from '@/components/LoadingSpinner';
 import BackButton from '@/components/BackButton';
 import { isCodOrder } from '@/lib/order-utils';
 import OrderCodCard from '@/components/cod/OrderCodCard';
+import { requirePermission } from '@/lib/auth-utils';
+import AccessDenied from '@/components/AccessDenied';
 
 export const dynamic = "force-dynamic";
 
 export default async function OrderDetailPage(props: {
   params: Promise<{ id: string }>
 }) {
+  const authRes = await requirePermission('orders:view');
+  if ('error' in authRes) {
+    return <AccessDenied message="You do not have permission to view order details." />;
+  }
+
   const params = await props.params;
   const orderId = params.id;
 

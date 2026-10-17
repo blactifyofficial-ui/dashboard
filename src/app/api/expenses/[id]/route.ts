@@ -2,10 +2,10 @@ import { NextResponse } from 'next/server';
 import { db } from '@/db';
 import { expenses, expenseActivities, expenseCategories, paymentMethods, users } from '@/db/schema';
 import { eq, desc, and, isNull } from 'drizzle-orm';
-import { requireAuth } from '@/lib/auth-utils';
+import { requireAuth, requirePermission } from '@/lib/auth-utils';
 import { enqueueSyncJob } from '@/lib/google-sheets';
 
-export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const authResult = await requireAuth();
     if (authResult.error) {
@@ -135,9 +135,11 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
   }
 }
 
-export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
+export const PATCH = PUT;
+
+export async function DELETE(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const authResult = await requireAuth();
+    const authResult = await requirePermission('expenses:delete');
     if (authResult.error) {
       return NextResponse.json({ error: authResult.error }, { status: authResult.status });
     }

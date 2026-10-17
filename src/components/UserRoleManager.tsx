@@ -19,6 +19,7 @@ import toast from 'react-hot-toast';
 import ConfirmModal from '@/components/ConfirmModal';
 import { UserRole } from '@/db/schema';
 import { PERMISSION_CATALOG, ROLE_COLOR_PALETTES } from '@/lib/rbac';
+import { useAuth } from '@/context/AuthContext';
 
 interface AllowedUser {
   id: string;
@@ -47,6 +48,10 @@ interface RoleRecord {
 }
 
 export default function UserRoleManager() {
+  const { hasPermission } = useAuth();
+  const canManageMembers = hasPermission('team:manage_members');
+  const canManageRoles = hasPermission('team:manage_roles');
+
   const [activeTab, setActiveTab] = useState<'members' | 'roles'>('members');
   const [users, setUsers] = useState<AllowedUser[]>([]);
   const [partners, setPartners] = useState<PartnerOption[]>([]);
@@ -279,20 +284,24 @@ export default function UserRoleManager() {
 
         {/* Action Buttons */}
         <div className="flex items-center gap-2">
-          <Link
-            href="/team/roles/new"
-            className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 bg-muted border border-border text-foreground text-xs sm:text-sm font-medium rounded-lg hover:bg-accent transition-colors shrink-0"
-          >
-            <ShieldCheck size={15} />
-            <span>+ Add Role</span>
-          </Link>
-          <button
-            onClick={() => setIsAddUserOpen(true)}
-            className="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-primary text-primary-foreground text-xs sm:text-sm font-semibold rounded-lg hover:opacity-90 transition-opacity shrink-0 shadow-xs"
-          >
-            <Plus size={15} />
-            <span>Invite Member</span>
-          </button>
+          {canManageRoles && (
+            <Link
+              href="/team/roles/new"
+              className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 bg-muted border border-border text-foreground text-xs sm:text-sm font-medium rounded-lg hover:bg-accent transition-colors shrink-0"
+            >
+              <ShieldCheck size={15} />
+              <span>+ Add Role</span>
+            </Link>
+          )}
+          {canManageMembers && (
+            <button
+              onClick={() => setIsAddUserOpen(true)}
+              className="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-primary text-primary-foreground text-xs sm:text-sm font-semibold rounded-lg hover:opacity-90 transition-opacity shrink-0 shadow-xs"
+            >
+              <Plus size={15} />
+              <span>Invite Member</span>
+            </button>
+          )}
         </div>
       </div>
 
@@ -370,7 +379,7 @@ export default function UserRoleManager() {
                     <div className="relative">
                       <select
                         value={u.role}
-                        disabled={isUpdating || (isCurrent && u.role === 'SUPER_ADMIN')}
+                        disabled={!canManageMembers || isUpdating || (isCurrent && u.role === 'SUPER_ADMIN')}
                         onChange={(e) => handleRoleChange(u.id, e.target.value, u.partnerId)}
                         className="bg-card border border-input text-foreground text-xs rounded-lg px-3 py-1.5 focus:border-primary focus:outline-none appearance-none pr-8 cursor-pointer disabled:opacity-50"
                       >
@@ -399,9 +408,9 @@ export default function UserRoleManager() {
                       <div className="relative">
                         <select
                           value={u.partnerId || ''}
-                          disabled={isUpdating}
+                          disabled={!canManageMembers || isUpdating}
                           onChange={(e) => handleRoleChange(u.id, 'PARTNER', e.target.value || null)}
-                          className="bg-card border border-amber-500/30 text-amber-700 dark:text-amber-300 text-xs rounded-lg px-3 py-1.5 focus:border-amber-500 focus:outline-none appearance-none pr-8 cursor-pointer"
+                          className="bg-card border border-amber-500/30 text-amber-700 dark:text-amber-300 text-xs rounded-lg px-3 py-1.5 focus:border-amber-500 focus:outline-none appearance-none pr-8 cursor-pointer disabled:opacity-50"
                         >
                           <option value="">Unlinked Partner</option>
                           {partners.map((p) => (
@@ -415,21 +424,23 @@ export default function UserRoleManager() {
                     )}
 
                     {/* Resend Invite Email button */}
-                    <button
-                      onClick={() => handleResendInvite(u)}
-                      disabled={resendingInviteUserId === u.id}
-                      className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors border border-transparent disabled:opacity-50"
-                      title="Resend invitation email"
-                    >
-                      {resendingInviteUserId === u.id ? (
-                        <Loader2 size={15} className="animate-spin text-muted-foreground" />
-                      ) : (
-                        <Send size={15} />
-                      )}
-                    </button>
+                    {canManageMembers && (
+                      <button
+                        onClick={() => handleResendInvite(u)}
+                        disabled={resendingInviteUserId === u.id}
+                        className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors border border-transparent disabled:opacity-50"
+                        title="Resend invitation email"
+                      >
+                        {resendingInviteUserId === u.id ? (
+                          <Loader2 size={15} className="animate-spin text-muted-foreground" />
+                        ) : (
+                          <Send size={15} />
+                        )}
+                      </button>
+                    )}
 
                     {/* Delete button (cannot delete yourself) */}
-                    {!isCurrent && (
+                    {canManageMembers && !isCurrent && (
                       <button
                         onClick={() => setUserToDelete(u)}
                         className="p-1.5 text-muted-foreground hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors border border-transparent hover:border-rose-500/20"
@@ -456,13 +467,15 @@ export default function UserRoleManager() {
                 Create custom roles to grant tailored access levels (e.g. Warehouse Staff, Media Buyers, Accountants) without exposing restricted financial records.
               </span>
             </div>
-            <Link
-              href="/team/roles/new"
-              className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 bg-primary text-primary-foreground text-xs font-semibold rounded-lg hover:opacity-90 transition-opacity shrink-0 shadow-xs"
-            >
-              <Plus size={14} />
-              <span>Create New Role</span>
-            </Link>
+            {canManageRoles && (
+              <Link
+                href="/team/roles/new"
+                className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 bg-primary text-primary-foreground text-xs font-semibold rounded-lg hover:opacity-90 transition-opacity shrink-0 shadow-xs"
+              >
+                <Plus size={14} />
+                <span>Create New Role</span>
+              </Link>
+            )}
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -498,7 +511,7 @@ export default function UserRoleManager() {
                       </div>
 
                       {/* Custom Role Actions (Edit page / Delete) */}
-                      {!role.isSystem && (
+                      {!role.isSystem && canManageRoles && (
                         <div className="flex items-center gap-1 shrink-0">
                           <Link
                             href={`/team/roles/${role.id}`}

@@ -8,24 +8,40 @@ import Image from 'next/image';
 import { Suspense } from 'react';
 import LoadingSpinner from '@/components/LoadingSpinner';
 
-import { requirePermission } from '@/lib/auth-utils';
-import { hasPermission } from '@/lib/rbac';
+import { requireAuth } from '@/lib/auth-utils';
+import { hasPermission, canAccessRoute } from '@/lib/rbac';
 import AccessDenied from '@/components/AccessDenied';
+import { redirect } from 'next/navigation';
 
 export const dynamic = "force-dynamic";
 
 export default async function RevenuePage(props: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }) {
-  const authRes = await requirePermission('revenue:view');
-  if ('error' in authRes) {
+  const authRes = await requireAuth();
+  if (authRes.error) {
+    if (authRes.status === 401) {
+      redirect('/login');
+    }
+    return <AccessDenied message={authRes.error} />;
+  }
+
+  if (!canAccessRoute(authRes.role, '/revenue', authRes.permissions)) {
     return <AccessDenied message="You do not have permission to view revenue and sales performance." />;
   }
 
+  const canViewRevenueLedger = hasPermission(authRes.role, 'revenue:view', authRes.permissions);
+  const canViewProducts = hasPermission(authRes.role, 'revenue:view_products', authRes.permissions);
   const canViewExpenses = hasPermission(authRes.role, 'expenses:view', authRes.permissions);
 
   const searchParams = await props.searchParams;
-  const tab = (searchParams.tab as string) || 'monthly';
+  let tab = (searchParams.tab as string) || (canViewRevenueLedger ? 'monthly' : 'products');
+  if (tab === 'monthly' && !canViewRevenueLedger) {
+    tab = 'products';
+  }
+  if (tab === 'products' && !canViewProducts) {
+    tab = 'monthly';
+  }
   const q = (searchParams.q as string) || '';
 
   return (
@@ -37,29 +53,42 @@ export default async function RevenuePage(props: {
         </div>
       </header>
 
-      <div className="flex-none flex flex-wrap sm:flex-nowrap gap-1 bg-muted border border-border p-1 rounded-lg w-full sm:w-fit">
-        <Link 
-          href="/revenue?tab=monthly" 
-          className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-3.5 py-1.5 min-h-[36px] rounded-md text-xs sm:text-sm font-medium transition-colors ${
-            tab === 'monthly' ? 'bg-card text-foreground font-semibold shadow-xs border border-border' : 'text-muted-foreground hover:text-foreground'
-          }`}
-        >
-          <CalendarDays size={15} className="shrink-0" />
-          <span>Monthly Breakdown</span>
-        </Link>
-        <Link 
-          href="/revenue?tab=products" 
-          className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-3.5 py-1.5 min-h-[36px] rounded-md text-xs sm:text-sm font-medium transition-colors ${
-            tab === 'products' ? 'bg-card text-foreground font-semibold shadow-xs border border-border' : 'text-muted-foreground hover:text-foreground'
-          }`}
-        >
-          <ShoppingBag size={15} className="shrink-0" />
-          <span>Product Performance</span>
-        </Link>
-      </div>
+      {(canViewRevenueLedger || canViewProducts) && (
+        <div className="flex-none flex flex-wrap sm:flex-nowrap gap-1 bg-muted border border-border p-1 rounded-lg w-full sm:w-fit">
+          {canViewRevenueLedger && (
+            <Link 
+              href="/revenue?tab=monthly" 
+              className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-3.5 py-1.5 min-h-[36px] rounded-md text-xs sm:text-sm font-medium transition-colors ${
+                tab === 'monthly' ? 'bg-card text-foreground font-semibold shadow-xs border border-border' : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              <CalendarDays size={15} className="shrink-0" />
+              <span>Monthly Breakdown</span>
+            </Link>
+          )}
+          {canViewProducts && (
+            <Link 
+              href="/revenue?tab=products" 
+              className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-3.5 py-1.5 min-h-[36px] rounded-md text-xs sm:text-sm font-medium transition-colors ${
+                tab === 'products' ? 'bg-card text-foreground font-semibold shadow-xs border border-border' : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              <ShoppingBag size={15} className="shrink-0" />
+              <span>Product Performance</span>
+            </Link>
+          )}
+        </div>
+      )}
 
       <Suspense fallback={<LoadingSpinner />} key={`${tab}-${q}-${searchParams.page}`}>
-        <RevenueContent searchParams={searchParams} tab={tab} q={q} canViewExpenses={canViewExpenses} />
+        <RevenueContent
+          searchParams={searchParams}
+          tab={tab}
+          q={q}
+          canViewExpenses={canViewExpenses}
+          canViewRevenueLedger={canViewRevenueLedger}
+          canViewProducts={canViewProducts}
+        />
       </Suspense>
     </div>
   );
@@ -69,18 +98,25 @@ async function RevenueContent({
   searchParams, 
   tab, 
   q, 
-  canViewExpenses 
+  canViewExpenses,
+  canViewRevenueLedger,
+  canViewProducts,
 }: { 
   searchParams: { [key: string]: string | string[] | undefined }, 
   tab: string, 
   q: string, 
-  canViewExpenses: boolean 
+  canViewExpenses: boolean,
+  canViewRevenueLedger: boolean,
+  canViewProducts: boolean,
 }) {
   const page = parseInt((searchParams.page as string) || '1', 10);
   const pageSize = 15;
   const offset = (page - 1) * pageSize;
 
   if (tab === 'monthly') {
+    if (!canViewRevenueLedger) {
+      return <AccessDenied message="You do not have permission to view monthly revenue reports." />;
+    }
     const whereClause = q ? ilike(sql<string>`to_char(${orders.createdAt} AT TIME ZONE 'Asia/Kolkata', 'FMMonth YYYY')`, `%${q}%`) : undefined;
 
     const monthlyData = await db.select({
@@ -221,6 +257,9 @@ async function RevenueContent({
       </div>
     );
   } else if (tab === 'products') {
+    if (!canViewProducts) {
+      return <AccessDenied message="You do not have permission to view product performance." />;
+    }
     const whereClause = q ? ilike(orderItems.title, `%${q}%`) : undefined;
 
     const [totalResult] = await db.select({

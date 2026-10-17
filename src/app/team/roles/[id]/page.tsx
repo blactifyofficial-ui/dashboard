@@ -18,13 +18,13 @@ export default async function EditRolePage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const authRes = await requirePermission('settings:manage_users');
+  const authRes = await requirePermission('team:manage_roles');
 
   if ('error' in authRes || authRes.error) {
     return (
       <AccessDenied
-        title="Super Admin Required"
-        message="You need Super Admin permissions to edit custom roles."
+        title="Access Restricted"
+        message="You need Manage Roles permission to edit custom roles."
       />
     );
   }

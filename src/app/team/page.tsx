@@ -10,13 +10,13 @@ export const metadata = {
 };
 
 export default async function TeamPage() {
-  const authRes = await requirePermission('settings:manage_users');
+  const authRes = await requirePermission('team:view');
 
   if ('error' in authRes || authRes.error) {
     return (
       <AccessDenied
-        title="Super Admin Required"
-        message="You need Super Admin permissions to manage team members, roles, and access control."
+        title="Access Restricted"
+        message="You need Team & Roles view permissions to view team members and roles."
       />
     );
   }

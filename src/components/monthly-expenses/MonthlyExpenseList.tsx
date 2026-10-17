@@ -27,6 +27,8 @@ interface MonthlyExpenseListProps {
   onAddClick: () => void;
   onOpenTemplates: () => void;
   onDeleteEntry: (id: string) => Promise<void>;
+  canPay?: boolean;
+  canEdit?: boolean;
 }
 
 function formatCurrency(val: string | number): string {
@@ -95,6 +97,8 @@ export default function MonthlyExpenseList({
   onAddClick,
   onOpenTemplates,
   onDeleteEntry,
+  canPay = true,
+  canEdit = true,
 }: MonthlyExpenseListProps) {
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<'ALL' | 'PENDING' | 'PAID'>('ALL');
@@ -334,42 +338,46 @@ export default function MonthlyExpenseList({
                     {/* Actions */}
                     <td className="px-4 py-3 text-right align-middle">
                       <div className="flex items-center justify-end gap-1">
-                        {!isPaid ? (
+                        {canPay && (!isPaid ? (
                           <button
                             onClick={() => onMarkPaidClick(entry)}
-                            className="px-2.5 py-1 text-xs font-semibold text-foreground bg-muted hover:bg-muted/80 border border-border rounded-md transition-colors"
+                            className="px-2.5 py-1 text-xs font-semibold text-foreground bg-muted hover:bg-muted/80 border border-border rounded-md transition-colors cursor-pointer"
                           >
                             Mark Paid
                           </button>
                         ) : (
                           <button
                             onClick={() => onMarkPaidClick(entry)}
-                            className="px-2.5 py-1 text-xs text-muted-foreground hover:text-foreground rounded-md hover:bg-muted transition-colors"
+                            className="px-2.5 py-1 text-xs text-muted-foreground hover:text-foreground rounded-md hover:bg-muted transition-colors cursor-pointer"
                             title="Edit payment"
                           >
                             Edit Payment
                           </button>
+                        ))}
+
+                        {canEdit && (
+                          <>
+                            <button
+                              onClick={() => onEditClick(entry)}
+                              className="w-7 h-7 flex items-center justify-center text-muted-foreground hover:text-foreground rounded-md hover:bg-muted transition-colors cursor-pointer"
+                              title="Edit bill"
+                            >
+                              <Pencil size={13} />
+                            </button>
+
+                            <button
+                              onClick={() => {
+                                if (confirm(`Remove "${entry.name}" from ${monthLabel}?`)) {
+                                  onDeleteEntry(entry.id);
+                                }
+                              }}
+                              className="w-7 h-7 flex items-center justify-center text-muted-foreground hover:text-rose-500 rounded-md hover:bg-rose-500/10 transition-colors cursor-pointer"
+                              title="Delete bill"
+                            >
+                              <Trash2 size={13} />
+                            </button>
+                          </>
                         )}
-
-                        <button
-                          onClick={() => onEditClick(entry)}
-                          className="w-7 h-7 flex items-center justify-center text-muted-foreground hover:text-foreground rounded-md hover:bg-muted transition-colors"
-                          title="Edit bill"
-                        >
-                          <Pencil size={13} />
-                        </button>
-
-                        <button
-                          onClick={() => {
-                            if (confirm(`Remove "${entry.name}" from ${monthLabel}?`)) {
-                              onDeleteEntry(entry.id);
-                            }
-                          }}
-                          className="w-7 h-7 flex items-center justify-center text-muted-foreground hover:text-rose-500 rounded-md hover:bg-rose-500/10 transition-colors"
-                          title="Delete bill"
-                        >
-                          <Trash2 size={13} />
-                        </button>
                       </div>
                     </td>
                   </tr>

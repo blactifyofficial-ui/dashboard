@@ -82,6 +82,7 @@ export default function MetaAdsPage() {
   const { hasPermission } = useAuth();
   const canViewAds = hasPermission('meta_ads:view');
   const canEditAds = hasPermission('meta_ads:edit');
+  const canDeleteAds = hasPermission('meta_ads:delete');
   const canManagePlanner = hasPermission('meta_ads:manage_planner') || canEditAds;
 
   // Tabs: 'planner' | 'billing'
@@ -855,7 +856,7 @@ export default function MetaAdsPage() {
                               </td>
 
                               {/* Actions */}
-                              {canEditAds && (
+                              {canDeleteAds && (
                                 <td className="py-3.5 px-4 md:px-6 text-right">
                                   <button
                                     onClick={() => setTxToDelete(tx)}

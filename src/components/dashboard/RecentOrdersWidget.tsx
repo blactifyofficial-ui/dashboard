@@ -20,9 +20,14 @@ export interface RecentOrder {
 interface RecentOrdersWidgetProps {
   orders: RecentOrder[];
   canViewRevenue: boolean;
+  canViewOrderDetails?: boolean;
 }
 
-export default function RecentOrdersWidget({ orders, canViewRevenue }: RecentOrdersWidgetProps) {
+export default function RecentOrdersWidget({
+  orders,
+  canViewRevenue,
+  canViewOrderDetails = true,
+}: RecentOrdersWidgetProps) {
   return (
     <div className="bg-card border border-border rounded-xl shadow-xs overflow-hidden flex flex-col h-full">
       {/* Header */}
@@ -32,13 +37,15 @@ export default function RecentOrdersWidget({ orders, canViewRevenue }: RecentOrd
           <h3 className="text-sm font-semibold text-foreground tracking-tight">Recent Orders</h3>
           <span className="text-xs text-muted-foreground font-mono">({orders.length})</span>
         </div>
-        <Link
-          href="/revenue"
-          className="text-xs text-primary hover:underline font-medium flex items-center gap-1 group"
-        >
-          <span>View All</span>
-          <ArrowUpRight size={13} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-        </Link>
+        {canViewRevenue && (
+          <Link
+            href="/revenue"
+            className="text-xs text-primary hover:underline font-medium flex items-center gap-1 group"
+          >
+            <span>View All</span>
+            <ArrowUpRight size={13} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+          </Link>
+        )}
       </div>
 
       {/* Orders List */}
@@ -55,16 +62,12 @@ export default function RecentOrdersWidget({ orders, canViewRevenue }: RecentOrd
             const price = parseFloat(order.totalPrice || '0') || 0;
             const orderNum = order.orderNumber ? `#${order.orderNumber}` : `#${order.id.substring(0, 6)}`;
 
-            return (
-              <Link
-                key={order.id}
-                href={`/orders/${order.id}`}
-                className="p-3.5 sm:px-4 sm:py-3.5 flex items-center justify-between gap-3 hover:bg-muted/40 transition-colors group"
-              >
+            const content = (
+              <>
                 {/* Left: Order # and Customer */}
                 <div className="min-w-0 flex-1 space-y-1">
                   <div className="flex items-center gap-2">
-                    <span className="font-mono font-semibold text-xs sm:text-sm text-foreground group-hover:text-primary transition-colors">
+                    <span className={`font-mono font-semibold text-xs sm:text-sm text-foreground ${canViewOrderDetails ? 'group-hover:text-primary' : ''} transition-colors`}>
                       {orderNum}
                     </span>
                     {/* Payment Badge */}
@@ -110,12 +113,35 @@ export default function RecentOrdersWidget({ orders, canViewRevenue }: RecentOrd
                       ₹{price.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </div>
                   )}
-                  <ArrowUpRight
-                    size={15}
-                    className="text-muted-foreground group-hover:text-foreground group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all"
-                  />
+                  {canViewOrderDetails && (
+                    <ArrowUpRight
+                      size={15}
+                      className="text-muted-foreground group-hover:text-foreground group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all"
+                    />
+                  )}
                 </div>
-              </Link>
+              </>
+            );
+
+            if (canViewOrderDetails) {
+              return (
+                <Link
+                  key={order.id}
+                  href={`/orders/${order.id}`}
+                  className="p-3.5 sm:px-4 sm:py-3.5 flex items-center justify-between gap-3 hover:bg-muted/40 transition-colors group cursor-pointer"
+                >
+                  {content}
+                </Link>
+              );
+            }
+
+            return (
+              <div
+                key={order.id}
+                className="p-3.5 sm:px-4 sm:py-3.5 flex items-center justify-between gap-3"
+              >
+                {content}
+              </div>
             );
           })
         )}

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { requireAuth } from '@/lib/auth-utils';
+import { requirePermission } from '@/lib/auth-utils';
 import { syncShopifyOrders } from '@/lib/shopify-sync';
 
 async function handleSync(req: NextRequest) {
@@ -16,9 +16,9 @@ async function handleSync(req: NextRequest) {
     (isVercelCron && (!cronSecret || authHeader === `Bearer ${cronSecret}`));
 
   if (!isCronAuthorized) {
-    // 2. Fall back to requiring a logged-in dashboard user
-    const authResult = await requireAuth();
-    if (authResult.error) {
+    // 2. Fall back to requiring a logged-in dashboard user with settings:sync_orders permission
+    const authResult = await requirePermission('settings:sync_orders');
+    if ('error' in authResult) {
       return NextResponse.json({ error: authResult.error }, { status: authResult.status });
     }
   }

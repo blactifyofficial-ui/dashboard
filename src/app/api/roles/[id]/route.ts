@@ -11,7 +11,7 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const authResult = await requirePermission('settings:manage_users');
+    const authResult = await requirePermission('team:manage_roles');
     if ('error' in authResult) {
       return NextResponse.json({ error: authResult.error }, { status: authResult.status });
     }
@@ -64,12 +64,14 @@ export async function PUT(
   }
 }
 
+export const PATCH = PUT;
+
 export async function DELETE(
-  req: Request,
+  _req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const authResult = await requirePermission('settings:manage_users');
+    const authResult = await requirePermission('team:manage_roles');
     if ('error' in authResult) {
       return NextResponse.json({ error: authResult.error }, { status: authResult.status });
     }

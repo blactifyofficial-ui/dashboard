@@ -7,8 +7,8 @@ interface LoadingSpinnerProps {
 
 export default function LoadingSpinner({ size = 'default', className = '' }: LoadingSpinnerProps) {
   const isSmall = size === 'small';
-  const width = isSmall ? 110 : 160;
-  const height = isSmall ? 24 : 36;
+  const width = isSmall ? 112 : 160;
+  const height = isSmall ? 11 : 16;
   const imgClass = `${isSmall ? 'w-28' : 'w-40'} h-auto animate-pulse opacity-60 relative z-10`;
 
   return (
@@ -20,6 +20,7 @@ export default function LoadingSpinner({ size = 'default', className = '' }: Loa
           width={width} 
           height={height} 
           className={`${imgClass} hidden dark:block`} 
+          style={{ height: 'auto' }}
           priority
         />
         <Image 
@@ -28,6 +29,7 @@ export default function LoadingSpinner({ size = 'default', className = '' }: Loa
           width={width} 
           height={height} 
           className={`${imgClass} block dark:hidden`} 
+          style={{ height: 'auto' }}
           priority
         />
       </div>

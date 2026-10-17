@@ -2,15 +2,15 @@ import { NextResponse } from 'next/server';
 import { db } from '@/db';
 import { metaAdsTransactions, expenses, expenseActivities, users } from '@/db/schema';
 import { eq } from 'drizzle-orm';
-import { requireAuth } from '@/lib/auth-utils';
+import { requirePermission } from '@/lib/auth-utils';
 import { enqueueSyncJob } from '@/lib/google-sheets';
 
 export async function DELETE(
-  req: Request, 
+  _req: Request, 
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const authResult = await requireAuth();
+    const authResult = await requirePermission('meta_ads:delete');
     if (authResult.error) {
       return NextResponse.json({ error: authResult.error }, { status: authResult.status });
     }
@@ -88,11 +88,11 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const authResult = await requireAuth();
-    if (authResult.error) {
+    const authResult = await requirePermission('meta_ads:edit');
+    if ('error' in authResult) {
       return NextResponse.json({ error: authResult.error }, { status: authResult.status });
     }
-    const session = { user: authResult.user! };
+    const session = { user: authResult.user };
 
     const { id } = await params;
     const body = await req.json();
@@ -177,4 +177,7 @@ export async function PATCH(
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+
+export const PUT = PATCH;
+
 

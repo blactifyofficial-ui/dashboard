@@ -26,6 +26,7 @@ interface RemittanceHistoryTableProps {
   onDelete: (id: string) => Promise<void>;
   onRecordNew: () => void;
   canManage: boolean;
+  canDelete?: boolean;
 }
 
 function formatCurrency(amount: string | number): string {
@@ -52,6 +53,7 @@ export default function RemittanceHistoryTable({
   onDelete,
   onRecordNew,
   canManage,
+  canDelete = canManage,
 }: RemittanceHistoryTableProps) {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
@@ -254,14 +256,16 @@ export default function RemittanceHistoryTable({
                           >
                             <Pencil size={13} />
                           </button>
-                          <button
-                            type="button"
-                            onClick={() => setConfirmDeleteId(remit.id)}
-                            className="p-1.5 rounded-md hover:bg-rose-500/15 text-muted-foreground hover:text-rose-500 transition-colors"
-                            title="Delete entry"
-                          >
-                            <Trash2 size={13} />
-                          </button>
+                          {canDelete && (
+                            <button
+                              type="button"
+                              onClick={() => setConfirmDeleteId(remit.id)}
+                              className="p-1.5 rounded-md hover:bg-rose-500/15 text-muted-foreground hover:text-rose-500 transition-colors"
+                              title="Delete entry"
+                            >
+                              <Trash2 size={13} />
+                            </button>
+                          )}
                         </div>
                       )}
                     </td>

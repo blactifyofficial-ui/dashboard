@@ -2,12 +2,12 @@ import { NextResponse } from 'next/server';
 import { db } from '@/db';
 import { monthlyExpenseTemplates, monthlyExpenseEntries } from '@/db/schema';
 import { eq, asc } from 'drizzle-orm';
-import { requireAuth } from '@/lib/auth-utils';
+import { requirePermission } from '@/lib/auth-utils';
 
 export async function POST(req: Request) {
   try {
-    const authResult = await requireAuth();
-    if (authResult.error) {
+    const authResult = await requirePermission('monthly_expenses:manage_templates');
+    if ('error' in authResult) {
       return NextResponse.json({ error: authResult.error }, { status: authResult.status });
     }
 

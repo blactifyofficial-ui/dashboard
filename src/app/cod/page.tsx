@@ -18,6 +18,8 @@ export default function CodCollectionPage() {
   const { hasPermission } = useAuth();
   const canViewCod = hasPermission('cod:view');
   const canManageCod = hasPermission('cod:manage');
+  const canExportCod = hasPermission('cod:export');
+  const canDeleteCod = hasPermission('cod:delete');
 
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -170,11 +172,13 @@ export default function CodCollectionPage() {
               <span>Record COD Received</span>
             </button>
           )}
-          <CodExportButton
-            remittances={remittances}
-            orders={orders}
-            mode={activeTab}
-          />
+          {canExportCod && (
+            <CodExportButton
+              remittances={remittances}
+              orders={orders}
+              mode={activeTab}
+            />
+          )}
           <button
             onClick={triggerRefresh}
             disabled={refreshing || loading}
@@ -232,6 +236,7 @@ export default function CodCollectionPage() {
           onDelete={handleDeleteRemittance}
           onRecordNew={handleOpenRecordModal}
           canManage={canManageCod}
+          canDelete={canDeleteCod}
         />
       ) : (
         <CodOrdersList orders={orders} />
