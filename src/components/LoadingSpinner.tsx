@@ -20,7 +20,7 @@ export default function LoadingSpinner({ size = 'default', className = '' }: Loa
           width={width} 
           height={height} 
           className={`${imgClass} hidden dark:block`} 
-          style={{ height: 'auto' }}
+          style={{ width: 'auto', height: 'auto' }}
           priority
         />
         <Image 
@@ -29,7 +29,7 @@ export default function LoadingSpinner({ size = 'default', className = '' }: Loa
           width={width} 
           height={height} 
           className={`${imgClass} block dark:hidden`} 
-          style={{ height: 'auto' }}
+          style={{ width: 'auto', height: 'auto' }}
           priority
         />
       </div>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import { 
   Plus, 
   Search, 
@@ -16,40 +17,27 @@ import {
   Loader2,
   ChevronDown,
   ChevronRight,
-  ChevronsUpDown
+  ChevronsUpDown,
+  Table as TableIcon,
+  BarChart3,
+  RefreshCw
 } from 'lucide-react';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { useAuth } from '@/context/AuthContext';
 import AccessDenied from '@/components/AccessDenied';
+import type { Expense, DateNote, MonthGroup } from '@/components/expenses/types';
 
-interface Expense {
-  id: string;
-  expenseDate: string;
-  createdAt: string;
-  category: string;
-  title: string;
-  amount: string;
-  paymentMethod: string;
-}
+const ExpenseTable = dynamic(() => import('@/components/expenses/ExpenseTable'), {
+  ssr: false,
+  loading: () => <LoadingSpinner />
+});
 
-interface DateNote {
-  id: string;
-  date: string;
-  note: string;
-  updatedAt: string;
-}
-
-interface MonthGroup {
-  monthKey: string;
-  monthLabel: string;
-  isCurrent: boolean;
-  totalAmount: number;
-  totalRecords: number;
-  dateKeys: string[];
-  daysCount: number;
-}
+const ExpenseAnalytics = dynamic(() => import('@/components/expenses/ExpenseAnalytics'), {
+  ssr: false,
+  loading: () => <LoadingSpinner />
+});
 
 // Format date into a canonical key YYYY-MM-DD
 function parseDateKey(dateStr: string): string {
@@ -138,6 +126,18 @@ export default function ExpensesPage() {
   const [showFilter, setShowFilter] = useState(false);
   const [timeSortOrder, setTimeSortOrder] = useState<'desc' | 'asc'>('desc'); // 'desc' = newest added first
 
+  // Active navigation tab
+  const [activeTab, setActiveTab] = useState<'daily' | 'table' | 'analytics'>(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const tabParam = params.get('tab');
+      if (tabParam === 'table' || tabParam === 'analytics' || tabParam === 'daily') {
+        return tabParam;
+      }
+    }
+    return 'daily';
+  });
+
   // Collapsed / Expanded state - default is collapsed (empty object)
   const [expandedMonths, setExpandedMonths] = useState<Record<string, boolean>>({});
   const [expandedDates, setExpandedDates] = useState<Record<string, boolean>>({});
@@ -150,7 +150,7 @@ export default function ExpensesPage() {
   const fetchData = async () => {
     try {
       const [expRes, notesRes] = await Promise.all([
-        fetch('/api/expenses'),
+        fetch('/api/expenses?pageSize=5000'),
         fetch('/api/expenses/notes')
       ]);
 
@@ -185,6 +185,19 @@ export default function ExpensesPage() {
     };
     void load();
   }, []);
+
+  const handleTabChange = (newTab: 'daily' | 'table' | 'analytics') => {
+    setActiveTab(newTab);
+    if (typeof window !== 'undefined') {
+      const url = new URL(window.location.href);
+      if (newTab === 'daily') {
+        url.searchParams.delete('tab');
+      } else {
+        url.searchParams.set('tab', newTab);
+      }
+      window.history.replaceState({}, '', url.toString());
+    }
+  };
 
   const handleStartEditNote = (dateKey: string) => {
     const monthKey = parseMonthKeyFromDate(dateKey);
@@ -567,6 +580,14 @@ export default function ExpensesPage() {
           <p className="text-xs sm:text-sm text-muted-foreground mt-1">Manage and track your business expenses grouped by date</p>
         </div>
         <div className="flex items-center gap-2.5 w-full sm:w-auto">
+          <button
+            onClick={fetchData}
+            disabled={loading}
+            className="p-2 min-h-[40px] rounded-lg border border-border bg-card text-foreground hover:bg-muted transition-colors disabled:opacity-50 cursor-pointer"
+            title="Refresh expenses"
+          >
+            <RefreshCw size={15} className={loading ? 'animate-spin' : ''} />
+          </button>
           <Link
             href="/meta-ads"
             className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 bg-card border border-border text-foreground px-3.5 py-2 min-h-[40px] rounded-lg font-medium hover:bg-muted transition-colors text-xs"
@@ -598,7 +619,7 @@ export default function ExpensesPage() {
             </div>
             <div className="bg-card border border-border rounded-xl p-4 sm:p-5 shadow-xs">
               <p className="text-xs text-muted-foreground mb-1 uppercase tracking-wider font-medium">Total Records</p>
-              <p className="text-xl sm:text-2xl font-bold text-foreground">{filteredExpenses.length}</p>
+              <p className="text-xl sm:text-2xl font-bold text-foreground">{expenses.length}</p>
             </div>
             <div className="bg-card border border-border rounded-xl p-4 sm:p-5 shadow-xs">
               <p className="text-xs text-muted-foreground mb-1 uppercase tracking-wider font-medium">Days Tracked</p>
@@ -606,7 +627,67 @@ export default function ExpensesPage() {
             </div>
           </div>
 
-          {/* Main Card with Controls & Expenses */}
+          {/* View Mode Navigation Tabs */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border/70 pb-3">
+            <div className="flex items-center gap-1.5 p-1 bg-muted/60 border border-border rounded-xl w-full sm:w-fit overflow-x-auto scrollbar-none">
+              <button
+                type="button"
+                onClick={() => handleTabChange('daily')}
+                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-all cursor-pointer whitespace-nowrap ${
+                  activeTab === 'daily'
+                    ? 'bg-card text-foreground border border-border shadow-xs'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                }`}
+              >
+                <Calendar size={15} className={activeTab === 'daily' ? 'text-primary' : 'text-muted-foreground'} />
+                <span>Daily Log</span>
+                <span className="px-1.5 py-0.2 rounded-md text-[11px] font-mono bg-muted text-foreground border border-border">
+                  {totalDaysTracked}d
+                </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleTabChange('table')}
+                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-all cursor-pointer whitespace-nowrap ${
+                  activeTab === 'table'
+                    ? 'bg-card text-foreground border border-border shadow-xs'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                }`}
+              >
+                <TableIcon size={15} className={activeTab === 'table' ? 'text-primary' : 'text-muted-foreground'} />
+                <span>All Entries Table</span>
+                <span className="px-1.5 py-0.2 rounded-md text-[11px] font-mono bg-muted text-foreground border border-border">
+                  {expenses.length}
+                </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleTabChange('analytics')}
+                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-all cursor-pointer whitespace-nowrap ${
+                  activeTab === 'analytics'
+                    ? 'bg-card text-foreground border border-border shadow-xs'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                }`}
+              >
+                <BarChart3 size={15} className={activeTab === 'analytics' ? 'text-primary' : 'text-muted-foreground'} />
+                <span>Analytics & Graphs</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Conditional View Rendering */}
+          {activeTab === 'table' && (
+            <ExpenseTable expenses={expenses} />
+          )}
+
+          {activeTab === 'analytics' && (
+            <ExpenseAnalytics expenses={expenses} />
+          )}
+
+          {activeTab === 'daily' && (
+          /* Main Card with Controls & Expenses */
           <div className="flex-1 min-h-0 flex flex-col bg-card border border-border rounded-xl overflow-hidden shadow-xs">
             {/* Filter & Search Bar */}
             <div className="flex-none p-3 sm:p-4 border-b border-border flex flex-col sm:flex-row gap-2.5 sm:gap-3 justify-between bg-muted/20">
@@ -753,6 +834,7 @@ export default function ExpensesPage() {
               )}
             </div>
           </div>
+          )}
         </>
       )}
     </div>
