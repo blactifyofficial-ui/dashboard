@@ -2,6 +2,7 @@
 
 import { Download } from 'lucide-react';
 import { CodRemittanceRecord, CodOrderBrief } from './types';
+import { getCodAmountToCollect, getPrepaidAmount } from '@/lib/order-utils';
 
 interface CodExportButtonProps {
   remittances?: CodRemittanceRecord[];
@@ -62,7 +63,9 @@ export default function CodExportButton({
         'Date',
         'Customer Name',
         'Customer Email',
-        'Order Amount',
+        'Total Order Amount',
+        'COD to Collect',
+        'Advance Paid Online',
         'Gateway',
         'Financial Status',
         'Fulfillment Status',
@@ -76,6 +79,8 @@ export default function CodExportButton({
         `"${(o.customerName || '').replace(/"/g, '""')}"`,
         `"${(o.customerEmail || '').replace(/"/g, '""')}"`,
         `"${o.totalPrice || '0'}"`,
+        `"${getCodAmountToCollect(o)}"`,
+        `"${getPrepaidAmount(o)}"`,
         `"${(o.paymentGateway || '').replace(/"/g, '""')}"`,
         `"${o.financialStatus || ''}"`,
         `"${o.fulfillmentStatus || ''}"`,

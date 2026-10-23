@@ -28,6 +28,7 @@ export interface ShopifyOrder {
     email?: string | null;
   } | null;
   current_total_price: string;
+  total_outstanding?: string | null;
   currency: string;
   created_at?: string | null;
   financial_status: string;
@@ -156,6 +157,10 @@ export async function syncShopifyOrders(options: SyncOptions = {}): Promise<Sync
          order.fulfillments.find((f) => f.tracking_urls && f.tracking_urls.length > 0)?.tracking_urls?.[0] || null)
       : null;
 
+    const totalOutstanding = order.total_outstanding !== undefined && order.total_outstanding !== null
+      ? order.total_outstanding
+      : (order.financial_status === 'paid' ? '0' : order.current_total_price);
+
     await db.insert(orders).values({
       id: order.id.toString(),
       shopifyOrderId: order.id.toString(),
@@ -163,6 +168,7 @@ export async function syncShopifyOrders(options: SyncOptions = {}): Promise<Sync
       customerName: customerName,
       customerEmail: customerEmail,
       totalPrice: order.current_total_price,
+      totalOutstanding: totalOutstanding,
       currency: order.currency,
       createdAt: order.created_at ? new Date(order.created_at) : undefined,
       financialStatus: order.financial_status,
@@ -177,6 +183,7 @@ export async function syncShopifyOrders(options: SyncOptions = {}): Promise<Sync
         customerName,
         customerEmail,
         totalPrice: order.current_total_price,
+        totalOutstanding: totalOutstanding,
         currency: order.currency,
         createdAt: order.created_at ? new Date(order.created_at) : undefined,
         financialStatus: order.financial_status,

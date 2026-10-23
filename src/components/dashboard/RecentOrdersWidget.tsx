@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { ArrowUpRight, ShoppingBag, CreditCard, Banknote, PackageCheck, Package } from 'lucide-react';
-import { isCodOrder } from '@/lib/order-utils';
+import { isCodOrder, getCodAmountToCollect } from '@/lib/order-utils';
 import { formatStoreDate, formatStoreTime } from '@/lib/date-utils';
 
 export interface RecentOrder {
@@ -11,6 +11,7 @@ export interface RecentOrder {
   customerName: string | null;
   customerEmail: string | null;
   totalPrice: string | null;
+  totalOutstanding?: string | null;
   createdAt: Date | string | null;
   financialStatus: string | null;
   fulfillmentStatus: string | null;
@@ -79,7 +80,7 @@ export default function RecentOrdersWidget({
                       }`}
                     >
                       {isCod ? <Banknote size={10} /> : <CreditCard size={10} />}
-                      {isCod ? 'COD' : 'Prepaid'}
+                      {order.financialStatus === 'partially_paid' ? 'Partial COD' : (isCod ? 'COD' : 'Prepaid')}
                     </span>
 
                     {/* Fulfillment Badge */}
@@ -109,9 +110,20 @@ export default function RecentOrdersWidget({
                 {/* Right: Price & Link icon */}
                 <div className="flex items-center gap-2 shrink-0 text-right">
                   {canViewRevenue && (
-                    <div className="font-mono font-semibold text-sm sm:text-base text-foreground">
-                      ₹{price.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                    </div>
+                    order.financialStatus === 'partially_paid' ? (
+                      <div className="flex flex-col items-end">
+                        <div className="font-mono font-semibold text-sm sm:text-base text-foreground">
+                          ₹{price.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </div>
+                        <div className="text-[10px] text-amber-600 dark:text-amber-400 font-mono font-medium">
+                          COD: ₹{getCodAmountToCollect(order).toLocaleString('en-IN')}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="font-mono font-semibold text-sm sm:text-base text-foreground">
+                        ₹{price.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </div>
+                    )
                   )}
                   {canViewOrderDetails && (
                     <ArrowUpRight

@@ -10,6 +10,7 @@ import {
   ChevronLeft,
   ChevronRight
 } from 'lucide-react';
+import { getCodAmountToCollect, getPrepaidAmount } from '@/lib/order-utils';
 
 interface CodOrdersListProps {
   orders: CodOrderBrief[];
@@ -41,7 +42,7 @@ export default function CodOrdersList({ orders }: CodOrdersListProps) {
   const totalPages = Math.ceil(orders.length / pageSize) || 1;
   const paginatedOrders = orders.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
-  const totalAmount = orders.reduce((acc, o) => acc + (parseFloat(o.totalPrice || '0') || 0), 0);
+  const totalAmount = orders.reduce((acc, o) => acc + getCodAmountToCollect(o), 0);
 
   if (orders.length === 0) {
     return (
@@ -73,7 +74,7 @@ export default function CodOrdersList({ orders }: CodOrdersListProps) {
                 <th className="py-3 px-4">Courier / Tracking</th>
                 <th className="py-3 px-4">Fulfillment</th>
                 <th className="py-3 px-4">Shopify Status</th>
-                <th className="py-3 px-4 text-right">Order Amount</th>
+                <th className="py-3 px-4 text-right">COD to Collect</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border/60">
@@ -164,11 +165,26 @@ export default function CodOrdersList({ orders }: CodOrdersListProps) {
                       </span>
                     </td>
 
-                    {/* Order Amount */}
+                    {/* COD to Collect */}
                     <td className="py-3 px-4 whitespace-nowrap text-right">
-                      <span className="font-mono font-bold text-foreground">
-                        {formatCurrency(order.totalPrice)}
-                      </span>
+                      {(() => {
+                        const isPartial = (order.financialStatus || '').toLowerCase() === 'partially_paid';
+                        const codAmount = getCodAmountToCollect(order);
+                        const prepaid = getPrepaidAmount(order);
+
+                        return (
+                          <div className="flex flex-col items-end gap-0.5">
+                            <span className="font-mono font-bold text-foreground">
+                              {formatCurrency(codAmount)}
+                            </span>
+                            {isPartial && (
+                              <span className="text-[10px] text-muted-foreground font-mono">
+                                Total: {formatCurrency(order.totalPrice)} • Adv: {formatCurrency(prepaid)}
+                              </span>
+                            )}
+                          </div>
+                        );
+                      })()}
                     </td>
                   </tr>
                 );

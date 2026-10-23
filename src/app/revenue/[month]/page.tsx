@@ -5,7 +5,7 @@ import { CalendarDays, Inbox, ArrowLeft, CreditCard, Banknote, TrendingUp, Trend
 import Link from 'next/link';
 import RevenueChart from '@/components/RevenueChart';
 import MonthOrdersTable from '@/components/MonthOrdersTable';
-import { isCodOrder } from '@/lib/order-utils';
+import { isCodOrder, getCodAmountToCollect, getPrepaidAmount } from '@/lib/order-utils';
 import { getStoreMonthRange, getStoreNow, getStoreDay } from '@/lib/date-utils';
 import { Suspense } from 'react';
 import LoadingSpinner from '@/components/LoadingSpinner';
@@ -78,6 +78,7 @@ async function MonthRevenueContent({ year, month, startDate, endDate, canViewExp
     customerName: orders.customerName,
     customerEmail: orders.customerEmail,
     totalPrice: orders.totalPrice,
+    totalOutstanding: orders.totalOutstanding,
     currency: orders.currency,
     createdAt: orders.createdAt,
     financialStatus: orders.financialStatus,
@@ -149,7 +150,14 @@ async function MonthRevenueContent({ year, month, startDate, endDate, canViewExp
 
     if (isCodOrder(order)) {
       codOrdersCount++;
-      codRevenue += revenue;
+      if (order.financialStatus === 'partially_paid') {
+        const codPortion = getCodAmountToCollect(order);
+        const prepaidPortion = getPrepaidAmount(order);
+        codRevenue += codPortion;
+        normalRevenue += prepaidPortion;
+      } else {
+        codRevenue += revenue;
+      }
     } else {
       normalOrdersCount++;
       normalRevenue += revenue;

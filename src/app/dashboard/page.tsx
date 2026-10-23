@@ -19,7 +19,7 @@ import {
   getStoreTodayRange,
   getStoreYesterdayRange,
 } from '@/lib/date-utils';
-import { isCodOrder } from '@/lib/order-utils';
+import { isCodOrder, getCodAmountToCollect, getPrepaidAmount } from '@/lib/order-utils';
 import { redirect } from 'next/navigation';
 
 export const dynamic = "force-dynamic";
@@ -258,6 +258,7 @@ async function DashboardContent({ authRes: initialAuthRes }: { authRes?: AuthRes
       customerName: orders.customerName,
       customerEmail: orders.customerEmail,
       totalPrice: orders.totalPrice,
+      totalOutstanding: orders.totalOutstanding,
       currency: orders.currency,
       createdAt: orders.createdAt,
       financialStatus: orders.financialStatus,
@@ -286,7 +287,14 @@ async function DashboardContent({ authRes: initialAuthRes }: { authRes?: AuthRes
       const isCod = isCodOrder(o);
       if (isCod) {
         codCount++;
-        codRevenue += price;
+        if (o.financialStatus === 'partially_paid') {
+          const codPortion = getCodAmountToCollect(o);
+          const prepaidPortion = getPrepaidAmount(o);
+          codRevenue += codPortion;
+          prepaidRevenue += prepaidPortion;
+        } else {
+          codRevenue += price;
+        }
       } else {
         prepaidCount++;
         prepaidRevenue += price;
@@ -348,6 +356,7 @@ async function DashboardContent({ authRes: initialAuthRes }: { authRes?: AuthRes
       customerName: orders.customerName,
       customerEmail: orders.customerEmail,
       totalPrice: orders.totalPrice,
+      totalOutstanding: orders.totalOutstanding,
       createdAt: orders.createdAt,
       financialStatus: orders.financialStatus,
       fulfillmentStatus: orders.fulfillmentStatus,

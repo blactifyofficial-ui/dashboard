@@ -40,6 +40,7 @@ export async function POST(req: Request) {
         order_number,
         customer,
         current_total_price,
+        total_outstanding,
         currency,
         created_at,
         financial_status,
@@ -85,6 +86,10 @@ export async function POST(req: Request) {
         }
       }
 
+      const totalOutstanding = total_outstanding !== undefined && total_outstanding !== null
+        ? total_outstanding
+        : (financial_status === 'paid' ? '0' : current_total_price);
+
       await db.insert(orders).values({
         id: id.toString(),
         shopifyOrderId: id.toString(),
@@ -92,6 +97,7 @@ export async function POST(req: Request) {
         customerName: customerName,
         customerEmail: customerEmail,
         totalPrice: current_total_price,
+        totalOutstanding: totalOutstanding,
         currency: currency,
         createdAt: created_at ? new Date(created_at) : undefined,
         financialStatus: financial_status,
@@ -106,6 +112,7 @@ export async function POST(req: Request) {
           customerName,
           customerEmail,
           totalPrice: current_total_price,
+          totalOutstanding: totalOutstanding,
           currency,
           createdAt: created_at ? new Date(created_at) : undefined,
           financialStatus: financial_status,

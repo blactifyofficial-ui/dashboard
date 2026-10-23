@@ -15,7 +15,7 @@ import {
   ChevronRight
 } from 'lucide-react';
 
-import { isCodOrder } from '@/lib/order-utils';
+import { isCodOrder, getCodAmountToCollect, getPrepaidAmount } from '@/lib/order-utils';
 import { formatStoreDate, formatStoreTime } from '@/lib/date-utils';
 
 export interface MonthOrderDetail {
@@ -24,6 +24,7 @@ export interface MonthOrderDetail {
   customerName: string | null;
   customerEmail: string | null;
   totalPrice: string | null;
+  totalOutstanding?: string | null;
   currency: string | null;
   createdAt: Date | string | null;
   financialStatus: string | null;
@@ -410,9 +411,20 @@ export default function MonthOrdersTable({ orders }: MonthOrdersTableProps) {
 
                     {/* Amount */}
                     <td className="px-4 sm:px-6 py-3.5 text-right whitespace-nowrap">
-                      <span className="font-medium text-sm sm:text-base text-foreground font-mono">
-                        ₹{amount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                      </span>
+                      {order.financialStatus === 'partially_paid' ? (
+                        <div className="flex flex-col items-end gap-0.5">
+                          <span className="font-medium text-sm sm:text-base text-foreground font-mono">
+                            ₹{amount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          </span>
+                          <span className="text-[11px] text-amber-600 dark:text-amber-400 font-mono font-medium">
+                            COD: ₹{getCodAmountToCollect(order).toLocaleString('en-IN')} (Adv: ₹{getPrepaidAmount(order).toLocaleString('en-IN')})
+                          </span>
+                        </div>
+                      ) : (
+                        <span className="font-medium text-sm sm:text-base text-foreground font-mono">
+                          ₹{amount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </span>
+                      )}
                     </td>
 
                     {/* Action */}

@@ -2,6 +2,7 @@ import { db } from '@/db';
 import { orders, codRemittances, paymentMethods, users } from '@/db/schema';
 import { sql, eq, desc, and, or, ilike, gte, lt, type AnyColumn } from 'drizzle-orm';
 import { getStoreMonthRange, getStoreNow } from '@/lib/date-utils';
+import { getCodAmountToCollect } from '@/lib/order-utils';
 
 export interface CodRemittanceRecord {
   id: string;
@@ -25,6 +26,7 @@ export interface CodOrderBrief {
   customerName: string | null;
   customerEmail: string | null;
   totalPrice: string | null;
+  totalOutstanding?: string | null;
   createdAt: Date | null;
   financialStatus: string | null;
   fulfillmentStatus: string | null;
@@ -122,6 +124,7 @@ export async function getCodDashboardData(params: GetCodDashboardParams = {}) {
       customerName: orders.customerName,
       customerEmail: orders.customerEmail,
       totalPrice: orders.totalPrice,
+      totalOutstanding: orders.totalOutstanding,
       createdAt: orders.createdAt,
       financialStatus: orders.financialStatus,
       fulfillmentStatus: orders.fulfillmentStatus,
@@ -140,8 +143,8 @@ export async function getCodDashboardData(params: GetCodDashboardParams = {}) {
   const monthsSet = new Set<string>();
 
   codOrdersRaw.forEach((o) => {
-    const price = parseFloat(o.totalPrice || '0') || 0;
-    totalCodAmount += price;
+    const codAmount = getCodAmountToCollect(o);
+    totalCodAmount += codAmount;
 
     const c = o.trackingCompany || o.courier;
     if (c && c.trim()) couriersSet.add(c.trim());

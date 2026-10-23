@@ -8,7 +8,7 @@ import { ArrowUpRight } from 'lucide-react';
 import { Suspense } from 'react';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import BackButton from '@/components/BackButton';
-import { isCodOrder } from '@/lib/order-utils';
+import { isCodOrder, getCodAmountToCollect, getPrepaidAmount } from '@/lib/order-utils';
 import OrderCodCard from '@/components/cod/OrderCodCard';
 import { requirePermission } from '@/lib/auth-utils';
 import AccessDenied from '@/components/AccessDenied';
@@ -185,8 +185,24 @@ async function OrderDetailContent({ orderId }: { orderId: string }) {
               </div>
               <div className="flex justify-between items-center pt-3 border-t border-border mt-3">
                 <span className="text-muted-foreground font-medium">Total</span>
-                <span className="font-semibold font-mono text-base text-foreground">₹{parseFloat(order.totalPrice as string || '0').toLocaleString('en-IN')}</span>
+                <span className="font-semibold font-mono text-base text-foreground">₹{parseFloat(order.totalPrice as string || '0').toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
               </div>
+              {order.financialStatus === 'partially_paid' && (
+                <>
+                  <div className="flex justify-between items-center text-xs text-emerald-600 dark:text-emerald-400">
+                    <span>Paid Online (Advance)</span>
+                    <span className="font-mono font-medium">
+                      ₹{getPrepaidAmount(order).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center text-xs text-amber-600 dark:text-amber-400 font-semibold">
+                    <span>Balance (To Collect)</span>
+                    <span className="font-mono">
+                      ₹{getCodAmountToCollect(order).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                    </span>
+                  </div>
+                </>
+              )}
             </div>
           </div>
 
