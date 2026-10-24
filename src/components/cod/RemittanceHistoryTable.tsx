@@ -19,6 +19,9 @@ import {
   AlertTriangle
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 
 interface RemittanceHistoryTableProps {
   remittances: CodRemittanceRecord[];
@@ -91,23 +94,23 @@ export default function RemittanceHistoryTable({
   if (remittances.length === 0) {
     return (
       <div className="bg-card border border-border rounded-xl p-10 sm:p-14 text-center">
-        <div className="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-500 mx-auto flex items-center justify-center mb-4">
-          <HandCoins size={28} />
+        <div className="w-12 h-12 rounded-xl bg-muted border border-border text-muted-foreground mx-auto flex items-center justify-center mb-3">
+          <HandCoins size={24} />
         </div>
-        <h3 className="text-base sm:text-lg font-bold text-foreground">
+        <h3 className="text-base font-semibold text-foreground">
           No COD Remittances Recorded Yet
         </h3>
-        <p className="text-xs sm:text-sm text-muted-foreground max-w-md mx-auto mt-1.5 mb-6">
+        <p className="text-xs sm:text-sm text-muted-foreground max-w-md mx-auto mt-1 mb-6">
           When you receive lump-sum settlements from India Post, Delhivery, or other couriers for delivered parcels, record them here to reconcile your COD balance.
         </p>
         {canManage && (
-          <button
+          <Button
             onClick={onRecordNew}
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-xs sm:text-sm shadow-xs transition-colors"
+            className="gap-2"
           >
             <Plus size={16} />
-            Record COD Payment Received
-          </button>
+            <span>Record COD Payment Received</span>
+          </Button>
         )}
       </div>
     );
@@ -115,67 +118,67 @@ export default function RemittanceHistoryTable({
 
   return (
     <div className="space-y-3">
-      {/* Table Container */}
+      {/* Table Container using 21st.dev Table */}
       <div className="bg-card border border-border rounded-xl overflow-hidden shadow-xs">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs sm:text-sm">
-            <thead className="bg-muted/60 border-b border-border text-muted-foreground uppercase text-[11px] font-semibold tracking-wider">
-              <tr>
-                <th className="py-3 px-4">Date Received</th>
-                <th className="py-3 px-4">Courier / Source</th>
-                <th className="py-3 px-4">Amount Received</th>
-                <th className="py-3 px-4">Parcels Covered</th>
-                <th className="py-3 px-4">Deposited In</th>
-                <th className="py-3 px-4">UTR / Reference</th>
-                <th className="py-3 px-4">Notes</th>
-                {canManage && <th className="py-3 px-4 text-right">Actions</th>}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border/60">
+          <Table className="min-w-[750px]">
+            <TableHeader className="bg-muted/40">
+              <TableRow>
+                <TableHead className="font-semibold text-xs">Date Received</TableHead>
+                <TableHead className="font-semibold text-xs">Courier / Source</TableHead>
+                <TableHead className="font-semibold text-xs">Amount Received</TableHead>
+                <TableHead className="font-semibold text-xs">Parcels Covered</TableHead>
+                <TableHead className="font-semibold text-xs">Deposited In</TableHead>
+                <TableHead className="font-semibold text-xs">UTR / Reference</TableHead>
+                <TableHead className="font-semibold text-xs">Notes</TableHead>
+                {canManage && <TableHead className="font-semibold text-xs text-right w-20">Actions</TableHead>}
+              </TableRow>
+            </TableHeader>
+            <TableBody>
               {remittances.map((remit) => (
-                <tr
+                <TableRow
                   key={remit.id}
                   className="hover:bg-muted/40 transition-colors group"
                 >
                   {/* Date */}
-                  <td className="py-3.5 px-4 whitespace-nowrap">
+                  <TableCell className="whitespace-nowrap">
                     <div className="flex items-center gap-2">
                       <Calendar size={13} className="text-muted-foreground shrink-0" />
-                      <span className="font-medium text-foreground">
+                      <span className="font-medium font-mono text-xs text-foreground">
                         {formatDate(remit.receivedDate)}
                       </span>
                     </div>
-                  </td>
+                  </TableCell>
 
                   {/* Courier / Source */}
-                  <td className="py-3.5 px-4 whitespace-nowrap">
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-muted border border-border text-foreground">
+                  <TableCell className="whitespace-nowrap">
+                    <Badge variant="neutral" size="sm" className="gap-1.5 font-medium">
                       <Truck size={12} className="text-primary shrink-0" />
                       {remit.courier || 'India Post Domestic'}
-                    </span>
-                  </td>
+                    </Badge>
+                  </TableCell>
 
                   {/* Amount */}
-                  <td className="py-3.5 px-4 whitespace-nowrap">
-                    <div className="font-mono text-sm sm:text-base font-bold text-emerald-600 dark:text-emerald-400">
+                  <TableCell className="whitespace-nowrap">
+                    <div className="font-mono text-xs sm:text-sm font-bold text-emerald-600 dark:text-emerald-400">
                       {formatCurrency(remit.amount)}
                     </div>
-                  </td>
+                  </TableCell>
 
                   {/* Parcels Covered */}
-                  <td className="py-3.5 px-4 whitespace-nowrap">
+                  <TableCell className="whitespace-nowrap">
                     {remit.ordersCount ? (
-                      <span className="inline-flex items-center gap-1 text-xs font-mono font-medium px-2 py-0.5 rounded bg-muted/80 text-foreground border border-border/80">
-                        <Layers size={11} className="text-muted-foreground" />
+                      <Badge variant="subtle" size="sm" className="font-mono">
+                        <Layers size={11} className="mr-1 text-muted-foreground" />
                         {remit.ordersCount} parcels
-                      </span>
+                      </Badge>
                     ) : (
                       <span className="text-muted-foreground text-xs">—</span>
                     )}
-                  </td>
+                  </TableCell>
 
                   {/* Deposited In */}
-                  <td className="py-3.5 px-4 whitespace-nowrap">
+                  <TableCell className="whitespace-nowrap">
                     {remit.paymentMethodName ? (
                       <span className="inline-flex items-center gap-1.5 text-xs text-foreground font-medium">
                         <Building2 size={12} className="text-muted-foreground shrink-0" />
@@ -184,10 +187,10 @@ export default function RemittanceHistoryTable({
                     ) : (
                       <span className="text-muted-foreground text-xs">—</span>
                     )}
-                  </td>
+                  </TableCell>
 
                   {/* UTR / Ref */}
-                  <td className="py-3.5 px-4 whitespace-nowrap">
+                  <TableCell className="whitespace-nowrap">
                     {remit.referenceNumber ? (
                       <div className="inline-flex items-center gap-1.5 font-mono text-xs bg-muted/70 px-2 py-0.5 rounded border border-border/70 text-foreground group/ref">
                         <Receipt size={11} className="text-muted-foreground" />
@@ -195,7 +198,7 @@ export default function RemittanceHistoryTable({
                         <button
                           type="button"
                           onClick={() => handleCopy(remit.referenceNumber!, remit.id)}
-                          className="text-muted-foreground hover:text-foreground transition-colors ml-0.5"
+                          className="text-muted-foreground hover:text-foreground transition-colors ml-0.5 cursor-pointer"
                           title="Copy reference"
                         >
                           {copiedId === remit.id ? (
@@ -208,10 +211,10 @@ export default function RemittanceHistoryTable({
                     ) : (
                       <span className="text-muted-foreground text-xs">—</span>
                     )}
-                  </td>
+                  </TableCell>
 
                   {/* Notes */}
-                  <td className="py-3.5 px-4 max-w-[200px]">
+                  <TableCell className="max-w-[200px]">
                     {remit.notes ? (
                       <p className="text-xs text-muted-foreground truncate" title={remit.notes}>
                         {remit.notes}
@@ -219,21 +222,21 @@ export default function RemittanceHistoryTable({
                     ) : (
                       <span className="text-muted-foreground text-xs">—</span>
                     )}
-                  </td>
+                  </TableCell>
 
                   {/* Actions */}
                   {canManage && (
-                    <td className="py-3.5 px-4 text-right whitespace-nowrap">
+                    <TableCell className="text-right whitespace-nowrap">
                       {confirmDeleteId === remit.id ? (
                         <div className="inline-flex items-center gap-1.5 bg-rose-500/10 border border-rose-500/30 p-1 rounded-lg">
-                          <span className="text-[11px] text-rose-400 font-medium px-1 flex items-center gap-1">
+                          <span className="text-[11px] text-rose-500 font-medium px-1 flex items-center gap-1">
                             <AlertTriangle size={11} /> Delete?
                           </span>
                           <button
                             type="button"
                             disabled={isDeleting}
                             onClick={() => handleDelete(remit.id)}
-                            className="px-2 py-0.5 text-[11px] font-semibold bg-rose-600 hover:bg-rose-500 text-white rounded transition-colors disabled:opacity-50"
+                            className="px-2 py-0.5 text-[11px] font-semibold bg-rose-600 hover:bg-rose-500 text-white rounded transition-colors disabled:opacity-50 cursor-pointer"
                           >
                             {isDeleting ? '...' : 'Yes'}
                           </button>
@@ -241,39 +244,41 @@ export default function RemittanceHistoryTable({
                             type="button"
                             disabled={isDeleting}
                             onClick={() => setConfirmDeleteId(null)}
-                            className="px-2 py-0.5 text-[11px] font-medium bg-muted hover:bg-muted/80 text-foreground rounded transition-colors"
+                            className="px-2 py-0.5 text-[11px] font-medium bg-muted hover:bg-muted/80 text-foreground rounded transition-colors cursor-pointer"
                           >
                             No
                           </button>
                         </div>
                       ) : (
                         <div className="inline-flex items-center gap-1 opacity-90 group-hover:opacity-100 transition-opacity">
-                          <button
-                            type="button"
+                          <Button
+                            variant="ghost"
+                            size="icon"
                             onClick={() => onEdit(remit)}
-                            className="p-1.5 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+                            className="h-7 w-7 text-muted-foreground hover:text-foreground"
                             title="Edit entry"
                           >
                             <Pencil size={13} />
-                          </button>
+                          </Button>
                           {canDelete && (
-                            <button
-                              type="button"
+                            <Button
+                              variant="ghost"
+                              size="icon"
                               onClick={() => setConfirmDeleteId(remit.id)}
-                              className="p-1.5 rounded-md hover:bg-rose-500/15 text-muted-foreground hover:text-rose-500 transition-colors"
+                              className="h-7 w-7 text-muted-foreground hover:text-destructive"
                               title="Delete entry"
                             >
                               <Trash2 size={13} />
-                            </button>
+                            </Button>
                           )}
                         </div>
                       )}
-                    </td>
+                    </TableCell>
                   )}
-                </tr>
+                </TableRow>
               ))}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         </div>
 
         {/* Table Footer with Summary */}

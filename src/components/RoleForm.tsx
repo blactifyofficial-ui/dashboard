@@ -6,13 +6,15 @@ import Link from 'next/link';
 import { 
   ArrowLeft, 
   ShieldCheck, 
-  Loader2, 
   Check, 
   Trash2
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import ConfirmModal from '@/components/ConfirmModal';
 import { PERMISSION_CATALOG, ROLE_COLOR_PALETTES, PermissionItem } from '@/lib/rbac';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
 
 const COLOR_CHOICES = [
   { id: 'purple', name: 'Purple', bg: 'bg-purple-500', border: 'border-purple-500' },
@@ -171,12 +173,15 @@ export default function RoleForm({
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <Link
-            href="/team"
-            className="p-2 rounded-lg bg-card border border-border text-muted-foreground hover:text-foreground hover:bg-muted transition-colors shadow-xs"
-            title="Back to Team & Roles"
-          >
-            <ArrowLeft size={18} />
+          <Link href="/team">
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-9 w-9"
+              title="Back to Team & Roles"
+            >
+              <ArrowLeft size={16} />
+            </Button>
           </Link>
 
           <div className="flex items-center gap-3">
@@ -197,9 +202,9 @@ export default function RoleForm({
         {/* Live Badge Preview */}
         <div className="bg-card border border-border rounded-lg px-3.5 py-2 flex items-center gap-2.5 self-start sm:self-auto shadow-xs">
           <span className="text-xs text-muted-foreground font-medium">Badge Preview:</span>
-          <span className={`px-2.5 py-0.5 rounded-md text-xs font-semibold border ${previewBadgeStyle}`}>
+          <Badge variant="outline" className={`px-2.5 py-0.5 text-xs font-semibold border ${previewBadgeStyle}`}>
             {roleName.trim() || 'Role Name'}
-          </span>
+          </Badge>
         </div>
       </div>
 
@@ -217,7 +222,7 @@ export default function RoleForm({
             {/* Role Name */}
             <div>
               <label className="block text-xs font-medium text-muted-foreground mb-1.5">Role Name *</label>
-              <input
+              <Input
                 type="text"
                 required
                 placeholder="e.g. Warehouse Lead"
@@ -228,7 +233,6 @@ export default function RoleForm({
                     setRoleCode(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '_'));
                   }
                 }}
-                className="w-full bg-muted/40 border border-input rounded-lg px-3.5 py-2 text-sm text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary transition-colors"
               />
             </div>
 
@@ -237,14 +241,14 @@ export default function RoleForm({
               <label className="block text-xs font-medium text-muted-foreground mb-1.5">
                 Role Code {isEdit ? '(Immutable)' : '*'}
               </label>
-              <input
+              <Input
                 type="text"
                 required
                 disabled={isEdit}
                 placeholder="e.g. WAREHOUSE_LEAD"
                 value={roleCode}
                 onChange={(e) => setRoleCode(e.target.value.toUpperCase().replace(/[^A-Z0-9_]/g, '_'))}
-                className="w-full bg-muted/40 border border-input rounded-lg px-3.5 py-2 text-sm text-foreground font-mono uppercase placeholder-muted-foreground focus:outline-none focus:border-primary disabled:opacity-50 transition-colors"
+                className="font-mono uppercase disabled:opacity-50"
               />
             </div>
           </div>
@@ -252,12 +256,11 @@ export default function RoleForm({
           {/* Description */}
           <div>
             <label className="block text-xs font-medium text-muted-foreground mb-1.5">Description</label>
-            <input
+            <Input
               type="text"
               placeholder="e.g. Handles product inventory and stock sync operations"
               value={roleDescription}
               onChange={(e) => setRoleDescription(e.target.value)}
-              className="w-full bg-muted/40 border border-input rounded-lg px-3.5 py-2 text-sm text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary transition-colors"
             />
           </div>
 
@@ -375,32 +378,32 @@ export default function RoleForm({
         <div className="bg-card/95 backdrop-blur-md p-4 rounded-xl border border-border flex items-center justify-between gap-4 shadow-xl sticky bottom-4 z-20">
           <div>
             {isEdit && !initialData?.isSystem && (
-              <button
+              <Button
                 type="button"
+                variant="ghost"
                 onClick={() => setIsDeleteModalOpen(true)}
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors border border-transparent hover:border-rose-500/20"
+                className="text-destructive hover:bg-destructive/10 hover:text-destructive gap-1.5"
               >
-                <Trash2 size={15} />
+                <Trash2 size={14} />
                 <span>Delete Role</span>
-              </button>
+              </Button>
             )}
           </div>
 
           <div className="flex items-center gap-3">
-            <Link
-              href="/team"
-              className="px-4 py-2 rounded-lg text-xs sm:text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-            >
-              Cancel
+            <Link href="/team">
+              <Button variant="ghost" size="sm">
+                Cancel
+              </Button>
             </Link>
-            <button
+            <Button
               type="submit"
               disabled={isSubmitting}
-              className="inline-flex items-center justify-center gap-2 px-5 py-2 bg-primary text-primary-foreground text-xs sm:text-sm font-semibold rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 shadow-xs"
+              loading={isSubmitting}
+              size="sm"
             >
-              {isSubmitting && <Loader2 size={15} className="animate-spin" />}
               <span>{isEdit ? 'Save Changes' : 'Create Role'}</span>
-            </button>
+            </Button>
           </div>
         </div>
       </form>

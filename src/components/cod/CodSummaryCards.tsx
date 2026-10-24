@@ -2,6 +2,7 @@
 
 import { CodStats } from './types';
 import { Banknote, CheckCircle2, Clock, TrendingUp } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 
 interface CodSummaryCardsProps {
   stats: CodStats;
@@ -48,9 +49,9 @@ export default function CodSummaryCards({ stats, timeRangeLabel }: CodSummaryCar
               <CheckCircle2 size={14} className="shrink-0" />
               Collected Amount
             </span>
-            <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-semibold font-mono bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/25">
+            <Badge variant="success" size="sm" className="font-mono">
               {stats.remittanceCount} {stats.remittanceCount === 1 ? 'payout' : 'payouts'}
-            </span>
+            </Badge>
           </div>
           <div className="text-2xl sm:text-3xl font-bold font-mono text-emerald-600 dark:text-emerald-400 tracking-tight">
             {formatCurrency(stats.collectedAmount)}
@@ -72,9 +73,9 @@ export default function CodSummaryCards({ stats, timeRangeLabel }: CodSummaryCar
               <Clock size={14} className="shrink-0" />
               Pending to Collect
             </span>
-            <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-semibold font-mono bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/25">
+            <Badge variant="warning" size="sm" className="font-mono">
               Due Balance
-            </span>
+            </Badge>
           </div>
           <div className="text-2xl sm:text-3xl font-bold font-mono text-amber-600 dark:text-amber-400 tracking-tight">
             {formatCurrency(stats.pendingAmount)}

@@ -4,6 +4,7 @@ import { TrendingUp, TrendingDown, Package, Clock, ShoppingBag, Receipt, CheckCi
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import { NumberTicker } from '@/components/ui/number-ticker';
+import { Badge } from '@/components/ui/badge';
 
 export interface DashboardKpiProps {
   canViewRevenue: boolean;
@@ -358,16 +359,16 @@ export default function DashboardKpis({
         </div>
       )}
 
-      {/* Secondary Ribbon: Segmented Executive Pill Strip */}
+      {/* Secondary Ribbon: Clean Enterprise Summary Strip */}
       {hasRibbonItems && (
-        <div className="bg-card/75 backdrop-blur-md border border-border/80 rounded-xl px-4 py-3 flex flex-col min-[960px]:flex-row items-start min-[960px]:items-center justify-between gap-3 text-xs shadow-xs">
-          <div className="flex flex-wrap items-center gap-x-4 sm:gap-x-5 gap-y-2.5">
+        <div className="bg-card border border-border rounded-lg px-4 py-2.5 flex flex-col min-[960px]:flex-row items-start min-[960px]:items-center justify-between gap-3 text-xs shadow-xs">
+          <div className="flex flex-wrap items-center gap-x-4 sm:gap-x-5 gap-y-2">
             {/* All-Time Performance Group */}
             <div className="flex flex-wrap items-center gap-x-3 sm:gap-x-3.5 gap-y-1.5">
-              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10px] font-bold tracking-wider uppercase bg-primary/10 text-primary border border-primary/20 shrink-0">
-                <Layers size={11} className="shrink-0" />
+              <Badge variant="subtle" size="sm" className="font-semibold uppercase tracking-wider text-[10px]">
+                <Layers size={11} className="mr-1 shrink-0" />
                 All-Time
-              </span>
+              </Badge>
 
               {canSeeRevenueBreakdown && (
                 <div className="flex items-center gap-1.5 text-muted-foreground">
@@ -434,10 +435,10 @@ export default function DashboardKpis({
             {/* Current Month (MTD) Group */}
             {showExpensesCard && (
               <div className="flex flex-wrap items-center gap-x-3 sm:gap-x-3.5 gap-y-1.5">
-                <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10px] font-bold tracking-wider uppercase bg-muted text-muted-foreground border border-border/70 shrink-0">
-                  <Calendar size={11} className="shrink-0" />
+                <Badge variant="neutral" size="sm" className="font-semibold uppercase tracking-wider text-[10px]">
+                  <Calendar size={11} className="mr-1 shrink-0" />
                   MTD
-                </span>
+                </Badge>
 
                 <div className="flex items-center gap-1.5 text-muted-foreground">
                   <span className="text-[11px]">Expenses:</span>
@@ -468,15 +469,11 @@ export default function DashboardKpis({
             )}
           </div>
 
-          {/* Real-time Status Badge */}
+          {/* Real-time Status Badge using 21st.dev Badge */}
           {canViewStatus && (
-            <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-[11px] font-medium shadow-2xs shrink-0 self-start min-[960px]:self-center">
-              <span className="relative flex h-2 w-2 shrink-0">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-              </span>
-              <span className="whitespace-nowrap font-medium">Shopify Webhooks Active</span>
-            </div>
+            <Badge variant="success" dot size="sm" className="shrink-0 self-start min-[960px]:self-center">
+              Shopify Webhooks Active
+            </Badge>
           )}
         </div>
       )}

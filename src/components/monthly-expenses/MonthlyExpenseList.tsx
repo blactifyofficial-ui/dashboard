@@ -17,6 +17,17 @@ import {
   Check, 
   SlidersHorizontal 
 } from 'lucide-react';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
 
 interface MonthlyExpenseListProps {
   entries: MonthlyExpenseEntry[];
@@ -127,18 +138,19 @@ export default function MonthlyExpenseList({
           {/* Search Box */}
           <div className="relative flex-1 sm:w-64">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4 pointer-events-none" />
-            <input
+            <Input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search expenses..."
-              className="w-full pl-9 pr-3.5 py-1.5 min-h-[38px] bg-background border border-border rounded-lg text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring transition-colors"
+              className="pl-9 h-9 text-xs"
             />
           </div>
 
           {/* Filter Pills */}
           <div className="flex items-center bg-muted/50 border border-border p-0.5 rounded-lg overflow-x-auto no-scrollbar">
             <button
+              type="button"
               onClick={() => setFilter('ALL')}
               className={`flex-1 sm:flex-none px-3 py-1 text-xs font-medium rounded-md transition-colors whitespace-nowrap ${
                 filter === 'ALL'
@@ -149,6 +161,7 @@ export default function MonthlyExpenseList({
               All ({entries.length})
             </button>
             <button
+              type="button"
               onClick={() => setFilter('PENDING')}
               className={`flex-1 sm:flex-none px-3 py-1 text-xs font-medium rounded-md transition-colors whitespace-nowrap ${
                 filter === 'PENDING'
@@ -159,6 +172,7 @@ export default function MonthlyExpenseList({
               Pending ({pendingCount})
             </button>
             <button
+              type="button"
               onClick={() => setFilter('PAID')}
               className={`flex-1 sm:flex-none px-3 py-1 text-xs font-medium rounded-md transition-colors whitespace-nowrap ${
                 filter === 'PAID'
@@ -173,21 +187,24 @@ export default function MonthlyExpenseList({
 
         {/* Right Actions */}
         <div className="flex items-center gap-2 w-full md:w-auto justify-end">
-          <button
+          <Button
+            variant="outline"
+            size="sm"
             onClick={onOpenTemplates}
-            className="flex-1 sm:flex-none px-3 py-1.5 min-h-[36px] text-xs font-medium text-foreground bg-card hover:bg-muted border border-border rounded-lg transition-colors flex items-center justify-center gap-1.5"
+            className="h-9"
           >
             <SlidersHorizontal size={14} />
             <span>Templates</span>
-          </button>
+          </Button>
 
-          <button
+          <Button
+            size="sm"
             onClick={onAddClick}
-            className="flex-1 sm:flex-none px-3.5 py-1.5 min-h-[36px] text-xs font-semibold text-primary-foreground bg-primary hover:opacity-90 rounded-lg transition-opacity flex items-center justify-center gap-1.5"
+            className="h-9"
           >
             <Plus size={14} />
             <span>Add Bill</span>
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -203,35 +220,36 @@ export default function MonthlyExpenseList({
             </p>
             {entries.length === 0 && (
               <div className="flex items-center justify-center gap-2 pt-2">
-                <button
+                <Button
+                  size="sm"
                   onClick={onAddClick}
-                  className="px-3.5 py-1.5 text-xs font-semibold text-primary-foreground bg-primary hover:opacity-90 rounded-lg transition-opacity flex items-center gap-1.5"
                 >
                   <Plus size={14} /> Add Bill
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
                   onClick={onOpenTemplates}
-                  className="px-3.5 py-1.5 text-xs font-medium text-foreground bg-card hover:bg-muted border border-border rounded-lg transition-colors"
                 >
                   Configure Templates
-                </button>
+                </Button>
               </div>
             )}
           </div>
         ) : (
-          <table className="w-full text-sm text-left min-w-[700px]">
-            <thead className="sticky top-0 bg-muted/40 text-xs text-muted-foreground uppercase tracking-wider border-b border-border z-10">
-              <tr>
-                <th className="w-12 px-4 py-3 text-center">Status</th>
-                <th className="px-4 py-3 font-medium">Expense</th>
-                <th className="px-4 py-3 font-medium">Category</th>
-                <th className="px-4 py-3 font-medium">Due Date</th>
-                <th className="px-4 py-3 font-medium">Payment Info</th>
-                <th className="px-4 py-3 font-medium text-right">Amount</th>
-                <th className="px-4 py-3 font-medium text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border/60">
+          <Table className="min-w-[700px]">
+            <TableHeader className="sticky top-0 bg-muted/40 z-10">
+              <TableRow className="hover:bg-muted/40">
+                <TableHead className="w-12 text-center">Status</TableHead>
+                <TableHead className="font-medium">Expense</TableHead>
+                <TableHead className="font-medium">Category</TableHead>
+                <TableHead className="font-medium">Due Date</TableHead>
+                <TableHead className="font-medium">Payment Info</TableHead>
+                <TableHead className="font-medium text-right">Amount</TableHead>
+                <TableHead className="font-medium text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
               {filteredEntries.map((entry) => {
                 const isPaid = entry.status === 'PAID';
                 const expected = parseFloat(entry.expectedAmount || '0') || 0;
@@ -239,15 +257,16 @@ export default function MonthlyExpenseList({
                 const dueBadge = getDueDayBadge(entry.dueDay, entry.month, isPaid);
 
                 return (
-                  <tr
+                  <TableRow
                     key={entry.id}
                     className={`hover:bg-muted/30 transition-colors group ${
                       isPaid ? 'opacity-75 hover:opacity-100' : ''
                     }`}
                   >
                     {/* Status Checkbox */}
-                    <td className="px-4 py-3 text-center align-middle">
+                    <TableCell className="text-center align-middle">
                       <button
+                        type="button"
                         onClick={() => {
                           if (isPaid) {
                             onToggleUnpaid(entry);
@@ -264,10 +283,10 @@ export default function MonthlyExpenseList({
                       >
                         {isPaid ? <Check size={13} className="stroke-[3]" /> : <Circle size={13} />}
                       </button>
-                    </td>
+                    </TableCell>
 
                     {/* Expense Name & Notes */}
-                    <td className="px-4 py-3 align-middle">
+                    <TableCell className="align-middle">
                       <div className="flex flex-col">
                         <span className={`font-medium ${isPaid ? 'text-muted-foreground line-through decoration-border' : 'text-foreground'}`}>
                           {entry.name}
@@ -278,17 +297,17 @@ export default function MonthlyExpenseList({
                           </span>
                         )}
                       </div>
-                    </td>
+                    </TableCell>
 
                     {/* Category */}
-                    <td className="px-4 py-3 align-middle">
-                      <span className="bg-muted border border-border/70 px-2 py-0.5 rounded text-xs text-foreground">
+                    <TableCell className="align-middle">
+                      <Badge variant="outline" size="sm">
                         {entry.category || 'General'}
-                      </span>
-                    </td>
+                      </Badge>
+                    </TableCell>
 
                     {/* Due Date */}
-                    <td className="px-4 py-3 align-middle">
+                    <TableCell className="align-middle">
                       {isPaid ? (
                         <span className="text-xs text-muted-foreground font-mono">
                           Settled
@@ -302,10 +321,10 @@ export default function MonthlyExpenseList({
                           )}
                         </div>
                       )}
-                    </td>
+                    </TableCell>
 
                     {/* Payment Info */}
-                    <td className="px-4 py-3 align-middle text-xs text-muted-foreground">
+                    <TableCell className="align-middle text-xs text-muted-foreground">
                       {isPaid ? (
                         <div className="space-y-1">
                           <div className="flex items-center gap-1.5 text-foreground font-medium flex-wrap">
@@ -321,10 +340,10 @@ export default function MonthlyExpenseList({
                       ) : (
                         <span className="text-muted-foreground/60">—</span>
                       )}
-                    </td>
+                    </TableCell>
 
                     {/* Amount */}
-                    <td className="px-4 py-3 text-right align-middle font-mono font-medium">
+                    <TableCell className="text-right align-middle font-mono font-medium">
                       <div className={isPaid ? 'text-muted-foreground' : 'text-foreground'}>
                         {formatCurrency(isPaid && actual > 0 ? actual : expected)}
                       </div>
@@ -333,58 +352,64 @@ export default function MonthlyExpenseList({
                           Exp: {formatCurrency(expected)}
                         </div>
                       )}
-                    </td>
+                    </TableCell>
 
                     {/* Actions */}
-                    <td className="px-4 py-3 text-right align-middle">
+                    <TableCell className="text-right align-middle">
                       <div className="flex items-center justify-end gap-1">
                         {canPay && (!isPaid ? (
-                          <button
+                          <Button
+                            variant="secondary"
+                            size="xs"
                             onClick={() => onMarkPaidClick(entry)}
-                            className="px-2.5 py-1 text-xs font-semibold text-foreground bg-muted hover:bg-muted/80 border border-border rounded-md transition-colors cursor-pointer"
                           >
                             Mark Paid
-                          </button>
+                          </Button>
                         ) : (
-                          <button
+                          <Button
+                            variant="ghost"
+                            size="xs"
                             onClick={() => onMarkPaidClick(entry)}
-                            className="px-2.5 py-1 text-xs text-muted-foreground hover:text-foreground rounded-md hover:bg-muted transition-colors cursor-pointer"
                             title="Edit payment"
                           >
                             Edit Payment
-                          </button>
+                          </Button>
                         ))}
 
                         {canEdit && (
                           <>
-                            <button
+                            <Button
+                              variant="ghost"
+                              size="icon"
                               onClick={() => onEditClick(entry)}
-                              className="w-7 h-7 flex items-center justify-center text-muted-foreground hover:text-foreground rounded-md hover:bg-muted transition-colors cursor-pointer"
+                              className="h-7 w-7"
                               title="Edit bill"
                             >
                               <Pencil size={13} />
-                            </button>
+                            </Button>
 
-                            <button
+                            <Button
+                              variant="ghost"
+                              size="icon"
                               onClick={() => {
                                 if (confirm(`Remove "${entry.name}" from ${monthLabel}?`)) {
                                   onDeleteEntry(entry.id);
                                 }
                               }}
-                              className="w-7 h-7 flex items-center justify-center text-muted-foreground hover:text-rose-500 rounded-md hover:bg-rose-500/10 transition-colors cursor-pointer"
+                              className="h-7 w-7 text-muted-foreground hover:text-rose-500"
                               title="Delete bill"
                             >
                               <Trash2 size={13} />
-                            </button>
+                            </Button>
                           </>
                         )}
                       </div>
-                    </td>
-                  </tr>
+                    </TableCell>
+                  </TableRow>
                 );
               })}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         )}
       </div>
 

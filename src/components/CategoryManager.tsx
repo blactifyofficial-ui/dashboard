@@ -2,8 +2,10 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import toast from 'react-hot-toast';
-import { Loader2, List } from 'lucide-react';
+import { List } from 'lucide-react';
 import LoadingSpinner from '@/components/LoadingSpinner';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
 interface Category {
   id: string;
@@ -80,32 +82,31 @@ export default function CategoryManager() {
           <form onSubmit={handleAddExpenseCategory} className="space-y-4">
             <div className="space-y-1.5">
               <label className="text-xs font-medium text-muted-foreground">Category Name</label>
-              <input
+              <Input
                 type="text"
                 required
                 value={expenseName}
                 onChange={(e) => setExpenseName(e.target.value)}
                 placeholder="e.g. Travel"
-                className="w-full bg-muted/50 border border-input rounded-lg px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors"
               />
             </div>
             <div className="space-y-1.5">
               <label className="text-xs font-medium text-muted-foreground">Description (Optional)</label>
-              <input
+              <Input
                 type="text"
                 value={expenseDesc}
                 onChange={(e) => setExpenseDesc(e.target.value)}
                 placeholder="e.g. Travel and commuting expenses"
-                className="w-full bg-muted/50 border border-input rounded-lg px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors"
               />
             </div>
-            <button
+            <Button
               type="submit"
               disabled={isExpenseLoading}
-              className="flex items-center justify-center gap-2 bg-primary text-primary-foreground px-4 h-10 rounded-lg text-xs sm:text-sm font-semibold hover:opacity-90 transition-colors w-full disabled:opacity-50 shadow-xs"
+              loading={isExpenseLoading}
+              className="w-full"
             >
-              {isExpenseLoading ? <Loader2 size={16} className="animate-spin" /> : 'Add Expense Category'}
-            </button>
+              Add Expense Category
+            </Button>
           </form>
         </div>
 

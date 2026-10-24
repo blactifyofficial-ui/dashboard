@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Poppins } from "next/font/google";
 import "./globals.css";
-import ResponsiveSidebar from "@/components/ResponsiveSidebar";
+import { ErpShell } from "@/components/shell/ErpShell";
 import SignOutLink from "@/components/SignOutLink";
 import { Toaster } from "react-hot-toast";
 import { auth } from "@/lib/auth/server";
@@ -118,23 +118,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             initialPartnerId={partnerId}
             initialPermissions={userPermissions}
           >
-            {/* Sidebar */}
-            {session?.user && (
-              <>
-                <ResponsiveSidebar />
-                <AutoSyncManager />
-              </>
-            )}
-
-            {/* Main Content */}
+            {/* ERP Application Shell */}
             {session?.user ? (
-              <main className="flex-1 w-full min-w-0 px-3.5 sm:px-6 lg:px-8 2xl:px-10 pt-3.5 sm:pt-6 lg:pt-8 pb-[max(1rem,env(safe-area-inset-bottom))] z-10 relative h-full flex flex-col overflow-y-auto">
-                <div className="mx-auto w-full max-w-[1920px] h-full flex flex-col min-h-0">
-                  <div className="flex-1 min-h-0 pb-2 sm:pb-6 lg:pb-8 flex flex-col">
-                    {children}
-                  </div>
-                </div>
-              </main>
+              <ErpShell>
+                <AutoSyncManager />
+                {children}
+              </ErpShell>
             ) : (
               <main className="flex-1 w-full h-full bg-background pb-[env(safe-area-inset-bottom)]">
                 {children}

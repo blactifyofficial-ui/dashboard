@@ -23,6 +23,17 @@ import { useAuth } from '@/context/AuthContext';
 import AccessDenied from '@/components/AccessDenied';
 import MetaAdsCalendar, { DailyPlanItem } from '@/components/meta-ads/MetaAdsCalendar';
 import DailyCampaignPlanner, { CampaignEntry } from '@/components/meta-ads/DailyCampaignPlanner';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 
 interface MetaAdsSettings {
   id: string;
@@ -503,13 +514,14 @@ export default function MetaAdsPage() {
         </div>
         {canEditAds && (
           <div className="flex items-center gap-3 w-full sm:w-auto">
-            <button
+            <Button
               onClick={handleOpenPaymentModal}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground px-4 py-2.5 min-h-[44px] rounded-xl font-semibold hover:opacity-90 active:opacity-80 transition-opacity text-xs sm:text-sm shadow-sm"
+              size="sm"
+              className="w-full sm:w-auto gap-2"
             >
-              <Plus size={18} className="shrink-0" />
+              <Plus size={15} className="shrink-0" />
               <span>Mark {currentDaysNum === 7 ? 'Weekly' : `${currentDaysNum}-Day`} Budget Paid</span>
-            </button>
+            </Button>
           </div>
         )}
       </header>
@@ -708,23 +720,16 @@ export default function MetaAdsPage() {
                     </div>
 
                     {canEditAds && (
-                      <button
+                      <Button
+                        size="sm"
                         onClick={handleSaveBudget}
                         disabled={savingBudget}
-                        className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground px-4 py-2 min-h-[40px] rounded-lg font-semibold hover:opacity-90 active:opacity-80 transition-opacity text-sm disabled:opacity-50"
+                        loading={savingBudget}
+                        className="w-full sm:w-auto gap-2"
                       >
-                        {savingBudget ? (
-                          <>
-                            <Loader2 size={16} className="animate-spin" />
-                            <span>Saving...</span>
-                          </>
-                        ) : (
-                          <>
-                            <Check size={16} />
-                            <span>Save Budget</span>
-                          </>
-                        )}
-                      </button>
+                        {!savingBudget && <Check size={14} />}
+                        <span>Save Budget</span>
+                      </Button>
                     )}
                   </div>
                 </div>
@@ -736,101 +741,104 @@ export default function MetaAdsPage() {
                 <div className="p-4 md:px-6 md:py-4 border-b border-border flex flex-col md:flex-row justify-between items-stretch md:items-center gap-4 bg-muted/40">
                   <div className="flex items-center gap-2.5">
                     <h2 className="text-base md:text-lg font-semibold text-foreground tracking-tight">Weekly Budget Payments</h2>
-                    <span className="text-xs px-2 py-0.5 rounded-md bg-muted text-muted-foreground font-medium border border-border">
+                    <Badge variant="secondary" className="text-xs">
                       {transactions.length}
-                    </span>
+                    </Badge>
                   </div>
 
                   {/* Search and Action Bar */}
                   <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
                     <div className="relative flex-1 sm:w-64">
-                      <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                      <input
+                      <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+                      <Input
                         type="text"
                         placeholder="Search ref, notes, method..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full bg-card border border-border rounded-lg pl-9 pr-3 py-1.5 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-border-hover transition-colors"
+                        className="pl-9 h-8 text-xs"
                       />
                     </div>
 
                     {canEditAds && (
-                      <button
+                      <Button
+                        size="xs"
                         onClick={handleOpenPaymentModal}
-                        className="inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground px-3.5 py-1.5 rounded-lg text-xs font-semibold hover:opacity-90 transition-opacity"
+                        className="gap-1.5"
                       >
-                        <Plus size={15} />
+                        <Plus size={13} />
                         <span>Record Payment</span>
-                      </button>
+                      </Button>
                     )}
                   </div>
                 </div>
 
                 {/* Table Body */}
                 <div className="flex-1 overflow-x-auto">
-                  <table className="w-full text-left border-collapse">
-                    <thead>
-                      <tr className="border-b border-border text-[11px] text-muted-foreground font-semibold uppercase tracking-wider bg-muted/20">
-                        <th className="py-3 px-4 md:px-6">Period</th>
-                        <th className="py-3 px-4 md:px-6">Target Spend</th>
-                        <th className="py-3 px-4 md:px-6">Amount Paid</th>
-                        <th className="py-3 px-4 md:px-6">Payment Date</th>
-                        <th className="py-3 px-4 md:px-6">Method &amp; Ref</th>
-                        <th className="py-3 px-4 md:px-6">Linked Expense</th>
-                        {canEditAds && <th className="py-3 px-4 md:px-6 text-right">Actions</th>}
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-border/60 text-sm">
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="border-b border-border text-[11px] text-muted-foreground font-semibold uppercase tracking-wider bg-muted/20 hover:bg-muted/20">
+                        <TableHead className="py-3 px-4 md:px-6">Period</TableHead>
+                        <TableHead className="py-3 px-4 md:px-6">Target Spend</TableHead>
+                        <TableHead className="py-3 px-4 md:px-6">Amount Paid</TableHead>
+                        <TableHead className="py-3 px-4 md:px-6">Payment Date</TableHead>
+                        <TableHead className="py-3 px-4 md:px-6">Method &amp; Ref</TableHead>
+                        <TableHead className="py-3 px-4 md:px-6">Linked Expense</TableHead>
+                        {canEditAds && <TableHead className="py-3 px-4 md:px-6 text-right">Actions</TableHead>}
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
                       {filteredTransactions.length === 0 ? (
-                        <tr>
-                          <td colSpan={canEditAds ? 7 : 6} className="py-12 text-center text-muted-foreground text-sm">
+                        <TableRow>
+                          <TableCell colSpan={canEditAds ? 7 : 6} className="py-12 text-center text-muted-foreground text-sm">
                             {searchQuery ? 'No payment records match your search.' : 'No weekly ad payments recorded yet.'}
-                          </td>
-                        </tr>
+                          </TableCell>
+                        </TableRow>
                       ) : (
                         filteredTransactions.map((tx) => {
                           const daysInPeriod = calculateDays(tx.weekStartDate, tx.weekEndDate);
                           return (
-                            <tr key={tx.id} className="hover:bg-muted/40 transition-colors group">
+                            <TableRow key={tx.id} className="hover:bg-muted/40 transition-colors group">
                               {/* Period Range */}
-                              <td className="py-3.5 px-4 md:px-6">
+                              <TableCell className="py-3.5 px-4 md:px-6">
                                 <div className="font-semibold text-foreground">
                                   {tx.weekStartDate} to {tx.weekEndDate}
                                 </div>
                                 <div className="text-xs text-muted-foreground">
                                   {daysInPeriod} {daysInPeriod === 1 ? 'day' : 'days'}
                                 </div>
-                              </td>
+                              </TableCell>
 
                               {/* Target Spend */}
-                              <td className="py-3.5 px-4 md:px-6">
+                              <TableCell className="py-3.5 px-4 md:px-6">
                                 <div className="text-foreground font-medium">
                                   ₹{parseFloat(tx.calculatedWeeklyBudget).toLocaleString('en-IN')}
                                 </div>
                                 <div className="text-xs text-muted-foreground">
                                   ₹{parseFloat(tx.dailyBudget).toLocaleString('en-IN')}/day
                                 </div>
-                              </td>
+                              </TableCell>
 
                               {/* Amount Paid */}
-                              <td className="py-3.5 px-4 md:px-6">
-                                <div className="font-semibold text-emerald-600 dark:text-emerald-400">
+                              <TableCell className="py-3.5 px-4 md:px-6">
+                                <div className="font-semibold text-emerald-600 dark:text-emerald-400 font-mono">
                                   ₹{parseFloat(tx.amountPaid).toLocaleString('en-IN')}
                                 </div>
-                                <div className="text-[11px] text-muted-foreground flex items-center gap-1">
-                                  <CheckCircle2 size={12} className="text-emerald-600 dark:text-emerald-400" />
-                                  <span>{tx.status}</span>
+                                <div className="mt-1">
+                                  <Badge variant="outline" className="gap-1 text-[10px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30">
+                                    <CheckCircle2 size={10} />
+                                    <span>{tx.status}</span>
+                                  </Badge>
                                 </div>
-                              </td>
+                              </TableCell>
 
                               {/* Payment Date */}
-                              <td className="py-3.5 px-4 md:px-6 text-muted-foreground">
+                              <TableCell className="py-3.5 px-4 md:px-6 text-muted-foreground text-xs font-mono">
                                 {tx.paymentDate}
-                              </td>
+                              </TableCell>
 
                               {/* Method & Ref */}
-                              <td className="py-3.5 px-4 md:px-6">
-                                <div className="text-foreground font-medium">
+                              <TableCell className="py-3.5 px-4 md:px-6">
+                                <div className="text-foreground font-medium text-xs">
                                   {tx.paymentMethodName || tx.paymentMethodCode || 'Other'}
                                 </div>
                                 {tx.referenceNumber && (
@@ -838,41 +846,42 @@ export default function MetaAdsPage() {
                                     {tx.referenceNumber}
                                   </div>
                                 )}
-                              </td>
+                              </TableCell>
 
                               {/* Linked Expense */}
-                              <td className="py-3.5 px-4 md:px-6">
+                              <TableCell className="py-3.5 px-4 md:px-6">
                                 {tx.expenseId ? (
-                                  <Link
-                                    href="/expenses"
-                                    className="inline-flex items-center gap-1 text-xs text-foreground hover:text-foreground bg-muted hover:bg-muted/80 px-2 py-1 rounded-md border border-border transition-colors"
-                                  >
-                                    <span>View Expense</span>
-                                    <ExternalLink size={12} />
+                                  <Link href="/expenses">
+                                    <Badge variant="outline" className="gap-1 text-xs cursor-pointer hover:bg-muted font-normal">
+                                      <span>View Expense</span>
+                                      <ExternalLink size={10} />
+                                    </Badge>
                                   </Link>
                                 ) : (
                                   <span className="text-xs text-muted-foreground">Unlinked</span>
                                 )}
-                              </td>
+                              </TableCell>
 
                               {/* Actions */}
                               {canDeleteAds && (
-                                <td className="py-3.5 px-4 md:px-6 text-right">
-                                  <button
+                                <TableCell className="py-3.5 px-4 md:px-6 text-right">
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
                                     onClick={() => setTxToDelete(tx)}
-                                    className="p-1 text-muted-foreground hover:text-rose-500 hover:bg-rose-500/10 rounded-md transition-colors"
+                                    className="h-7 w-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
                                     title="Delete Transaction"
                                   >
-                                    <Trash2 size={15} />
-                                  </button>
-                                </td>
+                                    <Trash2 size={13} />
+                                  </Button>
+                                </TableCell>
                               )}
-                            </tr>
+                            </TableRow>
                           );
                         })
                       )}
-                    </tbody>
-                  </table>
+                    </TableBody>
+                  </Table>
                 </div>
               </div>
             </div>

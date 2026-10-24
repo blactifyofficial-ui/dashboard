@@ -6,6 +6,9 @@ import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 import LoadingSpinner from '@/components/LoadingSpinner';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
 interface Category {
   id: string;
@@ -70,7 +73,6 @@ export default function AddExpensePage() {
     if (submitLockRef.current) return;
     submitLockRef.current = true;
     setIsSubmitting(true);
-    console.log('[AddExpense] handleSubmit fired');
     try {
       const res = await fetch('/api/expenses', {
         method: 'POST',
@@ -105,155 +107,158 @@ export default function AddExpensePage() {
   return (
     <div className="space-y-6 max-w-2xl mx-auto p-4 sm:p-6">
       <div className="flex items-center gap-3 sm:gap-4">
-        <Link 
-          href="/expenses" 
-          className="w-9 h-9 flex items-center justify-center bg-card hover:bg-muted rounded-lg transition-colors text-muted-foreground hover:text-foreground border border-border shrink-0"
-        >
-          <ArrowLeft size={16} />
-        </Link>
+        <Button variant="outline" size="icon" asChild className="h-9 w-9 shrink-0">
+          <Link href="/expenses" title="Back to Expenses">
+            <ArrowLeft size={16} />
+          </Link>
+        </Button>
         <div className="min-w-0">
-          <h1 className="text-xl sm:text-2xl font-bold truncate text-foreground">Add Expense</h1>
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">Add Expense</h1>
           <p className="text-xs sm:text-sm text-muted-foreground">Create a new business expense record</p>
         </div>
       </div>
 
-      <div className="bg-card border border-border rounded-xl p-4 sm:p-6 shadow-xs">
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <label className="text-xs font-medium text-foreground">Category</label>
-                <select
-                  required
-                  value={formData.categoryId}
-                  onChange={e => setFormData({ ...formData, categoryId: e.target.value })}
-                  className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-ring transition-colors"
-                >
-                  <option value="" className="bg-popover text-popover-foreground">Select Category</option>
-                  {categories.map(c => (
-                    <option key={c.id} value={c.id} className="bg-popover text-popover-foreground">{c.name}</option>
-                  ))}
-                </select>
-              </div>
-              
-              {isOtherCategory && (
+      <Card>
+        <CardHeader className="pb-4 border-b border-border">
+          <CardTitle className="text-base font-semibold">Expense Details</CardTitle>
+          <CardDescription>Fill in the transaction details and payment allocation.</CardDescription>
+        </CardHeader>
+        <CardContent className="pt-6">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-foreground">Custom Category Name</label>
-                  <input
+                  <label className="text-xs font-medium text-foreground">Category *</label>
+                  <select
                     required
-                    type="text"
-                    placeholder="E.g., Software Subscriptions"
-                    value={formData.customCategoryName}
-                    onChange={e => setFormData({ ...formData, customCategoryName: e.target.value })}
-                    className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring transition-colors"
+                    value={formData.categoryId}
+                    onChange={e => setFormData({ ...formData, categoryId: e.target.value })}
+                    className="w-full bg-background border border-border rounded-md px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-ring transition-colors"
+                  >
+                    <option value="" className="bg-popover text-popover-foreground">Select Category</option>
+                    {categories.map(c => (
+                      <option key={c.id} value={c.id} className="bg-popover text-popover-foreground">{c.name}</option>
+                    ))}
+                  </select>
+                </div>
+                
+                {isOtherCategory && (
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-medium text-foreground">Custom Category Name *</label>
+                    <Input
+                      required
+                      type="text"
+                      placeholder="E.g., Software Subscriptions"
+                      value={formData.customCategoryName}
+                      onChange={e => setFormData({ ...formData, customCategoryName: e.target.value })}
+                    />
+                  </div>
+                )}
+                
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-foreground">Expense Date *</label>
+                  <Input
+                    required
+                    type="date"
+                    value={formData.expenseDate}
+                    onChange={e => setFormData({ ...formData, expenseDate: e.target.value })}
                   />
                 </div>
-              )}
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-foreground">Title *</label>
+                <Input
+                  required
+                  type="text"
+                  placeholder="E.g., Petrol for delivery"
+                  value={formData.title}
+                  onChange={e => setFormData({ ...formData, title: e.target.value })}
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-foreground">Amount (₹) *</label>
+                  <Input
+                    required
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    placeholder="0.00"
+                    value={formData.amount}
+                    onChange={e => setFormData({ ...formData, amount: e.target.value })}
+                    className="font-mono"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-foreground">Payment Method *</label>
+                  <select
+                    required
+                    value={formData.paymentMethodId}
+                    onChange={e => setFormData({ ...formData, paymentMethodId: e.target.value })}
+                    className="w-full bg-background border border-border rounded-md px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-ring transition-colors"
+                  >
+                    <option value="" className="bg-popover text-popover-foreground">Select Payment</option>
+                    {paymentMethods.map(p => (
+                      <option key={p.id} value={p.id} className="bg-popover text-popover-foreground">{p.name}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-foreground">Description (Optional)</label>
+                <textarea
+                  placeholder="Enter additional details..."
+                  value={formData.description}
+                  onChange={e => setFormData({ ...formData, description: e.target.value })}
+                  className="w-full bg-background border border-border rounded-md p-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring h-24 resize-none transition-colors"
+                />
+              </div>
               
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-foreground">Expense Date</label>
-                <input
-                  required
-                  type="date"
-                  value={formData.expenseDate}
-                  onChange={e => setFormData({ ...formData, expenseDate: e.target.value })}
-                  className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-ring transition-colors"
+                <label className="text-xs font-medium text-foreground">Initial Remark (Optional)</label>
+                <Input
+                  type="text"
+                  placeholder="E.g., Added via web portal"
+                  value={formData.initialRemark}
+                  onChange={e => setFormData({ ...formData, initialRemark: e.target.value })}
+                />
+              </div>
+              
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-foreground">Reference Number (Optional)</label>
+                <Input
+                  type="text"
+                  placeholder="E.g., UPI123456789"
+                  value={formData.referenceNumber}
+                  onChange={e => setFormData({ ...formData, referenceNumber: e.target.value })}
+                  className="font-mono"
                 />
               </div>
             </div>
 
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-foreground">Title</label>
-              <input
-                required
-                type="text"
-                placeholder="E.g., Petrol for delivery"
-                value={formData.title}
-                onChange={e => setFormData({ ...formData, title: e.target.value })}
-                className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring transition-colors"
-              />
+            <div className="flex flex-col-reverse sm:flex-row gap-2.5 sm:justify-end pt-4 border-t border-border">
+              <Button
+                type="button"
+                variant="outline"
+                asChild
+                className="w-full sm:w-auto"
+              >
+                <Link href="/expenses">Cancel</Link>
+              </Button>
+              <Button
+                type="submit"
+                loading={isSubmitting}
+                className="w-full sm:w-auto"
+              >
+                Save Expense
+              </Button>
             </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <label className="text-xs font-medium text-foreground">Amount (₹)</label>
-                <input
-                  required
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  placeholder="0.00"
-                  value={formData.amount}
-                  onChange={e => setFormData({ ...formData, amount: e.target.value })}
-                  className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring font-mono transition-colors"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-xs font-medium text-foreground">Payment Method</label>
-                <select
-                  required
-                  value={formData.paymentMethodId}
-                  onChange={e => setFormData({ ...formData, paymentMethodId: e.target.value })}
-                  className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-ring transition-colors"
-                >
-                  <option value="" className="bg-popover text-popover-foreground">Select Payment</option>
-                  {paymentMethods.map(p => (
-                    <option key={p.id} value={p.id} className="bg-popover text-popover-foreground">{p.name}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-foreground">Description (Optional)</label>
-              <textarea
-                placeholder="Enter additional details..."
-                value={formData.description}
-                onChange={e => setFormData({ ...formData, description: e.target.value })}
-                className="w-full bg-background border border-border rounded-lg p-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring h-24 resize-none transition-colors"
-              />
-            </div>
-            
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-foreground">Initial Remark (Optional)</label>
-              <input
-                type="text"
-                placeholder="E.g., Added via web portal"
-                value={formData.initialRemark}
-                onChange={e => setFormData({ ...formData, initialRemark: e.target.value })}
-                className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring transition-colors"
-              />
-            </div>
-            
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-foreground">Reference Number (Optional)</label>
-              <input
-                type="text"
-                placeholder="E.g., UPI123456789"
-                value={formData.referenceNumber}
-                onChange={e => setFormData({ ...formData, referenceNumber: e.target.value })}
-                className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring font-mono transition-colors"
-              />
-            </div>
-          </div>
-
-          <div className="flex flex-col-reverse sm:flex-row gap-2.5 sm:justify-end pt-4 border-t border-border">
-            <Link
-              href="/expenses"
-              className="w-full sm:w-auto px-4 h-9 flex items-center justify-center text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
-            >
-              Cancel
-            </Link>
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="w-full sm:w-auto h-9 flex items-center justify-center bg-primary text-primary-foreground px-5 rounded-lg text-xs font-semibold hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isSubmitting ? 'Saving...' : 'Save Expense'}
-            </button>
-          </div>
-        </form>
-      </div>
+          </form>
+        </CardContent>
+      </Card>
     </div>
   );
 }

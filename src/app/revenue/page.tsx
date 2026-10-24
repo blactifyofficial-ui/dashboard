@@ -12,6 +12,9 @@ import { requireAuth } from '@/lib/auth-utils';
 import { hasPermission, canAccessRoute } from '@/lib/rbac';
 import AccessDenied from '@/components/AccessDenied';
 import { redirect } from 'next/navigation';
+import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 
 export const dynamic = "force-dynamic";
 
@@ -293,97 +296,103 @@ async function RevenueContent({
           </div>
         </div>
         <div className="flex-1 min-h-0 relative z-10 w-full overflow-x-auto overflow-y-auto">
-          <table className="w-full text-sm text-left min-w-[500px]">
-            <thead className="sticky top-0 text-xs text-muted-foreground uppercase tracking-wider bg-muted/90 border-b border-border z-20">
-              <tr>
-                <th className="px-4 sm:px-6 py-3 font-medium">Product</th>
-                <th className="px-4 sm:px-6 py-3 font-medium text-center">Units Sold</th>
-                <th className="px-4 sm:px-6 py-3 font-medium text-right">Revenue</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
+          <Table className="min-w-[500px]">
+            <TableHeader className="sticky top-0 bg-muted/80 backdrop-blur-none z-20">
+              <TableRow>
+                <TableHead className="font-semibold text-xs">Product</TableHead>
+                <TableHead className="font-semibold text-xs text-center w-28">Units Sold</TableHead>
+                <TableHead className="font-semibold text-xs text-right w-36">Revenue</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
               {productData.length === 0 ? (
-                <tr>
-                  <td colSpan={3} className="px-4 sm:px-6 py-16 text-center text-muted-foreground">
-                    <div className="flex flex-col items-center justify-center space-y-3">
-                      <div className="w-12 h-12 rounded-lg bg-muted border border-border flex items-center justify-center text-muted-foreground">
-                        <ShoppingBag size={24} />
+                <TableRow>
+                  <TableCell colSpan={3} className="py-16 text-center text-muted-foreground">
+                    <div className="flex flex-col items-center justify-center space-y-2.5">
+                      <div className="w-10 h-10 rounded-lg bg-muted border border-border flex items-center justify-center text-muted-foreground">
+                        <ShoppingBag size={20} />
                       </div>
-                      <p className="text-sm font-medium text-foreground">No product data available yet.</p>
+                      <p className="text-sm font-medium text-foreground">No product sales recorded yet</p>
                     </div>
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               ) : (
                 productData.map((data, idx) => (
-                  <tr key={idx} className="hover:bg-muted/40 transition-colors">
-                    <td className="px-4 sm:px-6 py-3.5 font-medium text-foreground">
+                  <TableRow key={idx} className="hover:bg-muted/40 transition-colors">
+                    <TableCell className="font-medium text-foreground">
                       <div className="flex items-center gap-3">
                         {data.imageUrl ? (
-                          <div className="relative w-8 h-8 rounded-lg overflow-hidden bg-muted border border-border shrink-0">
+                          <div className="relative w-9 h-9 rounded-lg overflow-hidden bg-muted border border-border shrink-0">
                             <Image 
                               src={data.imageUrl} 
                               alt={data.title || 'Product'} 
                               fill
-                              sizes="32px"
+                              sizes="36px"
                               className="object-cover" 
                             />
                           </div>
                         ) : (
-                          <div className="w-8 h-8 rounded-lg bg-muted border border-border flex items-center justify-center text-foreground shrink-0 text-xs font-semibold">
+                          <div className="w-9 h-9 rounded-lg bg-muted border border-border flex items-center justify-center text-foreground shrink-0 text-xs font-semibold">
                             {data.title ? data.title.charAt(0).toUpperCase() : '?'}
                           </div>
                         )}
-                        <Link href={`https://fvprhj-0y.myshopify.com/products/${data.title?.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '')}`} target="_blank" rel="noopener noreferrer" className="truncate hover:underline text-foreground flex items-center gap-1 group/link max-w-[200px] sm:max-w-xs md:max-w-md">
-                          <span className="truncate">{data.title || 'Unknown Product'}</span>
-                          <ArrowUpRight size={13} className="text-muted-foreground group-hover/link:text-foreground transition-colors shrink-0" />
+                        <Link href={`https://fvprhj-0y.myshopify.com/products/${data.title?.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '')}`} target="_blank" rel="noopener noreferrer" className="truncate hover:text-primary transition-colors text-foreground flex items-center gap-1 group/link max-w-[200px] sm:max-w-xs md:max-w-md">
+                          <span className="truncate text-xs sm:text-sm font-medium">{data.title || 'Unknown Product'}</span>
+                          <ArrowUpRight size={13} className="text-muted-foreground group-hover/link:text-primary transition-colors shrink-0" />
                         </Link>
                       </div>
-                    </td>
-                    <td className="px-4 sm:px-6 py-3.5 text-foreground text-center">
-                      <span className="inline-flex items-center justify-center px-2 py-0.5 rounded-md bg-muted border border-border text-xs font-mono text-foreground">
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <Badge variant="neutral" size="sm" className="font-mono">
                         {Number(data.unitsSold)}
-                      </span>
-                    </td>
-                    <td className="px-4 sm:px-6 py-3.5 text-right font-medium text-foreground text-sm whitespace-nowrap font-mono">
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right font-medium text-foreground text-xs sm:text-sm whitespace-nowrap font-mono">
                       ₹{Number(data.revenue).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                    </td>
-                  </tr>
+                    </TableCell>
+                  </TableRow>
                 ))
               )}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         </div>
         
         {totalPages > 1 && (
-          <div className="flex-none p-3.5 sm:px-6 border-t border-border flex flex-col sm:flex-row justify-between items-center gap-3 bg-muted/40 relative z-10">
+          <div className="flex-none p-3.5 sm:px-6 border-t border-border flex flex-col sm:flex-row justify-between items-center gap-3 bg-muted/20 relative z-10">
             <div className="text-xs text-muted-foreground">
-              Showing <span className="font-medium text-foreground">{totalProducts === 0 ? 0 : offset + 1}</span> to <span className="font-medium text-foreground">{Math.min(offset + pageSize, totalProducts)}</span> of <span className="font-medium text-foreground">{totalProducts}</span> products
+              Showing <span className="font-medium font-mono text-foreground">{totalProducts === 0 ? 0 : offset + 1}</span> to <span className="font-medium font-mono text-foreground">{Math.min(offset + pageSize, totalProducts)}</span> of <span className="font-medium font-mono text-foreground">{totalProducts}</span> products
             </div>
             <div className="flex space-x-2 w-full sm:w-auto justify-end">
               {page > 1 ? (
-                <Link
-                  href={`/revenue?tab=products&page=${page - 1}${q ? `&q=${encodeURIComponent(q)}` : ''}`}
-                  className="flex-1 sm:flex-initial text-center px-3.5 py-1.5 min-h-[36px] flex items-center justify-center border border-border bg-card text-foreground rounded-lg hover:bg-muted text-xs sm:text-sm font-medium transition-colors shadow-xs"
+                <Button
+                  variant="outline"
+                  size="xs"
+                  asChild
                 >
-                  Previous
-                </Link>
+                  <Link href={`/revenue?tab=products&page=${page - 1}${q ? `&q=${encodeURIComponent(q)}` : ''}`}>
+                    Previous
+                  </Link>
+                </Button>
               ) : (
-                <button disabled className="flex-1 sm:flex-initial px-3.5 py-1.5 min-h-[36px] flex items-center justify-center border border-border bg-muted/40 text-muted-foreground/50 rounded-lg text-xs sm:text-sm font-medium cursor-not-allowed">
+                <Button variant="outline" size="xs" disabled>
                   Previous
-                </button>
+                </Button>
               )}
               
               {page < totalPages ? (
-                <Link
-                  href={`/revenue?tab=products&page=${page + 1}${q ? `&q=${encodeURIComponent(q)}` : ''}`}
-                  className="flex-1 sm:flex-initial text-center px-3.5 py-1.5 min-h-[36px] flex items-center justify-center border border-border bg-card text-foreground rounded-lg hover:bg-muted text-xs sm:text-sm font-medium transition-colors shadow-xs"
+                <Button
+                  variant="outline"
+                  size="xs"
+                  asChild
                 >
-                  Next
-                </Link>
+                  <Link href={`/revenue?tab=products&page=${page + 1}${q ? `&q=${encodeURIComponent(q)}` : ''}`}>
+                    Next
+                  </Link>
+                </Button>
               ) : (
-                <button disabled className="flex-1 sm:flex-initial px-3.5 py-1.5 min-h-[36px] flex items-center justify-center border border-border bg-muted/40 text-muted-foreground/50 rounded-lg text-xs sm:text-sm font-medium cursor-not-allowed">
+                <Button variant="outline" size="xs" disabled>
                   Next
-                </button>
+                </Button>
               )}
             </div>
           </div>

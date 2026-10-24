@@ -21,6 +21,17 @@ import { Partner, PartnerTransaction, PaymentMethod } from '@/components/partner
 import { formatInputDate, formatCurrency, formatDisplayDate } from '@/components/partners/utils';
 import { useAuth } from '@/context/AuthContext';
 import AccessDenied from '@/components/AccessDenied';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
 
 interface PayoutFormData {
   partnerId: string;
@@ -277,13 +288,13 @@ export default function PayoutsPage() {
         {/* Top Header Action Buttons */}
         {canManagePayouts && (
           <div className="flex items-center gap-2">
-            <button
+            <Button
+              size="sm"
               onClick={() => handleOpenAddPayout()}
-              className="px-4 py-2 min-h-[38px] text-xs font-semibold text-primary-foreground bg-primary hover:opacity-90 rounded-lg transition-opacity flex items-center gap-1.5"
             >
               <Plus size={14} />
               <span>Record Payout</span>
-            </button>
+            </Button>
           </div>
         )}
       </div>
@@ -291,7 +302,7 @@ export default function PayoutsPage() {
       {/* KPI Cards Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {/* Card 1: Total Payouts */}
-        <div className="bg-card border border-border rounded-xl p-4 sm:p-5">
+        <div className="bg-card border border-border rounded-xl p-4 sm:p-5 shadow-xs">
           <p className="text-[11px] font-semibold text-muted-foreground mb-1 uppercase tracking-wider">Total Payouts Distributed</p>
           <p className="text-xl sm:text-2xl font-bold font-mono text-foreground tracking-tight">
             {formatCurrency(metrics.totalDistributed)}
@@ -302,7 +313,7 @@ export default function PayoutsPage() {
         </div>
 
         {/* Card 2: This Month's Payouts */}
-        <div className="bg-card border border-border rounded-xl p-4 sm:p-5">
+        <div className="bg-card border border-border rounded-xl p-4 sm:p-5 shadow-xs">
           <p className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 mb-1 uppercase tracking-wider">This Month Payouts</p>
           <p className="text-xl sm:text-2xl font-bold font-mono text-emerald-600 dark:text-emerald-400 tracking-tight">
             {formatCurrency(metrics.thisMonthPayouts)}
@@ -313,7 +324,7 @@ export default function PayoutsPage() {
         </div>
 
         {/* Card 3: Partners with Payouts */}
-        <div className="bg-card border border-border rounded-xl p-4 sm:p-5">
+        <div className="bg-card border border-border rounded-xl p-4 sm:p-5 shadow-xs">
           <p className="text-[11px] font-semibold text-muted-foreground mb-1 uppercase tracking-wider">Beneficiary Partners</p>
           <p className="text-xl sm:text-2xl font-bold font-mono text-foreground tracking-tight">
             {metrics.partnersWithPayoutsCount} / {partners.length}
@@ -324,7 +335,7 @@ export default function PayoutsPage() {
         </div>
 
         {/* Card 4: Average Payout */}
-        <div className="bg-card border border-border rounded-xl p-4 sm:p-5">
+        <div className="bg-card border border-border rounded-xl p-4 sm:p-5 shadow-xs">
           <p className="text-[11px] font-semibold text-muted-foreground mb-1 uppercase tracking-wider">Average Per Payout</p>
           <p className="text-xl sm:text-2xl font-bold font-mono text-foreground tracking-tight">
             {formatCurrency(metrics.avgPayout)}
@@ -336,13 +347,13 @@ export default function PayoutsPage() {
       </div>
 
       {/* Partner Payout Quick Summary Cards */}
-      <div className="bg-card border border-border rounded-xl p-4 sm:p-5">
+      <div className="bg-card border border-border rounded-xl p-4 sm:p-5 shadow-xs">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
             <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Partner Payout Summary</h2>
-            <span className="px-2 py-0.5 rounded-md text-[10px] font-medium bg-muted text-foreground border border-border">
+            <Badge variant="outline" size="sm">
               {partners.length} {partners.length === 1 ? 'Partner' : 'Partners'}
-            </span>
+            </Badge>
           </div>
         </div>
 
@@ -382,13 +393,15 @@ export default function PayoutsPage() {
                 </div>
 
                 <div className="mt-3 pt-2.5 border-t border-border flex items-center justify-end">
-                  <button
+                  <Button
+                    variant="outline"
+                    size="sm"
                     onClick={() => handleOpenAddPayout(partner.id)}
-                    className="w-full py-2 min-h-[34px] px-3 text-xs font-medium text-foreground bg-muted hover:bg-muted/80 border border-border rounded-lg transition-colors flex items-center justify-center gap-1.5"
+                    className="w-full"
                   >
                     <Banknote size={13} className="text-muted-foreground" />
                     <span>Record Payout</span>
-                  </button>
+                  </Button>
                 </div>
               </div>
             );
@@ -401,15 +414,16 @@ export default function PayoutsPage() {
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
           <div className="relative flex-1 sm:w-64">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-3.5 h-3.5" />
-            <input
+            <Input
               type="text"
               placeholder="Search by partner, UTR, notes..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-8 pr-8 py-2 min-h-[38px] bg-card border border-border rounded-lg text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-border-hover transition-colors"
+              className="pl-8 pr-8 h-9 text-xs"
             />
             {searchQuery && (
               <button
+                type="button"
                 onClick={() => setSearchQuery('')}
                 className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-1"
               >
@@ -453,7 +467,7 @@ export default function PayoutsPage() {
       </div>
 
       {/* Payouts Ledger Table */}
-      <div className="bg-card border border-border rounded-xl overflow-hidden flex flex-col flex-1 min-h-0">
+      <div className="bg-card border border-border rounded-xl overflow-hidden flex flex-col flex-1 min-h-0 shadow-xs">
         <div className="p-4 sm:p-5 border-b border-border flex items-center justify-between bg-muted/40">
           <div className="flex items-center gap-2">
             <h3 className="text-sm sm:text-base font-semibold text-foreground">
@@ -466,53 +480,53 @@ export default function PayoutsPage() {
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs sm:text-sm border-collapse min-w-[700px]">
-            <thead>
-              <tr className="border-b border-border bg-muted/20 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
-                <th className="py-2.5 px-4">Date</th>
-                <th className="py-2.5 px-4">Partner</th>
-                <th className="py-2.5 px-4">Payout Amount</th>
-                <th className="py-2.5 px-4">Payment Method</th>
-                <th className="py-2.5 px-4">Reference / UTR</th>
-                <th className="py-2.5 px-4">Notes</th>
-                <th className="py-2.5 px-4 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border text-xs">
+          <Table className="min-w-[700px]">
+            <TableHeader>
+              <TableRow className="bg-muted/20 hover:bg-muted/20">
+                <TableHead className="font-medium">Date</TableHead>
+                <TableHead className="font-medium">Partner</TableHead>
+                <TableHead className="font-medium">Payout Amount</TableHead>
+                <TableHead className="font-medium">Payment Method</TableHead>
+                <TableHead className="font-medium">Reference / UTR</TableHead>
+                <TableHead className="font-medium">Notes</TableHead>
+                <TableHead className="font-medium text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
               {filteredPayouts.length === 0 ? (
-                <tr>
-                  <td colSpan={7} className="py-16 text-center text-muted-foreground space-y-3">
+                <TableRow>
+                  <TableCell colSpan={7} className="py-16 text-center text-muted-foreground">
                     <div className="w-10 h-10 mx-auto rounded-lg bg-muted border border-border flex items-center justify-center text-muted-foreground mb-2">
                       <Banknote size={18} className="text-muted-foreground" />
                     </div>
                     <div className="text-sm font-medium text-foreground">
                       No payout records found
                     </div>
-                    <p className="text-xs text-muted-foreground max-w-sm mx-auto">
+                    <p className="text-xs text-muted-foreground max-w-sm mx-auto mt-1 mb-3">
                       Record profit distributions and partner payouts to see them logged in this ledger.
                     </p>
-                    <button
+                    <Button
+                      size="sm"
                       onClick={() => handleOpenAddPayout()}
-                      className="mt-2 inline-flex items-center justify-center gap-1.5 px-4 py-2 min-h-[38px] bg-primary text-primary-foreground hover:opacity-90 rounded-lg text-xs font-semibold transition-opacity"
                     >
                       <Plus size={14} />
                       <span>Record First Payout</span>
-                    </button>
-                  </td>
-                </tr>
+                    </Button>
+                  </TableCell>
+                </TableRow>
               ) : (
                 filteredPayouts.map((txn) => (
-                  <tr key={txn.id} className="hover:bg-muted/40 transition-colors group">
-                    <td className="py-3 px-4 text-muted-foreground whitespace-nowrap text-xs font-mono">
+                  <TableRow key={txn.id} className="hover:bg-muted/40 transition-colors group">
+                    <TableCell className="text-muted-foreground whitespace-nowrap text-xs font-mono">
                       {formatDisplayDate(txn.transactionDate)}
-                    </td>
-                    <td className="py-3 px-4 font-semibold text-foreground whitespace-nowrap">
+                    </TableCell>
+                    <TableCell className="font-semibold text-foreground whitespace-nowrap">
                       {txn.partnerName || '—'}
-                    </td>
-                    <td className="py-3 px-4 font-bold font-mono whitespace-nowrap text-foreground">
+                    </TableCell>
+                    <TableCell className="font-bold font-mono whitespace-nowrap text-emerald-600 dark:text-emerald-400">
                       {formatCurrency(txn.amount)}
-                    </td>
-                    <td className="py-3 px-4 text-muted-foreground whitespace-nowrap text-xs">
+                    </TableCell>
+                    <TableCell className="text-muted-foreground whitespace-nowrap text-xs">
                       {txn.paymentMethodName ? (
                         <span className="inline-flex items-center gap-1">
                           <CreditCard size={11} className="text-muted-foreground" />
@@ -521,8 +535,8 @@ export default function PayoutsPage() {
                       ) : (
                         '—'
                       )}
-                    </td>
-                    <td className="py-3 px-4 text-muted-foreground font-mono text-xs whitespace-nowrap">
+                    </TableCell>
+                    <TableCell className="text-muted-foreground font-mono text-xs whitespace-nowrap">
                       {txn.referenceNumber ? (
                         <span className="inline-flex items-center gap-1">
                           <Hash size={11} className="text-muted-foreground" />
@@ -531,23 +545,27 @@ export default function PayoutsPage() {
                       ) : (
                         '—'
                       )}
-                    </td>
-                    <td className="py-3 px-4 text-muted-foreground text-xs max-w-xs truncate">
+                    </TableCell>
+                    <TableCell className="text-muted-foreground text-xs max-w-xs truncate">
                       {txn.notes || '—'}
-                    </td>
-                    <td className="py-3 px-4 text-right whitespace-nowrap">
+                    </TableCell>
+                    <TableCell className="text-right whitespace-nowrap">
                       <div className="flex items-center justify-end gap-1">
                         {canManagePayouts && (
-                          <button
+                          <Button
+                            variant="ghost"
+                            size="icon"
                             onClick={() => handleOpenEditPayout(txn)}
-                            className="p-1.5 text-muted-foreground hover:text-foreground rounded-lg hover:bg-muted transition-colors cursor-pointer"
+                            className="h-7 w-7"
                             title="Edit payout"
                           >
                             <Pencil size={13} />
-                          </button>
+                          </Button>
                         )}
                         {canDeletePayouts && (
-                          <button
+                          <Button
+                            variant="ghost"
+                            size="icon"
                             onClick={() => {
                               setDeleteConfirm({
                                 isOpen: true,
@@ -556,19 +574,19 @@ export default function PayoutsPage() {
                                 partnerName: txn.partnerName || 'Partner',
                               });
                             }}
-                            className="p-1.5 text-muted-foreground hover:text-rose-500 rounded-lg hover:bg-rose-500/10 transition-colors cursor-pointer"
+                            className="h-7 w-7 text-muted-foreground hover:text-rose-500"
                             title="Delete payout"
                           >
                             <Trash2 size={13} />
-                          </button>
+                          </Button>
                         )}
                       </div>
-                    </td>
-                  </tr>
+                    </TableCell>
+                  </TableRow>
                 ))
               )}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         </div>
       </div>
 

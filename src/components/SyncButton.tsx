@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import toast from 'react-hot-toast';
 import { RefreshCw, CheckCircle2, Clock } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
 
 function formatTimeAgo(timestamp: number | null): string {
   if (!timestamp) {
@@ -102,14 +103,15 @@ export default function SyncButton() {
   return (
     <div className="space-y-3 w-full">
       <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-        <button
+        <Button
           onClick={handleSync}
           disabled={isSyncing}
-          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground px-6 py-3 min-h-[44px] rounded-xl font-semibold text-sm hover:opacity-90 active:opacity-80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+          loading={isSyncing}
+          className="w-full sm:w-auto h-11 px-6 rounded-lg font-semibold text-sm gap-2"
         >
-          <RefreshCw size={18} className={`shrink-0 ${isSyncing ? 'animate-spin' : ''}`} />
+          {!isSyncing && <RefreshCw size={16} className="shrink-0" />}
           <span>{isSyncing ? 'Syncing Orders...' : 'Sync Orders & Products Now'}</span>
-        </button>
+        </Button>
 
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
           <span className="flex h-2 w-2 relative">

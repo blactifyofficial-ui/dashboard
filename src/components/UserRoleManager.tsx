@@ -20,6 +20,9 @@ import ConfirmModal from '@/components/ConfirmModal';
 import { UserRole } from '@/db/schema';
 import { PERMISSION_CATALOG, ROLE_COLOR_PALETTES } from '@/lib/rbac';
 import { useAuth } from '@/context/AuthContext';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
 
 interface AllowedUser {
   id: string;
@@ -285,22 +288,22 @@ export default function UserRoleManager() {
         {/* Action Buttons */}
         <div className="flex items-center gap-2">
           {canManageRoles && (
-            <Link
-              href="/team/roles/new"
-              className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 bg-muted border border-border text-foreground text-xs sm:text-sm font-medium rounded-lg hover:bg-accent transition-colors shrink-0"
-            >
-              <ShieldCheck size={15} />
-              <span>+ Add Role</span>
+            <Link href="/team/roles/new">
+              <Button variant="secondary" size="sm" className="gap-1.5">
+                <ShieldCheck size={14} />
+                <span>+ Add Role</span>
+              </Button>
             </Link>
           )}
           {canManageMembers && (
-            <button
+            <Button
+              size="sm"
               onClick={() => setIsAddUserOpen(true)}
-              className="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-primary text-primary-foreground text-xs sm:text-sm font-semibold rounded-lg hover:opacity-90 transition-opacity shrink-0 shadow-xs"
+              className="gap-1.5"
             >
-              <Plus size={15} />
+              <Plus size={14} />
               <span>Invite Member</span>
-            </button>
+            </Button>
           )}
         </div>
       </div>
@@ -358,13 +361,13 @@ export default function UserRoleManager() {
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className="text-sm font-medium text-foreground truncate max-w-xs">{u.email}</span>
                         {isCurrent && (
-                          <span className="px-2 py-0.5 rounded-md text-[10px] font-medium bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30">
+                          <Badge variant="outline" className="px-2 py-0.5 text-[10px] font-medium bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-500/30">
                             You
-                          </span>
+                          </Badge>
                         )}
-                        <span className={`px-2 py-0.5 rounded-md text-[11px] font-medium border ${roleConfig.badge}`}>
+                        <Badge variant="outline" className={`px-2 py-0.5 text-[11px] font-medium border ${roleConfig.badge}`}>
                           {roleConfig.label}
-                        </span>
+                        </Badge>
                       </div>
                       <p className="text-xs text-muted-foreground mt-0.5 truncate max-w-md">
                         {roleConfig.description}
@@ -425,29 +428,33 @@ export default function UserRoleManager() {
 
                     {/* Resend Invite Email button */}
                     {canManageMembers && (
-                      <button
+                      <Button
+                        variant="ghost"
+                        size="icon"
                         onClick={() => handleResendInvite(u)}
                         disabled={resendingInviteUserId === u.id}
-                        className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors border border-transparent disabled:opacity-50"
+                        className="h-8 w-8 text-muted-foreground hover:text-foreground"
                         title="Resend invitation email"
                       >
                         {resendingInviteUserId === u.id ? (
-                          <Loader2 size={15} className="animate-spin text-muted-foreground" />
+                          <Loader2 size={14} className="animate-spin text-muted-foreground" />
                         ) : (
-                          <Send size={15} />
+                          <Send size={14} />
                         )}
-                      </button>
+                      </Button>
                     )}
 
                     {/* Delete button (cannot delete yourself) */}
                     {canManageMembers && !isCurrent && (
-                      <button
+                      <Button
+                        variant="ghost"
+                        size="icon"
                         onClick={() => setUserToDelete(u)}
-                        className="p-1.5 text-muted-foreground hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors border border-transparent hover:border-rose-500/20"
+                        className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
                         title="Remove user"
                       >
-                        <Trash2 size={15} />
-                      </button>
+                        <Trash2 size={14} />
+                      </Button>
                     )}
                   </div>
                 </div>
@@ -468,12 +475,11 @@ export default function UserRoleManager() {
               </span>
             </div>
             {canManageRoles && (
-              <Link
-                href="/team/roles/new"
-                className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 bg-primary text-primary-foreground text-xs font-semibold rounded-lg hover:opacity-90 transition-opacity shrink-0 shadow-xs"
-              >
-                <Plus size={14} />
-                <span>Create New Role</span>
+              <Link href="/team/roles/new">
+                <Button size="sm" className="gap-1.5 shrink-0">
+                  <Plus size={14} />
+                  <span>Create New Role</span>
+                </Button>
               </Link>
             )}
           </div>
@@ -494,17 +500,17 @@ export default function UserRoleManager() {
                       <div>
                         <div className="flex items-center gap-2 flex-wrap">
                           <h3 className="text-sm sm:text-base font-semibold text-foreground">{role.name}</h3>
-                          <span className={`px-2 py-0.5 rounded-md text-[10px] font-semibold border ${badgeStyle}`}>
+                          <Badge variant="outline" className={`px-2 py-0.5 text-[10px] font-semibold border ${badgeStyle}`}>
                             {role.code}
-                          </span>
+                          </Badge>
                           {role.isSystem ? (
-                            <span className="inline-flex items-center gap-1 text-[10px] text-muted-foreground bg-muted px-2 py-0.5 rounded-md border border-border">
+                            <Badge variant="secondary" className="inline-flex items-center gap-1 text-[10px] font-normal border border-border">
                               <Lock size={10} /> System Default
-                            </span>
+                            </Badge>
                           ) : (
-                            <span className="inline-flex items-center text-[10px] text-foreground bg-muted px-2 py-0.5 rounded-md border border-border font-medium">
+                            <Badge variant="secondary" className="inline-flex items-center text-[10px] border border-border font-medium">
                               Custom Role
-                            </span>
+                            </Badge>
                           )}
                         </div>
                         <p className="text-xs text-muted-foreground mt-1">{role.description || 'No description provided.'}</p>
@@ -513,20 +519,25 @@ export default function UserRoleManager() {
                       {/* Custom Role Actions (Edit page / Delete) */}
                       {!role.isSystem && canManageRoles && (
                         <div className="flex items-center gap-1 shrink-0">
-                          <Link
-                            href={`/team/roles/${role.id}`}
-                            className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors inline-flex items-center justify-center border border-transparent"
-                            title="Edit Role & Permissions"
-                          >
-                            <Edit2 size={14} />
+                          <Link href={`/team/roles/${role.id}`}>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-7 w-7 text-muted-foreground hover:text-foreground"
+                              title="Edit Role & Permissions"
+                            >
+                              <Edit2 size={13} />
+                            </Button>
                           </Link>
-                          <button
+                          <Button
+                            variant="ghost"
+                            size="icon"
                             onClick={() => setRoleToDelete(role)}
-                            className="p-1.5 text-muted-foreground hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors"
+                            className="h-7 w-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
                             title="Delete Custom Role"
                           >
-                            <Trash2 size={14} />
-                          </button>
+                            <Trash2 size={13} />
+                          </Button>
                         </div>
                       )}
                     </div>
@@ -585,14 +596,14 @@ export default function UserRoleManager() {
               <div>
                 <label className="block text-xs font-medium text-muted-foreground mb-1.5">Email Address</label>
                 <div className="relative">
-                  <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                  <input
+                  <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+                  <Input
                     type="email"
                     required
                     placeholder="user@example.com"
                     value={newEmail}
                     onChange={(e) => setNewEmail(e.target.value)}
-                    className="w-full bg-muted/40 border border-input rounded-lg pl-10 pr-3 py-2 text-sm text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary"
+                    className="pl-10"
                   />
                 </div>
               </div>
@@ -649,21 +660,20 @@ export default function UserRoleManager() {
               )}
 
               <div className="flex items-center justify-end gap-2 pt-3 border-t border-border">
-                <button
+                <Button
                   type="button"
+                  variant="ghost"
                   onClick={() => setIsAddUserOpen(false)}
-                  className="px-3.5 py-2 rounded-lg text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
                 >
                   Cancel
-                </button>
-                <button
+                </Button>
+                <Button
                   type="submit"
                   disabled={isSubmittingUser}
-                  className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-primary text-primary-foreground text-xs font-semibold rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 shadow-xs"
+                  loading={isSubmittingUser}
                 >
-                  {isSubmittingUser && <Loader2 size={14} className="animate-spin" />}
-                  <span>Save Member</span>
-                </button>
+                  Save Member
+                </Button>
               </div>
             </form>
           </div>

@@ -3,11 +3,15 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Loader2, Pencil, Trash2, Save, X, ExternalLink } from 'lucide-react';
+import { ArrowLeft, Pencil, Trash2, Save, X, ExternalLink } from 'lucide-react';
 import toast from 'react-hot-toast';
 import ConfirmModal from '@/components/ConfirmModal';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { useAuth } from '@/context/AuthContext';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
 
 type Activity = {
   id: string;
@@ -209,14 +213,13 @@ export default function ExpenseDetailPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3 sm:gap-4">
-          <Link
-            href="/expenses"
-            className="w-9 h-9 flex items-center justify-center bg-card hover:bg-muted rounded-lg transition-colors text-muted-foreground hover:text-foreground border border-border shrink-0"
-          >
-            <ArrowLeft size={16} />
-          </Link>
+          <Button variant="outline" size="icon" asChild className="h-9 w-9 shrink-0">
+            <Link href="/expenses" title="Back to Expenses">
+              <ArrowLeft size={16} />
+            </Link>
+          </Button>
           <div className="min-w-0">
-            <h1 className="text-xl sm:text-2xl font-bold truncate text-foreground">{isEditing ? 'Edit Expense' : expense.title}</h1>
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">{isEditing ? 'Edit Expense' : expense.title}</h1>
             <p className="text-xs sm:text-sm text-muted-foreground truncate">
               {isEditing ? 'Modify expense details below' : `Created ${new Date(expense.createdAt).toLocaleDateString()}`}
             </p>
@@ -226,20 +229,22 @@ export default function ExpenseDetailPage() {
         {!isEditing && (
           <div className="flex items-center gap-2 self-start sm:self-auto">
             {canEditExpenses && (
-              <button
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={() => setIsEditing(true)}
-                className="flex items-center justify-center gap-1.5 px-3.5 h-9 bg-card hover:bg-muted text-foreground border border-border rounded-lg text-xs font-semibold transition-colors cursor-pointer"
               >
                 <Pencil size={14} /> Edit
-              </button>
+              </Button>
             )}
             {canDeleteExpenses && (
-              <button
+              <Button
+                variant="destructive"
+                size="sm"
                 onClick={() => setShowDeleteModal(true)}
-                className="flex items-center justify-center gap-1.5 px-3.5 h-9 bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-500/30 rounded-lg text-xs font-semibold transition-colors cursor-pointer"
               >
                 <Trash2 size={14} /> Delete
-              </button>
+              </Button>
             )}
           </div>
         )}
@@ -250,160 +255,166 @@ export default function ExpenseDetailPage() {
         <div className="lg:col-span-2 space-y-6">
           {isEditing ? (
             /* ── Edit Form ── */
-            <div className="bg-card border border-border rounded-xl p-4 sm:p-6 space-y-5 shadow-xs">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Card>
+              <CardHeader className="pb-4 border-b border-border">
+                <CardTitle className="text-base font-semibold">Edit Expense Details</CardTitle>
+              </CardHeader>
+              <CardContent className="pt-5 space-y-5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-medium text-foreground">Title</label>
+                    <Input
+                      required
+                      type="text"
+                      value={formData.title}
+                      onChange={e => setFormData({ ...formData, title: e.target.value })}
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-medium text-foreground">Amount (₹)</label>
+                    <Input
+                      required
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      value={formData.amount}
+                      onChange={e => setFormData({ ...formData, amount: e.target.value })}
+                      className="font-mono"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-medium text-foreground">Category</label>
+                    <select
+                      required
+                      value={formData.categoryId}
+                      onChange={e => setFormData({ ...formData, categoryId: e.target.value })}
+                      className="w-full bg-background border border-border rounded-md px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-ring transition-colors"
+                    >
+                      <option value="" className="bg-popover text-popover-foreground">Select Category</option>
+                      {categories.map(c => (
+                        <option key={c.id} value={c.id} className="bg-popover text-popover-foreground">{c.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-medium text-foreground">Payment Method</label>
+                    <select
+                      required
+                      value={formData.paymentMethodId}
+                      onChange={e => setFormData({ ...formData, paymentMethodId: e.target.value })}
+                      className="w-full bg-background border border-border rounded-md px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-ring transition-colors"
+                    >
+                      <option value="" className="bg-popover text-popover-foreground">Select Payment</option>
+                      {paymentMethods.map(p => (
+                        <option key={p.id} value={p.id} className="bg-popover text-popover-foreground">{p.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
                 <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-foreground">Title</label>
-                  <input
+                  <label className="text-xs font-medium text-foreground">Expense Date</label>
+                  <Input
                     required
+                    type="date"
+                    value={formData.expenseDate}
+                    onChange={e => setFormData({ ...formData, expenseDate: e.target.value })}
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-foreground">Description (Optional)</label>
+                  <textarea
+                    value={formData.description}
+                    onChange={e => setFormData({ ...formData, description: e.target.value })}
+                    className="w-full bg-background border border-border rounded-md p-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring h-24 resize-none transition-colors"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-foreground">Reference Number (Optional)</label>
+                  <Input
                     type="text"
-                    value={formData.title}
-                    onChange={e => setFormData({ ...formData, title: e.target.value })}
-                    className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring transition-colors"
+                    value={formData.referenceNumber}
+                    onChange={e => setFormData({ ...formData, referenceNumber: e.target.value })}
+                    className="font-mono"
                   />
                 </div>
-                <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-foreground">Amount (₹)</label>
-                  <input
-                    required
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    value={formData.amount}
-                    onChange={e => setFormData({ ...formData, amount: e.target.value })}
-                    className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring font-mono transition-colors"
-                  />
-                </div>
-              </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-foreground">Category</label>
-                  <select
-                    required
-                    value={formData.categoryId}
-                    onChange={e => setFormData({ ...formData, categoryId: e.target.value })}
-                    className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-ring transition-colors"
+                <div className="flex flex-col-reverse sm:flex-row gap-2.5 sm:justify-end pt-4 border-t border-border">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={cancelEdit}
+                    className="w-full sm:w-auto"
                   >
-                    <option value="" className="bg-popover text-popover-foreground">Select Category</option>
-                    {categories.map(c => (
-                      <option key={c.id} value={c.id} className="bg-popover text-popover-foreground">{c.name}</option>
-                    ))}
-                  </select>
-                </div>
-                <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-foreground">Payment Method</label>
-                  <select
-                    required
-                    value={formData.paymentMethodId}
-                    onChange={e => setFormData({ ...formData, paymentMethodId: e.target.value })}
-                    className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-ring transition-colors"
+                    <X size={15} /> Cancel
+                  </Button>
+                  <Button
+                    type="button"
+                    onClick={handleSave}
+                    loading={isSubmitting}
+                    className="w-full sm:w-auto"
                   >
-                    <option value="" className="bg-popover text-popover-foreground">Select Payment</option>
-                    {paymentMethods.map(p => (
-                      <option key={p.id} value={p.id} className="bg-popover text-popover-foreground">{p.name}</option>
-                    ))}
-                  </select>
+                    <Save size={14} /> Save Changes
+                  </Button>
                 </div>
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-xs font-medium text-foreground">Expense Date</label>
-                <input
-                  required
-                  type="date"
-                  value={formData.expenseDate}
-                  onChange={e => setFormData({ ...formData, expenseDate: e.target.value })}
-                  className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-ring transition-colors"
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-xs font-medium text-foreground">Description (Optional)</label>
-                <textarea
-                  value={formData.description}
-                  onChange={e => setFormData({ ...formData, description: e.target.value })}
-                  className="w-full bg-background border border-border rounded-lg p-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring h-24 resize-none transition-colors"
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-xs font-medium text-foreground">Reference Number (Optional)</label>
-                <input
-                  type="text"
-                  value={formData.referenceNumber}
-                  onChange={e => setFormData({ ...formData, referenceNumber: e.target.value })}
-                  className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring font-mono transition-colors"
-                />
-              </div>
-
-              <div className="flex flex-col-reverse sm:flex-row gap-2.5 sm:justify-end pt-4 border-t border-border">
-                <button
-                  onClick={cancelEdit}
-                  className="w-full sm:w-auto flex items-center justify-center gap-1.5 px-3.5 h-9 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  <X size={15} /> Cancel
-                </button>
-                <button
-                  onClick={handleSave}
-                  disabled={isSubmitting}
-                  className="w-full sm:w-auto flex items-center justify-center gap-1.5 bg-primary text-primary-foreground px-4 h-9 rounded-lg text-xs font-semibold hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isSubmitting ? (
-                    <><Loader2 size={14} className="animate-spin" /> Saving...</>
-                  ) : (
-                    <><Save size={14} /> Save Changes</>
-                  )}
-                </button>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
           ) : (
             /* ── Read-only Detail ── */
-            <div className="bg-card border border-border rounded-xl p-5 sm:p-6 shadow-xs">
-              <div className="flex flex-wrap items-center gap-2 mb-5">
-                <span className="bg-muted border border-border px-2.5 py-0.5 rounded-md text-xs font-medium text-foreground">{expense.category}</span>
-                <span className="bg-muted border border-border px-2.5 py-0.5 rounded-md text-xs font-medium text-foreground">{expense.paymentMethod}</span>
-                {expense.category?.toLowerCase().includes('meta') && (
-                  <Link
-                    href="/meta-ads"
-                    className="bg-muted border border-border text-foreground px-2.5 py-0.5 rounded-md text-xs font-medium hover:bg-muted/80 transition-colors flex items-center gap-1.5"
-                  >
-                    <span>Meta Ads Tracker</span>
-                    <ExternalLink size={12} />
-                  </Link>
+            <Card>
+              <CardContent className="p-5 sm:p-6">
+                <div className="flex flex-wrap items-center gap-2 mb-5">
+                  <Badge variant="outline">{expense.category}</Badge>
+                  <Badge variant="secondary">{expense.paymentMethod}</Badge>
+                  {expense.category?.toLowerCase().includes('meta') && (
+                    <Button variant="outline" size="xs" asChild>
+                      <Link href="/meta-ads" className="flex items-center gap-1.5">
+                        <span>Meta Ads Tracker</span>
+                        <ExternalLink size={12} />
+                      </Link>
+                    </Button>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <div>
+                    <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1 font-medium">Amount</p>
+                    <p className="text-2xl sm:text-3xl font-bold font-mono text-foreground">₹{parseFloat(expense.amount).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1 font-medium">Expense Date</p>
+                    <p className="text-base sm:text-lg font-medium text-foreground">{new Date(expense.expenseDate).toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                  </div>
+                </div>
+
+                {expense.description && (
+                  <div className="mt-6 pt-5 border-t border-border">
+                    <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2 font-medium">Description</p>
+                    <p className="text-foreground text-sm leading-relaxed whitespace-pre-wrap">{expense.description}</p>
+                  </div>
                 )}
-              </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                <div>
-                  <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1 font-medium">Amount</p>
-                  <p className="text-2xl sm:text-3xl font-bold font-mono text-foreground">₹{parseFloat(expense.amount).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1 font-medium">Expense Date</p>
-                  <p className="text-base sm:text-lg font-medium text-foreground">{new Date(expense.expenseDate).toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
-                </div>
-              </div>
-
-              {expense.description && (
-                <div className="mt-6 pt-5 border-t border-border">
-                  <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2 font-medium">Description</p>
-                  <p className="text-foreground text-sm leading-relaxed whitespace-pre-wrap">{expense.description}</p>
-                </div>
-              )}
-
-              {expense.referenceNumber && (
-                <div className="mt-4 pt-4 border-t border-border">
-                  <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1 font-medium">Reference Number</p>
-                  <p className="font-mono text-sm text-foreground">{expense.referenceNumber}</p>
-                </div>
-              )}
-            </div>
+                {expense.referenceNumber && (
+                  <div className="mt-4 pt-4 border-t border-border">
+                    <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1 font-medium">Reference Number</p>
+                    <p className="font-mono text-sm text-foreground">{expense.referenceNumber}</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           )}
 
           {/* Activity Timeline */}
-          <div className="bg-card border border-border rounded-xl p-5 sm:p-6 shadow-xs">
-            <h2 className="text-base font-semibold text-foreground mb-4">Activity Timeline</h2>
+          <Card>
+            <CardHeader className="pb-3 border-b border-border">
+              <CardTitle className="text-base font-semibold">Activity Timeline</CardTitle>
+            </CardHeader>
+            <CardContent className="pt-4">
             {expense.activities.length === 0 ? (
               <p className="text-muted-foreground text-xs">No activity recorded.</p>
             ) : (
@@ -447,52 +458,61 @@ export default function ExpenseDetailPage() {
                 ))}
               </div>
             )}
-          </div>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Sidebar */}
         <div className="space-y-6">
-          <div className="bg-card border border-border rounded-xl p-5 sm:p-6 shadow-xs">
-            <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">Details</h3>
-            <div className="space-y-3 text-sm">
-              <div className="flex justify-between">
-                <span className="text-muted-foreground text-xs">Category</span>
-                <span className="font-medium text-xs text-foreground">{expense.category}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground text-xs">Payment</span>
-                <span className="font-medium text-xs text-foreground">{expense.paymentMethod}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground text-xs">Date</span>
-                <span className="text-xs text-foreground">{new Date(expense.expenseDate).toLocaleDateString()}</span>
-              </div>
-              {expense.referenceNumber && (
+          <Card>
+            <CardHeader className="pb-3 border-b border-border">
+              <CardTitle className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Details</CardTitle>
+            </CardHeader>
+            <CardContent className="pt-4">
+              <div className="space-y-3 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground text-xs">Reference</span>
-                  <span className="font-mono text-xs text-foreground">{expense.referenceNumber}</span>
+                  <span className="text-muted-foreground text-xs">Category</span>
+                  <span className="font-medium text-xs text-foreground">{expense.category}</span>
                 </div>
-              )}
-              <div className="pt-3 border-t border-border flex justify-between items-center">
-                <span className="text-muted-foreground text-xs">Amount</span>
-                <span className="font-bold text-base font-mono text-foreground">₹{parseFloat(expense.amount).toFixed(2)}</span>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground text-xs">Payment</span>
+                  <span className="font-medium text-xs text-foreground">{expense.paymentMethod}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground text-xs">Date</span>
+                  <span className="text-xs text-foreground">{new Date(expense.expenseDate).toLocaleDateString()}</span>
+                </div>
+                {expense.referenceNumber && (
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground text-xs">Reference</span>
+                    <span className="font-mono text-xs text-foreground">{expense.referenceNumber}</span>
+                  </div>
+                )}
+                <div className="pt-3 border-t border-border flex justify-between items-center">
+                  <span className="text-muted-foreground text-xs">Amount</span>
+                  <span className="font-bold text-base font-mono text-foreground">₹{parseFloat(expense.amount).toFixed(2)}</span>
+                </div>
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
-          <div className="bg-card border border-border rounded-xl p-5 sm:p-6 shadow-xs">
-            <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">Timestamps</h3>
-            <div className="space-y-3 text-sm">
-              <div>
-                <p className="text-muted-foreground text-xs mb-0.5">Created</p>
-                <p className="text-xs text-foreground">{new Date(expense.createdAt).toLocaleString()}</p>
+          <Card>
+            <CardHeader className="pb-3 border-b border-border">
+              <CardTitle className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Timestamps</CardTitle>
+            </CardHeader>
+            <CardContent className="pt-4">
+              <div className="space-y-3 text-sm">
+                <div>
+                  <p className="text-muted-foreground text-xs mb-0.5">Created</p>
+                  <p className="text-xs text-foreground">{new Date(expense.createdAt).toLocaleString()}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground text-xs mb-0.5">Last Updated</p>
+                  <p className="text-xs text-foreground">{new Date(expense.updatedAt).toLocaleString()}</p>
+                </div>
               </div>
-              <div>
-                <p className="text-muted-foreground text-xs mb-0.5">Last Updated</p>
-                <p className="text-xs text-foreground">{new Date(expense.updatedAt).toLocaleString()}</p>
-              </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>

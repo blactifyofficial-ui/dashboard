@@ -13,6 +13,8 @@ import {
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { FullSyncStats, FullSyncEntityStats } from '@/lib/google-sheets/types';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 
 interface ConnectionStatus {
   connected: boolean;
@@ -172,17 +174,17 @@ export default function GoogleSheetsSettings() {
 
         <div className="flex items-center gap-2">
           {loading ? (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-xs font-medium bg-muted text-muted-foreground border border-border">
+            <Badge variant="outline" className="gap-1.5 px-2.5 py-0.5 text-xs font-medium bg-muted text-muted-foreground border-border">
               <RefreshCw className="w-3.5 h-3.5 animate-spin" /> Checking...
-            </span>
+            </Badge>
           ) : status?.connected ? (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-xs font-medium bg-emerald-500/15 text-emerald-600 dark:text-emerald-300 border border-emerald-500/30">
+            <Badge variant="outline" className="gap-1.5 px-2.5 py-0.5 text-xs font-medium bg-emerald-500/15 text-emerald-600 dark:text-emerald-300 border-emerald-500/30">
               <CheckCircle2 className="w-3.5 h-3.5" /> Connected
-            </span>
+            </Badge>
           ) : (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-xs font-medium bg-rose-500/15 text-rose-600 dark:text-rose-300 border border-rose-500/30">
+            <Badge variant="outline" className="gap-1.5 px-2.5 py-0.5 text-xs font-medium bg-rose-500/15 text-rose-600 dark:text-rose-300 border-rose-500/30">
               <XCircle className="w-3.5 h-3.5" /> Not Connected
-            </span>
+            </Badge>
           )}
         </div>
       </div>
@@ -248,9 +250,9 @@ export default function GoogleSheetsSettings() {
           </div>
           <div className="flex flex-wrap gap-1.5">
             {status.sheetNames.map((name) => (
-              <span key={name} className="px-2 py-0.5 text-[11px] bg-card rounded border border-border text-foreground font-mono">
+              <Badge key={name} variant="outline" className="px-2 py-0.5 text-[11px] font-mono border-border">
                 {name}
-              </span>
+              </Badge>
             ))}
           </div>
         </div>
@@ -275,33 +277,41 @@ export default function GoogleSheetsSettings() {
 
       {/* Action Buttons */}
       <div className="flex flex-wrap items-center gap-2.5 pt-2">
-        <button
+        <Button
+          variant="secondary"
+          size="sm"
           onClick={handleTestConnection}
           disabled={isTesting}
-          className="h-9 px-3.5 text-xs font-medium bg-muted hover:bg-accent text-foreground rounded-lg border border-border transition-colors inline-flex items-center gap-2 disabled:opacity-50"
+          loading={isTesting}
+          className="gap-2"
         >
-          {isTesting ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
+          {!isTesting && <RefreshCw className="w-3.5 h-3.5" />}
           Test Connection
-        </button>
+        </Button>
 
-        <button
+        <Button
+          size="sm"
           onClick={handleSyncAll}
           disabled={isSyncing}
-          className="h-9 px-4 text-xs font-semibold bg-primary hover:opacity-90 text-primary-foreground rounded-lg transition-colors inline-flex items-center gap-2 disabled:opacity-50 shadow-xs"
+          loading={isSyncing}
+          className="gap-2"
         >
-          {isSyncing ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <RotateCw className="w-3.5 h-3.5" />}
+          {!isSyncing && <RotateCw className="w-3.5 h-3.5" />}
           Sync Everything
-        </button>
+        </Button>
 
         {(status?.failedSyncsCount ?? 0) > 0 && (
-          <button
+          <Button
+            variant="destructive"
+            size="sm"
             onClick={handleRetryFailed}
             disabled={isRetrying}
-            className="h-9 px-3.5 text-xs font-semibold bg-rose-600 hover:bg-rose-500 text-white rounded-lg transition-colors inline-flex items-center gap-2 disabled:opacity-50"
+            loading={isRetrying}
+            className="gap-2"
           >
-            {isRetrying ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
+            {!isRetrying && <RefreshCw className="w-3.5 h-3.5" />}
             Retry Failed Syncs ({status?.failedSyncsCount})
-          </button>
+          </Button>
         )}
       </div>
 

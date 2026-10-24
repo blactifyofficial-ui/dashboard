@@ -7,6 +7,7 @@ import ThemeSwitcher from '@/components/theme/ThemeSwitcher';
 import { requirePermission } from '@/lib/auth-utils';
 import { hasPermission } from '@/lib/rbac';
 import AccessDenied from '@/components/AccessDenied';
+import { Button } from '@/components/ui/button';
 
 export const dynamic = "force-dynamic";
 
@@ -72,9 +73,10 @@ export default async function SettingsPage() {
                   href={shopifyAuthUrl}
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="w-full sm:w-auto h-10 inline-flex items-center justify-center bg-primary text-primary-foreground px-5 rounded-lg text-xs sm:text-sm font-semibold hover:opacity-90 transition-colors shadow-xs"
                 >
-                  Re-Authorize Shopify App
+                  <Button size="sm">
+                    Re-Authorize Shopify App
+                  </Button>
                 </Link>
               </div>
               <p className="mt-4 text-xs text-muted-foreground">

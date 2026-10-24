@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Download } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface BeforeInstallPromptEvent extends Event {
   readonly platforms: string[];
@@ -47,12 +48,12 @@ export default function InstallPWA() {
   }
 
   return (
-    <button
+    <Button
       onClick={handleInstallClick}
-      className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground px-6 py-3 min-h-[44px] rounded-xl font-semibold text-sm hover:opacity-90 active:opacity-80 transition-colors mt-4 shadow-sm"
+      className="mt-4 gap-2"
     >
-      <Download size={18} className="shrink-0" />
+      <Download size={16} className="shrink-0" />
       <span>Install App</span>
-    </button>
+    </Button>
   );
 }

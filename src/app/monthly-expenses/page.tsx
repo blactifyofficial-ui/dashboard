@@ -26,6 +26,7 @@ import TemplateManagerModal from '@/components/monthly-expenses/TemplateManagerM
 import UnlockMonthModal from '@/components/monthly-expenses/UnlockMonthModal';
 import { useAuth } from '@/context/AuthContext';
 import AccessDenied from '@/components/AccessDenied';
+import { Button } from '@/components/ui/button';
 
 export default function MonthlyExpensesPage() {
   const { hasPermission } = useAuth();
@@ -313,22 +314,25 @@ export default function MonthlyExpensesPage() {
 
         <div className="flex items-center gap-2.5 sm:gap-3 w-full sm:w-auto">
           {canManageTemplates && (
-            <button
+            <Button
+              variant="outline"
+              size="sm"
               onClick={() => setIsTemplateModalOpen(true)}
-              className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-card border border-border text-foreground hover:bg-muted px-4 h-11 min-h-[44px] rounded-lg font-medium transition-colors text-sm shadow-xs cursor-pointer"
+              className="flex-1 sm:flex-none h-10"
             >
-              <Layers size={16} />
-              Templates
-            </button>
+              <Layers size={15} />
+              <span>Templates</span>
+            </Button>
           )}
           {canEditBills && (
-            <button
+            <Button
+              size="sm"
               onClick={() => setIsAddModalOpen(true)}
-              className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-primary text-primary-foreground px-4 h-11 min-h-[44px] rounded-lg font-medium hover:opacity-90 transition-opacity text-sm shadow-xs cursor-pointer"
+              className="flex-1 sm:flex-none h-10"
             >
-              <Plus size={16} />
-              Add Bill
-            </button>
+              <Plus size={15} />
+              <span>Add Bill</span>
+            </Button>
           )}
         </div>
       </div>

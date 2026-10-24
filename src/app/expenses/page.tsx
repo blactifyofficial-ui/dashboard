@@ -28,6 +28,17 @@ import LoadingSpinner from '@/components/LoadingSpinner';
 import { useAuth } from '@/context/AuthContext';
 import AccessDenied from '@/components/AccessDenied';
 import type { Expense, DateNote, MonthGroup } from '@/components/expenses/types';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
 
 const ExpenseTable = dynamic(() => import('@/components/expenses/ExpenseTable'), {
   ssr: false,
@@ -511,55 +522,59 @@ export default function ExpensesPage() {
 
             {/* Expenses Table for this Date */}
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm whitespace-nowrap">
-                <thead className="bg-muted/30 text-muted-foreground text-xs border-b border-border">
-                  <tr>
-                    <th className="px-6 py-2.5 font-medium flex items-center gap-1">
-                      <Clock size={12} />
-                      Adding Time
-                    </th>
-                    <th className="px-6 py-2.5 font-medium">Category</th>
-                    <th className="px-6 py-2.5 font-medium">Title</th>
-                    <th className="px-6 py-2.5 font-medium text-right">Amount</th>
-                    <th className="px-6 py-2.5 font-medium">Payment</th>
-                    <th className="px-6 py-2.5 font-medium text-right">Action</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border/60">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-muted/30 hover:bg-muted/30">
+                    <TableHead className="font-medium">
+                      <div className="flex items-center gap-1">
+                        <Clock size={12} />
+                        <span>Adding Time</span>
+                      </div>
+                    </TableHead>
+                    <TableHead className="font-medium">Category</TableHead>
+                    <TableHead className="font-medium">Title</TableHead>
+                    <TableHead className="font-medium text-right">Amount</TableHead>
+                    <TableHead className="font-medium">Payment</TableHead>
+                    <TableHead className="font-medium text-right">Action</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
                   {items.map(expense => (
-                    <tr 
+                    <TableRow 
                       key={expense.id} 
                       className="hover:bg-muted/30 transition-colors group"
                     >
-                      <td className="px-6 py-3 text-muted-foreground font-mono text-xs">
+                      <TableCell className="text-muted-foreground font-mono text-xs">
                         {formatAddedTime(expense.createdAt)}
-                      </td>
-                      <td className="px-6 py-3">
-                        <span className="bg-muted border border-border/70 px-2 py-0.5 rounded text-xs text-foreground">
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline" size="sm">
                           {expense.category || 'N/A'}
-                        </span>
-                      </td>
-                      <td className="px-6 py-3">
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
                         <span className="font-medium text-foreground">{expense.title}</span>
-                      </td>
-                      <td className="px-6 py-3 text-right font-medium text-foreground">
+                      </TableCell>
+                      <TableCell className="text-right font-medium font-mono text-foreground">
                         ₹{parseFloat(expense.amount || '0').toFixed(2)}
-                      </td>
-                      <td className="px-6 py-3 text-muted-foreground text-xs">
+                      </TableCell>
+                      <TableCell className="text-muted-foreground text-xs">
                         {expense.paymentMethod || 'N/A'}
-                      </td>
-                      <td className="px-6 py-3 text-right">
-                        <Link 
-                          href={`/expenses/${expense.id}`} 
-                          className="inline-flex items-center justify-center text-muted-foreground group-hover:text-foreground transition-colors"
-                        >
-                          <ArrowRight size={15} />
-                        </Link>
-                      </td>
-                    </tr>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button variant="ghost" size="icon" asChild className="h-7 w-7">
+                          <Link 
+                            href={`/expenses/${expense.id}`} 
+                            title="View details"
+                          >
+                            <ArrowRight size={14} />
+                          </Link>
+                        </Button>
+                      </TableCell>
+                    </TableRow>
                   ))}
-                </tbody>
-              </table>
+                </TableBody>
+              </Table>
             </div>
           </div>
         )}
@@ -580,29 +595,29 @@ export default function ExpensesPage() {
           <p className="text-xs sm:text-sm text-muted-foreground mt-1">Manage and track your business expenses grouped by date</p>
         </div>
         <div className="flex items-center gap-2.5 w-full sm:w-auto">
-          <button
+          <Button
+            variant="outline"
+            size="icon"
             onClick={fetchData}
             disabled={loading}
-            className="p-2 min-h-[40px] rounded-lg border border-border bg-card text-foreground hover:bg-muted transition-colors disabled:opacity-50 cursor-pointer"
+            className="h-9 w-9 shrink-0"
             title="Refresh expenses"
           >
-            <RefreshCw size={15} className={loading ? 'animate-spin' : ''} />
-          </button>
-          <Link
-            href="/meta-ads"
-            className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 bg-card border border-border text-foreground px-3.5 py-2 min-h-[40px] rounded-lg font-medium hover:bg-muted transition-colors text-xs"
-          >
-            <Megaphone size={15} />
-            <span>Meta Ads</span>
-          </Link>
-          {canEditExpenses && (
-            <Link
-              href="/expenses/add"
-              className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground px-3.5 py-2 min-h-[40px] rounded-lg font-semibold hover:opacity-90 transition-opacity text-xs"
-            >
-              <Plus size={15} />
-              <span>Add Expense</span>
+            <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
+          </Button>
+          <Button variant="outline" size="sm" asChild>
+            <Link href="/meta-ads">
+              <Megaphone size={14} />
+              <span>Meta Ads</span>
             </Link>
+          </Button>
+          {canEditExpenses && (
+            <Button size="sm" asChild>
+              <Link href="/expenses/add">
+                <Plus size={14} />
+                <span>Add Expense</span>
+              </Link>
+            </Button>
           )}
         </div>
       </div>
@@ -693,47 +708,53 @@ export default function ExpensesPage() {
             <div className="flex-none p-3 sm:p-4 border-b border-border flex flex-col sm:flex-row gap-2.5 sm:gap-3 justify-between bg-muted/20">
               <div className="relative w-full sm:max-w-xs">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={15} />
-                <input 
+                <Input 
                   type="text" 
                   placeholder="Search expenses..." 
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-background border border-border rounded-lg pl-9 pr-3 py-1.5 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring transition-colors"
+                  className="pl-9 h-9 text-xs"
                 />
               </div>
               
               <div className="flex items-center flex-wrap gap-2">
                 {/* Collapse / Expand All Toggle */}
                 {totalDaysTracked > 0 && (
-                  <button
+                  <Button
+                    variant="outline"
+                    size="sm"
                     onClick={toggleCollapseAll}
                     title={areAnyExpanded ? 'Collapse all' : 'Expand all'}
-                    className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 text-xs px-3 py-1.5 rounded-lg border bg-card border-border text-foreground hover:bg-muted transition-colors"
+                    className="h-9"
                   >
                     <ChevronsUpDown size={14} />
                     <span>{areAnyExpanded ? 'Collapse All' : 'Expand All'}</span>
-                  </button>
+                  </Button>
                 )}
 
                 {/* Adding Time Sort Order Toggle */}
-                <button
+                <Button
+                  variant="outline"
+                  size="sm"
                   onClick={() => setTimeSortOrder(prev => prev === 'desc' ? 'asc' : 'desc')}
                   title="Toggle order by adding time"
-                  className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 text-xs px-3 py-1.5 rounded-lg border bg-card border-border text-foreground hover:bg-muted transition-colors"
+                  className="h-9"
                 >
                   <ArrowUpDown size={14} />
                   <span>Time: {timeSortOrder === 'desc' ? 'Newest' : 'Oldest'}</span>
-                </button>
+                </Button>
 
                 {/* Category Filter Dropdown */}
                 <div className="relative flex-1 sm:flex-initial">
-                  <button 
+                  <Button 
+                    variant={showFilter || selectedCategory !== 'All' ? 'secondary' : 'outline'}
+                    size="sm"
                     onClick={() => setShowFilter(!showFilter)}
-                    className={`w-full sm:w-auto inline-flex items-center justify-center gap-2 text-xs px-3 py-1.5 rounded-lg border transition-colors ${showFilter || selectedCategory !== 'All' ? 'bg-muted border-border text-foreground font-medium' : 'text-muted-foreground hover:text-foreground bg-card border-border'}`}
+                    className="h-9 w-full sm:w-auto"
                   >
                     <Filter size={14} />
                     <span>{selectedCategory !== 'All' ? selectedCategory : 'Category'}</span>
-                  </button>
+                  </Button>
 
                   {showFilter && (
                     <div className="absolute right-0 top-full mt-2 w-48 bg-popover text-popover-foreground border border-border rounded-lg shadow-xl z-30 py-1 max-h-60 overflow-y-auto">

@@ -19,6 +19,9 @@ import LoadingSpinner from '@/components/LoadingSpinner';
 import type { InventoryResponse } from '@/app/api/inventory/route';
 import { useAuth } from '@/context/AuthContext';
 import AccessDenied from '@/components/AccessDenied';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
 export default function InventoryPage() {
   const { hasPermission } = useAuth();
@@ -293,8 +296,8 @@ export default function InventoryPage() {
       <div className="bg-card border border-border rounded-xl p-3 sm:p-4 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 shadow-xs">
         {/* Search */}
         <div className="relative flex-1 min-w-[220px]">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <input
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input
             type="text"
             value={searchQuery}
             onChange={(e) => {
@@ -302,7 +305,7 @@ export default function InventoryPage() {
               setCurrentPage(1);
             }}
             placeholder="Search by product name, SKU, or category..."
-            className="w-full bg-muted/40 border border-input focus:border-primary rounded-lg h-9 pl-9 pr-4 text-xs sm:text-sm text-foreground placeholder:text-muted-foreground focus:outline-none transition-colors"
+            className="pl-9 h-9 text-xs"
           />
         </div>
 
@@ -432,26 +435,19 @@ export default function InventoryPage() {
                         {/* Stock Status Badge */}
                         <div className="text-right">
                           <div className="flex items-center gap-1.5 justify-end">
-                            <span
-                              className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-xs font-medium ${
+                            <Badge
+                              variant={
                                 product.stockStatus === 'IN_STOCK'
-                                  ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30'
+                                  ? 'success'
                                   : product.stockStatus === 'LOW_STOCK'
-                                  ? 'bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30'
-                                  : 'bg-rose-500/15 text-rose-700 dark:text-rose-300 border border-rose-500/30'
-                              }`}
+                                  ? 'warning'
+                                  : 'destructive'
+                              }
+                              dot
+                              size="sm"
                             >
-                              <span
-                                className={`w-1.5 h-1.5 rounded-full ${
-                                  product.stockStatus === 'IN_STOCK'
-                                    ? 'bg-emerald-500'
-                                    : product.stockStatus === 'LOW_STOCK'
-                                    ? 'bg-amber-500'
-                                    : 'bg-rose-500'
-                                }`}
-                              />
                               {product.totalStock} in stock
-                            </span>
+                            </Badge>
                           </div>
                           {canViewValuation && (
                             <div className="text-[11px] font-mono text-muted-foreground mt-0.5">
@@ -492,20 +488,6 @@ export default function InventoryPage() {
                         </p>
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
                           {product.variants.map((v) => {
-                            const variantStockColor =
-                              v.inventoryQuantity > 5
-                                ? 'text-emerald-700 dark:text-emerald-400'
-                                : v.inventoryQuantity > 0
-                                ? 'text-amber-700 dark:text-amber-400'
-                                : 'text-rose-700 dark:text-rose-400';
-
-                            const variantDotColor =
-                              v.inventoryQuantity > 5
-                                ? 'bg-emerald-500'
-                                : v.inventoryQuantity > 0
-                                ? 'bg-amber-500'
-                                : 'bg-rose-500';
-
                             return (
                               <div
                                 key={v.id}
@@ -520,12 +502,21 @@ export default function InventoryPage() {
                                   </div>
                                 </div>
                                 <div className="text-right">
-                                  <div className={`text-xs font-semibold font-mono flex items-center justify-end gap-1.5 ${variantStockColor}`}>
-                                    <span className={`w-1.5 h-1.5 rounded-full ${variantDotColor}`} />
+                                  <Badge
+                                    variant={
+                                      v.inventoryQuantity > 5
+                                        ? 'success'
+                                        : v.inventoryQuantity > 0
+                                        ? 'warning'
+                                        : 'destructive'
+                                    }
+                                    dot
+                                    size="sm"
+                                  >
                                     {v.inventoryQuantity} in stock
-                                  </div>
+                                  </Badge>
                                   {canViewValuation && (
-                                    <div className="text-[10px] font-mono text-muted-foreground">
+                                    <div className="text-[10px] font-mono text-muted-foreground mt-0.5">
                                       {formatCurrency(v.potentialRevenue)}
                                     </div>
                                   )}
@@ -561,17 +552,15 @@ export default function InventoryPage() {
                     }
                     const isCurrent = page === safeCurrentPage;
                     return (
-                      <button
+                      <Button
                         key={`page-${page}`}
+                        variant={isCurrent ? 'default' : 'outline'}
+                        size="xs"
                         onClick={() => setCurrentPage(page as number)}
-                        className={`min-w-[32px] h-8 px-2 text-xs font-mono font-medium rounded-lg transition-colors ${
-                          isCurrent
-                            ? 'bg-primary text-primary-foreground font-semibold shadow-xs'
-                            : 'bg-card hover:bg-muted text-foreground border border-border shadow-xs'
-                        }`}
+                        className="min-w-[30px] font-mono"
                       >
                         {page}
-                      </button>
+                      </Button>
                     );
                   })}
                 </div>
@@ -597,22 +586,26 @@ export default function InventoryPage() {
                 </div>
 
                 <div className="flex items-center gap-1">
-                  <button
+                  <Button
+                    variant="outline"
+                    size="icon"
                     onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                     disabled={safeCurrentPage <= 1}
-                    className="p-2 min-h-[32px] min-w-[32px] rounded-lg border border-border bg-card text-foreground disabled:opacity-30 disabled:cursor-not-allowed hover:bg-muted transition-colors flex items-center justify-center shadow-xs"
+                    className="h-8 w-8"
                     title="Previous Page"
                   >
                     <ChevronLeft size={14} />
-                  </button>
-                  <button
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="icon"
                     onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                     disabled={safeCurrentPage >= totalPages}
-                    className="p-2 min-h-[32px] min-w-[32px] rounded-lg border border-border bg-card text-foreground disabled:opacity-30 disabled:cursor-not-allowed hover:bg-muted transition-colors flex items-center justify-center shadow-xs"
+                    className="h-8 w-8"
                     title="Next Page"
                   >
                     <ChevronRight size={14} />
-                  </button>
+                  </Button>
                 </div>
               </div>
             </div>

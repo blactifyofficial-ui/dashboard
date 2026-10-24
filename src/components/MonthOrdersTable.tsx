@@ -17,6 +17,10 @@ import {
 
 import { isCodOrder, getCodAmountToCollect, getPrepaidAmount } from '@/lib/order-utils';
 import { formatStoreDate, formatStoreTime } from '@/lib/date-utils';
+import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
 export interface MonthOrderDetail {
   id: string;
@@ -134,31 +138,31 @@ export default function MonthOrdersTable({ orders }: MonthOrdersTableProps) {
   return (
     <div className="bg-card border border-border rounded-xl relative overflow-hidden flex flex-col shadow-xs">
       {/* Header & Filter Controls */}
-      <div className="p-4 sm:p-5 border-b border-border relative z-10 space-y-4 bg-muted/40">
+      <div className="p-4 sm:p-5 border-b border-border relative z-10 space-y-3.5 bg-muted/20">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
           <div>
             <h2 className="text-base sm:text-lg font-semibold text-foreground tracking-tight">
-              Order Details &amp; Payment Types
+              Order Details &amp; Payment Ledger
             </h2>
             <p className="text-muted-foreground text-xs mt-0.5">
-              Detailed list of all orders with order number, amount, and COD / normal payment breakdown
+              Comprehensive transaction records with real-time payment channels and fulfillment states
             </p>
           </div>
 
-          {/* Search Input */}
+          {/* Search Input with 21st.dev Input */}
           <div className="relative w-full lg:w-72">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={15} />
-            <input
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={14} />
+            <Input
               type="text"
-              placeholder="Search orders..."
+              placeholder="Search by order #, name, email..."
               value={searchQuery}
               onChange={(e) => handleSearchChange(e.target.value)}
-              className="w-full bg-card border border-input rounded-lg pl-9 pr-8 py-2 text-xs sm:text-sm text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary transition-colors"
+              className="pl-9 pr-14 h-9 text-xs"
             />
             {searchQuery && (
               <button
                 onClick={() => handleSearchChange('')}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-muted-foreground hover:text-foreground px-1.5 py-0.5 rounded bg-muted"
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-[11px] text-muted-foreground hover:text-foreground px-1.5 py-0.5 rounded bg-muted hover:bg-accent transition-colors"
               >
                 Clear
               </button>
@@ -166,34 +170,34 @@ export default function MonthOrdersTable({ orders }: MonthOrdersTableProps) {
           </div>
         </div>
 
-        {/* Filter Pills */}
+        {/* Filter Toolbar */}
         <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
           {/* Order Type Tabs */}
-          <div className="flex flex-wrap items-center gap-1 bg-muted p-1 rounded-lg border border-border">
+          <div className="flex flex-wrap items-center gap-1 bg-muted/70 p-1 rounded-lg border border-border">
             <button
               onClick={() => handleFilterChange('ALL')}
-              className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors flex items-center gap-1.5 ${
+              className={`px-2.5 py-1 rounded-md text-xs font-medium transition-colors flex items-center gap-1.5 ${
                 filterType === 'ALL'
                   ? 'bg-card text-foreground font-semibold shadow-xs border border-border'
                   : 'text-muted-foreground hover:text-foreground'
               }`}
             >
               <span>All Orders</span>
-              <span className="text-[10px] px-1.5 py-0.2 rounded bg-muted border border-border font-mono text-muted-foreground">
+              <span className="text-[10px] px-1.5 py-0.2 rounded bg-muted border border-border/80 font-mono text-muted-foreground">
                 {orders.length}
               </span>
             </button>
 
             <button
               onClick={() => handleFilterChange('NORMAL')}
-              className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors flex items-center gap-1.5 ${
+              className={`px-2.5 py-1 rounded-md text-xs font-medium transition-colors flex items-center gap-1.5 ${
                 filterType === 'NORMAL'
                   ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 font-semibold border border-emerald-500/30'
                   : 'text-muted-foreground hover:text-foreground'
               }`}
             >
-              <CreditCard size={13} className="text-emerald-600 dark:text-emerald-400" />
-              <span>Normal (Prepaid)</span>
+              <CreditCard size={12} className="text-emerald-600 dark:text-emerald-400" />
+              <span>Prepaid</span>
               <span className="text-[10px] px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 font-mono">
                 {orderStats.normalCount}
               </span>
@@ -201,14 +205,14 @@ export default function MonthOrdersTable({ orders }: MonthOrdersTableProps) {
 
             <button
               onClick={() => handleFilterChange('COD')}
-              className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors flex items-center gap-1.5 ${
+              className={`px-2.5 py-1 rounded-md text-xs font-medium transition-colors flex items-center gap-1.5 ${
                 filterType === 'COD'
                   ? 'bg-amber-500/15 text-amber-700 dark:text-amber-300 font-semibold border border-amber-500/30'
                   : 'text-muted-foreground hover:text-foreground'
               }`}
             >
-              <Banknote size={13} className="text-amber-600 dark:text-amber-400" />
-              <span>COD (Cash on Delivery)</span>
+              <Banknote size={12} className="text-amber-600 dark:text-amber-400" />
+              <span>COD</span>
               <span className="text-[10px] px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-700 dark:text-amber-300 font-mono">
                 {orderStats.codCount}
               </span>
@@ -220,9 +224,9 @@ export default function MonthOrdersTable({ orders }: MonthOrdersTableProps) {
             <SlidersHorizontal size={13} className="text-muted-foreground mr-1 hidden sm:inline" />
             <button
               onClick={() => handleFulfillmentChange('ALL')}
-              className={`px-2.5 py-1.5 rounded-md border transition-colors ${
+              className={`px-2.5 py-1 rounded-md border text-xs transition-colors ${
                 fulfillmentFilter === 'ALL'
-                  ? 'bg-card text-foreground border-border shadow-xs'
+                  ? 'bg-card text-foreground border-border shadow-xs font-medium'
                   : 'text-muted-foreground border-border hover:text-foreground'
               }`}
             >
@@ -230,7 +234,7 @@ export default function MonthOrdersTable({ orders }: MonthOrdersTableProps) {
             </button>
             <button
               onClick={() => handleFulfillmentChange('FULFILLED')}
-              className={`px-2.5 py-1.5 rounded-md border transition-colors ${
+              className={`px-2.5 py-1 rounded-md border text-xs transition-colors ${
                 fulfillmentFilter === 'FULFILLED'
                   ? 'bg-blue-500/15 text-blue-700 dark:text-blue-300 border-blue-500/30 font-medium'
                   : 'text-muted-foreground border-border hover:text-foreground'
@@ -240,9 +244,9 @@ export default function MonthOrdersTable({ orders }: MonthOrdersTableProps) {
             </button>
             <button
               onClick={() => handleFulfillmentChange('UNFULFILLED')}
-              className={`px-2.5 py-1.5 rounded-md border transition-colors ${
+              className={`px-2.5 py-1 rounded-md border text-xs transition-colors ${
                 fulfillmentFilter === 'UNFULFILLED'
-                  ? 'bg-card text-foreground border-border font-medium'
+                  ? 'bg-amber-500/15 text-amber-700 dark:text-amber-300 border-amber-500/30 font-medium'
                   : 'text-muted-foreground border-border hover:text-foreground'
               }`}
             >
@@ -252,10 +256,10 @@ export default function MonthOrdersTable({ orders }: MonthOrdersTableProps) {
         </div>
 
         {/* Showing Summary text */}
-        <div className="flex items-center justify-between text-xs text-muted-foreground pt-1 border-t border-border">
+        <div className="flex items-center justify-between text-xs text-muted-foreground pt-1.5 border-t border-border/80">
           <span>
-            Showing <strong className="text-foreground">{filteredOrders.length}</strong> {filteredOrders.length === 1 ? 'order' : 'orders'}
-            {filterType !== 'ALL' && ` (${filterType === 'NORMAL' ? 'Normal / Prepaid' : 'COD'})`}
+            Showing <strong className="text-foreground font-mono">{filteredOrders.length}</strong> {filteredOrders.length === 1 ? 'order' : 'orders'}
+            {filterType !== 'ALL' && ` (${filterType === 'NORMAL' ? 'Prepaid' : 'COD'})`}
           </span>
           <span>
             Filtered Total: <strong className="text-foreground font-mono">₹{filteredTotalRevenue.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>
@@ -263,33 +267,33 @@ export default function MonthOrdersTable({ orders }: MonthOrdersTableProps) {
         </div>
       </div>
 
-      {/* Orders Table (Desktop & Tablet) */}
+      {/* Orders Table (Desktop & Tablet) using 21st.dev Table */}
       <div className="relative z-10 w-full overflow-x-auto">
-        <table className="w-full text-sm text-left min-w-[700px]">
-          <thead className="text-xs text-muted-foreground uppercase tracking-wider bg-muted/90 border-b border-border">
-            <tr>
-              <th className="px-4 sm:px-6 py-3 font-medium">Order</th>
-              <th className="px-4 sm:px-6 py-3 font-medium">Date &amp; Time</th>
-              <th className="px-4 sm:px-6 py-3 font-medium">Customer</th>
-              <th className="px-4 sm:px-6 py-3 font-medium">Payment / Type</th>
-              <th className="px-4 sm:px-6 py-3 font-medium">Fulfillment</th>
-              <th className="px-4 sm:px-6 py-3 font-medium text-right">Amount</th>
-              <th className="px-4 sm:px-6 py-3 font-medium text-center">Action</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-border">
+        <Table className="min-w-[700px]">
+          <TableHeader className="bg-muted/40">
+            <TableRow>
+              <TableHead className="font-semibold text-xs">Order</TableHead>
+              <TableHead className="font-semibold text-xs">Date &amp; Time</TableHead>
+              <TableHead className="font-semibold text-xs">Customer</TableHead>
+              <TableHead className="font-semibold text-xs">Payment &amp; Gateway</TableHead>
+              <TableHead className="font-semibold text-xs">Fulfillment</TableHead>
+              <TableHead className="font-semibold text-xs text-right">Amount</TableHead>
+              <TableHead className="font-semibold text-xs text-center w-16">Action</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {paginatedOrders.length === 0 ? (
-              <tr>
-                <td colSpan={7} className="px-6 py-16 text-center text-muted-foreground">
-                  <div className="flex flex-col items-center justify-center space-y-3">
-                    <div className="w-12 h-12 rounded-lg bg-muted border border-border flex items-center justify-center text-muted-foreground">
-                      <Package size={24} />
+              <TableRow>
+                <TableCell colSpan={7} className="py-16 text-center text-muted-foreground">
+                  <div className="flex flex-col items-center justify-center space-y-2.5">
+                    <div className="w-10 h-10 rounded-lg bg-muted border border-border flex items-center justify-center text-muted-foreground">
+                      <Package size={20} />
                     </div>
-                    <p className="text-sm font-medium text-foreground">No orders found matching your criteria</p>
-                    <p className="text-xs text-muted-foreground">Try changing your search term or filter options</p>
+                    <p className="text-sm font-medium text-foreground">No orders matching criteria</p>
+                    <p className="text-xs text-muted-foreground">Try adjusting search query or filters</p>
                   </div>
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             ) : (
               paginatedOrders.map((order) => {
                 const isCod = isCodOrder(order);
@@ -298,61 +302,57 @@ export default function MonthOrdersTable({ orders }: MonthOrdersTableProps) {
                 const amount = parseFloat(order.totalPrice || '0') || 0;
 
                 return (
-                  <tr 
-                    key={order.id} 
-                    className="hover:bg-muted/40 transition-colors"
-                  >
+                  <TableRow key={order.id} className="hover:bg-muted/40 transition-colors">
                     {/* Order Number */}
-                    <td className="px-4 sm:px-6 py-3.5 font-medium text-foreground whitespace-nowrap">
+                    <TableCell className="font-medium text-foreground whitespace-nowrap">
                       <Link 
                         href={`/orders/${order.id}`}
-                        className="inline-flex items-center gap-1 font-semibold text-foreground hover:opacity-80 transition-opacity group/link"
+                        className="inline-flex items-center gap-1 font-semibold text-foreground hover:text-primary transition-colors group/link"
                       >
-                        <span className="font-mono text-sm">#{order.orderNumber || order.id.slice(0, 8)}</span>
-                        <ArrowUpRight size={13} className="text-muted-foreground group-hover/link:text-foreground transition-colors shrink-0" />
+                        <span className="font-mono text-xs sm:text-sm">#{order.orderNumber || order.id.slice(0, 8)}</span>
+                        <ArrowUpRight size={13} className="text-muted-foreground group-hover/link:text-primary transition-colors shrink-0" />
                       </Link>
-                    </td>
+                    </TableCell>
 
                     {/* Date */}
-                    <td className="px-4 sm:px-6 py-3.5 text-muted-foreground whitespace-nowrap">
+                    <TableCell className="text-muted-foreground whitespace-nowrap">
                       <div className="text-xs font-medium text-foreground">{formattedDate}</div>
                       {formattedTime && (
                         <div className="text-[11px] text-muted-foreground flex items-center gap-1 mt-0.5">
-                          <Clock size={11} />
+                          <Clock size={10} />
                           <span>{formattedTime}</span>
                         </div>
                       )}
-                    </td>
+                    </TableCell>
 
                     {/* Customer */}
-                    <td className="px-4 sm:px-6 py-3.5">
+                    <TableCell>
                       <div className="font-medium text-foreground text-xs sm:text-sm max-w-[180px] truncate">
                         {order.customerName || 'Guest Customer'}
                       </div>
                       {order.customerEmail && (
-                        <div className="text-xs text-muted-foreground max-w-[180px] truncate mt-0.5">
+                        <div className="text-[11px] text-muted-foreground max-w-[180px] truncate mt-0.5">
                           {order.customerEmail}
                         </div>
                       )}
-                    </td>
+                    </TableCell>
 
                     {/* COD or Normal Order Detail */}
-                    <td className="px-4 sm:px-6 py-3.5 whitespace-nowrap">
+                    <TableCell className="whitespace-nowrap">
                       {isCod ? (
                         <div className="flex flex-col gap-1">
                           <div className="flex items-center gap-1.5 flex-wrap">
-                            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-xs font-medium bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/25 w-fit">
-                              <Banknote size={12} className="text-amber-600 dark:text-amber-400 shrink-0" />
-                              <span>COD</span>
-                            </span>
+                            <Badge variant="warning" dot size="sm">
+                              COD
+                            </Badge>
                             {order.codStatus === 'COLLECTED' ? (
-                              <span className="inline-flex items-center gap-1 px-1.5 py-0.2 rounded text-[10px] font-semibold bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/25">
+                              <Badge variant="success" size="sm">
                                 Collected
-                              </span>
+                              </Badge>
                             ) : order.codStatus === 'RTO' ? (
-                              <span className="inline-flex items-center gap-1 px-1.5 py-0.2 rounded text-[10px] font-semibold bg-rose-500/15 text-rose-700 dark:text-rose-300 border border-rose-500/25">
+                              <Badge variant="destructive" size="sm">
                                 RTO
-                              </span>
+                              </Badge>
                             ) : null}
                           </div>
                           <span className="text-[11px] text-muted-foreground">
@@ -365,10 +365,9 @@ export default function MonthOrdersTable({ orders }: MonthOrdersTableProps) {
                         </div>
                       ) : (
                         <div className="flex flex-col gap-1">
-                          <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-xs font-medium bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/25 w-fit">
-                            <CreditCard size={12} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
-                            <span>Normal (Prepaid)</span>
-                          </span>
+                          <Badge variant="success" dot size="sm" className="w-fit">
+                            Prepaid
+                          </Badge>
                           <span className="text-[11px] text-muted-foreground flex items-center gap-1">
                             <CheckCircle2 size={11} className="text-emerald-600 dark:text-emerald-400" />
                             <span>{order.financialStatus || 'Paid Online'}</span>
@@ -376,18 +375,18 @@ export default function MonthOrdersTable({ orders }: MonthOrdersTableProps) {
                           </span>
                         </div>
                       )}
-                    </td>
+                    </TableCell>
 
                     {/* Fulfillment */}
-                    <td className="px-4 sm:px-6 py-3.5 whitespace-nowrap">
+                    <TableCell className="whitespace-nowrap">
                       <div className="flex flex-col gap-1">
-                        <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium w-fit ${
-                          order.fulfillmentStatus === 'fulfilled'
-                            ? 'bg-blue-500/15 text-blue-700 dark:text-blue-300 border border-blue-500/20'
-                            : 'bg-muted text-muted-foreground border border-border'
-                        }`}>
+                        <Badge 
+                          variant={order.fulfillmentStatus === 'fulfilled' ? 'info' : 'neutral'} 
+                          size="sm"
+                          className="w-fit"
+                        >
                           {order.fulfillmentStatus ? order.fulfillmentStatus.charAt(0).toUpperCase() + order.fulfillmentStatus.slice(1) : 'Unfulfilled'}
-                        </span>
+                        </Badge>
                         {order.trackingId && (
                           order.trackingUrl ? (
                             <a
@@ -407,13 +406,13 @@ export default function MonthOrdersTable({ orders }: MonthOrdersTableProps) {
                           )
                         )}
                       </div>
-                    </td>
+                    </TableCell>
 
                     {/* Amount */}
-                    <td className="px-4 sm:px-6 py-3.5 text-right whitespace-nowrap">
+                    <TableCell className="text-right whitespace-nowrap">
                       {order.financialStatus === 'partially_paid' ? (
                         <div className="flex flex-col items-end gap-0.5">
-                          <span className="font-medium text-sm sm:text-base text-foreground font-mono">
+                          <span className="font-medium text-xs sm:text-sm text-foreground font-mono">
                             ₹{amount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                           </span>
                           <span className="text-[11px] text-amber-600 dark:text-amber-400 font-mono font-medium">
@@ -421,57 +420,68 @@ export default function MonthOrdersTable({ orders }: MonthOrdersTableProps) {
                           </span>
                         </div>
                       ) : (
-                        <span className="font-medium text-sm sm:text-base text-foreground font-mono">
+                        <span className="font-medium text-xs sm:text-sm text-foreground font-mono">
                           ₹{amount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </span>
                       )}
-                    </td>
+                    </TableCell>
 
                     {/* Action */}
-                    <td className="px-4 sm:px-6 py-3.5 text-center whitespace-nowrap">
-                      <Link
-                        href={`/orders/${order.id}`}
-                        className="inline-flex items-center justify-center p-1.5 rounded-lg bg-muted hover:bg-accent text-muted-foreground hover:text-foreground transition-colors border border-border"
-                        title="View Order Details"
-                        aria-label="View Order Details"
+                    <TableCell className="text-center whitespace-nowrap">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        asChild
+                        className="h-7 w-7 text-muted-foreground hover:text-foreground"
                       >
-                        <ArrowUpRight size={14} />
-                      </Link>
-                    </td>
-                  </tr>
+                        <Link
+                          href={`/orders/${order.id}`}
+                          title="View Order Details"
+                          aria-label="View Order Details"
+                        >
+                          <ArrowUpRight size={14} />
+                        </Link>
+                      </Button>
+                    </TableCell>
+                  </TableRow>
                 );
               })
             )}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
 
       {/* Pagination Footer */}
       {totalPages > 1 && (
-        <div className="p-3.5 sm:px-6 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-3 bg-muted/40 relative z-10">
+        <div className="p-3 sm:px-5 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-3 bg-muted/20 relative z-10">
           <div className="text-xs text-muted-foreground">
-            Page <span className="font-medium text-foreground">{currentPage}</span> of <span className="font-medium text-foreground">{totalPages}</span>
+            Page <span className="font-medium font-mono text-foreground">{currentPage}</span> of <span className="font-medium font-mono text-foreground">{totalPages}</span>
           </div>
-          <div className="flex items-center gap-2">
-            <button
+          <div className="flex items-center gap-1.5">
+            <Button
+              variant="outline"
+              size="xs"
               onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
               disabled={currentPage <= 1}
-              className="px-3 py-1.5 min-h-[32px] flex items-center gap-1 text-xs rounded-lg border border-border bg-card text-foreground disabled:opacity-40 disabled:cursor-not-allowed hover:bg-muted transition-colors shadow-xs"
+              className="gap-1"
             >
               <ChevronLeft size={13} />
               <span>Previous</span>
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="outline"
+              size="xs"
               onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
               disabled={currentPage >= totalPages}
-              className="px-3 py-1.5 min-h-[32px] flex items-center gap-1 text-xs rounded-lg border border-border bg-card text-foreground disabled:opacity-40 disabled:cursor-not-allowed hover:bg-muted transition-colors shadow-xs"
+              className="gap-1"
             >
               <span>Next</span>
               <ChevronRight size={13} />
-            </button>
+            </Button>
           </div>
         </div>
       )}
     </div>
   );
 }
+

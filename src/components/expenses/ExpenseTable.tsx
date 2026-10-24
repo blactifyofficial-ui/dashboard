@@ -31,6 +31,17 @@ import {
   ResponsiveContainer
 } from 'recharts';
 import { Expense } from './types';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
 
 const emptySubscribe = () => () => {};
 
@@ -326,7 +337,7 @@ export default function ExpenseTable({ expenses }: { expenses: Expense[] }) {
           {/* Search bar */}
           <div className="relative w-full sm:max-w-xs">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={15} />
-            <input
+            <Input
               type="text"
               placeholder="Search by title, category, payment..."
               value={search}
@@ -334,10 +345,11 @@ export default function ExpenseTable({ expenses }: { expenses: Expense[] }) {
                 setSearch(e.target.value);
                 setCurrentPage(1);
               }}
-              className="w-full bg-background border border-border rounded-lg pl-9 pr-3 py-1.5 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring transition-colors"
+              className="pl-9 pr-8 h-9 text-xs"
             />
             {search && (
               <button
+                type="button"
                 onClick={() => setSearch('')}
                 className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground text-xs"
               >
@@ -357,7 +369,7 @@ export default function ExpenseTable({ expenses }: { expenses: Expense[] }) {
                   setSelectedCategory(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="pl-2.5 pr-7 py-1.5 text-xs bg-card border border-border rounded-lg text-foreground font-medium appearance-none hover:bg-muted/70 transition-colors cursor-pointer"
+                className="pl-2.5 pr-7 h-9 text-xs bg-card border border-border rounded-lg text-foreground font-medium appearance-none hover:bg-muted/70 transition-colors cursor-pointer"
               >
                 <option value="All">All Categories ({categories.length - 1})</option>
                 {categories
@@ -380,7 +392,7 @@ export default function ExpenseTable({ expenses }: { expenses: Expense[] }) {
                   setSelectedPayment(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="pl-2.5 pr-7 py-1.5 text-xs bg-card border border-border rounded-lg text-foreground font-medium appearance-none hover:bg-muted/70 transition-colors cursor-pointer"
+                className="pl-2.5 pr-7 h-9 text-xs bg-card border border-border rounded-lg text-foreground font-medium appearance-none hover:bg-muted/70 transition-colors cursor-pointer"
               >
                 <option value="All">All Payment ({paymentMethods.length - 1})</option>
                 {paymentMethods
@@ -403,7 +415,7 @@ export default function ExpenseTable({ expenses }: { expenses: Expense[] }) {
                   setTimeFilter(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="pl-2.5 pr-7 py-1.5 text-xs bg-card border border-border rounded-lg text-foreground font-medium appearance-none hover:bg-muted/70 transition-colors cursor-pointer"
+                className="pl-2.5 pr-7 h-9 text-xs bg-card border border-border rounded-lg text-foreground font-medium appearance-none hover:bg-muted/70 transition-colors cursor-pointer"
               >
                 <option value="all">All Time</option>
                 <option value="this_month">This Month</option>
@@ -416,42 +428,44 @@ export default function ExpenseTable({ expenses }: { expenses: Expense[] }) {
 
             {/* Reset Filters button if any active */}
             {hasActiveFilters && (
-              <button
+              <Button
                 type="button"
+                variant="outline"
+                size="sm"
                 onClick={resetFilters}
-                className="px-2.5 py-1.5 text-xs rounded-lg border border-border bg-card text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
                 title="Reset all filters"
+                className="h-9"
               >
                 Reset
-              </button>
+              </Button>
             )}
 
             {/* Mini Chart Toggle */}
-            <button
+            <Button
               type="button"
+              variant={showMiniChart ? 'default' : 'outline'}
+              size="sm"
               onClick={() => setShowMiniChart(!showMiniChart)}
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors cursor-pointer ${
-                showMiniChart
-                  ? 'bg-primary text-primary-foreground border-primary shadow-xs'
-                  : 'bg-card border-border text-foreground hover:bg-muted'
-              }`}
               title="Toggle inline trend chart"
+              className="h-9"
             >
               <TrendingUp size={13} />
               <span>{showMiniChart ? 'Hide Trend' : 'Show Trend'}</span>
-            </button>
+            </Button>
 
             {/* Export CSV button */}
-            <button
+            <Button
               type="button"
+              variant="outline"
+              size="sm"
               onClick={handleExportCSV}
               disabled={filteredExpenses.length === 0}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-card border border-border text-foreground hover:bg-muted transition-colors disabled:opacity-50 cursor-pointer"
               title="Export filtered records as CSV"
+              className="h-9"
             >
               <Download size={13} />
               <span className="hidden sm:inline">Export CSV</span>
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -553,72 +567,72 @@ export default function ExpenseTable({ expenses }: { expenses: Expense[] }) {
       {/* Main Table Container */}
       <div className="bg-card border border-border rounded-xl overflow-hidden shadow-xs">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm whitespace-nowrap">
-            <thead className="bg-muted/40 text-muted-foreground text-xs border-b border-border select-none">
-              <tr>
-                <th
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-muted/40 hover:bg-muted/40">
+                <TableHead
                   onClick={() => handleSort('date')}
-                  className="px-5 py-3 font-medium cursor-pointer hover:text-foreground transition-colors group"
+                  className="font-medium cursor-pointer hover:text-foreground transition-colors group select-none"
                 >
                   <div className="flex items-center gap-1.5">
                     <Calendar size={13} />
                     <span>Expense Date</span>
                     {getSortIcon('date')}
                   </div>
-                </th>
-                <th
+                </TableHead>
+                <TableHead
                   onClick={() => handleSort('time')}
-                  className="px-5 py-3 font-medium cursor-pointer hover:text-foreground transition-colors group"
+                  className="font-medium cursor-pointer hover:text-foreground transition-colors group select-none"
                 >
                   <div className="flex items-center gap-1.5">
                     <Clock size={13} />
                     <span>Added Time</span>
                     {getSortIcon('time')}
                   </div>
-                </th>
-                <th
+                </TableHead>
+                <TableHead
                   onClick={() => handleSort('category')}
-                  className="px-5 py-3 font-medium cursor-pointer hover:text-foreground transition-colors group"
+                  className="font-medium cursor-pointer hover:text-foreground transition-colors group select-none"
                 >
                   <div className="flex items-center gap-1.5">
                     <span>Category</span>
                     {getSortIcon('category')}
                   </div>
-                </th>
-                <th
+                </TableHead>
+                <TableHead
                   onClick={() => handleSort('title')}
-                  className="px-5 py-3 font-medium cursor-pointer hover:text-foreground transition-colors group"
+                  className="font-medium cursor-pointer hover:text-foreground transition-colors group select-none"
                 >
                   <div className="flex items-center gap-1.5">
                     <span>Title / Description</span>
                     {getSortIcon('title')}
                   </div>
-                </th>
-                <th
+                </TableHead>
+                <TableHead
                   onClick={() => handleSort('amount')}
-                  className="px-5 py-3 font-medium text-right cursor-pointer hover:text-foreground transition-colors group"
+                  className="font-medium text-right cursor-pointer hover:text-foreground transition-colors group select-none"
                 >
                   <div className="flex items-center justify-end gap-1.5">
                     <span>Amount</span>
                     {getSortIcon('amount')}
                   </div>
-                </th>
-                <th
+                </TableHead>
+                <TableHead
                   onClick={() => handleSort('paymentMethod')}
-                  className="px-5 py-3 font-medium cursor-pointer hover:text-foreground transition-colors group"
+                  className="font-medium cursor-pointer hover:text-foreground transition-colors group select-none"
                 >
                   <div className="flex items-center gap-1.5">
                     <span>Payment Method</span>
                     {getSortIcon('paymentMethod')}
                   </div>
-                </th>
-                <th className="px-5 py-3 font-medium text-right">Action</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border/60">
+                </TableHead>
+                <TableHead className="font-medium text-right">Action</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
               {paginatedExpenses.length === 0 ? (
-                <tr>
-                  <td colSpan={7} className="px-6 py-16 text-center text-muted-foreground">
+                <TableRow>
+                  <TableCell colSpan={7} className="py-16 text-center text-muted-foreground">
                     <Calendar className="mx-auto mb-2 opacity-40" size={28} />
                     <p className="text-sm">No expenses matched your criteria.</p>
                     {hasActiveFilters && (
@@ -630,66 +644,67 @@ export default function ExpenseTable({ expenses }: { expenses: Expense[] }) {
                         Clear filters and search
                       </button>
                     )}
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               ) : (
                 paginatedExpenses.map((expense) => (
-                  <tr
+                  <TableRow
                     key={expense.id}
                     className="hover:bg-muted/40 transition-colors group"
                   >
                     {/* Expense Date */}
-                    <td className="px-5 py-3 text-foreground font-medium text-xs">
+                    <TableCell className="text-foreground font-medium text-xs">
                       {formatDate(expense.expenseDate)}
-                    </td>
+                    </TableCell>
 
                     {/* Added Time */}
-                    <td className="px-5 py-3 text-muted-foreground font-mono text-xs">
+                    <TableCell className="text-muted-foreground font-mono text-xs">
                       {formatTime(expense.createdAt)}
-                    </td>
+                    </TableCell>
 
                     {/* Category */}
-                    <td className="px-5 py-3">
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-muted border border-border text-foreground">
+                    <TableCell>
+                      <Badge variant="outline" size="sm">
                         {expense.category || 'General'}
-                      </span>
-                    </td>
+                      </Badge>
+                    </TableCell>
 
                     {/* Title */}
-                    <td className="px-5 py-3">
+                    <TableCell>
                       <span className="font-semibold text-foreground text-xs sm:text-sm">
                         {expense.title}
                       </span>
-                    </td>
+                    </TableCell>
 
                     {/* Amount */}
-                    <td className="px-5 py-3 text-right font-semibold font-mono text-xs sm:text-sm text-foreground">
+                    <TableCell className="text-right font-semibold font-mono text-xs sm:text-sm text-foreground">
                       ₹{parseFloat(expense.amount || '0').toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                    </td>
+                    </TableCell>
 
                     {/* Payment Method */}
-                    <td className="px-5 py-3 text-muted-foreground text-xs">
+                    <TableCell className="text-muted-foreground text-xs">
                       <span className="inline-flex items-center gap-1.5">
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" />
                         {expense.paymentMethod || 'Not Specified'}
                       </span>
-                    </td>
+                    </TableCell>
 
                     {/* Action */}
-                    <td className="px-5 py-3 text-right">
-                      <Link
-                        href={`/expenses/${expense.id}`}
-                        className="inline-flex items-center justify-center p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
-                        title="View or edit details"
-                      >
-                        <ArrowRight size={15} />
-                      </Link>
-                    </td>
-                  </tr>
+                    <TableCell className="text-right">
+                      <Button variant="ghost" size="icon" asChild className="h-7 w-7">
+                        <Link
+                          href={`/expenses/${expense.id}`}
+                          title="View or edit details"
+                        >
+                          <ArrowRight size={14} />
+                        </Link>
+                      </Button>
+                    </TableCell>
+                  </TableRow>
                 ))
               )}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         </div>
 
         {/* Pagination Footer */}
@@ -709,47 +724,51 @@ export default function ExpenseTable({ expenses }: { expenses: Expense[] }) {
 
             {/* Pagination Controls */}
             <div className="flex items-center gap-1.5">
-              <button
-                type="button"
+              <Button
+                variant="outline"
+                size="icon"
                 onClick={() => setCurrentPage(1)}
                 disabled={safeCurrentPage === 1}
-                className="p-1.5 rounded-md border border-border bg-card text-foreground hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                className="h-8 w-8"
                 title="First Page"
               >
                 <ChevronsLeft size={14} />
-              </button>
-              <button
-                type="button"
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
                 onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
                 disabled={safeCurrentPage === 1}
-                className="p-1.5 rounded-md border border-border bg-card text-foreground hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                className="h-8 w-8"
                 title="Previous Page"
               >
                 <ChevronLeft size={14} />
-              </button>
+              </Button>
 
-              <span className="px-3 py-1 font-medium text-foreground bg-muted rounded-md border border-border">
+              <span className="px-3 py-1 font-medium text-foreground bg-muted rounded-md border border-border h-8 flex items-center">
                 Page {safeCurrentPage} of {totalPages}
               </span>
 
-              <button
-                type="button"
+              <Button
+                variant="outline"
+                size="icon"
                 onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
                 disabled={safeCurrentPage >= totalPages}
-                className="p-1.5 rounded-md border border-border bg-card text-foreground hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                className="h-8 w-8"
                 title="Next Page"
               >
                 <ChevronRight size={14} />
-              </button>
-              <button
-                type="button"
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
                 onClick={() => setCurrentPage(totalPages)}
                 disabled={safeCurrentPage >= totalPages}
-                className="p-1.5 rounded-md border border-border bg-card text-foreground hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                className="h-8 w-8"
                 title="Last Page"
               >
                 <ChevronsRight size={14} />
-              </button>
+              </Button>
             </div>
           </div>
         )}

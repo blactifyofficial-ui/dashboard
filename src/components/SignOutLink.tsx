@@ -16,7 +16,6 @@ export default function SignOutLink() {
         if (lockRef.current) return;
         lockRef.current = true;
         setLoading(true);
-        console.log('[SignOutLink] signOut fired');
         await authClient.signOut({
           fetchOptions: {
             onSuccess: () => {

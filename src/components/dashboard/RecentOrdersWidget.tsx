@@ -1,9 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowUpRight, ShoppingBag, CreditCard, Banknote, PackageCheck, Package } from 'lucide-react';
+import { ArrowUpRight, ShoppingBag } from 'lucide-react';
 import { isCodOrder, getCodAmountToCollect } from '@/lib/order-utils';
 import { formatStoreDate, formatStoreTime } from '@/lib/date-utils';
+import { Badge } from '@/components/ui/badge';
 
 export interface RecentOrder {
   id: string;
@@ -72,28 +73,14 @@ export default function RecentOrdersWidget({
                       {orderNum}
                     </span>
                     {/* Payment Badge */}
-                    <span
-                      className={`inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full border ${
-                        isCod
-                          ? 'border-amber-500/30 text-amber-700 bg-amber-500/10 dark:text-amber-400'
-                          : 'border-emerald-500/30 text-emerald-700 bg-emerald-500/10 dark:text-emerald-400'
-                      }`}
-                    >
-                      {isCod ? <Banknote size={10} /> : <CreditCard size={10} />}
+                    <Badge variant={isCod ? 'warning' : 'success'} size="sm" dot>
                       {order.financialStatus === 'partially_paid' ? 'Partial COD' : (isCod ? 'COD' : 'Prepaid')}
-                    </span>
+                    </Badge>
 
                     {/* Fulfillment Badge */}
-                    <span
-                      className={`hidden sm:inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full border ${
-                        isFulfilled
-                          ? 'border-emerald-500/30 text-emerald-700 bg-emerald-500/10 dark:text-emerald-400'
-                          : 'border-orange-500/30 text-orange-700 bg-orange-500/10 dark:text-orange-400'
-                      }`}
-                    >
-                      {isFulfilled ? <PackageCheck size={10} /> : <Package size={10} />}
+                    <Badge variant={isFulfilled ? 'info' : 'neutral'} size="sm" className="hidden sm:inline-flex">
                       {isFulfilled ? 'Fulfilled' : 'Unfulfilled'}
-                    </span>
+                    </Badge>
                   </div>
 
                   <div className="flex items-center gap-2 text-xs text-muted-foreground truncate">
