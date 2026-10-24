@@ -7,9 +7,7 @@ interface LoadingSpinnerProps {
 
 export default function LoadingSpinner({ size = 'default', className = '' }: LoadingSpinnerProps) {
   const isSmall = size === 'small';
-  const width = isSmall ? 112 : 160;
-  const height = isSmall ? 11 : 16;
-  const imgClass = `${isSmall ? 'w-28' : 'w-40'} h-auto animate-pulse opacity-60 relative z-10`;
+  const imgClass = `${isSmall ? 'w-24' : 'w-36'} h-auto animate-pulse opacity-60 relative z-10`;
 
   return (
     <div className={`w-full h-full flex items-center justify-center relative z-10 ${isSmall ? 'min-h-[20vh]' : 'flex-1 min-h-[50vh]'} ${className}`}>
@@ -17,19 +15,19 @@ export default function LoadingSpinner({ size = 'default', className = '' }: Loa
         <Image 
           src="/blactify_logo_font.svg" 
           alt="Loading..." 
-          width={width} 
-          height={height} 
+          width={653} 
+          height={66} 
           className={`${imgClass} hidden dark:block`} 
-          style={{ width: 'auto', height: 'auto' }}
+          style={{ width: isSmall ? '96px' : '135px', height: 'auto' }}
           priority
         />
         <Image 
           src="/blactify_logo_dark.svg" 
           alt="Loading..." 
-          width={width} 
-          height={height} 
+          width={653} 
+          height={66} 
           className={`${imgClass} block dark:hidden`} 
-          style={{ width: 'auto', height: 'auto' }}
+          style={{ width: isSmall ? '96px' : '135px', height: 'auto' }}
           priority
         />
       </div>
