@@ -169,6 +169,7 @@ async function DashboardContent({ authRes: initialAuthRes }: { authRes?: AuthRes
   let mtdOrders = 0;
 
   let totalMtdExpenses = 0;
+  let totalAllTimeExpenses = 0;
   let mtdExpensesCount = 0;
   let monthlyBillsPaidAmount = 0;
   let monthlyBillsPendingAmount = 0;
@@ -413,7 +414,7 @@ async function DashboardContent({ authRes: initialAuthRes }: { authRes?: AuthRes
       }));
     }
 
-    // 7. Monthly Expenses and Recurring Bills Query for current month
+    // 7. Monthly Expenses and Recurring Bills Query for current month and all-time
     if (canSeeExpenseData) {
       const [expensesResult] = await db
         .select({
@@ -432,6 +433,17 @@ async function DashboardContent({ authRes: initialAuthRes }: { authRes?: AuthRes
       if (expensesResult) {
         totalMtdExpenses = Number(expensesResult.total ?? 0);
         mtdExpensesCount = Number(expensesResult.count ?? 0);
+      }
+
+      const [allTimeExpensesResult] = await db
+        .select({
+          total: sql<number>`COALESCE(SUM(CAST(${expenses.amount} AS NUMERIC)), 0)`,
+        })
+        .from(expenses)
+        .where(isNull(expenses.deletedAt));
+
+      if (allTimeExpensesResult) {
+        totalAllTimeExpenses = Number(allTimeExpensesResult.total ?? 0);
       }
 
       const currentMonthKey = `${storeNow.year}-${String(storeNow.month).padStart(2, '0')}`;
@@ -506,6 +518,7 @@ async function DashboardContent({ authRes: initialAuthRes }: { authRes?: AuthRes
         unfulfilledOrders={unfulfilledCount}
         totalAllTimeSales={totalAllTimeSales}
         totalAllTimeOrders={totalAllTimeOrders}
+        totalAllTimeExpenses={totalAllTimeExpenses}
       />
 
       {/* 2. Payment Channel, Fulfillment Health & Monthly Expenses */}

@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { CreditCard, Banknote, PackageCheck, Package, Clock, Receipt, CheckCircle2, ArrowUpRight } from 'lucide-react';
+import { NumberTicker } from '@/components/ui/number-ticker';
 
 export interface RecentMonthlyBill {
   id: string;
@@ -111,14 +112,14 @@ export default function PaymentAndFulfillmentCard({
             <div className="space-y-0.5">
               {canViewRevenue && (
                 <p className="text-sm sm:text-base font-bold font-mono text-foreground truncate" title={`₹${Math.round(prepaidRevenue).toLocaleString('en-IN')}`}>
-                  ₹{Math.round(prepaidRevenue).toLocaleString('en-IN')}{' '}
+                  ₹<NumberTicker value={Math.round(prepaidRevenue)} locale="en-IN" className="text-inherit dark:text-inherit font-mono" />{' '}
                   <span className="text-[11px] font-normal text-muted-foreground font-sans">
                     ({prepaidRevenuePercent}%)
                   </span>
                 </p>
               )}
               <p className="text-xs text-muted-foreground truncate">
-                <strong className="text-foreground font-mono">{prepaidCount}</strong> orders
+                <strong className="text-foreground font-mono"><NumberTicker value={prepaidCount} locale="en-IN" className="text-inherit dark:text-inherit font-mono" /></strong> orders
               </p>
             </div>
           </div>
@@ -141,14 +142,14 @@ export default function PaymentAndFulfillmentCard({
             <div className="space-y-0.5">
               {canViewRevenue && (
                 <p className="text-sm sm:text-base font-bold font-mono text-foreground truncate" title={`₹${Math.round(codRevenue).toLocaleString('en-IN')}`}>
-                  ₹{Math.round(codRevenue).toLocaleString('en-IN')}{' '}
+                  ₹<NumberTicker value={Math.round(codRevenue)} locale="en-IN" className="text-inherit dark:text-inherit font-mono" />{' '}
                   <span className="text-[11px] font-normal text-muted-foreground font-sans">
                     ({codRevenuePercent}%)
                   </span>
                 </p>
               )}
               <p className="text-xs text-muted-foreground truncate">
-                <strong className="text-foreground font-mono">{codCount}</strong> orders
+                <strong className="text-foreground font-mono"><NumberTicker value={codCount} locale="en-IN" className="text-inherit dark:text-inherit font-mono" /></strong> orders
               </p>
             </div>
           </div>
@@ -164,7 +165,7 @@ export default function PaymentAndFulfillmentCard({
               <p className="text-xs text-muted-foreground mt-0.5 truncate">Operational dispatch and shipping health</p>
             </div>
             <span className="text-xs font-mono text-muted-foreground bg-muted px-2 py-0.5 rounded shrink-0">
-              {totalOrders} Total Orders
+              <NumberTicker value={totalOrders} locale="en-IN" className="text-inherit dark:text-inherit font-mono" /> Total Orders
             </span>
           </div>
 
@@ -176,7 +177,7 @@ export default function PaymentAndFulfillmentCard({
                 <PackageCheck size={14} className="text-emerald-500 shrink-0" />
               </div>
               <p className="text-lg sm:text-xl font-bold font-mono text-emerald-600 dark:text-emerald-400 truncate">
-                {fulfilledCount}
+                <NumberTicker value={fulfilledCount} locale="en-IN" className="text-inherit dark:text-inherit font-mono" />
               </p>
               <p className="text-[10px] text-muted-foreground mt-0.5 truncate">
                 {totalOrders > 0 ? Math.round((fulfilledCount / totalOrders) * 100) : 0}% of total
@@ -196,7 +197,7 @@ export default function PaymentAndFulfillmentCard({
               <p className={`text-lg sm:text-xl font-bold font-mono truncate ${
                 unfulfilledCount > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-foreground'
               }`}>
-                {unfulfilledCount}
+                <NumberTicker value={unfulfilledCount} locale="en-IN" className="text-inherit dark:text-inherit font-mono" />
               </p>
               <p className="text-[10px] text-muted-foreground mt-0.5 truncate">
                 {unfulfilledCount > 0 ? 'Awaiting' : 'Dispatched'}
@@ -210,7 +211,7 @@ export default function PaymentAndFulfillmentCard({
                 <Clock size={14} className="text-blue-500 shrink-0" />
               </div>
               <p className="text-lg sm:text-xl font-bold font-mono text-foreground truncate">
-                {partiallyFulfilledCount}
+                <NumberTicker value={partiallyFulfilledCount} locale="en-IN" className="text-inherit dark:text-inherit font-mono" />
               </p>
               <p className="text-[10px] text-muted-foreground mt-0.5 truncate">
                 Split
@@ -270,10 +271,10 @@ export default function PaymentAndFulfillmentCard({
                 </div>
                 <div className="space-y-0.5">
                   <p className="text-sm sm:text-base font-bold font-mono text-foreground truncate" title={`₹${Math.round(monthlyBillsPaidAmount).toLocaleString('en-IN')}`}>
-                    ₹{Math.round(monthlyBillsPaidAmount).toLocaleString('en-IN')}
+                    ₹<NumberTicker value={Math.round(monthlyBillsPaidAmount)} locale="en-IN" className="text-inherit dark:text-inherit font-mono" />
                   </p>
                   <p className="text-xs text-muted-foreground truncate">
-                    <strong className="text-foreground font-mono">{monthlyBillsPaidCount}</strong> of {monthlyBillsTotalCount} settled
+                    <strong className="text-foreground font-mono"><NumberTicker value={monthlyBillsPaidCount} locale="en-IN" className="text-inherit dark:text-inherit font-mono" /></strong> of {monthlyBillsTotalCount} settled
                   </p>
                 </div>
               </div>
@@ -285,10 +286,10 @@ export default function PaymentAndFulfillmentCard({
                 </div>
                 <div className="space-y-0.5">
                   <p className="text-sm sm:text-base font-bold font-mono text-foreground truncate" title={`₹${Math.round(monthlyBillsPendingAmount).toLocaleString('en-IN')}`}>
-                    ₹{Math.round(monthlyBillsPendingAmount).toLocaleString('en-IN')}
+                    ₹<NumberTicker value={Math.round(monthlyBillsPendingAmount)} locale="en-IN" className="text-inherit dark:text-inherit font-mono" />
                   </p>
                   <p className="text-xs text-muted-foreground truncate">
-                    <strong className="text-foreground font-mono">{Math.max(0, monthlyBillsTotalCount - monthlyBillsPaidCount)}</strong> due
+                    <strong className="text-foreground font-mono"><NumberTicker value={Math.max(0, monthlyBillsTotalCount - monthlyBillsPaidCount)} locale="en-IN" className="text-inherit dark:text-inherit font-mono" /></strong> due
                   </p>
                 </div>
               </div>
@@ -304,7 +305,7 @@ export default function PaymentAndFulfillmentCard({
                     <div key={bill.id} className="flex items-center justify-between text-xs py-0.5 gap-2 min-w-0">
                       <span className="truncate flex-1 min-w-0 text-foreground/90 font-medium">{bill.name}</span>
                       <div className="flex items-center gap-2 shrink-0">
-                        <span className="font-mono font-medium text-foreground">₹{Math.round(amount).toLocaleString('en-IN')}</span>
+                        <span className="font-mono font-medium text-foreground">₹<NumberTicker value={Math.round(amount)} locale="en-IN" className="text-inherit dark:text-inherit font-mono" /></span>
                         <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${
                           isPaid 
                             ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' 
@@ -322,7 +323,7 @@ export default function PaymentAndFulfillmentCard({
 
           <div className="pt-3 border-t border-border/70 mt-3 flex items-center justify-between text-xs text-muted-foreground min-w-0 gap-2">
             <span className="truncate">
-              Total MTD: <strong className="text-foreground font-mono font-semibold">₹{Math.round(totalMtdExpenses).toLocaleString('en-IN')}</strong>
+              Total MTD: <strong className="text-foreground font-mono font-semibold">₹<NumberTicker value={Math.round(totalMtdExpenses)} locale="en-IN" className="text-inherit dark:text-inherit font-mono" /></strong>
             </span>
             <Link
               href="/monthly-expenses"
