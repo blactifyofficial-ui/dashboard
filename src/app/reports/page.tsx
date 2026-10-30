@@ -1,5 +1,5 @@
 import { requireAuth } from '@/lib/auth-utils';
-import { hasPermission, canAccessRoute } from '@/lib/rbac';
+import { canAccessRoute } from '@/lib/rbac';
 import AccessDenied from '@/components/AccessDenied';
 import { redirect } from 'next/navigation';
 import { listMonthlyFinancialReports, getOrCompileMonthlyReport } from '@/lib/financial-report-service';
@@ -8,10 +8,6 @@ import {
   FileText,
   CalendarCheck,
   ArrowUpRight,
-  Download,
-  DollarSign,
-  Receipt,
-  Percent,
   Sparkles,
   Clock,
   CheckCircle2,

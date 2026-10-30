@@ -7,7 +7,7 @@ interface ReportSalesBreakdownProps {
 }
 
 export function ReportSalesBreakdown({ data }: ReportSalesBreakdownProps) {
-  const { sales, kpis } = data;
+  const { sales } = data;
 
   const fmtINR = (val: number) => {
     return `₹${val.toLocaleString('en-IN', {

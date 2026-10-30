@@ -12,12 +12,8 @@ import { monthlyFinancialReports } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import {
   ArrowLeft,
-  CalendarDays,
   CheckCircle2,
   Sparkles,
-  TrendingUp,
-  TrendingDown,
-  Info,
 } from 'lucide-react';
 import Link from 'next/link';
 

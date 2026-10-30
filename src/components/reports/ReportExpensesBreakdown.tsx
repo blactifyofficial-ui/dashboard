@@ -1,6 +1,6 @@
 import React from 'react';
 import type { FinancialReportData } from '@/lib/financial-report-service';
-import { Layers, CalendarCheck, Megaphone } from 'lucide-react';
+import { Layers, CalendarCheck } from 'lucide-react';
 
 interface ReportExpensesBreakdownProps {
   data: FinancialReportData;

@@ -26,7 +26,7 @@ export function buildFinancialReportPdf(data: FinancialReportData): jsPDF {
   };
 
   // Header background banner
-  const drawPageHeader = (pageNumber: number) => {
+  const drawPageHeader = () => {
     doc.setFillColor(15, 23, 42); // slate-900
     doc.rect(0, 0, pageWidth, 28, 'F');
 
@@ -60,7 +60,7 @@ export function buildFinancialReportPdf(data: FinancialReportData): jsPDF {
   };
 
   // Draw header for page 1
-  drawPageHeader(1);
+  drawPageHeader();
 
   let currentY = 35;
 
@@ -275,7 +275,7 @@ export function buildFinancialReportPdf(data: FinancialReportData): jsPDF {
 
   // PAGE 2: Operating Expenses & Top Products
   doc.addPage();
-  drawPageHeader(2);
+  drawPageHeader();
 
   currentY = 35;
 

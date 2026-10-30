@@ -1,5 +1,5 @@
 import React from 'react';
-import type { ReportKpis, FinancialReportData } from '@/lib/financial-report-service';
+import type { FinancialReportData } from '@/lib/financial-report-service';
 import {
   TrendingUp,
   TrendingDown,
