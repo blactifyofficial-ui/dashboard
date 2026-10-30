@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { requirePermission } from '@/lib/auth-utils';
+import { deleteLocalOrder } from '@/lib/shopify-sync';
 
 export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   const authResult = await requirePermission('orders:view');
@@ -23,6 +24,12 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
       }
     });
 
+    if (response.status === 404) {
+      // Order was deleted in Shopify - prune it locally as well
+      await deleteLocalOrder(id);
+      return NextResponse.json({ error: 'Order not found in Shopify (deleted)', notFound: true, deletedLocally: true }, { status: 404 });
+    }
+
     if (!response.ok) {
       const errorText = await response.text();
       console.error('Shopify API response status:', response.status);
@@ -34,6 +41,25 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     return NextResponse.json(data.order);
   } catch (error) {
     console.error('Error fetching order from Shopify:', error);
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+  }
+}
+
+export async function DELETE(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const authResult = await requirePermission('settings:sync_orders');
+  if ('error' in authResult) {
+    return NextResponse.json({ error: authResult.error }, { status: authResult.status });
+  }
+
+  const { id } = await params;
+  try {
+    const deleted = await deleteLocalOrder(id);
+    if (!deleted) {
+      return NextResponse.json({ error: 'Order not found' }, { status: 404 });
+    }
+    return NextResponse.json({ success: true, message: 'Order successfully removed' }, { status: 200 });
+  } catch (error) {
+    console.error('Error deleting order:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }

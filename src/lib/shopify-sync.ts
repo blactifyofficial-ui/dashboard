@@ -1,5 +1,7 @@
 import { db } from '@/db';
-import { orders, orderItems } from '@/db/schema';
+import { orders, orderItems, codCollectionActivities } from '@/db/schema';
+import { eq, or } from 'drizzle-orm';
+import { enqueueSyncJob } from '@/lib/google-sheets';
 
 export interface ShopifyLineItem {
   id: number;
@@ -49,18 +51,70 @@ interface ShopifyProduct {
 export interface SyncOptions {
   limit?: number;
   status?: string;
+  pruneDeleted?: boolean;
 }
 
 export interface SyncResult {
   success: boolean;
   count: number;
+  deletedCount?: number;
+  message?: string;
   syncedAt: string;
   error?: string;
 }
 
 /**
+ * Deletes an order and its associated records (order items, COD activities)
+ * from the local database, and enqueues Google Sheets sync deletion.
+ */
+export async function deleteLocalOrder(orderIdOrShopifyId: string): Promise<boolean> {
+  const [existing] = await db
+    .select({ id: orders.id, orderNumber: orders.orderNumber })
+    .from(orders)
+    .where(or(eq(orders.id, orderIdOrShopifyId), eq(orders.shopifyOrderId, orderIdOrShopifyId)))
+    .limit(1);
+
+  if (!existing) {
+    return false;
+  }
+
+  // 1. Fetch line items to enqueue their deletion for Google Sheets
+  const items = await db
+    .select({ id: orderItems.id })
+    .from(orderItems)
+    .where(eq(orderItems.orderId, existing.id));
+
+  for (const item of items) {
+    void enqueueSyncJob({
+      entity: 'order_items',
+      databaseId: item.id,
+      operation: 'DELETE',
+    });
+  }
+
+  // 2. Delete line items from DB
+  await db.delete(orderItems).where(eq(orderItems.orderId, existing.id));
+
+  // 3. Delete COD collection activities from DB
+  await db.delete(codCollectionActivities).where(eq(codCollectionActivities.orderId, existing.id));
+
+  // 4. Delete the order itself
+  await db.delete(orders).where(eq(orders.id, existing.id));
+
+  // 5. Enqueue order deletion for Google Sheets
+  void enqueueSyncJob({
+    entity: 'orders',
+    databaseId: existing.id,
+    operation: 'DELETE',
+  });
+
+  return true;
+}
+
+/**
  * Core function to fetch and sync orders and line items from Shopify Admin API into PostgreSQL.
- * Runs every 3 minutes to keep PostgreSQL fresh.
+ * Runs periodically to keep PostgreSQL fresh and consistent with Shopify.
+ * If orders are deleted in Shopify, it prunes them from the local database.
  */
 export async function syncShopifyOrders(options: SyncOptions = {}): Promise<SyncResult> {
   const shop = process.env.SHOPIFY_SHOP_NAME;
@@ -72,25 +126,42 @@ export async function syncShopifyOrders(options: SyncOptions = {}): Promise<Sync
 
   const limit = options.limit || 250;
   const status = options.status || 'any';
+  const pruneDeleted = options.pruneDeleted ?? (status === 'any');
 
-  const response = await fetch(`https://${shop}/admin/api/2024-01/orders.json?status=${status}&limit=${limit}`, {
-    headers: {
-      'X-Shopify-Access-Token': token,
-      'Content-Type': 'application/json',
-    },
-    // Prevent Next.js from caching Shopify API responses
-    cache: 'no-store',
-  });
+  // Fetch all orders from Shopify with pagination support
+  const fetchedOrders: ShopifyOrder[] = [];
+  let nextUrl: string | null = `https://${shop}/admin/api/2024-01/orders.json?status=${status}&limit=${limit}`;
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    console.error('Shopify API response status:', response.status);
-    console.error('Shopify API response body:', errorText);
-    throw new Error(`Shopify API error: ${response.status} - ${errorText}`);
+  while (nextUrl) {
+    const response: Response = await fetch(nextUrl, {
+      headers: {
+        'X-Shopify-Access-Token': token,
+        'Content-Type': 'application/json',
+      },
+      // Prevent Next.js from caching Shopify API responses
+      cache: 'no-store',
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Shopify API response status:', response.status);
+      console.error('Shopify API response body:', errorText);
+      throw new Error(`Shopify API error: ${response.status} - ${errorText}`);
+    }
+
+    const data = await response.json();
+    if (data.orders && Array.isArray(data.orders)) {
+      fetchedOrders.push(...data.orders);
+    }
+
+    const linkHeader: string | null = response.headers.get('link');
+    if (linkHeader && linkHeader.includes('rel="next"')) {
+      const match: RegExpMatchArray | null = linkHeader.match(/<([^>]+)>;\s*rel="next"/);
+      nextUrl = match ? match[1] : null;
+    } else {
+      nextUrl = null;
+    }
   }
-
-  const data = await response.json();
-  const fetchedOrders: ShopifyOrder[] = data.orders || [];
 
   // Extract unique product IDs
   const productIds = new Set<string>();
@@ -218,9 +289,40 @@ export async function syncShopifyOrders(options: SyncOptions = {}): Promise<Sync
     }
   }
 
+  // Prune orders that were deleted in Shopify
+  let deletedCount = 0;
+  if (pruneDeleted) {
+    const activeShopifyOrderIds = new Set(fetchedOrders.map((o) => o.id.toString()));
+    const existingOrders = await db
+      .select({ id: orders.id, shopifyOrderId: orders.shopifyOrderId, orderNumber: orders.orderNumber })
+      .from(orders);
+
+    const ordersToDelete = existingOrders.filter(
+      (order) => !activeShopifyOrderIds.has(order.shopifyOrderId)
+    );
+
+    if (ordersToDelete.length > 0) {
+      console.log(
+        `[Shopify Sync] Found ${ordersToDelete.length} deleted order(s) in Shopify. Pruning from DB:`,
+        ordersToDelete.map((o) => `#${o.orderNumber || o.id}`)
+      );
+
+      for (const order of ordersToDelete) {
+        await deleteLocalOrder(order.id);
+        deletedCount++;
+      }
+    }
+  }
+
+  const message = deletedCount > 0
+    ? `Successfully synced ${fetchedOrders.length} orders (${deletedCount} deleted order${deletedCount > 1 ? 's' : ''} removed to match Shopify).`
+    : `Successfully synced ${fetchedOrders.length} orders from Shopify.`;
+
   return {
     success: true,
     count: fetchedOrders.length,
+    deletedCount,
+    message,
     syncedAt: new Date().toISOString(),
   };
 }

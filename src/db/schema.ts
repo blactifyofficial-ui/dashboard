@@ -28,7 +28,7 @@ export const orders = pgTable('orders', {
 
 export const orderItems = pgTable('order_items', {
   id: text('id').primaryKey(),
-  orderId: text('order_id').references(() => orders.id).notNull(),
+  orderId: text('order_id').references(() => orders.id, { onDelete: 'cascade' }).notNull(),
   shopifyProductId: text('shopify_product_id'),
   title: text('title'),
   quantity: numeric('quantity'),
@@ -275,7 +275,7 @@ export const googleSheetsSyncQueue = pgTable('google_sheets_sync_queue', {
 
 export const codCollectionActivities = pgTable('cod_collection_activities', {
   id: text('id').primaryKey(),
-  orderId: text('order_id').references(() => orders.id).notNull(),
+  orderId: text('order_id').references(() => orders.id, { onDelete: 'cascade' }).notNull(),
   actorId: text('actor_id').references(() => users.id),
   action: text('action').notNull(), // 'MARKED_COLLECTED' | 'REVERTED_PENDING' | 'UPDATED_DETAILS' | 'MARKED_RTO'
   amount: numeric('amount'),

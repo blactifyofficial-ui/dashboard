@@ -3,6 +3,7 @@ import crypto from 'crypto';
 import { db } from '@/db';
 import { orders, orderItems } from '@/db/schema';
 import { enqueueSyncJob } from '@/lib/google-sheets';
+import { deleteLocalOrder } from '@/lib/shopify-sync';
 
 export async function POST(req: Request) {
   try {
@@ -27,6 +28,16 @@ export async function POST(req: Request) {
     
     // Check webhook topic
     const topic = req.headers.get('X-Shopify-Topic');
+
+    // Handle order deletion from Shopify
+    if (topic === 'orders/delete') {
+      const orderId = payload.id?.toString();
+      if (orderId) {
+        await deleteLocalOrder(orderId);
+      }
+      return NextResponse.json({ success: true, action: 'deleted' }, { status: 200 });
+    }
+
     if (
       topic === 'orders/create' ||
       topic === 'orders/updated' ||
