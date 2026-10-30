@@ -71,6 +71,11 @@ export const PERMISSIONS = {
   'settings:sync_orders': ['SUPER_ADMIN', 'ADMIN'],
   'settings:manage_integrations': ['SUPER_ADMIN'],
   'settings:manage_users': ['SUPER_ADMIN'],
+
+  // --- 12. Monthly Financial Reports ---
+  'reports:view': ['SUPER_ADMIN', 'ADMIN', 'PARTNER', 'VIEWER'],
+  'reports:export': ['SUPER_ADMIN', 'ADMIN', 'PARTNER'],
+  'reports:generate': ['SUPER_ADMIN', 'ADMIN'],
 } as const;
 
 export type Permission = keyof typeof PERMISSIONS;
@@ -86,7 +91,8 @@ export type PermissionCategory =
   | 'Expenses'
   | 'Monthly Bills'
   | 'Team & Roles'
-  | 'Settings & Integrations';
+  | 'Settings & Integrations'
+  | 'Financial Reports';
 
 export interface PermissionItem {
   key: Permission;
@@ -166,6 +172,11 @@ export const PERMISSION_CATALOG: PermissionItem[] = [
   { key: 'settings:sync_orders', label: 'Trigger Manual Shopify Sync', description: 'Trigger manual synchronization of Shopify orders and customers', category: 'Settings & Integrations' },
   { key: 'settings:manage_integrations', label: 'Manage Integrations', description: 'Authorize Shopify OAuth app and configure Google Sheets backup sync', category: 'Settings & Integrations' },
   { key: 'settings:manage_users', label: 'Manage Team & Roles (Legacy)', description: 'Legacy compatibility key for managing users and roles', category: 'Settings & Integrations' },
+
+  // 12. Monthly Financial Reports
+  { key: 'reports:view', label: 'View Monthly Financial Reports', description: 'Access company-level closed month financial reports and executive summaries', category: 'Financial Reports' },
+  { key: 'reports:export', label: 'Download PDF Financial Reports', description: 'Download official executive financial PDF reports for any completed month', category: 'Financial Reports' },
+  { key: 'reports:generate', label: 'Generate & Email Monthly Reports', description: 'Compile closed month statements, regenerate reports, and trigger email delivery', category: 'Financial Reports' },
 ];
 
 export const ROLE_COLOR_PALETTES: Record<string, { badge: string; bg: string; text: string; border: string }> = {
@@ -262,6 +273,9 @@ export function hasPermission(
     if (permission === 'settings:view' && customPermissions.some((p) => p.startsWith('settings:'))) {
       return true;
     }
+    if (permission === 'reports:view' && customPermissions.some((p) => p.startsWith('reports:'))) {
+      return true;
+    }
     if (permission === 'team:view' && (customPermissions.some((p) => p.startsWith('team:')) || customPermissions.includes('settings:manage_users'))) {
       return true;
     }
@@ -307,6 +321,7 @@ export const ROUTE_PERMISSIONS: Record<string, Permission> = {
   '/monthly-expenses': 'monthly_expenses:view',
   '/team': 'team:view',
   '/settings': 'settings:view',
+  '/reports': 'reports:view',
 };
 
 /**
@@ -329,6 +344,11 @@ export const PAGE_PERMISSIONS: Record<string, readonly Permission[]> = {
   ],
   '/orders': [
     'orders:view',
+  ],
+  '/reports': [
+    'reports:view',
+    'reports:export',
+    'reports:generate',
   ],
   '/cod': [
     'cod:view',

@@ -10,6 +10,7 @@ import {
   HandCoins,
   Boxes,
   CalendarCheck,
+  FileText,
   Wallet,
   Banknote,
   Handshake,
@@ -51,6 +52,7 @@ const NAV_GROUPS: NavGroupDef[] = [
   {
     title: "Finance & Capital",
     items: [
+      { href: "/reports", label: "Monthly Reports", icon: FileText },
       { href: "/monthly-expenses", label: "Monthly Bills", icon: CalendarCheck },
       { href: "/expenses", label: "Daily Expenses", icon: Wallet },
       { href: "/payouts", label: "Partner Payouts", icon: Banknote },

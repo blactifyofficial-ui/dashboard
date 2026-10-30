@@ -446,6 +446,45 @@ CREATE TABLE IF NOT EXISTS "google_sheets_sync_queue" (
 );
 
 -- ==============================================================================
+-- 9b. MONTHLY FINANCIAL REPORTS & EXECUTIVE CLOSURES
+-- ==============================================================================
+
+-- Archived Monthly Company-Level Financial Reports (Released on 1st of month)
+CREATE TABLE IF NOT EXISTS "monthly_financial_reports" (
+    "id" TEXT PRIMARY KEY NOT NULL,
+    "month" TEXT NOT NULL UNIQUE,
+    "year" NUMERIC NOT NULL,
+    "month_number" NUMERIC NOT NULL,
+    "start_date" TIMESTAMP WITH TIME ZONE NOT NULL,
+    "end_date" TIMESTAMP WITH TIME ZONE NOT NULL,
+    "status" TEXT DEFAULT 'COMPLETED' NOT NULL,
+    "total_revenue" NUMERIC DEFAULT 0 NOT NULL,
+    "total_expenses" NUMERIC DEFAULT 0 NOT NULL,
+    "net_profit" NUMERIC DEFAULT 0 NOT NULL,
+    "profit_margin" NUMERIC DEFAULT 0 NOT NULL,
+    "total_orders" NUMERIC DEFAULT 0 NOT NULL,
+    "aov" NUMERIC DEFAULT 0 NOT NULL,
+    "prepaid_revenue" NUMERIC DEFAULT 0 NOT NULL,
+    "prepaid_orders_count" NUMERIC DEFAULT 0 NOT NULL,
+    "cod_revenue" NUMERIC DEFAULT 0 NOT NULL,
+    "cod_orders_count" NUMERIC DEFAULT 0 NOT NULL,
+    "cod_collected_amount" NUMERIC DEFAULT 0 NOT NULL,
+    "cod_pending_amount" NUMERIC DEFAULT 0 NOT NULL,
+    "operational_expenses" NUMERIC DEFAULT 0 NOT NULL,
+    "monthly_bills_amount" NUMERIC DEFAULT 0 NOT NULL,
+    "ad_spend_amount" NUMERIC DEFAULT 0 NOT NULL,
+    "summary_data" TEXT NOT NULL,
+    "email_sent_at" TIMESTAMP WITH TIME ZONE,
+    "email_recipients" TEXT,
+    "notes" TEXT,
+    "created_by_id" TEXT,
+    "generated_at" TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL,
+    "created_at" TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL,
+    "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL,
+    CONSTRAINT "monthly_financial_reports_created_by_id_user_id_fk" FOREIGN KEY ("created_by_id") REFERENCES "user"("id") ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+-- ==============================================================================
 -- 10. PERFORMANCE INDEXES
 -- ==============================================================================
 
@@ -497,6 +536,10 @@ CREATE INDEX IF NOT EXISTS "idx_partner_transactions_type" ON "partner_transacti
 CREATE INDEX IF NOT EXISTS "idx_monthly_expense_entries_month" ON "monthly_expense_entries" ("month");
 CREATE INDEX IF NOT EXISTS "idx_monthly_expense_entries_status" ON "monthly_expense_entries" ("status");
 CREATE INDEX IF NOT EXISTS "idx_monthly_expense_entries_template_id" ON "monthly_expense_entries" ("template_id");
+
+-- Monthly Financial Reports Indexes
+CREATE INDEX IF NOT EXISTS "idx_monthly_financial_reports_month" ON "monthly_financial_reports" ("month" DESC);
+CREATE INDEX IF NOT EXISTS "idx_monthly_financial_reports_year" ON "monthly_financial_reports" ("year" DESC);
 
 -- Google Sheets Sync Queue Indexes
 CREATE INDEX IF NOT EXISTS "idx_google_sheets_sync_queue_status_retry" ON "google_sheets_sync_queue" ("status", "next_retry_at");

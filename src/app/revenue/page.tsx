@@ -1,7 +1,7 @@
 import { db } from '@/db';
 import { orders, orderItems, expenses } from '@/db/schema';
 import { sql, desc, ilike, isNull } from 'drizzle-orm';
-import { CalendarDays, ShoppingBag, ArrowUpRight } from 'lucide-react';
+import { CalendarDays, ShoppingBag, ArrowUpRight, FileText } from 'lucide-react';
 import SearchInput from '@/components/SearchInput';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -54,6 +54,13 @@ export default async function RevenuePage(props: {
           <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-foreground">Revenue</h1>
           <p className="text-muted-foreground text-xs sm:text-sm">Breakdown of sales, orders, and product performance</p>
         </div>
+        <Link
+          href="/reports"
+          className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors shadow-xs self-start md:self-auto"
+        >
+          <FileText size={15} />
+          <span>Monthly PDF Reports</span>
+        </Link>
       </header>
 
       {(canViewRevenueLedger || canViewProducts) && (

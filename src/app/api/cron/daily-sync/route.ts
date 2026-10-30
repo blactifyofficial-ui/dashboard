@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { syncShopifyOrders } from '@/lib/shopify-sync';
 import { syncAllToGoogleSheets } from '@/lib/google-sheets';
+import { checkAndGenerateMonthlyReportOnSchedule } from '@/lib/financial-report-service';
 
 /**
  * Unified daily cron endpoint for Vercel Hobby plan (1 cron limit, 1/day).
- * Runs Shopify order sync first, then synchronizes all fresh data to Google Sheets.
+ * Runs Shopify order sync first, then synchronizes all fresh data to Google Sheets,
+ * and automatically triggers month-end financial report compilation & email delivery on the 1st of every month.
  */
 export async function GET(req: NextRequest) {
   const authHeader = req.headers.get('authorization');
@@ -32,10 +34,23 @@ export async function GET(req: NextRequest) {
     // 2. Sync all database entities to Google Sheets
     const sheetsSyncResult = await syncAllToGoogleSheets();
 
+    // 3. Check and generate monthly financial report (runs on 1st of the month or if closed month is uncompiled)
+    let monthlyReportResult = null;
+    try {
+      monthlyReportResult = await checkAndGenerateMonthlyReportOnSchedule();
+    } catch (reportErr) {
+      console.error('Error in scheduled monthly report execution:', reportErr);
+      monthlyReportResult = {
+        executed: false,
+        error: reportErr instanceof Error ? reportErr.message : 'Unknown report generation error',
+      };
+    }
+
     return NextResponse.json({
       message: 'Daily unified cron completed successfully',
       orders: orderSyncResult,
       googleSheets: sheetsSyncResult,
+      monthlyReport: monthlyReportResult,
       timestamp: new Date().toISOString(),
     }, { status: 200 });
   } catch (error: unknown) {

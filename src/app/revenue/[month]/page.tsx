@@ -1,7 +1,7 @@
 import { db } from '@/db';
 import { orders, expenses } from '@/db/schema';
 import { and, gte, lt, desc, isNull, sql } from 'drizzle-orm';
-import { CalendarDays, Inbox, ArrowLeft, CreditCard, Banknote, TrendingUp, TrendingDown, Wallet } from 'lucide-react';
+import { CalendarDays, Inbox, ArrowLeft, CreditCard, Banknote, TrendingUp, TrendingDown, Wallet, FileText } from 'lucide-react';
 import Link from 'next/link';
 import RevenueChart from '@/components/RevenueChart';
 import MonthOrdersTable from '@/components/MonthOrdersTable';
@@ -43,18 +43,27 @@ export default async function MonthRevenuePage(props: {
 
   return (
     <div className="space-y-4 sm:space-y-6 relative z-10 text-foreground">
-      <header className="flex items-center gap-2.5 sm:gap-3">
-        <Link 
-          href="/revenue" 
-          aria-label="Back to Revenue"
-          className="min-h-[38px] min-w-[38px] flex items-center justify-center rounded-lg bg-card hover:bg-muted text-foreground transition-colors border border-border shrink-0 shadow-xs"
-        >
-          <ArrowLeft size={16} />
-        </Link>
-        <div className="space-y-0.5">
-          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">{monthDisplay} Revenue</h1>
-          <p className="text-muted-foreground text-xs">Overview, profit performance, and order breakdown for this month</p>
+      <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="flex items-center gap-2.5 sm:gap-3">
+          <Link 
+            href="/revenue" 
+            aria-label="Back to Revenue"
+            className="min-h-[38px] min-w-[38px] flex items-center justify-center rounded-lg bg-card hover:bg-muted text-foreground transition-colors border border-border shrink-0 shadow-xs"
+          >
+            <ArrowLeft size={16} />
+          </Link>
+          <div className="space-y-0.5">
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">{monthDisplay} Revenue</h1>
+            <p className="text-muted-foreground text-xs">Overview, profit performance, and order breakdown for this month</p>
+          </div>
         </div>
+        <Link
+          href={`/reports/${monthParam}`}
+          className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors shadow-xs self-start sm:self-auto"
+        >
+          <FileText size={14} />
+          <span>Official Report & PDF</span>
+        </Link>
       </header>
 
       <Suspense fallback={<LoadingSpinner />}>

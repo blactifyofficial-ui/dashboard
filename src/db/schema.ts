@@ -299,5 +299,39 @@ export const codRemittances = pgTable('cod_remittances', {
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
 });
 
+export const monthlyFinancialReports = pgTable('monthly_financial_reports', {
+  id: text('id').primaryKey(), // 'rep_YYYY_MM'
+  month: text('month').notNull().unique(), // 'YYYY-MM'
+  year: numeric('year').notNull(),
+  monthNumber: numeric('month_number').notNull(),
+  startDate: timestamp('start_date', { withTimezone: true }).notNull(),
+  endDate: timestamp('end_date', { withTimezone: true }).notNull(),
+  status: text('status').default('COMPLETED').notNull(), // 'COMPLETED', 'DRAFT'
+  totalRevenue: numeric('total_revenue').default('0').notNull(),
+  totalExpenses: numeric('total_expenses').default('0').notNull(),
+  netProfit: numeric('net_profit').default('0').notNull(),
+  profitMargin: numeric('profit_margin').default('0').notNull(),
+  totalOrders: numeric('total_orders').default('0').notNull(),
+  aov: numeric('aov').default('0').notNull(),
+  prepaidRevenue: numeric('prepaid_revenue').default('0').notNull(),
+  prepaidOrdersCount: numeric('prepaid_orders_count').default('0').notNull(),
+  codRevenue: numeric('cod_revenue').default('0').notNull(),
+  codOrdersCount: numeric('cod_orders_count').default('0').notNull(),
+  codCollectedAmount: numeric('cod_collected_amount').default('0').notNull(),
+  codPendingAmount: numeric('cod_pending_amount').default('0').notNull(),
+  operationalExpenses: numeric('operational_expenses').default('0').notNull(),
+  monthlyBillsAmount: numeric('monthly_bills_amount').default('0').notNull(),
+  adSpendAmount: numeric('ad_spend_amount').default('0').notNull(),
+  summaryData: text('summary_data').notNull(), // JSON detailed breakdowns
+  emailSentAt: timestamp('email_sent_at', { withTimezone: true }),
+  emailRecipients: text('email_recipients'),
+  notes: text('notes'),
+  createdById: text('created_by_id').references(() => users.id),
+  generatedAt: timestamp('generated_at', { withTimezone: true }).defaultNow().notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+});
+
+
 
 

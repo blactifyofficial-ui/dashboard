@@ -1,7 +1,7 @@
 import { db } from '@/db';
 import { orders, orderItems, expenses, monthlyExpenseEntries } from '@/db/schema';
 import { count, sql, and, gte, lt, desc, eq, isNull, asc } from 'drizzle-orm';
-import { Inbox, ArrowUpRight, BarChart3, Boxes } from 'lucide-react';
+import { Inbox, ArrowUpRight, BarChart3, Boxes, FileText } from 'lucide-react';
 import Link from 'next/link';
 import DynamicOrdersChart from '@/components/DynamicOrdersChart';
 import DashboardKpis from '@/components/dashboard/DashboardKpis';
@@ -56,6 +56,7 @@ export default async function Dashboard() {
   }
 
   const canViewRevenueReports = hasPermission(role, 'revenue:view', customPerms) && hasPermission(role, 'overview:view_revenue', customPerms);
+  const canViewReports = hasPermission(role, 'reports:view', customPerms);
   const canViewInventory = hasPermission(role, 'inventory:view', customPerms);
   const canViewTopProducts = hasPermission(role, 'overview:view_top_products', customPerms);
   const showInventoryShortcut = canViewInventory && canViewTopProducts;
@@ -80,15 +81,24 @@ export default async function Dashboard() {
         </div>
 
         {/* Quick Shortcut Buttons */}
-        {(canViewRevenueReports || showInventoryShortcut) && (
-          <div className="flex items-center gap-2">
+        {(canViewRevenueReports || canViewReports || showInventoryShortcut) && (
+          <div className="flex items-center gap-2 flex-wrap">
+            {canViewReports && (
+              <Link
+                href="/reports"
+                className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors flex items-center gap-1.5 shadow-xs"
+              >
+                <FileText size={14} />
+                <span>Monthly Reports</span>
+              </Link>
+            )}
             {canViewRevenueReports && (
               <Link
                 href="/revenue"
                 className="px-3 py-1.5 text-xs font-medium rounded-lg bg-card border border-border hover:bg-muted text-foreground transition-colors flex items-center gap-1.5 shadow-xs"
               >
                 <BarChart3 size={14} className="text-muted-foreground" />
-                <span>Revenue Reports</span>
+                <span>Revenue Ledger</span>
               </Link>
             )}
             {showInventoryShortcut && (
