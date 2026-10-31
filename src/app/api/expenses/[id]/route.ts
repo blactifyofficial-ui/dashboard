@@ -4,6 +4,7 @@ import { expenses, expenseActivities, expenseCategories, paymentMethods, users }
 import { eq, desc, and, isNull } from 'drizzle-orm';
 import { requireAuth, requirePermission } from '@/lib/auth-utils';
 import { enqueueSyncJob } from '@/lib/google-sheets';
+import { updateMonthlyReportForDateOrMonth } from '@/lib/financial-report-service';
 
 export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -128,6 +129,12 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
       operation: 'UPDATE',
     });
 
+    // Automatically update the monthly financial report for this expense's month
+    void updateMonthlyReportForDateOrMonth(expenseDate);
+    if (existing.expenseDate) {
+      void updateMonthlyReportForDateOrMonth(existing.expenseDate);
+    }
+
     return NextResponse.json(updated);
   } catch (error) {
     console.error(error);
@@ -186,6 +193,11 @@ export async function DELETE(_req: Request, { params }: { params: Promise<{ id: 
       databaseId: id,
       operation: 'DELETE',
     });
+
+    // Automatically update the monthly financial report for this expense's month
+    if (existing.expenseDate) {
+      void updateMonthlyReportForDateOrMonth(existing.expenseDate);
+    }
 
     return NextResponse.json({ success: true });
   } catch (error) {

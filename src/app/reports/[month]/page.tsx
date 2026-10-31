@@ -3,6 +3,7 @@ import { hasPermission, canAccessRoute } from '@/lib/rbac';
 import AccessDenied from '@/components/AccessDenied';
 import { redirect } from 'next/navigation';
 import { getOrCompileMonthlyReport } from '@/lib/financial-report-service';
+import { getStoreNow } from '@/lib/date-utils';
 import { ReportActionButtons } from '@/components/reports/ReportActionButtons';
 import { ReportKpiGrid } from '@/components/reports/ReportKpiGrid';
 import { ReportSalesBreakdown } from '@/components/reports/ReportSalesBreakdown';
@@ -96,7 +97,15 @@ export default async function MonthlyReportDetailPage(props: {
                 {reportData.meta.monthDisplay} Financial Report
               </h1>
               <span className="inline-flex items-center gap-1 text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
-                <CheckCircle2 size={11} /> Finalized
+                {month === getStoreNow().dateStr.slice(0, 7) ? (
+                  <>
+                    <Sparkles size={11} /> Live Report (Current Month)
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle2 size={11} /> Finalized
+                  </>
+                )}
               </span>
             </div>
             <p className="text-xs text-muted-foreground">

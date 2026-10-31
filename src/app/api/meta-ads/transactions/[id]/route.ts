@@ -4,6 +4,7 @@ import { metaAdsTransactions, expenses, expenseActivities, users } from '@/db/sc
 import { eq } from 'drizzle-orm';
 import { requirePermission } from '@/lib/auth-utils';
 import { enqueueSyncJob } from '@/lib/google-sheets';
+import { updateMonthlyReportForDateOrMonth } from '@/lib/financial-report-service';
 
 export async function DELETE(
   _req: Request, 
@@ -74,6 +75,11 @@ export async function DELETE(
         databaseId: existing.expenseId,
         operation: 'DELETE',
       });
+    }
+
+    // Automatically update the monthly financial report
+    if (existing.paymentDate) {
+      void updateMonthlyReportForDateOrMonth(existing.paymentDate);
     }
 
     return NextResponse.json({ success: true, message: 'Transaction and linked expense removed' });
@@ -170,6 +176,9 @@ export async function PATCH(
       databaseId: id,
       operation: 'UPDATE',
     });
+
+    // Automatically update the monthly financial report
+    void updateMonthlyReportForDateOrMonth(paymentDate || existing.paymentDate);
 
     return NextResponse.json({ success: true, transaction: updatedTx });
   } catch (error) {

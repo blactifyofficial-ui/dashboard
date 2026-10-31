@@ -143,12 +143,12 @@ async function RevenueContent({
     const monthlyExpensesMap = new Map<string, number>();
     if (canViewExpenses) {
       const expensesList = await db.select({
-        month: sql<string>`to_char(date_trunc('month', ${expenses.expenseDate} AT TIME ZONE 'Asia/Kolkata'), 'YYYY-MM')`,
+        month: sql<string>`to_char(date_trunc('month', ${expenses.expenseDate}), 'YYYY-MM')`,
         totalExpense: sql<number>`COALESCE(SUM(CAST(${expenses.amount} AS NUMERIC)), 0)`
       })
       .from(expenses)
       .where(isNull(expenses.deletedAt))
-      .groupBy(sql`date_trunc('month', ${expenses.expenseDate} AT TIME ZONE 'Asia/Kolkata')`);
+      .groupBy(sql`date_trunc('month', ${expenses.expenseDate})`);
 
       for (const exp of expensesList) {
         if (exp.month) {

@@ -5,6 +5,7 @@ import { eq } from 'drizzle-orm';
 import { requireAuth } from '@/lib/auth-utils';
 import { hasPermission } from '@/lib/rbac';
 import { enqueueSyncJob } from '@/lib/google-sheets';
+import { updateMonthlyReportForDateOrMonth } from '@/lib/financial-report-service';
 
 export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -75,6 +76,9 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
       });
     }
 
+    // Automatically update the monthly financial report
+    void updateMonthlyReportForDateOrMonth(updated.transactionDate || existing.transactionDate);
+
     return NextResponse.json({ success: true, transaction: updated });
   } catch (error) {
     console.error('Error updating transaction:', error);
@@ -130,6 +134,11 @@ export async function DELETE(_req: Request, { params }: { params: Promise<{ id: 
         databaseId: id,
         operation: 'DELETE',
       });
+    }
+
+    // Automatically update the monthly financial report
+    if (deleted.transactionDate) {
+      void updateMonthlyReportForDateOrMonth(deleted.transactionDate);
     }
 
     return NextResponse.json({ success: true, deletedId: id });

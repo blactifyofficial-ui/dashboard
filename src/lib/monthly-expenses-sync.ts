@@ -8,6 +8,7 @@ import {
 } from '@/db/schema';
 import { eq, or, ilike } from 'drizzle-orm';
 import { parseMonthKey, getMonthLabel } from './monthly-expenses-utils';
+import { updateMonthlyReportForDateOrMonth } from '@/lib/financial-report-service';
 
 /**
  * Friendly display names for monthly expense standard categories
@@ -240,6 +241,9 @@ export async function syncMonthlyBillPaymentToExpenses(params: SyncMonthlyBillPa
     remark: `Recorded from monthly bill payment (${name} - ${monthLabel})`,
   });
 
+  // Automatically update the monthly financial report
+  void updateMonthlyReportForDateOrMonth(month);
+
   return newExpenseId;
 }
 
@@ -278,4 +282,9 @@ export async function removeMonthlyBillPaymentFromExpenses(
     activityType: 'DELETED',
     remark: remark || 'Auto-deleted because monthly bill was marked as unpaid or deleted',
   });
+
+  // Automatically update the monthly financial report
+  if (existing.expenseDate) {
+    void updateMonthlyReportForDateOrMonth(existing.expenseDate);
+  }
 }

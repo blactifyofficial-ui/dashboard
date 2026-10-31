@@ -5,6 +5,7 @@ import { eq, desc } from 'drizzle-orm';
 import { requireAuth, requirePermission } from '@/lib/auth-utils';
 import { hasPermission } from '@/lib/rbac';
 import { enqueueSyncJob } from '@/lib/google-sheets';
+import { updateMonthlyReportForDateOrMonth } from '@/lib/financial-report-service';
 
 export async function GET(req: Request) {
   try {
@@ -148,6 +149,9 @@ export async function POST(req: Request) {
         operation: 'CREATE',
       });
     }
+
+    // Automatically update the monthly financial report
+    void updateMonthlyReportForDateOrMonth(transactionDate);
 
     return NextResponse.json({ success: true, transaction: newTxn }, { status: 201 });
   } catch (error) {

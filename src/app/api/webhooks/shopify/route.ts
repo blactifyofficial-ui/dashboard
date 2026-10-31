@@ -4,6 +4,7 @@ import { db } from '@/db';
 import { orders, orderItems } from '@/db/schema';
 import { enqueueSyncJob } from '@/lib/google-sheets';
 import { deleteLocalOrder } from '@/lib/shopify-sync';
+import { updateMonthlyReportForDateOrMonth } from '@/lib/financial-report-service';
 
 export async function POST(req: Request) {
   try {
@@ -169,6 +170,9 @@ export async function POST(req: Request) {
           });
         }
       }
+
+      // Automatically update the monthly financial report for this order's month
+      void updateMonthlyReportForDateOrMonth(created_at || new Date());
     }
 
     return NextResponse.json({ success: true }, { status: 200 });

@@ -12,6 +12,7 @@ import {
 import { eq, desc, ilike, or } from 'drizzle-orm';
 import { requirePermission } from '@/lib/auth-utils';
 import { enqueueSyncJob } from '@/lib/google-sheets';
+import { updateMonthlyReportForDateOrMonth } from '@/lib/financial-report-service';
 
 async function getOrCreateMetaAdsCategory() {
   const existing = await db
@@ -258,6 +259,9 @@ export async function POST(req: Request) {
         operation: 'CREATE',
       });
     }
+
+    // Automatically update the monthly financial report
+    void updateMonthlyReportForDateOrMonth(paymentDate);
 
     return NextResponse.json({
       success: true,

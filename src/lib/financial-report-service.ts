@@ -608,13 +608,17 @@ export async function compileMonthlyFinancialReport(
 }
 
 /**
- * Retrieves a monthly report from the database if compiled, or compiles on the fly.
+ * Retrieves a monthly report from the database if compiled and up to date, or compiles on the fly.
+ * For the ongoing current month, it always recompiles to reflect real-time orders and expenses.
  */
 export async function getOrCompileMonthlyReport(
   monthStr: string,
   forceRefresh = false
 ): Promise<FinancialReportData> {
-  if (!forceRefresh) {
+  const currentMonthStr = getStoreNow().dateStr.slice(0, 7);
+  const isCurrentMonth = monthStr === currentMonthStr;
+
+  if (!forceRefresh && !isCurrentMonth) {
     const [existing] = await db
       .select()
       .from(monthlyFinancialReports)
@@ -622,7 +626,25 @@ export async function getOrCompileMonthlyReport(
 
     if (existing?.summaryData) {
       try {
-        return JSON.parse(existing.summaryData) as FinancialReportData;
+        // Quick verification: check if orders count or revenue changed since generation
+        const { year, month } = parseMonthString(monthStr);
+        const { startDate, endDate } = getStoreMonthRange(year, month);
+        const [liveOrders] = await db
+          .select({
+            count: sql<number>`COUNT(*)`,
+            revenue: sql<number>`COALESCE(SUM(CAST(${orders.totalPrice} AS NUMERIC)), 0)`,
+          })
+          .from(orders)
+          .where(and(gte(orders.createdAt, startDate), lt(orders.createdAt, endDate)));
+
+        const liveCount = Number(liveOrders?.count || 0);
+        const liveRev = Number(liveOrders?.revenue || 0);
+        const cachedCount = parseInt(existing.totalOrders || '0', 10);
+        const cachedRev = parseFloat(existing.totalRevenue || '0');
+
+        if (liveCount === cachedCount && Math.abs(liveRev - cachedRev) < 0.01) {
+          return JSON.parse(existing.summaryData) as FinancialReportData;
+        }
       } catch (err) {
         console.warn(`[MonthlyReport] Failed to parse summaryData for ${monthStr}, recompiling...`, err);
       }
@@ -633,8 +655,8 @@ export async function getOrCompileMonthlyReport(
 }
 
 /**
- * Lists all generated monthly reports from database and discovers any past closed months
- * that have orders but haven't been compiled yet.
+ * Lists all monthly reports combining stored records and real-time live aggregations
+ * so that both ongoing and historical months always present accurate numbers.
  */
 export async function listMonthlyFinancialReports(): Promise<{
   reports: Array<{
@@ -649,77 +671,168 @@ export async function listMonthlyFinancialReports(): Promise<{
     generatedAt: string;
     emailSentAt: string | null;
     isCompiled: boolean;
+    isCurrentMonth: boolean;
   }>;
 }> {
-  const existingReports = await db
-    .select()
-    .from(monthlyFinancialReports)
-    .orderBy(desc(monthlyFinancialReports.month));
+  const currentMonthStr = getStoreNow().dateStr.slice(0, 7);
+
+  const [existingReports, monthlyOrdersAgg, monthlyExpensesAgg] = await Promise.all([
+    db
+      .select()
+      .from(monthlyFinancialReports)
+      .orderBy(desc(monthlyFinancialReports.month)),
+
+    db
+      .select({
+        month: sql<string>`to_char(date_trunc('month', ${orders.createdAt} AT TIME ZONE 'Asia/Kolkata'), 'YYYY-MM')`,
+        revenue: sql<number>`COALESCE(SUM(CAST(${orders.totalPrice} AS NUMERIC)), 0)`,
+        orderCount: sql<number>`COUNT(*)`,
+      })
+      .from(orders)
+      .groupBy(sql`date_trunc('month', ${orders.createdAt} AT TIME ZONE 'Asia/Kolkata')`)
+      .orderBy(desc(sql`date_trunc('month', ${orders.createdAt} AT TIME ZONE 'Asia/Kolkata')`)),
+
+    db
+      .select({
+        month: sql<string>`to_char(date_trunc('month', ${expenses.expenseDate}), 'YYYY-MM')`,
+        totalExpense: sql<number>`COALESCE(SUM(CAST(${expenses.amount} AS NUMERIC)), 0)`,
+      })
+      .from(expenses)
+      .where(isNull(expenses.deletedAt))
+      .groupBy(sql`date_trunc('month', ${expenses.expenseDate})`),
+  ]);
 
   const existingMap = new Map<string, (typeof existingReports)[0]>();
   for (const r of existingReports) {
     existingMap.set(r.month, r);
   }
 
-  // Also query distinct closed months with orders
-  const distinctOrderMonths = await db
-    .select({
-      month: sql<string>`to_char(date_trunc('month', ${orders.createdAt} AT TIME ZONE 'Asia/Kolkata'), 'YYYY-MM')`,
-    })
-    .from(orders)
-    .groupBy(sql`date_trunc('month', ${orders.createdAt} AT TIME ZONE 'Asia/Kolkata')`)
-    .orderBy(desc(sql`date_trunc('month', ${orders.createdAt} AT TIME ZONE 'Asia/Kolkata')`));
+  const liveOrdersMap = new Map<string, { revenue: number; orderCount: number }>();
+  for (const o of monthlyOrdersAgg) {
+    if (o.month) {
+      liveOrdersMap.set(o.month, {
+        revenue: Number(o.revenue || 0),
+        orderCount: Number(o.orderCount || 0),
+      });
+    }
+  }
+
+  const liveExpensesMap = new Map<string, number>();
+  for (const e of monthlyExpensesAgg) {
+    if (e.month) {
+      liveExpensesMap.set(e.month, Number(e.totalExpense || 0));
+    }
+  }
 
   const allMonthsSet = new Set<string>();
-  for (const r of existingReports) {
-    allMonthsSet.add(r.month);
-  }
-  for (const m of distinctOrderMonths) {
-    if (m.month) allMonthsSet.add(m.month);
-  }
+  for (const r of existingReports) allMonthsSet.add(r.month);
+  for (const o of monthlyOrdersAgg) if (o.month) allMonthsSet.add(o.month);
+  for (const e of monthlyExpensesAgg) if (e.month) allMonthsSet.add(e.month);
 
   const sortedMonths = Array.from(allMonthsSet).sort((a, b) => b.localeCompare(a));
 
   const result = sortedMonths.map((m) => {
     const existing = existingMap.get(m);
+    const liveOrder = liveOrdersMap.get(m);
+    const liveExpense = liveExpensesMap.get(m) || 0;
     const { year, month } = parseMonthString(m);
     const monthDisplay = new Date(year, month - 1, 1).toLocaleDateString('en-US', {
       month: 'long',
       year: 'numeric',
     });
 
-    if (existing) {
-      return {
-        id: existing.id,
-        month: m,
-        monthDisplay,
-        totalRevenue: parseFloat(existing.totalRevenue || '0'),
-        totalExpenses: parseFloat(existing.totalExpenses || '0'),
-        netProfit: parseFloat(existing.netProfit || '0'),
-        profitMargin: parseFloat(existing.profitMargin || '0'),
-        totalOrders: parseInt(existing.totalOrders || '0', 10),
-        generatedAt: existing.generatedAt ? existing.generatedAt.toISOString() : new Date().toISOString(),
-        emailSentAt: existing.emailSentAt ? existing.emailSentAt.toISOString() : null,
-        isCompiled: true,
-      };
+    const isCurrentMonth = m === currentMonthStr;
+
+    // Determine the source of truth for metrics
+    let totalRevenue = 0;
+    let totalExpenses = 0;
+    let totalOrders = 0;
+
+    if (isCurrentMonth || !existing) {
+      // For current ongoing month or uncompiled months, always use live aggregated data
+      totalRevenue = liveOrder?.revenue || 0;
+      totalOrders = liveOrder?.orderCount || 0;
+      totalExpenses = liveExpense;
+    } else {
+      // For compiled past months, verify if live order counts or revenue changed
+      const cachedRevenue = parseFloat(existing.totalRevenue || '0');
+      const cachedOrders = parseInt(existing.totalOrders || '0', 10);
+      const liveOrdersCount = liveOrder?.orderCount || 0;
+      const liveRev = liveOrder?.revenue || 0;
+
+      if (liveOrdersCount !== cachedOrders || Math.abs(liveRev - cachedRevenue) > 0.01) {
+        totalRevenue = liveRev;
+        totalOrders = liveOrdersCount;
+        totalExpenses = liveExpense;
+      } else {
+        totalRevenue = cachedRevenue;
+        totalExpenses = parseFloat(existing.totalExpenses || '0');
+        totalOrders = cachedOrders;
+      }
     }
 
+    const netProfit = totalRevenue - totalExpenses;
+    const profitMargin = totalRevenue > 0 ? (netProfit / totalRevenue) * 100 : 0;
+
     return {
-      id: `rep_${m.replace('-', '_')}`,
+      id: existing?.id || `rep_${m.replace('-', '_')}`,
       month: m,
       monthDisplay,
-      totalRevenue: 0,
-      totalExpenses: 0,
-      netProfit: 0,
-      profitMargin: 0,
-      totalOrders: 0,
-      generatedAt: new Date().toISOString(),
-      emailSentAt: null,
-      isCompiled: false,
+      totalRevenue: Math.round(totalRevenue * 100) / 100,
+      totalExpenses: Math.round(totalExpenses * 100) / 100,
+      netProfit: Math.round(netProfit * 100) / 100,
+      profitMargin: Math.round(profitMargin * 10) / 10,
+      totalOrders,
+      generatedAt: existing?.generatedAt ? existing.generatedAt.toISOString() : new Date().toISOString(),
+      emailSentAt: existing?.emailSentAt ? existing.emailSentAt.toISOString() : null,
+      isCompiled: !!existing,
+      isCurrentMonth,
     };
   });
 
   return { reports: result };
+}
+
+/**
+ * Automatically updates/recompiles a monthly financial report when an order or expense transaction changes.
+ * Can take a YYYY-MM string, or a Date / date string (like order createdAt or expenseDate).
+ */
+export async function updateMonthlyReportForDateOrMonth(
+  dateOrMonth: Date | string | null | undefined
+): Promise<void> {
+  if (!dateOrMonth) return;
+  let monthStr: string;
+  if (typeof dateOrMonth === 'string' && /^\d{4}-\d{2}$/.test(dateOrMonth)) {
+    monthStr = dateOrMonth;
+  } else {
+    const parts = getStoreDateParts(dateOrMonth);
+    const paddedMonth = parts.month < 10 ? `0${parts.month}` : `${parts.month}`;
+    monthStr = `${parts.year}-${paddedMonth}`;
+  }
+
+  try {
+    await compileMonthlyFinancialReport(monthStr, { saveToDb: true });
+    console.log(`[MonthlyReport] Auto-updated report for ${monthStr}`);
+  } catch (err) {
+    console.warn(`[MonthlyReport] Auto-update failed for ${monthStr}:`, err);
+  }
+}
+
+/**
+ * Automatically updates/recompiles monthly financial reports for multiple affected months.
+ */
+export async function updateMonthlyReportsForMonths(monthStrings: Iterable<string>): Promise<void> {
+  const uniqueMonths = new Set(monthStrings);
+  for (const m of uniqueMonths) {
+    if (/^\d{4}-\d{2}$/.test(m)) {
+      try {
+        await compileMonthlyFinancialReport(m, { saveToDb: true });
+        console.log(`[MonthlyReport] Auto-updated report for ${m}`);
+      } catch (err) {
+        console.warn(`[MonthlyReport] Auto-update failed for ${m}:`, err);
+      }
+    }
+  }
 }
 
 /**

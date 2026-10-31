@@ -99,7 +99,15 @@ export default async function ReportsPage() {
                     {latestReportData.meta.monthDisplay} Financial Report
                   </h3>
                   <span className="inline-flex items-center gap-1 text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
-                    <CheckCircle2 size={11} /> Official Release
+                    {latestMonthItem.isCurrentMonth ? (
+                      <>
+                        <Sparkles size={11} /> Live Report (Current Month)
+                      </>
+                    ) : (
+                      <>
+                        <CheckCircle2 size={11} /> Official Release
+                      </>
+                    )}
                   </span>
                 </div>
                 <p className="text-xs text-muted-foreground mt-0.5">
@@ -232,7 +240,7 @@ export default async function ReportsPage() {
                       </span>
                     </div>
                     <p className="text-xs text-muted-foreground mt-0.5">
-                      {item.totalOrders} orders completed &bull; Released on the 1st
+                      {item.totalOrders} {item.totalOrders === 1 ? 'order' : 'orders'} completed &bull; {item.isCurrentMonth ? 'Live Ongoing Month' : 'Released on the 1st'}
                     </p>
                   </div>
                 </div>

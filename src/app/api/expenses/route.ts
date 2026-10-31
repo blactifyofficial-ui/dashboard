@@ -4,6 +4,7 @@ import { expenses, expenseActivities, users, expenseCategories, paymentMethods }
 import { eq, desc, and, ilike, or, gte, lte, isNull } from 'drizzle-orm';
 import { requireAuth } from '@/lib/auth-utils';
 import { enqueueSyncJob } from '@/lib/google-sheets';
+import { updateMonthlyReportForDateOrMonth } from '@/lib/financial-report-service';
 
 export async function GET(req: Request) {
   try {
@@ -153,6 +154,9 @@ export async function POST(req: Request) {
       databaseId: expenseId,
       operation: 'CREATE',
     });
+
+    // Automatically update the monthly financial report for this expense's month
+    void updateMonthlyReportForDateOrMonth(expenseDate);
 
     return NextResponse.json(expense, { status: 201 });
   } catch (error) {

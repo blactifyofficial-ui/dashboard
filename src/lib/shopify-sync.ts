@@ -2,6 +2,8 @@ import { db } from '@/db';
 import { orders, orderItems, codCollectionActivities } from '@/db/schema';
 import { eq, or } from 'drizzle-orm';
 import { enqueueSyncJob } from '@/lib/google-sheets';
+import { updateMonthlyReportForDateOrMonth, updateMonthlyReportsForMonths } from '@/lib/financial-report-service';
+import { getStoreDateParts, getStoreNow } from '@/lib/date-utils';
 
 export interface ShopifyLineItem {
   id: number;
@@ -69,7 +71,7 @@ export interface SyncResult {
  */
 export async function deleteLocalOrder(orderIdOrShopifyId: string): Promise<boolean> {
   const [existing] = await db
-    .select({ id: orders.id, orderNumber: orders.orderNumber })
+    .select({ id: orders.id, orderNumber: orders.orderNumber, createdAt: orders.createdAt })
     .from(orders)
     .where(or(eq(orders.id, orderIdOrShopifyId), eq(orders.shopifyOrderId, orderIdOrShopifyId)))
     .limit(1);
@@ -107,6 +109,11 @@ export async function deleteLocalOrder(orderIdOrShopifyId: string): Promise<bool
     databaseId: existing.id,
     operation: 'DELETE',
   });
+
+  // 6. Automatically update the monthly financial report for this order's month
+  if (existing.createdAt) {
+    void updateMonthlyReportForDateOrMonth(existing.createdAt);
+  }
 
   return true;
 }
@@ -313,6 +320,18 @@ export async function syncShopifyOrders(options: SyncOptions = {}): Promise<Sync
       }
     }
   }
+
+  // Automatically update monthly reports for all months touched by this sync
+  const affectedMonths = new Set<string>();
+  affectedMonths.add(getStoreNow().dateStr.slice(0, 7));
+  for (const order of fetchedOrders) {
+    if (order.created_at) {
+      const parts = getStoreDateParts(order.created_at);
+      const padM = parts.month < 10 ? `0${parts.month}` : `${parts.month}`;
+      affectedMonths.add(`${parts.year}-${padM}`);
+    }
+  }
+  void updateMonthlyReportsForMonths(affectedMonths);
 
   const message = deletedCount > 0
     ? `Successfully synced ${fetchedOrders.length} orders (${deletedCount} deleted order${deletedCount > 1 ? 's' : ''} removed to match Shopify).`
