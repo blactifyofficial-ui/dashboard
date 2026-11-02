@@ -6,7 +6,8 @@ import {
   getStoreMonthRange, 
   getStoreNow, 
   formatStoreDate, 
-  formatStoreTime 
+  formatStoreTime,
+  getProductFilterDateRange 
 } from '../src/lib/date-utils';
 
 describe('Store Timezone & Date Utils (Asia/Kolkata 24h day)', () => {
@@ -61,5 +62,59 @@ describe('Store Timezone & Date Utils (Asia/Kolkata 24h day)', () => {
     assert.ok(now.month >= 1 && now.month <= 12);
     assert.ok(now.day >= 1 && now.day <= 31);
     assert.match(now.dateStr, /^\d{4}-\d{2}-\d{2}$/);
+  });
+
+  describe('getProductFilterDateRange', () => {
+    it('should return undefined dates for all-time preset', () => {
+      const res = getProductFilterDateRange({ period: 'all' });
+      assert.strictEqual(res.startDate, undefined);
+      assert.strictEqual(res.endDate, undefined);
+      assert.strictEqual(res.label, 'All Time');
+      assert.strictEqual(res.periodKey, 'all');
+    });
+
+    it('should compute boundaries for today / daily', () => {
+      const resToday = getProductFilterDateRange({ period: 'today' });
+      const resDaily = getProductFilterDateRange({ period: 'daily' });
+      assert.ok(resToday.startDate instanceof Date);
+      assert.ok(resToday.endDate instanceof Date);
+      assert.strictEqual(resDaily.startDate?.toISOString(), resToday.startDate?.toISOString());
+      assert.strictEqual(resDaily.endDate?.toISOString(), resToday.endDate?.toISOString());
+      assert.match(resToday.label, /^Today/);
+    });
+
+    it('should compute boundaries for last 90 days', () => {
+      const res = getProductFilterDateRange({ period: '90d' });
+      assert.ok(res.startDate instanceof Date);
+      assert.ok(res.endDate instanceof Date);
+      const diffMs = res.endDate!.getTime() - res.startDate!.getTime();
+      const diffDays = Math.round(diffMs / (24 * 60 * 60 * 1000));
+      assert.strictEqual(diffDays, 90);
+      assert.match(res.label, /^Last 90 Days/);
+      assert.strictEqual(res.periodKey, '90d');
+    });
+
+    it('should compute boundaries for this_month and monthly', () => {
+      const resMonth = getProductFilterDateRange({ period: 'this_month' });
+      const resMonthly = getProductFilterDateRange({ period: 'monthly' });
+      assert.strictEqual(resMonth.startDate?.toISOString(), resMonthly.startDate?.toISOString());
+      assert.strictEqual(resMonth.endDate?.toISOString(), resMonthly.endDate?.toISOString());
+      assert.match(resMonth.label, /^This Month/);
+    });
+
+    it('should compute exact boundaries for a specified month string', () => {
+      const res = getProductFilterDateRange({ month: '2026-10' });
+      assert.strictEqual(res.startDate?.toISOString(), '2026-09-30T18:30:00.000Z');
+      assert.strictEqual(res.endDate?.toISOString(), '2026-10-31T18:30:00.000Z');
+      assert.strictEqual(res.label, 'October 2026');
+      assert.strictEqual(res.periodKey, '2026-10');
+    });
+
+    it('should compute boundaries for custom date range', () => {
+      const res = getProductFilterDateRange({ from: '2026-10-05', to: '2026-10-10' });
+      assert.strictEqual(res.startDate?.toISOString(), '2026-10-04T18:30:00.000Z');
+      assert.strictEqual(res.endDate?.toISOString(), '2026-10-10T18:30:00.000Z');
+      assert.strictEqual(res.periodKey, 'custom');
+    });
   });
 });

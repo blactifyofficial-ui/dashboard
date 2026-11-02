@@ -1,8 +1,10 @@
 import { db } from '@/db';
 import { orders, orderItems, expenses } from '@/db/schema';
-import { sql, desc, ilike, isNull } from 'drizzle-orm';
+import { sql, desc, ilike, isNull, and, gte, lt, eq } from 'drizzle-orm';
 import { CalendarDays, ShoppingBag, ArrowUpRight, FileText } from 'lucide-react';
 import SearchInput from '@/components/SearchInput';
+import ProductFilterToolbar from '@/components/revenue/ProductFilterToolbar';
+import { getProductFilterDateRange } from '@/lib/date-utils';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Suspense } from 'react';
@@ -46,6 +48,10 @@ export default async function RevenuePage(props: {
     tab = 'monthly';
   }
   const q = (searchParams.q as string) || '';
+  const period = (searchParams.period as string) || '';
+  const month = (searchParams.month as string) || '';
+  const from = (searchParams.from as string) || '';
+  const to = (searchParams.to as string) || '';
 
   return (
     <div className="flex flex-col h-full space-y-4 sm:space-y-6 relative z-10 text-foreground">
@@ -90,7 +96,7 @@ export default async function RevenuePage(props: {
         </div>
       )}
 
-      <Suspense fallback={<LoadingSpinner />} key={`${tab}-${q}-${searchParams.page}`}>
+      <Suspense fallback={<LoadingSpinner />} key={`${tab}-${q}-${searchParams.page}-${period}-${month}-${from}-${to}`}>
         <RevenueContent
           searchParams={searchParams}
           tab={tab}
@@ -270,15 +276,51 @@ async function RevenueContent({
     if (!canViewProducts) {
       return <AccessDenied message="You do not have permission to view product performance." />;
     }
-    const whereClause = q ? ilike(orderItems.title, `%${q}%`) : undefined;
 
-    const [totalResult] = await db.select({
-      totalProducts: sql<number>`count(distinct ${orderItems.title})`
+    const period = (searchParams.period as string) || '';
+    const month = (searchParams.month as string) || '';
+    const from = (searchParams.from as string) || '';
+    const to = (searchParams.to as string) || '';
+
+    const dateRange = getProductFilterDateRange({ period, month, from, to });
+
+    const conditions = [];
+    if (q) {
+      conditions.push(ilike(orderItems.title, `%${q}%`));
+    }
+    if (dateRange.startDate) {
+      conditions.push(gte(orders.createdAt, dateRange.startDate));
+    }
+    if (dateRange.endDate) {
+      conditions.push(lt(orders.createdAt, dateRange.endDate));
+    }
+
+    const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+
+    // Fetch available months from orders for the dropdown filter
+    const availableMonthsResult = await db.select({
+      month: sql<string>`to_char(date_trunc('month', ${orders.createdAt} AT TIME ZONE 'Asia/Kolkata'), 'YYYY-MM')`
+    })
+    .from(orders)
+    .where(sql`${orders.createdAt} IS NOT NULL`)
+    .groupBy(sql`date_trunc('month', ${orders.createdAt} AT TIME ZONE 'Asia/Kolkata')`)
+    .orderBy(desc(sql`date_trunc('month', ${orders.createdAt} AT TIME ZONE 'Asia/Kolkata')`));
+
+    const availableMonths = availableMonthsResult.map(r => r.month).filter(Boolean) as string[];
+
+    // Fetch total matching products count, total revenue, and total units sold for the filter
+    const [summaryResult] = await db.select({
+      totalProducts: sql<number>`count(distinct ${orderItems.title})`,
+      totalRevenue: sql<number>`COALESCE(SUM(CAST(${orderItems.price} AS NUMERIC) * CAST(${orderItems.quantity} AS NUMERIC)), 0)`,
+      totalUnits: sql<number>`COALESCE(SUM(CAST(${orderItems.quantity} AS NUMERIC)), 0)`
     })
     .from(orderItems)
+    .innerJoin(orders, eq(orderItems.orderId, orders.id))
     .where(whereClause);
 
-    const totalProducts = Number(totalResult.totalProducts) || 0;
+    const totalProducts = Number(summaryResult?.totalProducts) || 0;
+    const totalRevenue = Number(summaryResult?.totalRevenue) || 0;
+    const totalUnits = Number(summaryResult?.totalUnits) || 0;
     const totalPages = Math.ceil(totalProducts / pageSize);
 
     const productData = await db.select({
@@ -288,20 +330,49 @@ async function RevenueContent({
       unitsSold: sql<number>`COALESCE(SUM(CAST(${orderItems.quantity} AS NUMERIC)), 0)`
     })
     .from(orderItems)
+    .innerJoin(orders, eq(orderItems.orderId, orders.id))
     .where(whereClause)
     .groupBy(orderItems.title)
     .orderBy(desc(sql`COALESCE(SUM(CAST(${orderItems.price} AS NUMERIC) * CAST(${orderItems.quantity} AS NUMERIC)), 0)`))
     .limit(pageSize)
     .offset(offset);
 
+    const buildPageUrl = (targetPage: number) => {
+      const p = new URLSearchParams();
+      p.set('tab', 'products');
+      p.set('page', targetPage.toString());
+      if (q) p.set('q', q);
+      if (period && period !== 'all') p.set('period', period);
+      if (month) p.set('month', month);
+      if (from) p.set('from', from);
+      if (to) p.set('to', to);
+      return `/revenue?${p.toString()}`;
+    };
+
     return (
       <div className="flex-1 min-h-0 flex flex-col bg-card border border-border rounded-xl relative overflow-hidden shadow-xs">
         <div className="flex-none p-4 sm:px-6 sm:py-4 border-b border-border flex flex-col md:flex-row justify-between items-start md:items-center gap-3 bg-muted/40">
-          <h2 className="text-base font-semibold text-foreground">Product Performance</h2>
+          <div>
+            <h2 className="text-base font-semibold text-foreground">Product Performance</h2>
+            <p className="text-xs text-muted-foreground">Catalog revenue, volume, and sales breakdown</p>
+          </div>
           <div className="w-full md:w-auto">
             <SearchInput initialQuery={q} />
           </div>
         </div>
+
+        <ProductFilterToolbar
+          currentPeriod={period || 'all'}
+          currentMonth={month}
+          currentFrom={from}
+          currentTo={to}
+          availableMonths={availableMonths}
+          totalProducts={totalProducts}
+          totalRevenue={totalRevenue}
+          totalUnits={totalUnits}
+          activeLabel={dateRange.label}
+        />
+
         <div className="flex-1 min-h-0 relative z-10 w-full overflow-x-auto overflow-y-auto">
           <Table className="min-w-[500px]">
             <TableHeader className="sticky top-0 bg-muted/80 backdrop-blur-none z-20">
@@ -319,7 +390,8 @@ async function RevenueContent({
                       <div className="w-10 h-10 rounded-lg bg-muted border border-border flex items-center justify-center text-muted-foreground">
                         <ShoppingBag size={20} />
                       </div>
-                      <p className="text-sm font-medium text-foreground">No product sales recorded yet</p>
+                      <p className="text-sm font-medium text-foreground">No product sales recorded for {dateRange.label}</p>
+                      <p className="text-xs text-muted-foreground">Try selecting a different date range or search keyword</p>
                     </div>
                   </TableCell>
                 </TableRow>
@@ -376,7 +448,7 @@ async function RevenueContent({
                   size="xs"
                   asChild
                 >
-                  <Link href={`/revenue?tab=products&page=${page - 1}${q ? `&q=${encodeURIComponent(q)}` : ''}`}>
+                  <Link href={buildPageUrl(page - 1)}>
                     Previous
                   </Link>
                 </Button>
@@ -392,7 +464,7 @@ async function RevenueContent({
                   size="xs"
                   asChild
                 >
-                  <Link href={`/revenue?tab=products&page=${page + 1}${q ? `&q=${encodeURIComponent(q)}` : ''}`}>
+                  <Link href={buildPageUrl(page + 1)}>
                     Next
                   </Link>
                 </Button>

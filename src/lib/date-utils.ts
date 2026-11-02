@@ -137,3 +137,158 @@ export function formatStoreTime(
   if (isNaN(d.getTime())) return '';
   return d.toLocaleTimeString('en-US', { ...options, timeZone: STORE_TIMEZONE });
 }
+
+export interface ProductFilterRangeResult {
+  startDate?: Date;
+  endDate?: Date;
+  label: string;
+  periodKey: string;
+}
+
+/**
+ * Computes exact start and end dates in store timezone for product performance filters.
+ */
+export function getProductFilterDateRange(params: {
+  period?: string;
+  month?: string;
+  from?: string;
+  to?: string;
+}): ProductFilterRangeResult {
+  const period = params.period?.toLowerCase();
+  const month = params.month;
+  const from = params.from;
+  const to = params.to;
+
+  // Custom date range: from and to provided (YYYY-MM-DD)
+  if (from && to) {
+    const startDate = new Date(`${from}T00:00:00+05:30`);
+    const endDate = new Date(new Date(`${to}T00:00:00+05:30`).getTime() + 24 * 60 * 60 * 1000);
+    if (!isNaN(startDate.getTime()) && !isNaN(endDate.getTime())) {
+      return {
+        startDate,
+        endDate,
+        label: `${formatStoreDate(startDate)} – ${formatStoreDate(new Date(endDate.getTime() - 1000))}`,
+        periodKey: 'custom',
+      };
+    }
+  } else if (from) {
+    const startDate = new Date(`${from}T00:00:00+05:30`);
+    const endDate = new Date(startDate.getTime() + 24 * 60 * 60 * 1000);
+    if (!isNaN(startDate.getTime()) && !isNaN(endDate.getTime())) {
+      return {
+        startDate,
+        endDate,
+        label: formatStoreDate(startDate),
+        periodKey: 'custom',
+      };
+    }
+  }
+
+  // Specific month: YYYY-MM
+  if (month && /^\d{4}-\d{2}$/.test(month)) {
+    const [year, monthNum] = month.split('-').map(Number);
+    if (year >= 2000 && monthNum >= 1 && monthNum <= 12) {
+      const { startDate, endDate } = getStoreMonthRange(year, monthNum);
+      const dateObj = new Date(year, monthNum - 1, 1);
+      const monthLabel = dateObj.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+      return {
+        startDate,
+        endDate,
+        label: monthLabel,
+        periodKey: month,
+      };
+    }
+  }
+
+  const now = getStoreNow();
+  const todayRange = getStoreTodayRange();
+
+  switch (period) {
+    case 'today':
+    case 'daily':
+      return {
+        startDate: todayRange.startDate,
+        endDate: todayRange.endDate,
+        label: `Today (${formatStoreDate(todayRange.startDate)})`,
+        periodKey: 'today',
+      };
+
+    case 'yesterday': {
+      const yRange = getStoreYesterdayRange();
+      return {
+        startDate: yRange.startDate,
+        endDate: yRange.endDate,
+        label: `Yesterday (${formatStoreDate(yRange.startDate)})`,
+        periodKey: 'yesterday',
+      };
+    }
+
+    case '7d': {
+      const startDate = new Date(todayRange.startDate.getTime() - 6 * 24 * 60 * 60 * 1000);
+      return {
+        startDate,
+        endDate: todayRange.endDate,
+        label: `Last 7 Days (${formatStoreDate(startDate)} – ${formatStoreDate(new Date(todayRange.endDate.getTime() - 1000))})`,
+        periodKey: '7d',
+      };
+    }
+
+    case 'this_month':
+    case 'monthly': {
+      const { startDate, endDate } = getStoreMonthRange(now.year, now.month);
+      const dateObj = new Date(now.year, now.month - 1, 1);
+      const monthName = dateObj.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+      return {
+        startDate,
+        endDate,
+        label: `This Month (${monthName})`,
+        periodKey: 'this_month',
+      };
+    }
+
+    case 'last_month': {
+      let prevMonth = now.month - 1;
+      let prevYear = now.year;
+      if (prevMonth < 1) {
+        prevMonth = 12;
+        prevYear -= 1;
+      }
+      const { startDate, endDate } = getStoreMonthRange(prevYear, prevMonth);
+      const dateObj = new Date(prevYear, prevMonth - 1, 1);
+      const monthName = dateObj.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+      return {
+        startDate,
+        endDate,
+        label: `Last Month (${monthName})`,
+        periodKey: 'last_month',
+      };
+    }
+
+    case '30d': {
+      const startDate = new Date(todayRange.startDate.getTime() - 29 * 24 * 60 * 60 * 1000);
+      return {
+        startDate,
+        endDate: todayRange.endDate,
+        label: `Last 30 Days (${formatStoreDate(startDate)} – ${formatStoreDate(new Date(todayRange.endDate.getTime() - 1000))})`,
+        periodKey: '30d',
+      };
+    }
+
+    case '90d': {
+      const startDate = new Date(todayRange.startDate.getTime() - 89 * 24 * 60 * 60 * 1000);
+      return {
+        startDate,
+        endDate: todayRange.endDate,
+        label: `Last 90 Days (${formatStoreDate(startDate)} – ${formatStoreDate(new Date(todayRange.endDate.getTime() - 1000))})`,
+        periodKey: '90d',
+      };
+    }
+
+    case 'all':
+    default:
+      return {
+        label: 'All Time',
+        periodKey: 'all',
+      };
+  }
+}
