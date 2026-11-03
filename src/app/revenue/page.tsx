@@ -28,6 +28,14 @@ export default async function RevenuePage(props: {
     if (authRes.status === 401) {
       redirect('/login');
     }
+    if (authRes.status === 503) {
+      return (
+        <AccessDenied
+          title="Database Connection Offline"
+          message="Unable to reach the live database. You are currently offline or your network connection was interrupted. Please reconnect to load live revenue metrics."
+        />
+      );
+    }
     return <AccessDenied message={authRes.error} />;
   }
 
@@ -404,6 +412,7 @@ export default async function RevenuePage(props: {
                                                         fill
                                                         sizes="36px"
                                                         className="object-cover"
+                                                        unoptimized
                                                       />
                                                     </div>
                                                   ) : (

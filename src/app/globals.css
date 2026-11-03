@@ -30,7 +30,7 @@
   --sidebar-muted-foreground: #cccccc;
   --header: #272729;
   --header-border: rgba(255, 255, 255, 0.08);
-  
+
   /* Apple Specific Named Tokens */
   --apple-action-blue: #0066cc;
   --apple-focus-blue: #0071e3;
@@ -48,7 +48,7 @@
   --apple-chip: rgba(210, 210, 215, 0.64);
   --apple-hairline: #e0e0e0;
   --apple-divider-soft: #f0f0f0;
-  
+
   color-scheme: dark;
 }
 
@@ -172,65 +172,82 @@ html {
 .tracking-tight {
   letter-spacing: -0.374px !important;
 }
+
 .tracking-tighter {
   letter-spacing: -0.28px !important;
 }
 
-/* Focused elements: 2px solid Focus Blue (#0071e3) */
-:focus-visible {
-  outline: 2px solid var(--ring) !important;
-  outline-offset: 2px !important;
-  box-shadow: none !important;
-}
 
-/* Apple Button Universal Micro-Interaction: transform scale(0.95) */
-button:active:not(:disabled),
-[role="button"]:active:not([aria-disabled="true"]),
-.button-apple-active:active {
-  transform: scale(0.95);
-  transition: transform 0.08s ease-in-out;
-}
 
-/* Zero shadow on UI chrome — Apple uses exactly one shadow for physical product imagery */
-.shadow-xs,
-.shadow-sm,
-.shadow-md,
-.shadow-lg,
-.shadow-xl,
-.shadow-2xl {
-  box-shadow: none !important;
-}
+  @layer base {
+    :focus-visible {
+      outline: none;
+    }
+  }
 
-/* Apple Signature Product Drop-Shadow */
-.shadow-apple-product {
-  box-shadow: 3px 5px 30px rgba(0, 0, 0, 0.22) !important;
-}
 
-/* Sidebar hover expansion drop-shadow */
-.sidebar-float-shadow {
-  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.14) !important;
-}
-:where(.dark, .dark *) .sidebar-float-shadow {
-  box-shadow: 6px 0 32px rgba(0, 0, 0, 0.5) !important;
-}
+  .outline-none,
+  [class*="outline-none"] {
+    outline: none !important;
+    box-shadow: none !important;
+  }
 
-/* Smooth touch scrolling on iOS */
-.overflow-x-auto, .overflow-y-auto {
-  -webkit-overflow-scrolling: touch;
-}
 
-/* Apple refined scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-::-webkit-scrollbar-thumb {
-  background: rgba(120, 120, 128, 0.28);
-  border-radius: 9999px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(120, 120, 128, 0.48);
-}
+  /* Apple Button Universal Micro-Interaction: transform scale(0.95) */
+  button:active:not(:disabled),
+  [role="button"]:active:not([aria-disabled="true"]),
+  .button-apple-active:active {
+    transform: scale(0.95);
+    transition: transform 0.08s ease-in-out;
+  }
+
+
+  /* Zero shadow on UI chrome — Apple uses exactly one shadow for physical product imagery */
+  .shadow-xs,
+  .shadow-sm,
+  .shadow-md,
+  .shadow-lg,
+  .shadow-xl,
+  .shadow-2xl {
+    box-shadow: none !important;
+  }
+
+
+  /* Apple Signature Product Drop-Shadow */
+  .shadow-apple-product {
+    box-shadow: 3px 5px 30px rgba(0, 0, 0, 0.22) !important;
+  }
+
+  /* Sidebar hover expansion drop-shadow */
+  .sidebar-float-shadow {
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.14) !important;
+  }
+
+  :where(.dark, .dark *) .sidebar-float-shadow {
+    box-shadow: 6px 0 32px rgba(0, 0, 0, 0.5) !important;
+  }
+
+  /* Smooth touch scrolling on iOS */
+  .overflow-x-auto,
+  .overflow-y-auto {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Apple refined scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgba(120, 120, 128, 0.28);
+    border-radius: 9999px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(120, 120, 128, 0.48);
+  }

@@ -33,8 +33,14 @@ export default async function Dashboard() {
     }
     return (
       <div className="bg-card border border-border rounded-[18px] p-8 text-center text-muted-foreground">
-        <p className="text-[17px] font-semibold text-foreground mb-1 tracking-[-0.374px]">Access Restricted</p>
-        <p className="text-[14px] tracking-[-0.224px]">{authRes.error}</p>
+        <p className="text-[17px] font-semibold text-foreground mb-1 tracking-[-0.374px]">
+          {authRes.status === 503 ? "Database Connection Offline" : "Access Restricted"}
+        </p>
+        <p className="text-[14px] tracking-[-0.224px]">
+          {authRes.status === 503
+            ? "Unable to reach the live database. You are currently offline or your network connection was interrupted. Please reconnect to load live dashboard data."
+            : authRes.error}
+        </p>
       </div>
     );
   }

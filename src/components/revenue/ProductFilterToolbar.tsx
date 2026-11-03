@@ -140,159 +140,158 @@ export default function ProductFilterToolbar({
                 key={opt.id}
                 type="button"
                 onClick={() => handleSelectPreset(opt.id)}
-                className={`flex items - center gap - 1.5 px - 3 py - 1.5 text - [13px] font - normal rounded - full transition - all active:scale-95 tracking-[-0.1px] ${
-            isSelected
-              ? 'bg-[#0066cc] text-white'
-              : 'bg-muted/70 text-muted-foreground hover:text-foreground hover:bg-muted border border-border/60'
-          }`}
+                className={`flex items-center gap-1.5 px-3 py-1.5 text-[13px] font-normal rounded-full transition-all active:scale-95 tracking-[-0.1px] ${isSelected
+                  ? 'bg-[#0066cc] text-white'
+                  : 'bg-muted/70 text-muted-foreground hover:text-foreground hover:bg-muted border border-border/60'
+                  }`}
               >
-          {Icon && <Icon size={12} className={isSelected ? 'text-white' : 'text-[#0066cc] dark:text-[#2997ff]'} />}
-          <span>{opt.label}</span>
-        </button>
-        );
+                {Icon && <Icon size={12} className={isSelected ? 'text-white' : 'text-[#0066cc] dark:text-[#2997ff]'} />}
+                <span>{opt.label}</span>
+              </button>
+            );
           })}
 
-        {/* Month Selector Dropdown */}
-        {availableMonths.length > 0 && (
-          <div className="relative inline-flex items-center">
-            <Calendar size={13} className="absolute left-3 text-muted-foreground pointer-events-none" />
-            <select
-              aria-label="Filter by month"
-              value={currentMonth}
-              onChange={(e) => handleMonthChange(e.target.value)}
-              className={`pl-8 pr-4 py-1.5 text-[13px] font-normal rounded-full border appearance-none transition-all cursor-pointer active:scale-95 tracking-[-0.1px] ${currentMonth
-                ? 'bg-[#0066cc] text-white border-transparent'
-                : 'bg-muted/70 text-muted-foreground border-border/60 hover:text-foreground'
-                }`
-              }
-            >
-              <option value="" className="bg-popover text-popover-foreground">Select Month...</option>
-              {
-                availableMonths.map((m) => {
-                  const [year, monthNum] = m.split('-');
-                  const date = new Date(parseInt(year, 10), parseInt(monthNum, 10) - 1, 1);
-                  const label = date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
-                  return (
-                    <option key={m} value={m} className="bg-popover text-popover-foreground">
-                      {label}
-                    </option>
-                  );
-                })
-              }
-            </select>
-          </div>
-        )}
+          {/* Month Selector Dropdown */}
+          {availableMonths.length > 0 && (
+            <div className="relative inline-flex items-center">
+              <Calendar size={13} className="absolute left-3 text-muted-foreground pointer-events-none" />
+              <select
+                aria-label="Filter by month"
+                value={currentMonth}
+                onChange={(e) => handleMonthChange(e.target.value)}
+                className={`pl-8 pr-4 py-1.5 text-[13px] font-normal rounded-full border appearance-none transition-all cursor-pointer active:scale-95 tracking-[-0.1px] ${currentMonth
+                  ? 'bg-[#0066cc] text-white border-transparent'
+                  : 'bg-muted/70 text-muted-foreground border-border/60 hover:text-foreground'
+                  }`
+                }
+              >
+                <option value="" className="bg-popover text-popover-foreground">Select Month...</option>
+                {
+                  availableMonths.map((m) => {
+                    const [year, monthNum] = m.split('-');
+                    const date = new Date(parseInt(year, 10), parseInt(monthNum, 10) - 1, 1);
+                    const label = date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+                    return (
+                      <option key={m} value={m} className="bg-popover text-popover-foreground">
+                        {label}
+                      </option>
+                    );
+                  })
+                }
+              </select>
+            </div>
+          )}
 
-        {/* Custom Date Range Toggle */}
-        <button
-          type="button"
-          onClick={() => setShowCustomRange(!showCustomRange)}
-        className={`flex items-center gap-1.5 px-3 py-1.5 text-[13px] font-normal rounded-full border transition-all cursor-pointer active:scale-95 tracking-[-0.1px] ${showCustomRange || currentFrom
-            ? 'bg-card text-foreground border-border'
-            : 'bg-muted/70 text-muted-foreground border-border/60 hover:text-foreground'
-          }`}
-      >
-        <CalendarDays size={13} />
-        <span>Custom Dates</span>
-        <ChevronDown size={12} className={`transition-transform duration-200 ${showCustomRange ? 'rotate-180' : ''}`} />
-      </button>
+          {/* Custom Date Range Toggle */}
+          <button
+            type="button"
+            onClick={() => setShowCustomRange(!showCustomRange)}
+            className={`flex items-center gap-1.5 px-3 py-1.5 text-[13px] font-normal rounded-full border transition-all cursor-pointer active:scale-95 tracking-[-0.1px] ${showCustomRange || currentFrom
+              ? 'bg-card text-foreground border-border'
+              : 'bg-muted/70 text-muted-foreground border-border/60 hover:text-foreground'
+              }`}
+          >
+            <CalendarDays size={13} />
+            <span>Custom Dates</span>
+            <ChevronDown size={12} className={`transition-transform duration-200 ${showCustomRange ? 'rotate-180' : ''}`} />
+          </button>
 
-      {/* Clear Filters Button if any active filter */}
-      {hasActiveFilter && (
-        <button
-          type="button"
-          onClick={handleClearFilters}
-          className="px-3 py-1.5 text-[13px] font-normal rounded-full text-[#ff453a] hover:bg-[#ff453a]/10 transition-colors flex items-center gap-1 cursor-pointer active:scale-95"
-          title="Reset all date filters to all-time"
-        >
-          <X size={13} />
-          <span>Reset</span>
-        </button>
-      )}
-    </div>
-      </div >
-
-    {/* Expandable Custom Date Range Selector */ }
-  {
-    showCustomRange && (
-      <form onSubmit={handleApplyCustomRange} className="flex flex-wrap items-center gap-2 pt-2 border-t border-border/60">
-        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-          <label htmlFor={fromInputId} className="font-medium">From:</label>
-          <input
-            id={fromInputId}
-            type="date"
-            value={customFrom}
-            onChange={(e) => setCustomFrom(e.target.value)}
-            className="bg-card border border-input rounded-md px-2.5 py-1 text-xs text-foreground focus:outline-none focus:border-primary shadow-xs"
-            required
-          />
-        </div>
-        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-          <label htmlFor={toInputId} className="font-medium">To:</label>
-          <input
-            id={toInputId}
-            type="date"
-            value={customTo}
-            onChange={(e) => setCustomTo(e.target.value)}
-            className="bg-card border border-input rounded-md px-2.5 py-1 text-xs text-foreground focus:outline-none focus:border-primary shadow-xs"
-          />
-        </div>
-        <div className="flex items-center gap-1.5">
-          <Button type="submit" size="xs" variant="default" className="h-7 text-xs">
-            <Check size={12} className="mr-1" />
-            Apply
-          </Button>
-          {(currentFrom || currentTo) && (
-            <Button
+          {/* Clear Filters Button if any active filter */}
+          {hasActiveFilter && (
+            <button
               type="button"
-              size="xs"
-              variant="outline"
-              className="h-7 text-xs"
               onClick={handleClearFilters}
+              className="px-3 py-1.5 text-[13px] font-normal rounded-full text-[#ff453a] hover:bg-[#ff453a]/10 transition-colors flex items-center gap-1 cursor-pointer active:scale-95"
+              title="Reset all date filters to all-time"
             >
-              Clear
-            </Button>
+              <X size={13} />
+              <span>Reset</span>
+            </button>
           )}
         </div>
-      </form>
+    </div>
+
+      {/* Expandable Custom Date Range Selector */ }
+    {
+      showCustomRange && (
+        <form onSubmit={handleApplyCustomRange} className="flex flex-wrap items-center gap-2 pt-2 border-t border-border/60">
+          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            <label htmlFor={fromInputId} className="font-medium">From:</label>
+            <input
+              id={fromInputId}
+              type="date"
+              value={customFrom}
+              onChange={(e) => setCustomFrom(e.target.value)}
+              className="bg-card border border-input rounded-md px-2.5 py-1 text-xs text-foreground focus:outline-none focus:border-primary shadow-xs"
+              required
+            />
+          </div>
+          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            <label htmlFor={toInputId} className="font-medium">To:</label>
+            <input
+              id={toInputId}
+              type="date"
+              value={customTo}
+              onChange={(e) => setCustomTo(e.target.value)}
+              className="bg-card border border-input rounded-md px-2.5 py-1 text-xs text-foreground focus:outline-none focus:border-primary shadow-xs"
+            />
+          </div>
+          <div className="flex items-center gap-1.5">
+            <Button type="submit" size="xs" variant="default" className="h-7 text-xs">
+              <Check size={12} className="mr-1" />
+              Apply
+            </Button>
+            {(currentFrom || currentTo) && (
+              <Button
+                type="button"
+                size="xs"
+                variant="outline"
+                className="h-7 text-xs"
+                onClick={handleClearFilters}
+              >
+                Clear
+              </Button>
+            )}
+          </div>
+        </form>
     )
   }
 
-  {/* Active Filter & Period Summary Strip */ }
-  <div className="flex flex-wrap items-center justify-between gap-2.5 pt-1 text-xs">
-    <div className="flex items-center gap-2 flex-wrap">
-      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-muted border border-border text-foreground font-medium text-[11px]">
-        <Clock size={12} className="text-muted-foreground shrink-0" />
-        <span>Filter:</span>
-        <strong className="text-foreground font-semibold">{activeLabel}</strong>
-      </span>
-      {hasActiveFilter && (
-        <span className="text-[11px] text-muted-foreground">
-          Showing filtered results
-        </span>
-      )}
-    </div>
+          {/* Active Filter & Period Summary Strip */}
+          <div className="flex flex-wrap items-center justify-between gap-2.5 pt-1 text-xs">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-muted border border-border text-foreground font-medium text-[11px]">
+                <Clock size={12} className="text-muted-foreground shrink-0" />
+                <span>Filter:</span>
+                <strong className="text-foreground font-semibold">{activeLabel}</strong>
+              </span>
+            {hasActiveFilter && (
+              <span className="text-[11px] text-muted-foreground">
+                Showing filtered results
+              </span>
+            )}
+          </div>
 
-    {/* Live Period Metrics Pill */}
-    <div className="flex items-center gap-3 font-mono text-[11px] text-muted-foreground bg-muted/50 px-3 py-1 rounded-md border border-border/50">
-      <div>
-        <span>Units: </span>
-        <strong className="text-foreground font-semibold">{totalUnits.toLocaleString('en-IN')}</strong>
-      </div>
-      <span className="text-border">•</span>
-      <div>
-        <span>Revenue: </span>
-        <strong className="text-foreground font-semibold">
-          ₹{totalRevenue.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-        </strong>
-      </div>
-      <span className="text-border">•</span>
-      <div>
-        <span>Products: </span>
-        <strong className="text-foreground font-semibold">{totalProducts.toLocaleString('en-IN')}</strong>
-      </div>
-    </div>
-  </div>
-    </div >
-  );
+              {/* Live Period Metrics Pill */}
+              <div className="flex items-center gap-3 font-mono text-[11px] text-muted-foreground bg-muted/50 px-3 py-1 rounded-md border border-border/50">
+                <div>
+                  <span>Units: </span>
+                  <strong className="text-foreground font-semibold">{totalUnits.toLocaleString('en-IN')}</strong>
+                </div>
+                <span className="text-border">•</span>
+                <div>
+                  <span>Revenue: </span>
+                  <strong className="text-foreground font-semibold">
+                    ₹{totalRevenue.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </strong>
+                </div>
+                <span className="text-border">•</span>
+                <div>
+                  <span>Products: </span>
+                  <strong className="text-foreground font-semibold">{totalProducts.toLocaleString('en-IN')}</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+      );
 }

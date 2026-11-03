@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import { ErpShell } from "@/components/shell/ErpShell";
 import SignOutLink from "@/components/SignOutLink";
@@ -12,132 +12,142 @@ import AutoSyncManager from "@/components/AutoSyncManager";
 import { AuthProvider } from "@/context/AuthContext";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-  display: "swap",
-});
+  const inter = localFont({
+    src: "./fonts/Inter-Variable.woff2",
+    variable: "--font-inter",
+    display: "swap",
+  });
 
-export const metadata: Metadata = {
-  title: "Blactify ERP",
-  description: "Real-time Blactify ERP & Sales Dashboard",
-  manifest: "/manifest.json",
-  appleWebApp: {
-    capable: true,
-    title: "Blactify",
-    statusBarStyle: "black-translucent",
-  },
-  icons: {
-    icon: [
-      { url: "/favicon.ico", sizes: "any" },
-      { url: "/icon.png", type: "image/png", sizes: "512x512" },
-    ],
-    apple: [
-      { url: "/apple-icon.png", sizes: "180x180", type: "image/png" },
-    ],
-  },
-};
+  export const metadata: Metadata = {
+    title: "Blactify Dashboard",
+    description: "Real-time Blactify Dashboard & Sales Dashboard",
+    manifest: "/manifest.json",
+    appleWebApp: {
+      capable: true,
+      title: "Blactify",
+      statusBarStyle: "black-translucent",
+    },
+    icons: {
+      icon: [
+        { url: "/favicon.ico", sizes: "any" },
+        { url: "/icon.png", type: "image/png", sizes: "512x512" },
+      ],
+      apple: [
+        { url: "/apple-icon.png", sizes: "180x180", type: "image/png" },
+      ],
+    },
+  };
 
-export const viewport: Viewport = {
-  themeColor: "#000000",
-  width: "device-width",
-  initialScale: 1,
-  maximumScale: 5,
-  viewportFit: "cover",
-};
+  export const viewport: Viewport = {
+    themeColor: "#000000",
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 5,
+    viewportFit: "cover",
+  };
 
-export const dynamic = 'force-dynamic';
+  export const dynamic = 'force-dynamic';
 
-export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  let session = null;
-  let userRole: UserRole = 'VIEWER';
-  let partnerId: string | null = null;
-  let userPermissions: string[] = [];
+  export default async function RootLayout({ children }: { children: React.ReactNode }) {
+    let session = null;
+    let userRole: UserRole = 'VIEWER';
+    let partnerId: string | null = null;
+    let userPermissions: string[] = [];
 
-  let isNotAllowed = false;
+    let isNotAllowed = false;
 
-  try {
-    const sessionRes = await auth.getSession();
-    session = sessionRes?.data ?? null;
+    try {
+      const sessionRes = await auth.getSession();
+      session = sessionRes?.data ?? null;
 
-    // Check if they are logged in but not allowed
-    if (session?.user?.email) {
-      const [allowed] = await db
-        .select()
-        .from(allowedUsers)
-        .where(ilike(allowedUsers.email, session.user.email))
-        .limit(1);
+      // Check if they are logged in but not allowed
+      if(session?.user?.email) {
+        const [allowed] = await db
+          .select()
+          .from(allowedUsers)
+          .where(ilike(allowedUsers.email, session.user.email))
+          .limit(1);
 
-      if (!allowed) {
-        isNotAllowed = true;
-      } else {
-        userRole = allowed.role;
-        partnerId = allowed.partnerId;
+        if (!allowed) {
+          isNotAllowed = true;
+        } else {
+          userRole = allowed.role;
+          partnerId = allowed.partnerId;
 
-        if (!userRoles.includes(userRole as typeof userRoles[number])) {
-          const [customRoleRecord] = await db
-            .select()
-            .from(customRoles)
-            .where(eq(customRoles.code, userRole))
-            .limit(1);
+          if (!userRoles.includes(userRole as typeof userRoles[number])) {
+            const [customRoleRecord] = await db
+              .select()
+              .from(customRoles)
+              .where(eq(customRoles.code, userRole))
+              .limit(1);
 
-          if (customRoleRecord?.permissions) {
-            try {
-              userPermissions = JSON.parse(customRoleRecord.permissions);
-            } catch (err) {
-              console.error("Failed to parse custom role permissions JSON in layout:", err);
+            if (customRoleRecord?.permissions) {
+              try {
+                userPermissions = JSON.parse(customRoleRecord.permissions);
+              } catch (err) {
+                console.error("Failed to parse custom role permissions JSON in layout:", err);
+              }
             }
           }
         }
       }
+    } catch(error) {
+      console.error("RootLayout session/auth verification error:", error);
     }
-  } catch (error) {
-    console.error("RootLayout session/auth verification error:", error);
-  }
 
-  if (isNotAllowed) {
-    return (
-      <html lang="en" suppressHydrationWarning className={`${inter.variable} dark h-full antialiased`}>
-        <body className="min-h-full bg-background text-foreground flex flex-col items-center justify-center font-sans gap-4">
-          <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-            <div className="text-xl font-medium">You are not authorized to view this dashboard.</div>
-            <SignOutLink />
-            <Toaster position="bottom-right" />
-          </ThemeProvider>
-        </body>
-      </html>
-    );
-  }
+  if(isNotAllowed) {
+      return (
+        <html lang="en" suppressHydrationWarning className={`${inter.variable} h-full antialiased`}>
+          <body className="min-h-full bg-background text-foreground flex flex-col items-center justify-center font-sans gap-4">
+            <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+              <div className="text-xl font-medium">You are not authorized to view this dashboard.</div>
+              <SignOutLink />
+              <Toaster
+                position="bottom-right"
+                toastOptions={{
+                  className: '!bg-card/90 !backdrop-blur-md !text-foreground !border !border-border !shadow-xl !rounded-full !text-[13px] !tracking-[-0.12px] !font-normal !px-4 !py-2.5',
+                }}
+              />
+            </ThemeProvider>
+          </body>
+        </html>
+      );
+    }
 
-  return (
+  return(
     <html
-      lang="en"
+      lang = "en"
       suppressHydrationWarning
-      className={`${inter.variable} dark h-full antialiased`}
+      className = {`${inter.variable} h-full antialiased`}
+>
+<body className="h-[100dvh] overflow-hidden bg-background text-foreground flex flex-col md:flex-row relative selection:bg-foreground/20 font-sans transition-colors duration-150">
+  <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+    <AuthProvider
+      initialUser={session?.user || null}
+      initialRole={userRole}
+      initialPartnerId={partnerId}
+      initialPermissions={userPermissions}
     >
-      <body className="h-[100dvh] overflow-hidden bg-background text-foreground flex flex-col md:flex-row relative selection:bg-foreground/20 font-sans transition-colors duration-150">
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-          <AuthProvider
-            initialUser={session?.user || null}
-            initialRole={userRole}
-            initialPartnerId={partnerId}
-            initialPermissions={userPermissions}
-          >
-            {/* ERP Application Shell */}
-            {session?.user ? (
-              <ErpShell>
-                <AutoSyncManager />
-                {children}
-              </ErpShell>
-            ) : (
-              <main className="flex-1 w-full h-full bg-background pb-[env(safe-area-inset-bottom)]">
-                {children}
-              </main>
-            )}
-            <Toaster position="bottom-right" />
-          </AuthProvider>
-        </ThemeProvider>
-      </body>
-    </html>
+      {/* ERP Application Shell */}
+      {session?.user ? (
+        <ErpShell>
+          <AutoSyncManager />
+          {children}
+        </ErpShell>
+      ) : (
+        <main className="flex-1 w-full h-full bg-background pb-[env(safe-area-inset-bottom)]">
+          {children}
+        </main>
+      )}
+      <Toaster
+        position="bottom-right"
+        toastOptions={{
+          className: '!bg-card/90 !backdrop-blur-md !text-foreground !border !border-border !shadow-xl !rounded-full !text-[13px] !tracking-[-0.12px] !font-normal !px-4 !py-2.5',
+        }}
+      />
+    </AuthProvider>
+  </ThemeProvider>
+</body>
+    </html >
   );
 }

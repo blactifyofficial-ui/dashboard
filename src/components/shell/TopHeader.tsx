@@ -1,11 +1,9 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import {
   Menu,
-  Search,
   RefreshCw,
   LayoutDashboard,
   BarChart3,
@@ -18,11 +16,9 @@ import {
   Megaphone,
   Users,
   Settings,
-  ChevronRight,
   LogOut,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
-import ThemeSwitcher from "@/components/theme/ThemeSwitcher";
 import { CommandMenu, type CommandItem } from "@/components/ui/command";
 import {
   DropdownMenu,
@@ -34,35 +30,17 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { authClient } from "@/lib/auth/client";
-import { cn } from "@/lib/utils";
+import { useNetworkStatus } from "@/components/NetworkStatusIndicator";
 import toast from "react-hot-toast";
-
-const ROUTE_TITLES: Record<string, { title: string; category: string; icon: React.ElementType }> = {
-  "/dashboard": { title: "Overview", category: "Core Operations", icon: LayoutDashboard },
-  "/revenue": { title: "Revenue Analytics", category: "Core Operations", icon: BarChart3 },
-  "/cod": { title: "COD Collection", category: "Core Operations", icon: HandCoins },
-  "/inventory": { title: "Inventory & Stock", category: "Core Operations", icon: Boxes },
-  "/monthly-expenses": { title: "Monthly Bills", category: "Finance & Capital", icon: CalendarCheck },
-  "/expenses": { title: "Expenses Ledger", category: "Finance & Capital", icon: Wallet },
-  "/expenses/add": { title: "Record Expense", category: "Finance & Capital", icon: Wallet },
-  "/payouts": { title: "Partner Payouts", category: "Finance & Capital", icon: Banknote },
-  "/partners": { title: "Partners & Capital", category: "Finance & Capital", icon: Handshake },
-  "/meta-ads": { title: "Meta Ads Planning", category: "Growth & Marketing", icon: Megaphone },
-  "/team": { title: "Team & Roles", category: "Administration", icon: Users },
-  "/settings": { title: "System Settings", category: "Administration", icon: Settings },
-};
 
 export function TopHeader({
   onOpenMobile,
 }: {
-  sidebarCollapsed?: boolean;
-  sidebarPinned?: boolean;
-  onToggleSidebar?: () => void;
   onOpenMobile: () => void;
 }) {
-  const pathname = usePathname();
   const router = useRouter();
   const { user, role } = useAuth();
+  const { isOnline } = useNetworkStatus();
   const [commandOpen, setCommandOpen] = React.useState(false);
   const [isSyncing, setIsSyncing] = React.useState(false);
 
@@ -78,15 +56,12 @@ export function TopHeader({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
-  // Compute breadcrumbs
-  const currentRouteMeta = ROUTE_TITLES[pathname] || {
-    title: pathname.split("/").filter(Boolean).map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(" / ") || "Dashboard",
-    category: "ERP Portal",
-    icon: LayoutDashboard,
-  };
-
   const handleManualSync = async () => {
     if (isSyncing) return;
+    if (!isOnline) {
+      toast.error("You are currently offline. Please reconnect to sync with Shopify.", { id: "shopify-sync" });
+      return;
+    }
     setIsSyncing(true);
     toast.loading("Initiating live Shopify sync...", { id: "shopify-sync" });
     try {
@@ -238,91 +213,26 @@ export function TopHeader({
   return (
     <>
       <header className="h-[52px] shrink-0 border-b border-border bg-card/85 backdrop-blur-md px-3 sm:px-6 flex items-center justify-between sticky top-0 z-30 transition-colors">
-        {/* Left: Sidebar Toggles & Breadcrumb */}
-        <div className="flex items-center gap-2 sm:gap-3.5 min-w-0">
-          {/* Mobile hamburger */}
+        {/* Mobile Hamburger menu */}
+        <div className="flex items-center md:hidden">
           <button
             type="button"
             onClick={onOpenMobile}
             aria-label="Open sidebar menu"
-            className="md:hidden p-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted border border-border transition-colors active:scale-95"
+            className="p-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted border border-border transition-colors active:scale-95"
           >
             <Menu className="w-4 h-4" />
           </button>
-
-          {/* Breadcrumb Path */}
-          <div className="flex items-center gap-1.5 text-[13px] text-muted-foreground tracking-[-0.12px] truncate">
-            <Link
-              href="/dashboard"
-              className="hover:text-foreground transition-colors hidden sm:inline font-normal"
-            >
-              Blactify ERP
-            </Link>
-            <ChevronRight className="w-3 h-3 text-muted-foreground/40 hidden sm:inline shrink-0" />
-            <span className="text-muted-foreground/80 hidden sm:inline truncate font-normal">
-              {currentRouteMeta.category}
-            </span>
-            <ChevronRight className="w-3 h-3 text-muted-foreground/40 hidden sm:inline shrink-0" />
-            <span className="font-semibold text-foreground truncate text-[14px] sm:text-[15px] tracking-[-0.224px]">
-              {currentRouteMeta.title}
-            </span>
-          </div>
         </div>
 
-        {/* Right: Search / Actions / Theme / User Profile */}
-        <div className="flex items-center gap-2 sm:gap-2.5">
-          {/* Global Search Bar (Trigger ⌘K) - Apple Search Pill */}
-          <button
-            type="button"
-            onClick={() => setCommandOpen(true)}
-            aria-label="Search or type a command"
-            className="hidden sm:flex items-center gap-2.5 px-3.5 py-1.5 h-[36px] rounded-full bg-card border border-border text-muted-foreground hover:text-foreground hover:border-[#0071e3]/50 transition-all w-44 md:w-60 justify-between cursor-pointer active:scale-95"
-          >
-            <div className="flex items-center gap-2 truncate text-[13px] tracking-[-0.12px]">
-              <Search className="w-3.5 h-3.5 shrink-0" />
-              <span className="truncate">Search commands...</span>
-            </div>
-            <kbd className="hidden md:inline-flex items-center px-1.5 py-0.5 text-[10px] font-mono text-muted-foreground/70 bg-muted border border-border rounded-full">
-              ⌘K
-            </kbd>
-          </button>
-
-          {/* Mobile search button */}
-          <button
-            type="button"
-            onClick={() => setCommandOpen(true)}
-            aria-label="Open command palette"
-            className="sm:hidden p-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted border border-border transition-colors active:scale-95"
-          >
-            <Search className="w-4 h-4" />
-          </button>
-
-          {/* Shopify Live Sync Status / Trigger - Apple Pill CTA */}
-          <button
-            type="button"
-            onClick={handleManualSync}
-            disabled={isSyncing}
-            title="Click to trigger manual Shopify order sync"
-            className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 h-[32px] text-[12px] font-normal rounded-full bg-muted/60 border border-border text-muted-foreground hover:text-foreground hover:bg-muted transition-all active:scale-95"
-          >
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#0066cc] opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-[#0066cc]"></span>
-            </span>
-            <span className="hidden md:inline font-normal">Shopify</span>
-            <RefreshCw className={`w-3 h-3 ${isSyncing ? "animate-spin text-[#0066cc]" : ""}`} />
-          </button>
-
-          {/* Theme Switcher */}
-          <ThemeSwitcher className="h-[36px] w-[36px] rounded-full" />
-
-          {/* User Account Menu */}
+        {/* Right: User Profile Menu */}
+        <div className="ml-auto flex items-center">
           <DropdownMenu>
             <DropdownMenuTrigger
               aria-label="User account menu"
               className="flex items-center gap-2 p-0.5 rounded-full hover:bg-muted transition-colors cursor-pointer outline-none focus-visible:ring-1 focus-visible:ring-ring border border-border"
             >
-              <div className="w-[32px] h-[32px] rounded-full bg-[#0066cc]/10 border border-[#0066cc]/20 text-[#0066cc] dark:text-[#2997ff] font-semibold text-[13px] flex items-center justify-center shrink-0">
+              <div className="w-[34px] h-[34px] rounded-full bg-[#0066cc]/10 border border-[#0066cc]/20 text-[#0066cc] dark:text-[#2997ff] font-semibold text-[13px] flex items-center justify-center shrink-0">
                 {user?.name ? user.name.charAt(0).toUpperCase() : user?.email?.charAt(0).toUpperCase() || "A"}
               </div>
             </DropdownMenuTrigger>

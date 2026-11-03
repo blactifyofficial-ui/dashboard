@@ -1,7 +1,7 @@
 {
-  "name": "Blactify ERP",
+  "name": "Blactify Dashboard",
   "short_name": "Blactify",
-  "description": "Blactify ERP & Sales Dashboard",
+  "description": "Blactify Dashboard & Sales Dashboard",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#1d1d1f",
@@ -22,7 +22,7 @@
     {
       "src": "/icon-512.png",
       "sizes": "512x512",
-      "type": "image/png",
+      "type": "image/png"
     },
     {
       "src": "/icon-512.png",
