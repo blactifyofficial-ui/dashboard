@@ -5,8 +5,6 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
   Menu,
-  PanelLeftClose,
-  PanelLeftOpen,
   Search,
   RefreshCw,
   LayoutDashboard,
@@ -36,6 +34,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { authClient } from "@/lib/auth/client";
+import { cn } from "@/lib/utils";
 import toast from "react-hot-toast";
 
 const ROUTE_TITLES: Record<string, { title: string; category: string; icon: React.ElementType }> = {
@@ -54,12 +53,11 @@ const ROUTE_TITLES: Record<string, { title: string; category: string; icon: Reac
 };
 
 export function TopHeader({
-  sidebarCollapsed,
-  onToggleSidebar,
   onOpenMobile,
 }: {
-  sidebarCollapsed: boolean;
-  onToggleSidebar: () => void;
+  sidebarCollapsed?: boolean;
+  sidebarPinned?: boolean;
+  onToggleSidebar?: () => void;
   onOpenMobile: () => void;
 }) {
   const pathname = usePathname();
@@ -239,154 +237,140 @@ export function TopHeader({
 
   return (
     <>
-        <header className="h-[52px] shrink-0 border-b border-border bg-card/85 backdrop-blur-md px-3 sm:px-6 flex items-center justify-between sticky top-0 z-30 transition-colors">
-          {/* Left: Sidebar Toggles & Breadcrumb */}
-            <div className="flex items-center gap-2 sm:gap-3.5 min-w-0">
-              {/* Mobile hamburger */}
-              <button
-                type="button"
-                onClick={onOpenMobile}
-                aria-label="Open sidebar menu"
-                className="md:hidden p-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted border border-border transition-colors active:scale-95"
-              >
-                <Menu className="w-4 h-4" />
-              </button>
+      <header className="h-[52px] shrink-0 border-b border-border bg-card/85 backdrop-blur-md px-3 sm:px-6 flex items-center justify-between sticky top-0 z-30 transition-colors">
+        {/* Left: Sidebar Toggles & Breadcrumb */}
+        <div className="flex items-center gap-2 sm:gap-3.5 min-w-0">
+          {/* Mobile hamburger */}
+          <button
+            type="button"
+            onClick={onOpenMobile}
+            aria-label="Open sidebar menu"
+            className="md:hidden p-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted border border-border transition-colors active:scale-95"
+          >
+            <Menu className="w-4 h-4" />
+          </button>
 
-              {/* Desktop sidebar rail toggle */}
-              <button
-                type="button"
-                onClick={onToggleSidebar}
-                aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-                className="hidden md:flex p-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted border border-border transition-colors active:scale-95"
-              >
-                {sidebarCollapsed ? (
-                  <PanelLeftOpen className="w-4 h-4" />
-                ) : (
-                  <PanelLeftClose className="w-4 h-4" />
-                )}
-              </button>
+          {/* Breadcrumb Path */}
+          <div className="flex items-center gap-1.5 text-[13px] text-muted-foreground tracking-[-0.12px] truncate">
+            <Link
+              href="/dashboard"
+              className="hover:text-foreground transition-colors hidden sm:inline font-normal"
+            >
+              Blactify ERP
+            </Link>
+            <ChevronRight className="w-3 h-3 text-muted-foreground/40 hidden sm:inline shrink-0" />
+            <span className="text-muted-foreground/80 hidden sm:inline truncate font-normal">
+              {currentRouteMeta.category}
+            </span>
+            <ChevronRight className="w-3 h-3 text-muted-foreground/40 hidden sm:inline shrink-0" />
+            <span className="font-semibold text-foreground truncate text-[14px] sm:text-[15px] tracking-[-0.224px]">
+              {currentRouteMeta.title}
+            </span>
+          </div>
+        </div>
 
-              {/* Breadcrumb Path */}
-                <div className="flex items-center gap-1.5 text-[13px] text-muted-foreground tracking-[-0.12px] truncate">
-                  <Link
-                    href="/dashboard"
-                    className="hover:text-foreground transition-colors hidden sm:inline font-normal"
-                  >
-                    Blactify ERP
-                  </Link>
-                  <ChevronRight className="w-3 h-3 text-muted-foreground/40 hidden sm:inline shrink-0" />
-                    <span className="text-muted-foreground/80 hidden sm:inline truncate font-normal">
-                      {currentRouteMeta.category}
-                    </span>
-                    <ChevronRight className="w-3 h-3 text-muted-foreground/40 hidden sm:inline shrink-0" />
-                      <span className="font-semibold text-foreground truncate text-[14px] sm:text-[15px] tracking-[-0.224px]">
-                        {currentRouteMeta.title}
-                      </span>
-                    </div>
+        {/* Right: Search / Actions / Theme / User Profile */}
+        <div className="flex items-center gap-2 sm:gap-2.5">
+          {/* Global Search Bar (Trigger ⌘K) - Apple Search Pill */}
+          <button
+            type="button"
+            onClick={() => setCommandOpen(true)}
+            aria-label="Search or type a command"
+            className="hidden sm:flex items-center gap-2.5 px-3.5 py-1.5 h-[36px] rounded-full bg-card border border-border text-muted-foreground hover:text-foreground hover:border-[#0071e3]/50 transition-all w-44 md:w-60 justify-between cursor-pointer active:scale-95"
+          >
+            <div className="flex items-center gap-2 truncate text-[13px] tracking-[-0.12px]">
+              <Search className="w-3.5 h-3.5 shrink-0" />
+              <span className="truncate">Search commands...</span>
+            </div>
+            <kbd className="hidden md:inline-flex items-center px-1.5 py-0.5 text-[10px] font-mono text-muted-foreground/70 bg-muted border border-border rounded-full">
+              ⌘K
+            </kbd>
+          </button>
+
+          {/* Mobile search button */}
+          <button
+            type="button"
+            onClick={() => setCommandOpen(true)}
+            aria-label="Open command palette"
+            className="sm:hidden p-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted border border-border transition-colors active:scale-95"
+          >
+            <Search className="w-4 h-4" />
+          </button>
+
+          {/* Shopify Live Sync Status / Trigger - Apple Pill CTA */}
+          <button
+            type="button"
+            onClick={handleManualSync}
+            disabled={isSyncing}
+            title="Click to trigger manual Shopify order sync"
+            className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 h-[32px] text-[12px] font-normal rounded-full bg-muted/60 border border-border text-muted-foreground hover:text-foreground hover:bg-muted transition-all active:scale-95"
+          >
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#0066cc] opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-[#0066cc]"></span>
+            </span>
+            <span className="hidden md:inline font-normal">Shopify</span>
+            <RefreshCw className={`w-3 h-3 ${isSyncing ? "animate-spin text-[#0066cc]" : ""}`} />
+          </button>
+
+          {/* Theme Switcher */}
+          <ThemeSwitcher className="h-[36px] w-[36px] rounded-full" />
+
+          {/* User Account Menu */}
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              aria-label="User account menu"
+              className="flex items-center gap-2 p-0.5 rounded-full hover:bg-muted transition-colors cursor-pointer outline-none focus-visible:ring-1 focus-visible:ring-ring border border-border"
+            >
+              <div className="w-[32px] h-[32px] rounded-full bg-[#0066cc]/10 border border-[#0066cc]/20 text-[#0066cc] dark:text-[#2997ff] font-semibold text-[13px] flex items-center justify-center shrink-0">
+                {user?.name ? user.name.charAt(0).toUpperCase() : user?.email?.charAt(0).toUpperCase() || "A"}
+              </div>
+            </DropdownMenuTrigger>
+
+            <DropdownMenuContent align="right" className="w-56 p-1.5">
+              <DropdownMenuLabel className="pb-1.5">
+                <div className="flex flex-col">
+                  <span className="font-semibold text-foreground text-[13px] tracking-[-0.12px] truncate">
+                    {user?.name || "Blactify Admin"}
+                  </span>
+                  <span className="text-[11px] text-muted-foreground font-mono truncate font-normal">
+                    {user?.email || "admin@blactify.com"}
+                  </span>
                 </div>
+                <div className="mt-1.5">
+                  <Badge variant="neutral" size="xs">
+                    {role || "VIEWER"}
+                  </Badge>
+                </div>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onSelect={() => router.push("/settings")}>
+                <Settings className="w-3.5 h-3.5 text-muted-foreground mr-1.5" />
+                <span>Account Settings</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => router.push("/team")}>
+                <Users className="w-3.5 h-3.5 text-muted-foreground mr-1.5" />
+                <span>Team & Permissions</span>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onSelect={handleSignOut}
+                className="text-[#ff453a] hover:bg-[#ff453a]/10"
+              >
+                <LogOut className="w-3.5 h-3.5 mr-1.5" />
+                <span>Log out</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </header>
 
-                {/* Right: Search / Actions / Theme / User Profile */}
-                <div className="flex items-center gap-2 sm:gap-2.5">
-                  {/* Global Search Bar (Trigger ⌘K) - Apple Search Pill */}
-                  <button
-                    type="button"
-                    onClick={() => setCommandOpen(true)}
-                    aria-label="Search or type a command"
-                    className="hidden sm:flex items-center gap-2.5 px-3.5 py-1.5 h-[36px] rounded-full bg-card border border-border text-muted-foreground hover:text-foreground hover:border-[#0071e3]/50 transition-all w-44 md:w-60 justify-between cursor-pointer active:scale-95"
-                  >
-                      <div className="flex items-center gap-2 truncate text-[13px] tracking-[-0.12px]">
-                        <Search className="w-3.5 h-3.5 shrink-0" />
-                        <span className="truncate">Search commands...</span>
-                      </div>
-                        <kbd className="hidden md:inline-flex items-center px-1.5 py-0.5 text-[10px] font-mono text-muted-foreground/70 bg-muted border border-border rounded-full">
-                          ⌘K
-                        </kbd>
-                      </button>
-
-                      {/* Mobile search button */}
-                      <button
-                        type="button"
-                        onClick={() => setCommandOpen(true)}
-                        aria-label="Open command palette"
-                        className="sm:hidden p-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted border border-border transition-colors active:scale-95"
-                      >
-                        <Search className="w-4 h-4" />
-                      </button>
-
-                      {/* Shopify Live Sync Status / Trigger - Apple Pill CTA */}
-                      <button
-                        type="button"
-                        onClick={handleManualSync}
-                        disabled={isSyncing}
-                        title="Click to trigger manual Shopify order sync"
-                        className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 h-[32px] text-[12px] font-normal rounded-full bg-muted/60 border border-border text-muted-foreground hover:text-foreground hover:bg-muted transition-all active:scale-95"
-                      >
-                        <span className="relative flex h-2 w-2">
-                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#0066cc] opacity-75"></span>
-                          <span className="relative inline-flex rounded-full h-2 w-2 bg-[#0066cc]"></span>
-                        </span>
-                        <span className="hidden md:inline font-normal">Shopify</span>
-                        <RefreshCw className={`w-3 h-3 ${isSyncing ? "animate-spin text-[#0066cc]" : ""}`} />
-                      </button>
-
-                      {/* Theme Switcher */}
-                      <ThemeSwitcher className="h-[36px] w-[36px] rounded-full" />
-
-                      {/* User Account Menu */}
-                      <DropdownMenu>
-                        <DropdownMenuTrigger
-                          aria-label="User account menu"
-                          className="flex items-center gap-2 p-0.5 rounded-full hover:bg-muted transition-colors cursor-pointer outline-none focus-visible:ring-1 focus-visible:ring-ring border border-border"
-                        >
-                            <div className="w-[32px] h-[32px] rounded-full bg-[#0066cc]/10 border border-[#0066cc]/20 text-[#0066cc] dark:text-[#2997ff] font-semibold text-[13px] flex items-center justify-center shrink-0">
-                              {user?.name ? user.name.charAt(0).toUpperCase() : user?.email?.charAt(0).toUpperCase() || "A"}
-                            </div>
-                        </DropdownMenuTrigger>
-
-                        <DropdownMenuContent align="right" className="w-56 p-1.5">
-                          <DropdownMenuLabel className="pb-1.5">
-                            <div className="flex flex-col">
-                                <span className="font-semibold text-foreground text-[13px] tracking-[-0.12px] truncate">
-                                  {user?.name || "Blactify Admin"}
-                                </span>
-                                <span className="text-[11px] text-muted-foreground font-mono truncate font-normal">
-                                  {user?.email || "admin@blactify.com"}
-                                </span>
-                            </div>
-                            <div className="mt-1.5">
-                              <Badge variant="neutral" size="xs">
-                                {role || "VIEWER"}
-                              </Badge>
-                            </div>
-                          </DropdownMenuLabel>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem onSelect={() => router.push("/settings")}>
-                            <Settings className="w-3.5 h-3.5 text-muted-foreground mr-1.5" />
-                            <span>Account Settings</span>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onSelect={() => router.push("/team")}>
-                            <Users className="w-3.5 h-3.5 text-muted-foreground mr-1.5" />
-                            <span>Team & Permissions</span>
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem
-                            onSelect={handleSignOut}
-                            className="text-[#ff453a] hover:bg-[#ff453a]/10"
-                          >
-                            <LogOut className="w-3.5 h-3.5 mr-1.5" />
-                            <span>Log out</span>
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-                  </header>
-
-                  {/* Global Command Palette */}
-                  <CommandMenu
-                    open={commandOpen}
-                    onOpenChange={setCommandOpen}
-                    items={commandItems}
-                  />
-                </>
-                );
+      {/* Global Command Palette */}
+      <CommandMenu
+        open={commandOpen}
+        onOpenChange={setCommandOpen}
+        items={commandItems}
+      />
+    </>
+  );
 }

@@ -19,17 +19,22 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Shopify Dashboard",
-  description: "Real-time Shopify Sales Dashboard",
+  title: "Blactify ERP",
+  description: "Real-time Blactify ERP & Sales Dashboard",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
-    title: "Dashboard",
+    title: "Blactify",
     statusBarStyle: "black-translucent",
   },
   icons: {
-    icon: "/icon",
-    apple: "/apple-icon",
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icon.png", type: "image/png", sizes: "512x512" },
+    ],
+    apple: [
+      { url: "/apple-icon.png", sizes: "180x180", type: "image/png" },
+    ],
   },
 };
 
