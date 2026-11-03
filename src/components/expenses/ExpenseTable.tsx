@@ -1,19 +1,19 @@
 'use client';
 
 import { useState, useMemo, useSyncExternalStore } from 'react';
-import { 
-  Search, 
-  ArrowUpDown, 
-  ArrowUp, 
-  ArrowDown, 
-  Download, 
-  Calendar, 
-  Clock, 
-  ArrowRight, 
-  TrendingUp, 
-  ChevronLeft, 
-  ChevronRight, 
-  ChevronsLeft, 
+import {
+  Search,
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown,
+  Download,
+  Calendar,
+  Clock,
+  ArrowRight,
+  TrendingUp,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
   ChevronsRight,
   X,
   CreditCard,
@@ -43,7 +43,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 
-const emptySubscribe = () => () => {};
+const emptySubscribe = () => () => { };
 
 type SortField = 'date' | 'amount' | 'title' | 'category' | 'paymentMethod' | 'time';
 type SortOrder = 'asc' | 'desc';
@@ -94,7 +94,6 @@ export default function ExpenseTable({ expenses }: { expenses: Expense[] }) {
 
   const gridStroke = isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.06)';
   const axisColor = isDark ? '#94a3b8' : '#64748b';
-  const primaryStroke = isDark ? '#818cf8' : '#4f46e5';
 
   // Unique categories and payment methods
   const categories = useMemo(() => {
@@ -332,11 +331,11 @@ export default function ExpenseTable({ expenses }: { expenses: Expense[] }) {
   return (
     <div className="space-y-4">
       {/* Table Toolbar: Search, Filters, Mini Graph Toggle, Export */}
-      <div className="flex flex-col gap-3 bg-muted/20 border border-border p-3.5 rounded-xl">
+      <div className="flex flex-col gap-3 bg-muted/20 border border-border p-3.5 sm:p-4 rounded-[18px]">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           {/* Search bar */}
           <div className="relative w-full sm:max-w-xs">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={15} />
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" size={15} />
             <Input
               type="text"
               placeholder="Search by title, category, payment..."
@@ -345,13 +344,13 @@ export default function ExpenseTable({ expenses }: { expenses: Expense[] }) {
                 setSearch(e.target.value);
                 setCurrentPage(1);
               }}
-              className="pl-9 pr-8 h-9 text-xs"
+              className="pl-9 pr-8 h-10 rounded-full text-xs"
             />
             {search && (
               <button
                 type="button"
                 onClick={() => setSearch('')}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground text-xs"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground text-xs"
               >
                 <X size={13} />
               </button>
@@ -369,7 +368,7 @@ export default function ExpenseTable({ expenses }: { expenses: Expense[] }) {
                   setSelectedCategory(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="pl-2.5 pr-7 h-9 text-xs bg-card border border-border rounded-lg text-foreground font-medium appearance-none hover:bg-muted/70 transition-colors cursor-pointer"
+                className="pl-3 pr-8 h-10 text-xs bg-card border border-border rounded-full text-foreground font-semibold appearance-none hover:bg-muted/70 transition-colors cursor-pointer"
               >
                 <option value="All">All Categories ({categories.length - 1})</option>
                 {categories
@@ -380,7 +379,7 @@ export default function ExpenseTable({ expenses }: { expenses: Expense[] }) {
                     </option>
                   ))}
               </select>
-              <Tag size={12} className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+              <Tag size={12} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
             </div>
 
             {/* Payment Method Filter */}
@@ -392,7 +391,7 @@ export default function ExpenseTable({ expenses }: { expenses: Expense[] }) {
                   setSelectedPayment(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="pl-2.5 pr-7 h-9 text-xs bg-card border border-border rounded-lg text-foreground font-medium appearance-none hover:bg-muted/70 transition-colors cursor-pointer"
+                className="pl-3 pr-8 h-10 text-xs bg-card border border-border rounded-full text-foreground font-semibold appearance-none hover:bg-muted/70 transition-colors cursor-pointer"
               >
                 <option value="All">All Payment ({paymentMethods.length - 1})</option>
                 {paymentMethods
@@ -403,7 +402,7 @@ export default function ExpenseTable({ expenses }: { expenses: Expense[] }) {
                     </option>
                   ))}
               </select>
-              <CreditCard size={12} className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+              <CreditCard size={12} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
             </div>
 
             {/* Time Period Filter */}
@@ -415,7 +414,7 @@ export default function ExpenseTable({ expenses }: { expenses: Expense[] }) {
                   setTimeFilter(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="pl-2.5 pr-7 h-9 text-xs bg-card border border-border rounded-lg text-foreground font-medium appearance-none hover:bg-muted/70 transition-colors cursor-pointer"
+                className="pl-3 pr-8 h-10 text-xs bg-card border border-border rounded-full text-foreground font-semibold appearance-none hover:bg-muted/70 transition-colors cursor-pointer"
               >
                 <option value="all">All Time</option>
                 <option value="this_month">This Month</option>
@@ -423,7 +422,7 @@ export default function ExpenseTable({ expenses }: { expenses: Expense[] }) {
                 <option value="last_30_days">Last 30 Days</option>
                 <option value="last_7_days">Last 7 Days</option>
               </select>
-              <Calendar size={12} className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+              <Calendar size={12} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
             </div>
 
             {/* Reset Filters button if any active */}
@@ -434,7 +433,7 @@ export default function ExpenseTable({ expenses }: { expenses: Expense[] }) {
                 size="sm"
                 onClick={resetFilters}
                 title="Reset all filters"
-                className="h-9"
+                className="h-10 rounded-full"
               >
                 Reset
               </Button>
@@ -447,7 +446,7 @@ export default function ExpenseTable({ expenses }: { expenses: Expense[] }) {
               size="sm"
               onClick={() => setShowMiniChart(!showMiniChart)}
               title="Toggle inline trend chart"
-              className="h-9"
+              className="h-10 rounded-full"
             >
               <TrendingUp size={13} />
               <span>{showMiniChart ? 'Hide Trend' : 'Show Trend'}</span>
@@ -461,7 +460,7 @@ export default function ExpenseTable({ expenses }: { expenses: Expense[] }) {
               onClick={handleExportCSV}
               disabled={filteredExpenses.length === 0}
               title="Export filtered records as CSV"
-              className="h-9"
+              className="h-10 rounded-full"
             >
               <Download size={13} />
               <span className="hidden sm:inline">Export CSV</span>
@@ -519,7 +518,7 @@ export default function ExpenseTable({ expenses }: { expenses: Expense[] }) {
 
       {/* Optional Mini Trend Graph Preview */}
       {showMiniChart && (
-        <div className="bg-card border border-border rounded-xl p-4 shadow-xs animate-in fade-in slide-in-from-top-2 duration-200">
+        <div className="bg-card border border-border rounded-[18px] p-4 shadow-none animate-in fade-in slide-in-from-top-2 duration-200">
           <div className="flex items-center justify-between pb-2 mb-2 border-b border-border/60">
             <h4 className="text-xs font-semibold text-foreground flex items-center gap-1.5">
               <TrendingUp size={14} className="text-primary" />
@@ -537,8 +536,8 @@ export default function ExpenseTable({ expenses }: { expenses: Expense[] }) {
                 <AreaChart data={miniChartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                   <defs>
                     <linearGradient id="miniTableGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor={primaryStroke} stopOpacity={isDark ? 0.35 : 0.25} />
-                      <stop offset="95%" stopColor={primaryStroke} stopOpacity={0} />
+                      <stop offset="0%" stopColor="#0066cc" stopOpacity={isDark ? 0.35 : 0.25} />
+                      <stop offset="95%" stopColor="#0066cc" stopOpacity={0} />
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke={gridStroke} vertical={false} />
@@ -552,7 +551,7 @@ export default function ExpenseTable({ expenses }: { expenses: Expense[] }) {
                   <Area
                     type="monotone"
                     dataKey="amount"
-                    stroke={primaryStroke}
+                    stroke="#0066cc"
                     strokeWidth={2}
                     fillOpacity={1}
                     fill="url(#miniTableGradient)"
@@ -565,7 +564,7 @@ export default function ExpenseTable({ expenses }: { expenses: Expense[] }) {
       )}
 
       {/* Main Table Container */}
-      <div className="bg-card border border-border rounded-xl overflow-hidden shadow-xs">
+      <div className="bg-card border border-border rounded-[18px] overflow-hidden shadow-none">
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
@@ -729,7 +728,7 @@ export default function ExpenseTable({ expenses }: { expenses: Expense[] }) {
                 size="icon"
                 onClick={() => setCurrentPage(1)}
                 disabled={safeCurrentPage === 1}
-                className="h-8 w-8"
+                className="h-8 w-8 rounded-full"
                 title="First Page"
               >
                 <ChevronsLeft size={14} />
@@ -739,13 +738,13 @@ export default function ExpenseTable({ expenses }: { expenses: Expense[] }) {
                 size="icon"
                 onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
                 disabled={safeCurrentPage === 1}
-                className="h-8 w-8"
+                className="h-8 w-8 rounded-full"
                 title="Previous Page"
               >
                 <ChevronLeft size={14} />
               </Button>
 
-              <span className="px-3 py-1 font-medium text-foreground bg-muted rounded-md border border-border h-8 flex items-center">
+              <span className="px-3.5 py-1 font-semibold text-foreground bg-muted/60 rounded-full border border-border h-8 flex items-center">
                 Page {safeCurrentPage} of {totalPages}
               </span>
 
@@ -754,7 +753,7 @@ export default function ExpenseTable({ expenses }: { expenses: Expense[] }) {
                 size="icon"
                 onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
                 disabled={safeCurrentPage >= totalPages}
-                className="h-8 w-8"
+                className="h-8 w-8 rounded-full"
                 title="Next Page"
               >
                 <ChevronRight size={14} />
@@ -764,7 +763,7 @@ export default function ExpenseTable({ expenses }: { expenses: Expense[] }) {
                 size="icon"
                 onClick={() => setCurrentPage(totalPages)}
                 disabled={safeCurrentPage >= totalPages}
-                className="h-8 w-8"
+                className="h-8 w-8 rounded-full"
                 title="Last Page"
               >
                 <ChevronsRight size={14} />

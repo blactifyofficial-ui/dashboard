@@ -50,7 +50,7 @@ export default function InstallPWA() {
   return (
     <Button
       onClick={handleInstallClick}
-      className="mt-4 gap-2"
+      className="mt-4 gap-2 rounded-full"
     >
       <Download size={16} className="shrink-0" />
       <span>Install App</span>

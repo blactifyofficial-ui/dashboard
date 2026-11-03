@@ -38,65 +38,65 @@ export default function OrderCodCard({ order }: OrderCodCardProps) {
 
       <CardContent className="pt-4 space-y-3 text-xs sm:text-sm">
         {/* Main Amount to Collect */}
-        <div className="flex justify-between items-center py-2 px-3 bg-amber-500/10 rounded-lg border border-amber-500/20">
-          <span className="font-medium text-amber-900 dark:text-amber-200">
-            {isPartiallyPaid ? 'COD Balance to Collect' : 'Amount to Collect'}
-          </span>
-          <span className="font-mono font-bold text-base text-amber-700 dark:text-amber-300">
-            ₹{amountToCollect.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-          </span>
-        </div>
+            <div className="flex justify-between items-center py-2.5 px-4 bg-muted/50 rounded-[14px] border border-border">
+              <span className="font-semibold text-foreground text-[14px] tracking-[-0.224px]">
+                {isPartiallyPaid ? 'COD Balance to Collect' : 'Amount to Collect'}
+              </span>
+                <span className="font-mono font-semibold text-[17px] text-foreground">
+                  ₹{amountToCollect.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </span>
+            </div>
 
-        {/* Breakdown for Partial COD */}
-        {isPartiallyPaid && (
-          <div className="space-y-2 pt-1 border-b border-border/60 pb-3 text-muted-foreground text-xs">
-            <div className="flex justify-between items-center">
-              <span>Total Order Value</span>
-              <span className="font-mono text-foreground font-medium">
-                ₹{totalPrice.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            {/* Breakdown for Partial COD */}
+            {isPartiallyPaid && (
+              <div className="space-y-2 pt-1 border-b border-border/60 pb-3 text-muted-foreground text-xs">
+                <div className="flex justify-between items-center">
+                  <span>Total Order Value</span>
+                  <span className="font-mono text-foreground font-medium">
+                    ₹{totalPrice.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center text-emerald-600 dark:text-emerald-400">
+                  <span className="flex items-center gap-1">
+                    <CheckCircle2 size={12} />
+                    <span>Advance Paid Online</span>
+                  </span>
+                  <span className="font-mono font-medium">
+                    -₹{prepaidAdvance.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </span>
+                </div>
+                <div className="mt-2 p-2.5 rounded-md bg-muted/60 border border-border text-[11px] text-muted-foreground flex items-start gap-1.5 leading-relaxed">
+                  <Info size={13} className="shrink-0 text-amber-500 mt-0.5" />
+                  <span>
+                    Customer paid <strong>₹{prepaidAdvance.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</strong> in advance online. The courier collects the remaining unpaid balance of <strong>₹{amountToCollect.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</strong> at delivery.
+                  </span>
+                </div>
+              </div>
+            )}
+
+            <div className="flex justify-between items-center pt-1">
+              <span className="text-muted-foreground">Courier / Carrier</span>
+              <span className="text-foreground font-medium flex items-center gap-1.5">
+                <Truck size={13} className="text-muted-foreground" />
+                {courier}
               </span>
             </div>
-            <div className="flex justify-between items-center text-emerald-600 dark:text-emerald-400">
-              <span className="flex items-center gap-1">
-                <CheckCircle2 size={12} />
-                <span>Advance Paid Online</span>
-              </span>
-              <span className="font-mono font-medium">
-                -₹{prepaidAdvance.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-              </span>
+
+            <p className="text-xs text-muted-foreground pt-2 border-t border-border/60">
+              Courier remittances are recorded in lump-sum payouts for multiple parcels.
+            </p>
+
+            <div className="pt-1">
+              <Link
+                href="/cod"
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline"
+              >
+                <span>View COD Collections Ledger</span>
+                <ArrowRight size={13} />
+              </Link>
             </div>
-            <div className="mt-2 p-2.5 rounded-md bg-muted/60 border border-border text-[11px] text-muted-foreground flex items-start gap-1.5 leading-relaxed">
-              <Info size={13} className="shrink-0 text-amber-500 mt-0.5" />
-              <span>
-                Customer paid <strong>₹{prepaidAdvance.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</strong> in advance online. The courier collects the remaining unpaid balance of <strong>₹{amountToCollect.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</strong> at delivery.
-              </span>
-            </div>
-          </div>
-        )}
-
-        <div className="flex justify-between items-center pt-1">
-          <span className="text-muted-foreground">Courier / Carrier</span>
-          <span className="text-foreground font-medium flex items-center gap-1.5">
-            <Truck size={13} className="text-muted-foreground" />
-            {courier}
-          </span>
-        </div>
-
-        <p className="text-xs text-muted-foreground pt-2 border-t border-border/60">
-          Courier remittances are recorded in lump-sum payouts for multiple parcels.
-        </p>
-
-        <div className="pt-1">
-          <Link
-            href="/cod"
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline"
-          >
-            <span>View COD Collections Ledger</span>
-            <ArrowRight size={13} />
-          </Link>
-        </div>
-      </CardContent>
-    </Card>
-  );
+          </CardContent>
+        </Card>
+        );
 }
 

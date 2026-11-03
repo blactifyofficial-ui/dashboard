@@ -25,81 +25,81 @@ export default async function SettingsPage() {
 
   return (
     <div className="p-4 sm:p-6 md:p-8 max-w-4xl mx-auto text-foreground">
-      <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground mb-6">Settings</h1>
+      <h1 className="text-2xl sm:text-[34px] font-bold tracking-tight text-foreground mb-6">Settings</h1>
 
       <div className="grid grid-cols-1 gap-6">
 
         {/* Appearance & Theme Section */}
-        <div className="bg-card p-4 sm:p-6 rounded-xl border border-border shadow-xs text-card-foreground">
-          <h2 className="text-base sm:text-lg font-semibold mb-2 border-b border-border pb-2 text-card-foreground">Appearance</h2>
-          <div className="space-y-4 text-sm text-muted-foreground mt-4">
-            <p>
-              Customize your dashboard viewing experience. Choose between Light, Dark, or System mode to adapt to your environment.
-            </p>
-            <div className="pt-1">
-              <ThemeSwitcher variant="segmented" />
-            </div>
-          </div>
-        </div>
-
-        {/* Google Sheets Backup Section */}
-        {canManageIntegrations && <GoogleSheetsSettings />}
-
-        {/* Manual Sync Section */}
-        {canSyncOrders && (
-          <div className="bg-card p-4 sm:p-6 rounded-xl border border-border shadow-xs text-card-foreground">
-            <h2 className="text-base sm:text-lg font-semibold mb-4 border-b border-border pb-2 text-card-foreground">Manual Sync</h2>
-            <div className="space-y-4 text-sm text-muted-foreground">
+          <div className="bg-card p-5 sm:p-6 rounded-[18px] border border-border shadow-none text-card-foreground">
+            <h2 className="text-base sm:text-lg font-semibold mb-2 border-b border-border pb-2 text-card-foreground tracking-[-0.01em]">Appearance</h2>
+            <div className="space-y-4 text-sm text-muted-foreground mt-4">
               <p>
-                By default, webhooks should handle most of your order syncing. If you are missing recent orders or if new product images haven&apos;t loaded yet, you can trigger a manual sync to pull the latest data from Shopify.
+                Customize your dashboard viewing experience. Choose between Light, Dark, or System mode to adapt to your environment.
               </p>
-              <div className="mt-4">
-                <SyncButton />
+              <div className="pt-1">
+                <ThemeSwitcher variant="segmented" />
               </div>
             </div>
           </div>
-        )}
 
-        {/* Authorization Section */}
-        {canManageIntegrations && (
-          <div className="bg-card p-4 sm:p-6 rounded-xl border border-border shadow-xs text-card-foreground">
-            <h2 className="text-base sm:text-lg font-semibold mb-4 border-b border-border pb-2 text-card-foreground">Shopify Integration</h2>
-            <div className="space-y-4 text-sm text-muted-foreground">
-              <p>
-                If you ever need to re-authenticate your Shopify application or update your permissions (for example, if your <code>shpat_</code> access token expires or is invalidated), use the button below to authorize the app again.
-              </p>
-              <div className="mt-4">
-                <Link 
-                  href={shopifyAuthUrl}
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                >
-                  <Button size="sm">
-                    Re-Authorize Shopify App
-                  </Button>
-                </Link>
+          {/* Google Sheets Backup Section */}
+          {canManageIntegrations && <GoogleSheetsSettings />}
+
+          {/* Manual Sync Section */}
+          {canSyncOrders && (
+              <div className="bg-card p-5 sm:p-6 rounded-[18px] border border-border shadow-none text-card-foreground">
+                <h2 className="text-base sm:text-lg font-semibold mb-4 border-b border-border pb-2 text-card-foreground tracking-[-0.01em]">Manual Sync</h2>
+                <div className="space-y-4 text-sm text-muted-foreground">
+                  <p>
+                    By default, webhooks should handle most of your order syncing. If you are missing recent orders or if new product images haven&apos;t loaded yet, you can trigger a manual sync to pull the latest data from Shopify.
+                  </p>
+                  <div className="mt-4">
+                    <SyncButton />
+                  </div>
+                </div>
               </div>
-              <p className="mt-4 text-xs text-muted-foreground">
-                Ensure your Client ID and Shop Name are set in the <code>.env.local</code> file for this to work.
-              </p>
-            </div>
-          </div>
         )}
-        
-        {/* Category Management */}
-        {canManageCategories && <CategoryManager />}
 
-        {/* Install App Section */}
-        <div className="bg-card p-4 sm:p-6 rounded-xl border border-border shadow-xs text-card-foreground">
-          <h2 className="text-base sm:text-lg font-semibold mb-4 border-b border-border pb-2 text-card-foreground">Install App</h2>
-          <div className="space-y-4 text-sm text-muted-foreground">
-            <p>
-              Install the Blactify Dashboard as an application on your device for quick access and a better native experience.
-            </p>
-            <InstallPWA />
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+              {/* Authorization Section */}
+              {canManageIntegrations && (
+                  <div className="bg-card p-5 sm:p-6 rounded-[18px] border border-border shadow-none text-card-foreground">
+                    <h2 className="text-base sm:text-lg font-semibold mb-4 border-b border-border pb-2 text-card-foreground tracking-[-0.01em]">Shopify Integration</h2>
+                    <div className="space-y-4 text-sm text-muted-foreground">
+                      <p>
+                        If you ever need to re-authenticate your Shopify application or update your permissions (for example, if your <code>shpat_</code> access token expires or is invalidated), use the button below to authorize the app again.
+                      </p>
+                      <div className="mt-4">
+                        <Link
+                          href={shopifyAuthUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                            <Button size="sm" className="rounded-full">
+                              Re-Authorize Shopify App
+                            </Button>
+                        </Link>
+                      </div>
+                      <p className="mt-4 text-xs text-muted-foreground">
+                        Ensure your Client ID and Shop Name are set in the <code>.env.local</code> file for this to work.
+                      </p>
+                    </div>
+                  </div>
+        )}
+
+                  {/* Category Management */}
+                  {canManageCategories && <CategoryManager />}
+
+                  {/* Install App Section */}
+                    <div className="bg-card p-5 sm:p-6 rounded-[18px] border border-border shadow-none text-card-foreground">
+                      <h2 className="text-base sm:text-lg font-semibold mb-4 border-b border-border pb-2 text-card-foreground tracking-[-0.01em]">Install App</h2>
+                      <div className="space-y-4 text-sm text-muted-foreground">
+                        <p>
+                          Install the Blactify Dashboard as an application on your device for quick access and a better native experience.
+                        </p>
+                        <InstallPWA />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
 }

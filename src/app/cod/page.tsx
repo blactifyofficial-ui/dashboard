@@ -149,111 +149,111 @@ export default function CodCollectionPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border/80 pb-5">
         <div className="space-y-1">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0">
-              <HandCoins size={18} />
+              <div className="w-9 h-9 rounded-full bg-[#0066cc]/10 border border-[#0066cc]/20 flex items-center justify-center text-[#0066cc] dark:text-[#2997ff] shrink-0">
+                <HandCoins size={18} />
+              </div>
+                <h1 className="text-[26px] sm:text-[34px] font-semibold tracking-[-0.374px] text-foreground leading-[1.2]">
+                  COD Collections
+                </h1>
             </div>
-            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
-              COD Collections
-            </h1>
+              <p className="text-[14px] sm:text-[15px] text-muted-foreground tracking-[-0.224px]">
+                Track Cash on Delivery remittances, reconcile courier payouts, and record collected amounts
+              </p>
           </div>
-          <p className="text-xs sm:text-sm text-muted-foreground">
-            Track Cash on Delivery remittances, reconcile courier payouts, and record collected amounts
-          </p>
-        </div>
 
-        {/* Header Right Actions */}
-        <div className="flex items-center gap-2 flex-wrap">
-          {canManageCod && (
-            <button
-              onClick={handleOpenRecordModal}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs sm:text-sm shadow-xs transition-colors cursor-pointer"
-            >
-              <Plus size={16} />
-              <span>Record COD Received</span>
-            </button>
-          )}
-          {canExportCod && (
-            <CodExportButton
+          {/* Header Right Actions */}
+            <div className="flex items-center gap-2.5 flex-wrap">
+              {canManageCod && (
+                <button
+                  onClick={handleOpenRecordModal}
+                  className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-[#0066cc] hover:bg-[#0071e3] text-white font-normal text-[14px] sm:text-[15px] tracking-[-0.224px] transition-all cursor-pointer active:scale-95"
+                >
+                  <Plus size={16} />
+                  <span>Record COD Received</span>
+                </button>
+              )}
+              {canExportCod && (
+                <CodExportButton
+                  remittances={remittances}
+                  orders={orders}
+                  mode={activeTab}
+                />
+              )}
+              <button
+                onClick={triggerRefresh}
+                disabled={refreshing || loading}
+                className="p-2.5 rounded-full border border-border bg-card text-foreground hover:bg-muted/60 transition-all disabled:opacity-40 cursor-pointer active:scale-95"
+                title="Refresh table"
+              >
+                <RefreshCw size={14} className={refreshing ? 'animate-spin' : ''} />
+              </button>
+            </div>
+          </div>
+
+          {/* Summary KPI Cards */}
+          <CodSummaryCards
+            stats={stats}
+            timeRangeLabel={
+              selectedMonth
+                ? selectedMonth
+                : timeRange === 'this_month'
+                  ? 'This Month'
+                  : timeRange === 'last_month'
+                    ? 'Last Month'
+                    : timeRange === 'last_30_days'
+                      ? 'Last 30 Days'
+                      : undefined
+            }
+          />
+
+          {/* Filter and Tab Navigation Toolbar */}
+          <CodFilterToolbar
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
+            timeRange={timeRange}
+            onTimeRangeChange={setTimeRange}
+            selectedMonth={selectedMonth}
+            onMonthChange={setSelectedMonth}
+            availableMonths={availableMonths}
+            search={search}
+            onSearchChange={setSearch}
+            courier={courier}
+            onCourierChange={setCourier}
+            availableCouriers={availableCouriers}
+            remittanceCount={remittances.length}
+            ordersCount={orders.length}
+          />
+
+          {/* Main Content Area */}
+          {loading ? (
+            <div className="py-24 flex justify-center">
+              <LoadingSpinner />
+            </div>
+          ) : activeTab === 'remittances' ? (
+            <RemittanceHistoryTable
               remittances={remittances}
-              orders={orders}
-              mode={activeTab}
+              onEdit={handleOpenEditModal}
+              onDelete={handleDeleteRemittance}
+              onRecordNew={handleOpenRecordModal}
+              canManage={canManageCod}
+              canDelete={canDeleteCod}
             />
+          ) : (
+            <CodOrdersList orders={orders} />
           )}
-          <button
-            onClick={triggerRefresh}
-            disabled={refreshing || loading}
-            className="p-2 rounded-lg border border-border bg-muted/60 text-foreground hover:bg-muted transition-colors disabled:opacity-50 cursor-pointer"
-            title="Refresh table"
-          >
-            <RefreshCw size={14} className={refreshing ? 'animate-spin' : ''} />
-          </button>
+
+          {/* Record / Edit Remittance Modal */}
+          <RecordRemittanceModal
+            isOpen={isModalOpen}
+            onClose={() => {
+              setIsModalOpen(false);
+              setRemittanceToEdit(null);
+            }}
+            remittanceToEdit={remittanceToEdit}
+            paymentMethods={paymentMethods}
+            availableCouriers={availableCouriers}
+            onSuccess={triggerRefresh}
+          />
         </div>
-      </div>
-
-      {/* Summary KPI Cards */}
-      <CodSummaryCards
-        stats={stats}
-        timeRangeLabel={
-          selectedMonth
-            ? selectedMonth
-            : timeRange === 'this_month'
-            ? 'This Month'
-            : timeRange === 'last_month'
-            ? 'Last Month'
-            : timeRange === 'last_30_days'
-            ? 'Last 30 Days'
-            : undefined
-        }
-      />
-
-      {/* Filter and Tab Navigation Toolbar */}
-      <CodFilterToolbar
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-        timeRange={timeRange}
-        onTimeRangeChange={setTimeRange}
-        selectedMonth={selectedMonth}
-        onMonthChange={setSelectedMonth}
-        availableMonths={availableMonths}
-        search={search}
-        onSearchChange={setSearch}
-        courier={courier}
-        onCourierChange={setCourier}
-        availableCouriers={availableCouriers}
-        remittanceCount={remittances.length}
-        ordersCount={orders.length}
-      />
-
-      {/* Main Content Area */}
-      {loading ? (
-        <div className="py-24 flex justify-center">
-          <LoadingSpinner />
-        </div>
-      ) : activeTab === 'remittances' ? (
-        <RemittanceHistoryTable
-          remittances={remittances}
-          onEdit={handleOpenEditModal}
-          onDelete={handleDeleteRemittance}
-          onRecordNew={handleOpenRecordModal}
-          canManage={canManageCod}
-          canDelete={canDeleteCod}
-        />
-      ) : (
-        <CodOrdersList orders={orders} />
-      )}
-
-      {/* Record / Edit Remittance Modal */}
-      <RecordRemittanceModal
-        isOpen={isModalOpen}
-        onClose={() => {
-          setIsModalOpen(false);
-          setRemittanceToEdit(null);
-        }}
-        remittanceToEdit={remittanceToEdit}
-        paymentMethods={paymentMethods}
-        availableCouriers={availableCouriers}
-        onSuccess={triggerRefresh}
-      />
-    </div>
-  );
+        );
 }

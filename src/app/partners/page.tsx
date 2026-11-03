@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { 
-  Plus, 
-  Search, 
+import {
+  Plus,
+  Search,
   X,
   Users,
   Receipt,
@@ -300,7 +300,7 @@ export default function PartnersPage() {
       const matchPartner = partnerFilter === 'ALL' || t.partnerId === partnerFilter;
       const matchType = typeFilter === 'ALL' || t.type === typeFilter;
       const q = searchQuery.toLowerCase();
-      const matchSearch = 
+      const matchSearch =
         !q ||
         (t.partnerName && t.partnerName.toLowerCase().includes(q)) ||
         (t.referenceNumber && t.referenceNumber.toLowerCase().includes(q)) ||
@@ -330,10 +330,10 @@ export default function PartnersPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 flex-shrink-0">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-lg sm:text-xl lg:text-2xl font-bold tracking-tight text-foreground flex items-center gap-2.5">
+            <h1 className="text-2xl sm:text-[34px] font-bold tracking-tight text-foreground flex items-center gap-2.5">
               <span>Partners &amp; Capital</span>
             </h1>
-            <span className="px-2 py-0.5 rounded-md text-xs font-medium bg-muted text-foreground border border-border">
+            <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-muted/60 text-foreground border border-border">
               Equity &amp; Capital
             </span>
           </div>
@@ -347,7 +347,7 @@ export default function PartnersPage() {
           {canManagePartners && (
             <button
               onClick={handleOpenAddPartner}
-              className="px-3.5 py-2 min-h-[38px] text-xs font-medium text-foreground bg-muted hover:bg-muted/80 border border-border rounded-lg transition-colors flex items-center gap-1.5"
+              className="px-4 py-2 min-h-[38px] text-xs font-semibold text-foreground bg-muted/60 hover:bg-muted border border-border rounded-full transition-all active:scale-95 flex items-center gap-1.5"
             >
               <Users size={14} className="text-muted-foreground" />
               <span>Add Partner</span>
@@ -358,7 +358,7 @@ export default function PartnersPage() {
             <>
               <button
                 onClick={() => handleOpenAddTxn(undefined, 'PAYOUT')}
-                className="px-3.5 py-2 min-h-[38px] text-xs font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 rounded-lg transition-colors flex items-center gap-1.5"
+                className="px-4 py-2 min-h-[38px] text-xs font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 rounded-full transition-all active:scale-95 flex items-center gap-1.5"
               >
                 <Banknote size={14} />
                 <span>Record Payout</span>
@@ -366,7 +366,7 @@ export default function PartnersPage() {
 
               <button
                 onClick={() => handleOpenAddTxn()}
-                className="px-4 py-2 min-h-[38px] text-xs font-semibold text-primary-foreground bg-primary hover:opacity-90 rounded-lg transition-opacity flex items-center gap-1.5"
+                className="px-5 py-2 min-h-[38px] text-xs font-semibold text-primary-foreground bg-primary hover:opacity-90 rounded-full transition-all active:scale-95 flex items-center gap-1.5"
               >
                 <Plus size={14} />
                 <span>Record Transaction</span>
@@ -379,190 +379,187 @@ export default function PartnersPage() {
       {/* KPI Stats & Distribution */}
       <PartnerSummaryCards summary={summary} partners={partners} />
 
-      {/* Tabs & Search Filter Controls Bar */}
-      <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 flex-shrink-0">
-        {/* Tab Selection Pills */}
-        <div className="flex items-center overflow-x-auto no-scrollbar bg-card border border-border p-1 rounded-lg">
-          <button
-            onClick={() => setActiveTab('overview')}
-            className={`px-3 py-1.5 min-h-[34px] text-xs font-medium rounded-md transition-colors flex items-center gap-1.5 whitespace-nowrap ${
-              activeTab === 'overview'
-                ? 'bg-muted text-foreground font-semibold'
-                : 'text-muted-foreground hover:text-foreground'
-            }`}
-          >
-            <Users size={13} />
-            <span>Partners ({partners.length})</span>
-          </button>
-          <button
-            onClick={() => setActiveTab('ledger')}
-            className={`px-3 py-1.5 min-h-[34px] text-xs font-medium rounded-md transition-colors flex items-center gap-1.5 whitespace-nowrap ${
-              activeTab === 'ledger'
-                ? 'bg-muted text-foreground font-semibold'
-                : 'text-muted-foreground hover:text-foreground'
-            }`}
-          >
-            <Receipt size={13} />
-            <span>Capital Ledger ({transactions.length})</span>
-          </button>
-          <button
-            onClick={() => setActiveTab('captable')}
-            className={`px-3 py-1.5 min-h-[34px] text-xs font-medium rounded-md transition-colors flex items-center gap-1.5 whitespace-nowrap ${
-              activeTab === 'captable'
-                ? 'bg-muted text-foreground font-semibold'
-                : 'text-muted-foreground hover:text-foreground'
-            }`}
-          >
-            <PieChart size={13} />
-            <span>Cap Table</span>
-          </button>
-        </div>
-
-        {/* Search and Secondary Filter */}
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-          <div className="relative flex-1 sm:w-56">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-3.5 h-3.5" />
-            <input
-              type="text"
-              placeholder={
-                activeTab === 'overview'
-                  ? 'Search partners...'
-                  : 'Search transactions...'
-              }
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-8 pr-8 py-2 min-h-[38px] bg-card border border-border rounded-lg text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-border-hover transition-colors"
-            />
-            {searchQuery && (
+          {/* Tabs & Search Filter Controls Bar */}
+          <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 flex-shrink-0">
+            {/* Tab Selection Pills */}
+            <div className="flex items-center overflow-x-auto no-scrollbar bg-muted/40 border border-border p-1 rounded-full">
               <button
-                onClick={() => setSearchQuery('')}
-                className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-1"
+                onClick={() => setActiveTab('overview')}
+                className={`px-4 py-1.5 min-h-[34px] text-xs font-semibold rounded-full transition-all active:scale-95 flex items-center gap-1.5 whitespace-nowrap ${activeTab === 'overview'
+                    ? 'bg-primary text-primary-foreground shadow-none'
+                    : 'text-muted-foreground hover:text-foreground'
+                  }`}
               >
-                <X size={13} />
+                <Users size={13} />
+                <span>Partners ({partners.length})</span>
               </button>
-            )}
+              <button
+                onClick={() => setActiveTab('ledger')}
+            className={`px-4 py-1.5 min-h-[34px] text-xs font-semibold rounded-full transition-all active:scale-95 flex items-center gap-1.5 whitespace-nowrap ${activeTab === 'ledger'
+                    ? 'bg-primary text-primary-foreground shadow-none'
+                    : 'text-muted-foreground hover:text-foreground'
+                  }`}
+              >
+              <Receipt size={13} />
+              <span>Capital Ledger ({transactions.length})</span>
+            </button>
+            <button
+              onClick={() => setActiveTab('captable')}
+              className={`px-4 py-1.5 min-h-[34px] text-xs font-semibold rounded-full transition-all active:scale-95 flex items-center gap-1.5 whitespace-nowrap ${activeTab === 'captable'
+                  ? 'bg-primary text-primary-foreground shadow-none'
+                  : 'text-muted-foreground hover:text-foreground'
+                }`}
+            >
+              <PieChart size={13} />
+              <span>Cap Table</span>
+            </button>
           </div>
 
-          {activeTab === 'ledger' && (
-            <div className="flex items-center gap-1.5">
-              <select
-                value={partnerFilter}
-                onChange={(e) => setPartnerFilter(e.target.value)}
-                className="flex-1 sm:flex-initial bg-card border border-border rounded-lg px-2.5 py-2 min-h-[38px] text-xs text-foreground focus:outline-none focus:border-border-hover transition-colors"
-              >
-                <option value="ALL" className="bg-card text-foreground">All Partners</option>
-                {partners.map((p) => (
-                  <option key={p.id} value={p.id} className="bg-card text-foreground">
-                    {p.name}
-                  </option>
-                ))}
-              </select>
-
-              <select
-                value={typeFilter}
-                onChange={(e) => setTypeFilter(e.target.value)}
-                className="flex-1 sm:flex-initial bg-card border border-border rounded-lg px-2.5 py-2 min-h-[38px] text-xs text-foreground focus:outline-none focus:border-border-hover transition-colors"
-              >
-                <option value="ALL" className="bg-card text-foreground">All Types</option>
-                <option value="PAYOUT" className="bg-card text-emerald-600 dark:text-emerald-400 font-semibold">Partner Payout</option>
-                <option value="INVESTMENT" className="bg-card text-foreground">Capital In</option>
-                <option value="WITHDRAWAL" className="bg-card text-foreground">Withdrawal</option>
-                <option value="PROFIT_SHARE" className="bg-card text-foreground">Profit Share</option>
-              </select>
+          {/* Search and Secondary Filter */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+            <div className="relative flex-1 sm:w-56">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground w-3.5 h-3.5" />
+              <input
+                type="text"
+                placeholder={
+                  activeTab === 'overview'
+                    ? 'Search partners...'
+                    : 'Search transactions...'
+                }
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-9 pr-8 py-2 min-h-[40px] bg-card border border-border rounded-full text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[#0071e3] transition-colors"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-1"
+                >
+                  <X size={13} />
+                </button>
+              )}
             </div>
-          )}
+
+            {activeTab === 'ledger' && (
+              <div className="flex items-center gap-1.5">
+                <select
+                  value={partnerFilter}
+                  onChange={(e) => setPartnerFilter(e.target.value)}
+                  className="flex-1 sm:flex-initial bg-card border border-border rounded-full px-3.5 py-2 min-h-[40px] text-xs font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-[#0071e3] transition-colors"
+                >
+                  <option value="ALL" className="bg-card text-foreground">All Partners</option>
+                  {partners.map((p) => (
+                    <option key={p.id} value={p.id} className="bg-card text-foreground">
+                      {p.name}
+                    </option>
+                  ))}
+                </select>
+
+                <select
+                  value={typeFilter}
+                  onChange={(e) => setTypeFilter(e.target.value)}
+                  className="flex-1 sm:flex-initial bg-card border border-border rounded-full px-3.5 py-2 min-h-[40px] text-xs font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-[#0071e3] transition-colors"
+                >
+                  <option value="ALL" className="bg-card text-foreground">All Types</option>
+                  <option value="PAYOUT" className="bg-card text-emerald-600 dark:text-emerald-400 font-semibold">Partner Payout</option>
+                  <option value="INVESTMENT" className="bg-card text-foreground">Capital In</option>
+                  <option value="WITHDRAWAL" className="bg-card text-foreground">Withdrawal</option>
+                  <option value="PROFIT_SHARE" className="bg-card text-foreground">Profit Share</option>
+                </select>
+              </div>
+            )}
+          </div>
         </div>
+
+        {/* Tab 1: Partners Overview */}
+        {activeTab === 'overview' && (
+          <PartnersOverviewTab
+            partners={filteredPartners}
+            totalFund={totalFund}
+            searchQuery={searchQuery}
+            onOpenAddPartner={handleOpenAddPartner}
+            onAddInvestment={(partnerId) => handleOpenAddTxn(partnerId, 'INVESTMENT')}
+            onAddWithdrawal={(partnerId) => handleOpenAddTxn(partnerId, 'WITHDRAWAL')}
+            onAddPayout={(partnerId) => handleOpenAddTxn(partnerId, 'PAYOUT')}
+            onViewLedger={(partner) => setSelectedPartnerForLedger(partner)}
+            onEditPartner={handleOpenEditPartner}
+            onDeletePartner={(partner) => {
+              setDeleteConfirm({
+                isOpen: true,
+                type: 'partner',
+                id: partner.id,
+                title: `Delete Partner:${partner.name}?`,
+                message: `Are you sure you want to delete ${partner.name}? All recorded transactions associated with this partner will also be permanently deleted.`,
+              });
+            }}
+          />
+        )}
+
+        {/* Tab 2: Master Ledger */}
+        {activeTab === 'ledger' && (
+          <MasterLedgerTab
+            transactions={filteredTransactions}
+            onOpenAddTxn={() => handleOpenAddTxn()}
+            onEditTxn={handleOpenEditTxn}
+            onDeleteTxn={(txn) => {
+              setDeleteConfirm({
+                isOpen: true,
+                type: 'transaction',
+                id: txn.id,
+                title: 'Delete Transaction?',
+                message: `Are you sure you want to delete this transaction of ${formatCurrency(txn.amount)}?`,
+              });
+            }}
+          />
+        )}
+
+        {/* Tab 3: Cap Table */}
+        {activeTab === 'captable' && (
+          <CapTableTab partners={partners} summary={summary} />
+        )}
+
+        {/* Partner Detail History Drawer / Modal */}
+        <PartnerLedgerModal
+          partner={selectedPartnerForLedger}
+          transactions={transactions}
+          onClose={() => setSelectedPartnerForLedger(null)}
+          onAddTransaction={(partnerId, defaultType) => handleOpenAddTxn(partnerId, defaultType)}
+        />
+
+        {/* Add / Edit Partner Modal */}
+        <PartnerModal
+          isOpen={isPartnerModalOpen}
+          editingPartner={editingPartner}
+          formData={partnerFormData}
+          isSubmitting={isSubmittingPartner}
+          onClose={() => setIsPartnerModalOpen(false)}
+          onChange={setPartnerFormData}
+          onSubmit={handleSubmitPartner}
+        />
+
+        {/* Record / Edit Transaction Modal */}
+        <TransactionModal
+          isOpen={isTxnModalOpen}
+          editingTxn={editingTxn}
+          partners={partners}
+          paymentMethods={paymentMethods}
+          formData={txnFormData}
+          isSubmitting={isSubmittingTxn}
+          onClose={() => setIsTxnModalOpen(false)}
+          onChange={setTxnFormData}
+          onSubmit={handleSubmitTxn}
+        />
+
+        {/* Confirm Delete Modal */}
+        <ConfirmModal
+          isOpen={deleteConfirm.isOpen}
+          title={deleteConfirm.title}
+          message={deleteConfirm.message}
+          onConfirm={handleConfirmDelete}
+          onCancel={() => setDeleteConfirm((prev) => ({ ...prev, isOpen: false }))}
+          confirmText="Delete"
+          isLoading={isDeleting}
+        />
       </div>
-
-      {/* Tab 1: Partners Overview */}
-      {activeTab === 'overview' && (
-        <PartnersOverviewTab
-          partners={filteredPartners}
-          totalFund={totalFund}
-          searchQuery={searchQuery}
-          onOpenAddPartner={handleOpenAddPartner}
-          onAddInvestment={(partnerId) => handleOpenAddTxn(partnerId, 'INVESTMENT')}
-          onAddWithdrawal={(partnerId) => handleOpenAddTxn(partnerId, 'WITHDRAWAL')}
-          onAddPayout={(partnerId) => handleOpenAddTxn(partnerId, 'PAYOUT')}
-          onViewLedger={(partner) => setSelectedPartnerForLedger(partner)}
-          onEditPartner={handleOpenEditPartner}
-          onDeletePartner={(partner) => {
-            setDeleteConfirm({
-              isOpen: true,
-              type: 'partner',
-              id: partner.id,
-              title: `Delete Partner: ${partner.name}?`,
-              message: `Are you sure you want to delete ${partner.name}? All recorded transactions associated with this partner will also be permanently deleted.`,
-            });
-          }}
-        />
-      )}
-
-      {/* Tab 2: Master Ledger */}
-      {activeTab === 'ledger' && (
-        <MasterLedgerTab
-          transactions={filteredTransactions}
-          onOpenAddTxn={() => handleOpenAddTxn()}
-          onEditTxn={handleOpenEditTxn}
-          onDeleteTxn={(txn) => {
-            setDeleteConfirm({
-              isOpen: true,
-              type: 'transaction',
-              id: txn.id,
-              title: 'Delete Transaction?',
-              message: `Are you sure you want to delete this transaction of ${formatCurrency(txn.amount)}?`,
-            });
-          }}
-        />
-      )}
-
-      {/* Tab 3: Cap Table */}
-      {activeTab === 'captable' && (
-        <CapTableTab partners={partners} summary={summary} />
-      )}
-
-      {/* Partner Detail History Drawer / Modal */}
-      <PartnerLedgerModal
-        partner={selectedPartnerForLedger}
-        transactions={transactions}
-        onClose={() => setSelectedPartnerForLedger(null)}
-        onAddTransaction={(partnerId, defaultType) => handleOpenAddTxn(partnerId, defaultType)}
-      />
-
-      {/* Add / Edit Partner Modal */}
-      <PartnerModal
-        isOpen={isPartnerModalOpen}
-        editingPartner={editingPartner}
-        formData={partnerFormData}
-        isSubmitting={isSubmittingPartner}
-        onClose={() => setIsPartnerModalOpen(false)}
-        onChange={setPartnerFormData}
-        onSubmit={handleSubmitPartner}
-      />
-
-      {/* Record / Edit Transaction Modal */}
-      <TransactionModal
-        isOpen={isTxnModalOpen}
-        editingTxn={editingTxn}
-        partners={partners}
-        paymentMethods={paymentMethods}
-        formData={txnFormData}
-        isSubmitting={isSubmittingTxn}
-        onClose={() => setIsTxnModalOpen(false)}
-        onChange={setTxnFormData}
-        onSubmit={handleSubmitTxn}
-      />
-
-      {/* Confirm Delete Modal */}
-      <ConfirmModal
-        isOpen={deleteConfirm.isOpen}
-        title={deleteConfirm.title}
-        message={deleteConfirm.message}
-        onConfirm={handleConfirmDelete}
-        onCancel={() => setDeleteConfirm((prev) => ({ ...prev, isOpen: false }))}
-        confirmText="Delete"
-        isLoading={isDeleting}
-      />
-    </div>
-  );
+      );
 }

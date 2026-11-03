@@ -10,8 +10,8 @@ interface BackButtonProps {
   className?: string;
 }
 
-export default function BackButton({ 
-  fallbackUrl = '/dashboard', 
+export default function BackButton({
+  fallbackUrl = '/dashboard',
   label = 'Back',
   iconOnly = false,
   className = ''
@@ -32,11 +32,11 @@ export default function BackButton({
       onClick={handleBack}
       aria-label={label}
       title={label}
-      className={`inline-flex items-center justify-center transition-colors cursor-pointer text-muted-foreground hover:text-foreground bg-card hover:bg-muted border border-border shrink-0 shadow-xs ${
-        iconOnly 
-          ? 'h-9 w-9 rounded-lg' 
-          : 'gap-1.5 text-xs sm:text-sm font-medium py-1.5 px-3 rounded-lg'
-      } ${className}`}
+      className={`inline - flex items - center justify - center border border - border bg - muted / 60 hover: bg - muted text - foreground transition - all active: scale - 95 ${
+  iconOnly
+    ? 'h-[36px] w-[36px] sm:h-[44px] sm:w-[44px] rounded-full'
+    : 'gap-2 text-[14px] sm:text-[15px] font-normal py-2 px-4 rounded-full'
+} ${ className } `}
     >
       <ArrowLeft size={16} className="shrink-0" />
       {!iconOnly && <span>{label}</span>}

@@ -54,16 +54,16 @@ async function OrderDetailContent({ orderId }: { orderId: string }) {
         <BackButton fallbackUrl="/revenue" iconOnly label="Back to Orders" />
         <div className="space-y-0.5">
           <div className="flex items-center gap-2">
-            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
-              Order Details
-            </h1>
-            <Badge variant={isCod ? 'warning' : 'success'} size="sm" dot>
-              {isCod ? 'COD Order' : 'Prepaid Order'}
-            </Badge>
+              <h1 className="text-[26px] sm:text-[34px] font-semibold tracking-[-0.374px] text-foreground leading-[1.2]">
+                Order Details
+              </h1>
+              <Badge variant={isCod ? 'warning' : 'success'} size="sm" dot>
+                {isCod ? 'COD Order' : 'Prepaid Order'}
+              </Badge>
           </div>
-          <p className="text-muted-foreground text-xs sm:text-sm font-mono">
-            Order #{order.orderNumber || order.id.substring(0, 6)}
-          </p>
+            <p className="text-muted-foreground text-[13px] sm:text-[14px] font-mono tracking-[-0.1px]">
+              Order #{order.orderNumber || order.id.substring(0, 6)}
+            </p>
         </div>
       </header>
 
@@ -71,41 +71,41 @@ async function OrderDetailContent({ orderId }: { orderId: string }) {
         <div className="md:col-span-2 space-y-6">
           <Card>
             <CardHeader className="pb-3 border-b border-border">
-              <CardTitle className="text-base font-semibold">Products ({items.length})</CardTitle>
+              <CardTitle className="text-[17px] font-semibold tracking-[-0.374px]">Products ({items.length})</CardTitle>
             </CardHeader>
             <CardContent className="pt-4">
               {items.length === 0 ? (
-                <p className="text-muted-foreground text-sm">No products found in this order.</p>
+                <p className="text-muted-foreground text-[14px]">No products found in this order.</p>
               ) : (
                 <ul className="divide-y divide-border/60">
                   {items.map(item => (
                     <li key={item.id} className="py-3 flex justify-between items-center gap-4">
                       <div className="flex items-center gap-3">
                         {item.imageUrl ? (
-                          <div className="relative w-11 h-11 rounded-lg overflow-hidden bg-muted border border-border shrink-0">
+                          <div className="relative w-12 h-12 rounded-[8px] overflow-hidden bg-muted border border-border shrink-0 shadow-apple-product">
                             <Image
                               src={item.imageUrl}
                               alt={item.title || 'Product'}
                               fill
-                              sizes="44px"
+                              sizes="48px"
                               className="object-cover"
                               unoptimized
                             />
                           </div>
                         ) : (
-                          <div className="w-11 h-11 rounded-lg bg-muted border border-border flex items-center justify-center text-foreground shrink-0 text-xs font-semibold">
+                          <div className="w-12 h-12 rounded-[8px] bg-muted border border-border flex items-center justify-center text-foreground shrink-0 text-xs font-semibold">
                             {item.title ? item.title.charAt(0).toUpperCase() : '?'}
                           </div>
                         )}
                         <div>
-                          <Link href={`https://fvprhj-0y.myshopify.com/products/${item.title?.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '')}`} target="_blank" rel="noopener noreferrer" className="text-sm font-medium hover:underline text-foreground flex items-center gap-1 group/link">
+                          <Link href={`https://fvprhj-0y.myshopify.com/products/${item.title?.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '')}`} target="_blank" rel="noopener noreferrer" className="text-[15px] font-normal hover:underline text-foreground flex items-center gap-1 group/link tracking-[-0.224px]">
                             <span>{item.title}</span>
                             <ArrowUpRight size={13} className="text-muted-foreground group-hover/link:text-foreground transition-colors shrink-0" />
                           </Link>
-                          <p className="text-xs text-muted-foreground mt-0.5 font-mono">Qty: {item.quantity}</p>
+                          <p className="text-[12px] text-muted-foreground mt-0.5 font-mono">Qty: {item.quantity}</p>
                         </div>
                       </div>
-                      <div className="font-semibold font-mono text-sm shrink-0 text-foreground">
+                      <div className="font-semibold font-mono text-[15px] shrink-0 text-foreground">
                         ₹{parseFloat(item.price as string || '0').toLocaleString('en-IN')}
                       </div>
                     </li>
@@ -224,6 +224,6 @@ async function OrderDetailContent({ orderId }: { orderId: string }) {
           )}
         </div>
       </div>
-    </>
-  );
+          </>
+          );
 }

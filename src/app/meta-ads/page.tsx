@@ -2,15 +2,15 @@
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import Link from 'next/link';
-import { 
-  Calendar as CalendarIcon, 
-  TrendingUp, 
-  Plus, 
-  CheckCircle2, 
-  ExternalLink, 
-  Trash2, 
-  Search, 
-  Check, 
+import {
+  Calendar as CalendarIcon,
+  TrendingUp,
+  Plus,
+  CheckCircle2,
+  ExternalLink,
+  Trash2,
+  Search,
+  Check,
   Clock,
   Wallet,
   Loader2,
@@ -123,7 +123,7 @@ export default function MetaAdsPage() {
   // Payment Modal state
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [isSubmittingPayment, setIsSubmittingPayment] = useState(false);
-  
+
   // Payment Form state
   const [paymentPreset, setPaymentPreset] = useState<'current_week' | 'previous_week' | 'custom'>('current_week');
   const [weekStartDate, setWeekStartDate] = useState('');
@@ -149,7 +149,7 @@ export default function MetaAdsPage() {
     const currentDay = now.getDay();
     // Monday is 1, Sunday is 0 -> distance to Monday:
     const distanceToMonday = (currentDay + 6) % 7;
-    
+
     const monday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - distanceToMonday - (weeksAgo * 7));
     const sunday = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + 6);
 
@@ -440,8 +440,8 @@ export default function MetaAdsPage() {
       }
 
       toast.success(
-        syncToExpenses 
-          ? 'Weekly budget marked as paid and synced to Expenses!' 
+        syncToExpenses
+          ? 'Weekly budget marked as paid and synced to Expenses!'
           : 'Weekly budget payment recorded successfully!'
       );
       setIsPaymentModalOpen(false);
@@ -507,8 +507,8 @@ export default function MetaAdsPage() {
       {/* Header */}
       <header className="flex-none flex flex-col md:flex-row md:items-end justify-between gap-4 sm:gap-6">
         <div className="space-y-1 sm:space-y-2">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-foreground">Meta Ads</h1>
-          <p className="text-muted-foreground text-xs sm:text-sm md:text-base">
+          <h1 className="text-2xl sm:text-[34px] font-bold tracking-tight text-foreground">Meta Ads</h1>
+          <p className="text-muted-foreground text-xs sm:text-sm">
             Daily campaign planning, budget allocation, and billing ledger
           </p>
         </div>
@@ -517,7 +517,7 @@ export default function MetaAdsPage() {
             <Button
               onClick={handleOpenPaymentModal}
               size="sm"
-              className="w-full sm:w-auto gap-2"
+              className="w-full sm:w-auto gap-2 rounded-full"
             >
               <Plus size={15} className="shrink-0" />
               <span>Mark {currentDaysNum === 7 ? 'Weekly' : `${currentDaysNum}-Day`} Budget Paid</span>
@@ -527,544 +527,539 @@ export default function MetaAdsPage() {
       </header>
 
       {/* Tab Switcher */}
-      <div className="flex items-center gap-1 bg-card border border-border p-1 rounded-lg w-fit">
-        <button
-          type="button"
-          onClick={() => setActiveTab('planner')}
-          className={`px-3.5 py-1.5 text-xs sm:text-sm font-medium rounded-md transition-colors flex items-center gap-2 whitespace-nowrap ${
-            activeTab === 'planner'
-              ? 'bg-muted text-foreground font-semibold'
-              : 'text-muted-foreground hover:text-foreground'
-          }`}
-        >
-          <CalendarIcon size={15} />
-          <span>Daily Planner</span>
-        </button>
-        <button
-          type="button"
-          onClick={() => setActiveTab('billing')}
-          className={`px-3.5 py-1.5 text-xs sm:text-sm font-medium rounded-md transition-colors flex items-center gap-2 whitespace-nowrap ${
-            activeTab === 'billing'
-              ? 'bg-muted text-foreground font-semibold'
-              : 'text-muted-foreground hover:text-foreground'
-          }`}
-        >
-          <Wallet size={15} />
-          <span>Billing &amp; Payments ({transactions.length})</span>
-        </button>
-      </div>
-
-      {loading && !settings ? (
-        <LoadingSpinner />
-      ) : (
-        <>
-          {/* Top Row: 4 Uniform KPI Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-            {/* Card 1: Daily Budget */}
-            <div className="bg-card border border-border rounded-xl p-5 flex flex-col justify-between">
-              <div className="flex items-center justify-between mb-2">
-                <h2 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Daily Budget</h2>
-                <CalendarIcon size={16} className="text-muted-foreground/60 shrink-0" />
-              </div>
-              <div>
-                <p className="text-2xl sm:text-3xl font-semibold font-mono text-foreground tracking-tight truncate">
-                  ₹{currentDailyBudgetNum.toLocaleString('en-IN')}
-                </p>
-                <p className="text-xs text-muted-foreground mt-1">Active daily target</p>
-              </div>
-            </div>
-
-            {/* Card 2: Period Budget Target */}
-            <div className="bg-card border border-border rounded-xl p-5 flex flex-col justify-between">
-              <div className="flex items-center justify-between mb-2">
-                <h2 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                  Period Budget ({currentDaysNum}d)
-                </h2>
-                <TrendingUp size={16} className="text-muted-foreground/60 shrink-0" />
-              </div>
-              <div>
-                <p className="text-2xl sm:text-3xl font-semibold font-mono text-foreground tracking-tight truncate">
-                  ₹{livePeriodBudget.toLocaleString('en-IN')}
-                </p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {currentDaysNum}d × ₹{currentDailyBudgetNum.toLocaleString('en-IN')}/day
-                </p>
-              </div>
-            </div>
-
-            {/* Card 3: Monthly Budget */}
-            <div className="bg-card border border-border rounded-xl p-5 flex flex-col justify-between">
-              <div className="flex items-center justify-between mb-2">
-                <h2 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Monthly Budget</h2>
-                <Clock size={16} className="text-muted-foreground/60 shrink-0" />
-              </div>
-              <div>
-                <p className="text-2xl sm:text-3xl font-semibold font-mono text-foreground tracking-tight truncate">
-                  ₹{liveMonthlyBudget.toLocaleString('en-IN')}
-                </p>
-                <p className="text-xs text-muted-foreground mt-1">30 Days estimated spend</p>
-              </div>
-            </div>
-
-            {/* Card 4: Monthly Balance */}
-            <div className="bg-card border border-border rounded-xl p-5 flex flex-col justify-between">
-              <div className="flex items-center justify-between mb-2">
-                <h2 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Monthly Balance</h2>
-                <Scale size={16} className="text-muted-foreground/60 shrink-0" />
-              </div>
-              <div>
-                <p className="text-2xl sm:text-3xl font-semibold font-mono text-foreground tracking-tight truncate">
-                  ₹{monthlyBalanceRemaining.toLocaleString('en-IN')}
-                </p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  ₹{thisMonthSpent.toLocaleString('en-IN')} spent this month
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* TAB 1: Daily Planner View */}
-          {activeTab === 'planner' && (
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-              {/* Left Side: Daily Campaign Planner */}
-              <div className="lg:col-span-6 xl:col-span-6 bg-card border border-border rounded-xl p-5 sm:p-6 flex flex-col justify-between">
-                <DailyCampaignPlanner
-                  key={selectedDate}
-                  selectedDate={selectedDate}
-                  onDateChange={(d) => setSelectedDate(d)}
-                  currentPlan={plansMap[selectedDate] || null}
-                  defaultDailyBudget={currentDailyBudgetNum}
-                  onSavePlan={handleSaveDailyPlan}
-                  canEdit={canManagePlanner}
-                  todayStr={todayStr}
-                />
-              </div>
-
-              {/* Right Side: Interactive Calendar */}
-              <div className="lg:col-span-6 xl:col-span-6 bg-card border border-border rounded-xl p-5 sm:p-6 flex flex-col justify-between">
-                <MetaAdsCalendar
-                  currentMonth={currentMonth}
-                  onMonthChange={(m) => setCurrentMonth(m)}
-                  selectedDate={selectedDate}
-                  onSelectDate={(d) => setSelectedDate(d)}
-                  plansMap={plansMap}
-                  todayStr={todayStr}
-                />
-              </div>
-            </div>
-          )}
-
-
-          {/* TAB 2: Billing & Payments View (Budget Config & Weekly Ledger) */}
-          {activeTab === 'billing' && (
-            <div className="space-y-6">
-              {/* Budget Configuration Panel */}
-              <div className="bg-card border border-border rounded-xl p-5 sm:p-6">
-                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5 sm:gap-6">
-                  <div className="space-y-1 max-w-md">
-                    <div className="flex items-center gap-2">
-                      <span className="h-2 w-2 rounded-full bg-emerald-500 shrink-0" />
-                      <h2 className="text-base sm:text-lg font-semibold text-foreground tracking-tight">Base Target Settings</h2>
-                    </div>
-                    <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-                      Enter baseline daily spend &amp; number of days to set the period budget target.
-                    </p>
-                  </div>
-
-                  <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
-                    {/* Daily Budget Input */}
-                    <div className="relative flex-1 sm:flex-initial">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground font-medium text-sm">
-                        ₹
-                      </span>
-                      <input
-                        type="number"
-                        inputMode="decimal"
-                        min="0"
-                        step="50"
-                        value={dailyBudgetInput}
-                        onChange={(e) => setDailyBudgetInput(e.target.value)}
-                        placeholder="400"
-                        className="w-full sm:w-32 bg-card border border-border rounded-lg pl-7 pr-12 py-2 min-h-[40px] text-sm font-medium text-foreground focus:outline-none focus:border-border-hover transition-colors"
-                      />
-                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground font-medium">
-                        / day
-                      </span>
-                    </div>
-
-                    <span className="text-muted-foreground font-bold text-sm hidden sm:inline">×</span>
-
-                    {/* Number of Days Input */}
-                    <div className="relative flex-1 sm:flex-initial">
-                      <input
-                        type="number"
-                        inputMode="numeric"
-                        min="1"
-                        max="365"
-                        step="1"
-                        value={daysInput}
-                        onChange={(e) => setDaysInput(e.target.value)}
-                        placeholder="7"
-                        className="w-full sm:w-24 bg-card border border-border rounded-lg pl-3 pr-10 py-2 min-h-[40px] text-sm font-medium text-foreground focus:outline-none focus:border-border-hover transition-colors"
-                      />
-                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground font-medium">
-                        days
-                      </span>
-                    </div>
-
-                    <span className="text-muted-foreground font-bold text-sm hidden sm:inline">=</span>
-
-                    {/* Calculated Result Display */}
-                    <div className="w-full sm:w-auto bg-muted/60 border border-border rounded-lg px-3.5 py-2 min-h-[40px] flex items-center justify-center text-sm font-semibold text-foreground whitespace-nowrap">
-                      Target: ₹{livePeriodBudget.toLocaleString('en-IN')}
-                    </div>
-
-                    {canEditAds && (
-                      <Button
-                        size="sm"
-                        onClick={handleSaveBudget}
-                        disabled={savingBudget}
-                        loading={savingBudget}
-                        className="w-full sm:w-auto gap-2"
-                      >
-                        {!savingBudget && <Check size={14} />}
-                        <span>Save Budget</span>
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* Transactions & Payment History Table */}
-              <div className="bg-card border border-border rounded-xl overflow-hidden flex flex-col">
-                {/* Table Header */}
-                <div className="p-4 md:px-6 md:py-4 border-b border-border flex flex-col md:flex-row justify-between items-stretch md:items-center gap-4 bg-muted/40">
-                  <div className="flex items-center gap-2.5">
-                    <h2 className="text-base md:text-lg font-semibold text-foreground tracking-tight">Weekly Budget Payments</h2>
-                    <Badge variant="secondary" className="text-xs">
-                      {transactions.length}
-                    </Badge>
-                  </div>
-
-                  {/* Search and Action Bar */}
-                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-                    <div className="relative flex-1 sm:w-64">
-                      <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
-                      <Input
-                        type="text"
-                        placeholder="Search ref, notes, method..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="pl-9 h-8 text-xs"
-                      />
-                    </div>
-
-                    {canEditAds && (
-                      <Button
-                        size="xs"
-                        onClick={handleOpenPaymentModal}
-                        className="gap-1.5"
-                      >
-                        <Plus size={13} />
-                        <span>Record Payment</span>
-                      </Button>
-                    )}
-                  </div>
-                </div>
-
-                {/* Table Body */}
-                <div className="flex-1 overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow className="border-b border-border text-[11px] text-muted-foreground font-semibold uppercase tracking-wider bg-muted/20 hover:bg-muted/20">
-                        <TableHead className="py-3 px-4 md:px-6">Period</TableHead>
-                        <TableHead className="py-3 px-4 md:px-6">Target Spend</TableHead>
-                        <TableHead className="py-3 px-4 md:px-6">Amount Paid</TableHead>
-                        <TableHead className="py-3 px-4 md:px-6">Payment Date</TableHead>
-                        <TableHead className="py-3 px-4 md:px-6">Method &amp; Ref</TableHead>
-                        <TableHead className="py-3 px-4 md:px-6">Linked Expense</TableHead>
-                        {canEditAds && <TableHead className="py-3 px-4 md:px-6 text-right">Actions</TableHead>}
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {filteredTransactions.length === 0 ? (
-                        <TableRow>
-                          <TableCell colSpan={canEditAds ? 7 : 6} className="py-12 text-center text-muted-foreground text-sm">
-                            {searchQuery ? 'No payment records match your search.' : 'No weekly ad payments recorded yet.'}
-                          </TableCell>
-                        </TableRow>
-                      ) : (
-                        filteredTransactions.map((tx) => {
-                          const daysInPeriod = calculateDays(tx.weekStartDate, tx.weekEndDate);
-                          return (
-                            <TableRow key={tx.id} className="hover:bg-muted/40 transition-colors group">
-                              {/* Period Range */}
-                              <TableCell className="py-3.5 px-4 md:px-6">
-                                <div className="font-semibold text-foreground">
-                                  {tx.weekStartDate} to {tx.weekEndDate}
-                                </div>
-                                <div className="text-xs text-muted-foreground">
-                                  {daysInPeriod} {daysInPeriod === 1 ? 'day' : 'days'}
-                                </div>
-                              </TableCell>
-
-                              {/* Target Spend */}
-                              <TableCell className="py-3.5 px-4 md:px-6">
-                                <div className="text-foreground font-medium">
-                                  ₹{parseFloat(tx.calculatedWeeklyBudget).toLocaleString('en-IN')}
-                                </div>
-                                <div className="text-xs text-muted-foreground">
-                                  ₹{parseFloat(tx.dailyBudget).toLocaleString('en-IN')}/day
-                                </div>
-                              </TableCell>
-
-                              {/* Amount Paid */}
-                              <TableCell className="py-3.5 px-4 md:px-6">
-                                <div className="font-semibold text-emerald-600 dark:text-emerald-400 font-mono">
-                                  ₹{parseFloat(tx.amountPaid).toLocaleString('en-IN')}
-                                </div>
-                                <div className="mt-1">
-                                  <Badge variant="outline" className="gap-1 text-[10px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30">
-                                    <CheckCircle2 size={10} />
-                                    <span>{tx.status}</span>
-                                  </Badge>
-                                </div>
-                              </TableCell>
-
-                              {/* Payment Date */}
-                              <TableCell className="py-3.5 px-4 md:px-6 text-muted-foreground text-xs font-mono">
-                                {tx.paymentDate}
-                              </TableCell>
-
-                              {/* Method & Ref */}
-                              <TableCell className="py-3.5 px-4 md:px-6">
-                                <div className="text-foreground font-medium text-xs">
-                                  {tx.paymentMethodName || tx.paymentMethodCode || 'Other'}
-                                </div>
-                                {tx.referenceNumber && (
-                                  <div className="text-xs text-muted-foreground font-mono">
-                                    {tx.referenceNumber}
-                                  </div>
-                                )}
-                              </TableCell>
-
-                              {/* Linked Expense */}
-                              <TableCell className="py-3.5 px-4 md:px-6">
-                                {tx.expenseId ? (
-                                  <Link href="/expenses">
-                                    <Badge variant="outline" className="gap-1 text-xs cursor-pointer hover:bg-muted font-normal">
-                                      <span>View Expense</span>
-                                      <ExternalLink size={10} />
-                                    </Badge>
-                                  </Link>
-                                ) : (
-                                  <span className="text-xs text-muted-foreground">Unlinked</span>
-                                )}
-                              </TableCell>
-
-                              {/* Actions */}
-                              {canDeleteAds && (
-                                <TableCell className="py-3.5 px-4 md:px-6 text-right">
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={() => setTxToDelete(tx)}
-                                    className="h-7 w-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
-                                    title="Delete Transaction"
-                                  >
-                                    <Trash2 size={13} />
-                                  </Button>
-                                </TableCell>
-                              )}
-                            </TableRow>
-                          );
-                        })
-                      )}
-                    </TableBody>
-                  </Table>
-                </div>
-              </div>
-            </div>
-          )}
-        </>
-      )}
-
-      {/* Payment Recording Modal */}
-      {isPaymentModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
-          <div className="bg-card border border-border rounded-xl p-6 max-w-lg w-full shadow-xl relative">
-            <h3 className="text-lg font-bold text-foreground mb-1">Record Meta Ads Budget Payment</h3>
-            <p className="text-xs text-muted-foreground mb-5">
-              Confirm payment details for your selected ad period.
-            </p>
-
-            <form onSubmit={handleSubmitPayment} className="space-y-4">
-              {/* Presets */}
-              <div className="flex items-center gap-1.5 bg-muted/60 p-1 rounded-lg border border-border">
-                <button
-                  type="button"
-                  onClick={() => handleSelectPreset('current_week')}
-                  className={`flex-1 py-1.5 text-xs font-semibold rounded-md transition-colors ${
-                    paymentPreset === 'current_week' ? 'bg-card text-foreground shadow-xs' : 'text-muted-foreground hover:text-foreground'
-                  }`}
-                >
-                  Current Period
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleSelectPreset('previous_week')}
-                  className={`flex-1 py-1.5 text-xs font-semibold rounded-md transition-colors ${
-                    paymentPreset === 'previous_week' ? 'bg-card text-foreground shadow-xs' : 'text-muted-foreground hover:text-foreground'
-                  }`}
-                >
-                  Previous Period
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setPaymentPreset('custom')}
-                  className={`flex-1 py-1.5 text-xs font-semibold rounded-md transition-colors ${
-                    paymentPreset === 'custom' ? 'bg-card text-foreground shadow-xs' : 'text-muted-foreground hover:text-foreground'
-                  }`}
-                >
-                  Custom
-                </button>
-              </div>
-
-              {/* Date Range Inputs */}
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1">
-                  <label className="text-xs font-medium text-foreground">Start Date</label>
-                  <input
-                    type="date"
-                    required
-                    value={weekStartDate}
-                    onChange={(e) => handleStartDateChange(e.target.value)}
-                    className="w-full bg-card border border-border rounded-lg px-3 py-1.5 text-xs text-foreground focus:outline-none focus:border-border-hover"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="text-xs font-medium text-foreground">End Date</label>
-                  <input
-                    type="date"
-                    required
-                    value={weekEndDate}
-                    onChange={(e) => handleEndDateChange(e.target.value)}
-                    className="w-full bg-card border border-border rounded-lg px-3 py-1.5 text-xs text-foreground focus:outline-none focus:border-border-hover"
-                  />
-                </div>
-              </div>
-
-              {/* Amount and Payment Date */}
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1">
-                  <label className="text-xs font-medium text-foreground">Amount Paid (₹)</label>
-                  <input
-                    type="number"
-                    required
-                    min="0"
-                    step="1"
-                    value={amountPaid}
-                    onChange={(e) => setAmountPaid(e.target.value)}
-                    placeholder="e.g. 2800"
-                    className="w-full bg-card border border-border rounded-lg px-3 py-1.5 text-xs font-semibold text-foreground focus:outline-none focus:border-border-hover"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="text-xs font-medium text-foreground">Payment Date</label>
-                  <input
-                    type="date"
-                    required
-                    value={paymentDate}
-                    onChange={(e) => setPaymentDate(e.target.value)}
-                    className="w-full bg-card border border-border rounded-lg px-3 py-1.5 text-xs text-foreground focus:outline-none focus:border-border-hover"
-                  />
-                </div>
-              </div>
-
-              {/* Payment Method & Reference */}
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1">
-                  <label className="text-xs font-medium text-foreground">Payment Method</label>
-                  <select
-                    required
-                    value={paymentMethodId}
-                    onChange={(e) => setPaymentMethodId(e.target.value)}
-                    className="w-full bg-card border border-border rounded-lg px-3 py-1.5 text-xs text-foreground focus:outline-none focus:border-border-hover"
-                  >
-                    {paymentMethods.map((pm) => (
-                      <option key={pm.id} value={pm.id} className="bg-card text-foreground">
-                        {pm.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="space-y-1">
-                  <label className="text-xs font-medium text-foreground">Reference / UTR (Optional)</label>
-                  <input
-                    type="text"
-                    value={referenceNumber}
-                    onChange={(e) => setReferenceNumber(e.target.value)}
-                    placeholder="e.g. UPI Ref #12345"
-                    className="w-full bg-card border border-border rounded-lg px-3 py-1.5 text-xs text-foreground focus:outline-none focus:border-border-hover"
-                  />
-                </div>
-              </div>
-
-              {/* Sync to Expenses Toggle */}
-              <div className="flex items-center gap-3 p-3 bg-muted/40 border border-border rounded-lg">
-                <input
-                  type="checkbox"
-                  id="syncExpenses"
-                  checked={syncToExpenses}
-                  onChange={(e) => setSyncToExpenses(e.target.checked)}
-                  className="rounded border-border text-foreground focus:ring-0"
-                />
-                <label htmlFor="syncExpenses" className="text-xs text-foreground select-none cursor-pointer">
-                  Automatically sync this payment to <strong>Expenses</strong> ledger
-                </label>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex items-center justify-end gap-3 pt-4 border-t border-border">
-                <button
-                  type="button"
-                  onClick={() => setIsPaymentModalOpen(false)}
-                  className="px-4 py-2 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={isSubmittingPayment}
-                  className="px-4 py-2 bg-primary text-primary-foreground font-semibold text-xs rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center gap-2"
-                >
-                  {isSubmittingPayment ? (
-                    <>
-                      <Loader2 size={14} className="animate-spin" />
-                      <span>Recording...</span>
-                    </>
-                  ) : (
-                    <span>Record Payment</span>
-                  )}
-                </button>
-              </div>
-            </form>
-          </div>
+        <div className="flex items-center gap-1 bg-muted/40 border border-border p-1 rounded-full w-fit">
+          <button
+            type="button"
+            onClick={() => setActiveTab('planner')}
+            className={`px-4 py-1.5 text-xs sm:text-sm font-semibold rounded-full transition-all active:scale-95 flex items-center gap-2 whitespace-nowrap ${activeTab === 'planner'
+                ? 'bg-primary text-primary-foreground shadow-none'
+                : 'text-muted-foreground hover:text-foreground'
+              }`}
+          >
+            <CalendarIcon size={15} />
+            <span>Daily Planner</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('billing')}
+          className={`px-4 py-1.5 text-xs sm:text-sm font-semibold rounded-full transition-all active:scale-95 flex items-center gap-2 whitespace-nowrap ${activeTab === 'billing'
+                ? 'bg-primary text-primary-foreground shadow-none'
+                : 'text-muted-foreground hover:text-foreground'
+              }`}
+          >
+            <Wallet size={15} />
+            <span>Billing &amp; Payments ({transactions.length})</span>
+          </button>
         </div>
-      )}
 
-      {/* Delete Confirmation Modal */}
-      {txToDelete && (
-        <ConfirmModal
-          isOpen={true}
-          title="Delete Payment Record"
-          message={`Are you sure you want to delete the payment record for period ${txToDelete.weekStartDate} to ${txToDelete.weekEndDate}? This will also delete any linked expense record.`}
-          confirmText="Delete"
-          onConfirm={handleConfirmDelete}
-          onCancel={() => setTxToDelete(null)}
-          isLoading={isDeleting}
-        />
-      )}
-    </div>
-  );
+        {loading && !settings ? (
+          <LoadingSpinner />
+        ) : (
+          <>
+            {/* Top Row: 4 Uniform KPI Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+              {/* Card 1: Daily Budget */}
+              <div className="bg-card border border-border rounded-[18px] p-5 sm:p-6 flex flex-col justify-between shadow-none">
+                <div className="flex items-center justify-between mb-2">
+                  <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Daily Budget</h2>
+                  <CalendarIcon size={16} className="text-muted-foreground/60 shrink-0" />
+                </div>
+                <div>
+                  <p className="text-2xl sm:text-[32px] font-bold font-mono text-foreground tracking-tight truncate">
+                    ₹{currentDailyBudgetNum.toLocaleString('en-IN')}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1 font-semibold">Active daily target</p>
+                </div>
+              </div>
+
+              {/* Card 2: Period Budget Target */}
+              <div className="bg-card border border-border rounded-[18px] p-5 sm:p-6 flex flex-col justify-between shadow-none">
+                <div className="flex items-center justify-between mb-2">
+                  <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                    Period Budget ({currentDaysNum}d)
+                  </h2>
+                  <TrendingUp size={16} className="text-muted-foreground/60 shrink-0" />
+                </div>
+                <div>
+                  <p className="text-2xl sm:text-[32px] font-bold font-mono text-foreground tracking-tight truncate">
+                    ₹{livePeriodBudget.toLocaleString('en-IN')}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1 font-semibold">
+                    {currentDaysNum}d × ₹{currentDailyBudgetNum.toLocaleString('en-IN')}/day
+                  </p>
+                </div>
+              </div>
+
+              {/* Card 3: Monthly Budget */}
+              <div className="bg-card border border-border rounded-[18px] p-5 sm:p-6 flex flex-col justify-between shadow-none">
+                <div className="flex items-center justify-between mb-2">
+                  <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Monthly Budget</h2>
+                  <Clock size={16} className="text-muted-foreground/60 shrink-0" />
+                </div>
+                <div>
+                  <p className="text-2xl sm:text-[32px] font-bold font-mono text-foreground tracking-tight truncate">
+                    ₹{liveMonthlyBudget.toLocaleString('en-IN')}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1 font-semibold">30 Days estimated spend</p>
+                </div>
+              </div>
+
+              {/* Card 4: Monthly Balance */}
+              <div className="bg-card border border-border rounded-[18px] p-5 sm:p-6 flex flex-col justify-between shadow-none">
+                <div className="flex items-center justify-between mb-2">
+                  <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Monthly Balance</h2>
+                  <Scale size={16} className="text-muted-foreground/60 shrink-0" />
+                </div>
+                <div>
+                  <p className="text-2xl sm:text-[32px] font-bold font-mono text-foreground tracking-tight truncate">
+                    ₹{monthlyBalanceRemaining.toLocaleString('en-IN')}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1 font-semibold">
+                    ₹{thisMonthSpent.toLocaleString('en-IN')} spent this month
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* TAB 1: Daily Planner View */}
+            {activeTab === 'planner' && (
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                {/* Left Side: Daily Campaign Planner */}
+                <div className="lg:col-span-6 xl:col-span-6 bg-card border border-border rounded-[18px] p-5 sm:p-6 flex flex-col justify-between shadow-none">
+                  <DailyCampaignPlanner
+                    key={selectedDate}
+                    selectedDate={selectedDate}
+                    onDateChange={(d) => setSelectedDate(d)}
+                    currentPlan={plansMap[selectedDate] || null}
+                    defaultDailyBudget={currentDailyBudgetNum}
+                    onSavePlan={handleSaveDailyPlan}
+                    canEdit={canManagePlanner}
+                    todayStr={todayStr}
+                  />
+                </div>
+
+                {/* Right Side: Interactive Calendar */}
+                <div className="lg:col-span-6 xl:col-span-6 bg-card border border-border rounded-xl p-5 sm:p-6 flex flex-col justify-between">
+                  <MetaAdsCalendar
+                    currentMonth={currentMonth}
+                    onMonthChange={(m) => setCurrentMonth(m)}
+                    selectedDate={selectedDate}
+                    onSelectDate={(d) => setSelectedDate(d)}
+                    plansMap={plansMap}
+                    todayStr={todayStr}
+                  />
+                </div>
+              </div>
+            )}
+
+
+            {/* TAB 2: Billing & Payments View (Budget Config & Weekly Ledger) */}
+            {activeTab === 'billing' && (
+              <div className="space-y-6">
+                {/* Budget Configuration Panel */}
+                <div className="bg-card border border-border rounded-xl p-5 sm:p-6">
+                  <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5 sm:gap-6">
+                    <div className="space-y-1 max-w-md">
+                      <div className="flex items-center gap-2">
+                        <span className="h-2 w-2 rounded-full bg-emerald-500 shrink-0" />
+                        <h2 className="text-base sm:text-lg font-semibold text-foreground tracking-tight">Base Target Settings</h2>
+                      </div>
+                      <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                        Enter baseline daily spend &amp; number of days to set the period budget target.
+                      </p>
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
+                      {/* Daily Budget Input */}
+                      <div className="relative flex-1 sm:flex-initial">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground font-medium text-sm">
+                          ₹
+                        </span>
+                        <input
+                          type="number"
+                          inputMode="decimal"
+                          min="0"
+                          step="50"
+                          value={dailyBudgetInput}
+                          onChange={(e) => setDailyBudgetInput(e.target.value)}
+                          placeholder="400"
+                          className="w-full sm:w-32 bg-card border border-border rounded-lg pl-7 pr-12 py-2 min-h-[40px] text-sm font-medium text-foreground focus:outline-none focus:border-border-hover transition-colors"
+                        />
+                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground font-medium">
+                          / day
+                        </span>
+                      </div>
+
+                      <span className="text-muted-foreground font-bold text-sm hidden sm:inline">×</span>
+
+                      {/* Number of Days Input */}
+                      <div className="relative flex-1 sm:flex-initial">
+                        <input
+                          type="number"
+                          inputMode="numeric"
+                          min="1"
+                          max="365"
+                          step="1"
+                          value={daysInput}
+                          onChange={(e) => setDaysInput(e.target.value)}
+                          placeholder="7"
+                          className="w-full sm:w-24 bg-card border border-border rounded-lg pl-3 pr-10 py-2 min-h-[40px] text-sm font-medium text-foreground focus:outline-none focus:border-border-hover transition-colors"
+                        />
+                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground font-medium">
+                          days
+                        </span>
+                      </div>
+
+                      <span className="text-muted-foreground font-bold text-sm hidden sm:inline">=</span>
+
+                      {/* Calculated Result Display */}
+                      <div className="w-full sm:w-auto bg-muted/60 border border-border rounded-lg px-3.5 py-2 min-h-[40px] flex items-center justify-center text-sm font-semibold text-foreground whitespace-nowrap">
+                        Target: ₹{livePeriodBudget.toLocaleString('en-IN')}
+                      </div>
+
+                      {canEditAds && (
+                        <Button
+                          size="sm"
+                          onClick={handleSaveBudget}
+                          disabled={savingBudget}
+                          loading={savingBudget}
+                          className="w-full sm:w-auto gap-2"
+                        >
+                          {!savingBudget && <Check size={14} />}
+                          <span>Save Budget</span>
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Transactions & Payment History Table */}
+                <div className="bg-card border border-border rounded-xl overflow-hidden flex flex-col">
+                  {/* Table Header */}
+                  <div className="p-4 md:px-6 md:py-4 border-b border-border flex flex-col md:flex-row justify-between items-stretch md:items-center gap-4 bg-muted/40">
+                    <div className="flex items-center gap-2.5">
+                      <h2 className="text-base md:text-lg font-semibold text-foreground tracking-tight">Weekly Budget Payments</h2>
+                      <Badge variant="secondary" className="text-xs">
+                        {transactions.length}
+                      </Badge>
+                    </div>
+
+                    {/* Search and Action Bar */}
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                      <div className="relative flex-1 sm:w-64">
+                        <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+                        <Input
+                          type="text"
+                          placeholder="Search ref, notes, method..."
+                          value={searchQuery}
+                          onChange={(e) => setSearchQuery(e.target.value)}
+                          className="pl-9 h-8 text-xs"
+                        />
+                      </div>
+
+                      {canEditAds && (
+                        <Button
+                          size="xs"
+                          onClick={handleOpenPaymentModal}
+                          className="gap-1.5"
+                        >
+                          <Plus size={13} />
+                          <span>Record Payment</span>
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Table Body */}
+                  <div className="flex-1 overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow className="border-b border-border text-[11px] text-muted-foreground font-semibold uppercase tracking-wider bg-muted/20 hover:bg-muted/20">
+                          <TableHead className="py-3 px-4 md:px-6">Period</TableHead>
+                          <TableHead className="py-3 px-4 md:px-6">Target Spend</TableHead>
+                          <TableHead className="py-3 px-4 md:px-6">Amount Paid</TableHead>
+                          <TableHead className="py-3 px-4 md:px-6">Payment Date</TableHead>
+                          <TableHead className="py-3 px-4 md:px-6">Method &amp; Ref</TableHead>
+                          <TableHead className="py-3 px-4 md:px-6">Linked Expense</TableHead>
+                          {canEditAds && <TableHead className="py-3 px-4 md:px-6 text-right">Actions</TableHead>}
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {filteredTransactions.length === 0 ? (
+                          <TableRow>
+                            <TableCell colSpan={canEditAds ? 7 : 6} className="py-12 text-center text-muted-foreground text-sm">
+                              {searchQuery ? 'No payment records match your search.' : 'No weekly ad payments recorded yet.'}
+                            </TableCell>
+                          </TableRow>
+                        ) : (
+                          filteredTransactions.map((tx) => {
+                            const daysInPeriod = calculateDays(tx.weekStartDate, tx.weekEndDate);
+                            return (
+                              <TableRow key={tx.id} className="hover:bg-muted/40 transition-colors group">
+                                {/* Period Range */}
+                                <TableCell className="py-3.5 px-4 md:px-6">
+                                  <div className="font-semibold text-foreground">
+                                    {tx.weekStartDate} to {tx.weekEndDate}
+                                  </div>
+                                  <div className="text-xs text-muted-foreground">
+                                    {daysInPeriod} {daysInPeriod === 1 ? 'day' : 'days'}
+                                  </div>
+                                </TableCell>
+
+                                {/* Target Spend */}
+                                <TableCell className="py-3.5 px-4 md:px-6">
+                                  <div className="text-foreground font-medium">
+                                    ₹{parseFloat(tx.calculatedWeeklyBudget).toLocaleString('en-IN')}
+                                  </div>
+                                  <div className="text-xs text-muted-foreground">
+                                    ₹{parseFloat(tx.dailyBudget).toLocaleString('en-IN')}/day
+                                  </div>
+                                </TableCell>
+
+                                {/* Amount Paid */}
+                                <TableCell className="py-3.5 px-4 md:px-6">
+                                  <div className="font-semibold text-emerald-600 dark:text-emerald-400 font-mono">
+                                    ₹{parseFloat(tx.amountPaid).toLocaleString('en-IN')}
+                                  </div>
+                                  <div className="mt-1">
+                                    <Badge variant="outline" className="gap-1 text-[10px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30">
+                                      <CheckCircle2 size={10} />
+                                      <span>{tx.status}</span>
+                                    </Badge>
+                                  </div>
+                                </TableCell>
+
+                                {/* Payment Date */}
+                                <TableCell className="py-3.5 px-4 md:px-6 text-muted-foreground text-xs font-mono">
+                                  {tx.paymentDate}
+                                </TableCell>
+
+                                {/* Method & Ref */}
+                                <TableCell className="py-3.5 px-4 md:px-6">
+                                  <div className="text-foreground font-medium text-xs">
+                                    {tx.paymentMethodName || tx.paymentMethodCode || 'Other'}
+                                  </div>
+                                  {tx.referenceNumber && (
+                                    <div className="text-xs text-muted-foreground font-mono">
+                                      {tx.referenceNumber}
+                                    </div>
+                                  )}
+                                </TableCell>
+
+                                {/* Linked Expense */}
+                                <TableCell className="py-3.5 px-4 md:px-6">
+                                  {tx.expenseId ? (
+                                    <Link href="/expenses">
+                                      <Badge variant="outline" className="gap-1 text-xs cursor-pointer hover:bg-muted font-normal">
+                                        <span>View Expense</span>
+                                        <ExternalLink size={10} />
+                                      </Badge>
+                                    </Link>
+                                  ) : (
+                                    <span className="text-xs text-muted-foreground">Unlinked</span>
+                                  )}
+                                </TableCell>
+
+                                {/* Actions */}
+                                {canDeleteAds && (
+                                  <TableCell className="py-3.5 px-4 md:px-6 text-right">
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      onClick={() => setTxToDelete(tx)}
+                                      className="h-7 w-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                                      title="Delete Transaction"
+                                    >
+                                      <Trash2 size={13} />
+                                    </Button>
+                                  </TableCell>
+                                )}
+                              </TableRow>
+                            );
+                          })
+                        )}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </div>
+              </div>
+            )}
+          </>
+        )}
+
+        {/* Payment Recording Modal */}
+        {isPaymentModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+            <div className="bg-card border border-border rounded-xl p-6 max-w-lg w-full shadow-xl relative">
+              <h3 className="text-lg font-bold text-foreground mb-1">Record Meta Ads Budget Payment</h3>
+              <p className="text-xs text-muted-foreground mb-5">
+                Confirm payment details for your selected ad period.
+              </p>
+
+              <form onSubmit={handleSubmitPayment} className="space-y-4">
+                {/* Presets */}
+                <div className="flex items-center gap-1.5 bg-muted/60 p-1 rounded-lg border border-border">
+                  <button
+                    type="button"
+                    onClick={() => handleSelectPreset('current_week')}
+                    className={`flex-1 py-1.5 text-xs font-semibold rounded-md transition-colors ${paymentPreset === 'current_week' ? 'bg-card text-foreground shadow-xs' : 'text-muted-foreground hover:text-foreground'
+                      }`}
+                  >
+                    Current Period
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleSelectPreset('previous_week')}
+                    className={`flex-1 py-1.5 text-xs font-semibold rounded-md transition-colors ${paymentPreset === 'previous_week' ? 'bg-card text-foreground shadow-xs' : 'text-muted-foreground hover:text-foreground'
+                      }`}
+                  >
+                    Previous Period
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPaymentPreset('custom')}
+                    className={`flex-1 py-1.5 text-xs font-semibold rounded-md transition-colors ${paymentPreset === 'custom' ? 'bg-card text-foreground shadow-xs' : 'text-muted-foreground hover:text-foreground'
+                      }`}
+                  >
+                    Custom
+                  </button>
+                </div>
+
+                {/* Date Range Inputs */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1">
+                    <label className="text-xs font-medium text-foreground">Start Date</label>
+                    <input
+                      type="date"
+                      required
+                      value={weekStartDate}
+                      onChange={(e) => handleStartDateChange(e.target.value)}
+                      className="w-full bg-card border border-border rounded-lg px-3 py-1.5 text-xs text-foreground focus:outline-none focus:border-border-hover"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-xs font-medium text-foreground">End Date</label>
+                    <input
+                      type="date"
+                      required
+                      value={weekEndDate}
+                      onChange={(e) => handleEndDateChange(e.target.value)}
+                      className="w-full bg-card border border-border rounded-lg px-3 py-1.5 text-xs text-foreground focus:outline-none focus:border-border-hover"
+                    />
+                  </div>
+                </div>
+
+                {/* Amount and Payment Date */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1">
+                    <label className="text-xs font-medium text-foreground">Amount Paid (₹)</label>
+                    <input
+                      type="number"
+                      required
+                      min="0"
+                      step="1"
+                      value={amountPaid}
+                      onChange={(e) => setAmountPaid(e.target.value)}
+                      placeholder="e.g. 2800"
+                      className="w-full bg-card border border-border rounded-lg px-3 py-1.5 text-xs font-semibold text-foreground focus:outline-none focus:border-border-hover"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-xs font-medium text-foreground">Payment Date</label>
+                    <input
+                      type="date"
+                      required
+                      value={paymentDate}
+                      onChange={(e) => setPaymentDate(e.target.value)}
+                      className="w-full bg-card border border-border rounded-lg px-3 py-1.5 text-xs text-foreground focus:outline-none focus:border-border-hover"
+                    />
+                  </div>
+                </div>
+
+                {/* Payment Method & Reference */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1">
+                    <label className="text-xs font-medium text-foreground">Payment Method</label>
+                    <select
+                      required
+                      value={paymentMethodId}
+                      onChange={(e) => setPaymentMethodId(e.target.value)}
+                      className="w-full bg-card border border-border rounded-lg px-3 py-1.5 text-xs text-foreground focus:outline-none focus:border-border-hover"
+                    >
+                      {paymentMethods.map((pm) => (
+                        <option key={pm.id} value={pm.id} className="bg-card text-foreground">
+                          {pm.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-xs font-medium text-foreground">Reference / UTR (Optional)</label>
+                    <input
+                      type="text"
+                      value={referenceNumber}
+                      onChange={(e) => setReferenceNumber(e.target.value)}
+                      placeholder="e.g. UPI Ref #12345"
+                      className="w-full bg-card border border-border rounded-lg px-3 py-1.5 text-xs text-foreground focus:outline-none focus:border-border-hover"
+                    />
+                  </div>
+                </div>
+
+                {/* Sync to Expenses Toggle */}
+                <div className="flex items-center gap-3 p-3 bg-muted/40 border border-border rounded-lg">
+                  <input
+                    type="checkbox"
+                    id="syncExpenses"
+                    checked={syncToExpenses}
+                    onChange={(e) => setSyncToExpenses(e.target.checked)}
+                    className="rounded border-border text-foreground focus:ring-0"
+                  />
+                  <label htmlFor="syncExpenses" className="text-xs text-foreground select-none cursor-pointer">
+                    Automatically sync this payment to <strong>Expenses</strong> ledger
+                  </label>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex items-center justify-end gap-3 pt-4 border-t border-border">
+                  <button
+                    type="button"
+                    onClick={() => setIsPaymentModalOpen(false)}
+                    className="px-4 py-2 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isSubmittingPayment}
+                    className="px-4 py-2 bg-primary text-primary-foreground font-semibold text-xs rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center gap-2"
+                  >
+                    {isSubmittingPayment ? (
+                      <>
+                        <Loader2 size={14} className="animate-spin" />
+                        <span>Recording...</span>
+                      </>
+                    ) : (
+                      <span>Record Payment</span>
+                    )}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* Delete Confirmation Modal */}
+        {txToDelete && (
+          <ConfirmModal
+            isOpen={true}
+            title="Delete Payment Record"
+            message={`Are you sure you want to delete the payment record for period ${txToDelete.weekStartDate} to ${txToDelete.weekEndDate}? This will also delete any linked expense record.`}
+            confirmText="Delete"
+            onConfirm={handleConfirmDelete}
+            onCancel={() => setTxToDelete(null)}
+            isLoading={isDeleting}
+          />
+        )}
+      </div>
+      );
 }

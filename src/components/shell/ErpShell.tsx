@@ -219,48 +219,49 @@ export function ErpShell({ children }: { children: React.ReactNode }) {
                       href={item.href}
                       onClick={() => setMobileOpen(false)}
                       className={cn(
-                        "group flex items-center rounded-lg text-xs font-medium transition-colors select-none",
+                        "group flex items-center rounded-full text-[13px] sm:text-[14px] font-normal transition-all duration-100 select-none active:scale-95 tracking-[-0.224px]",
                         collapsed
-                          ? "justify-center p-2 h-9 w-full"
-                          : "gap-2.5 px-2.5 py-2 min-h-[36px]",
+                          ? "justify-center p-2 h-9 w-full rounded-full"
+                        : "gap-2.5 px-3 py-2 min-h-[36px]",
                         isActive
-                          ? "bg-primary text-primary-foreground font-semibold shadow-xs"
-                          : "text-muted-foreground hover:text-foreground hover:bg-sidebar-muted active:bg-sidebar-muted"
-                      )}
+                            ? "bg-[#0066cc] text-white font-normal"
+                            : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                      )
+                }
                     >
-                      <Icon
-                        className={cn(
-                          "w-4 h-4 shrink-0 transition-colors",
-                          isActive
-                            ? "text-primary-foreground"
-                            : "text-muted-foreground group-hover:text-foreground"
+                  <Icon
+                    className={cn(
+                      "w-4 h-4 shrink-0 transition-colors",
+                      isActive
+                          ? "text-white"
+                          : "text-muted-foreground group-hover:text-foreground"
                         )}
-                        strokeWidth={1.75}
-                      />
+                    strokeWidth={1.75}
+                  />
                       {!collapsed && (
-                        <span className="truncate">{item.label}</span>
+                  <span className="truncate">{item.label}</span>
+                )}
+                {!collapsed && item.badge && (
+                    <span className="ml-auto text-[10px] font-mono px-2 py-0.5 rounded-full bg-white/20 text-white">
+                      {item.badge}
+                    </span>
                       )}
-                      {!collapsed && item.badge && (
-                        <span className="ml-auto text-[10px] font-mono px-1.5 py-0.25 rounded-full bg-primary/10 text-primary">
-                          {item.badge}
-                        </span>
-                      )}
-                    </Link>
-                  );
+                  </Link>
+                );
 
-                  if (collapsed) {
+                if (collapsed) {
                     return (
-                      <Tooltip
-                        key={item.href}
-                        content={item.label}
-                        position="right"
-                      >
-                        {navContent}
-                      </Tooltip>
-                    );
+                <Tooltip
+                  key={item.href}
+                  content={item.label}
+                  position="right"
+                >
+                  {navContent}
+                </Tooltip>
+                );
                   }
 
-                  return navContent;
+                return navContent;
                 })}
               </div>
             );
@@ -275,54 +276,54 @@ export function ErpShell({ children }: { children: React.ReactNode }) {
                 type="button"
                 onClick={handleSignOut}
                 aria-label="Log out"
-                className="w-full h-9 flex items-center justify-center rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+                className="w-full h-9 flex items-center justify-center rounded-full text-muted-foreground hover:text-[#ff453a] hover:bg-[#ff453a]/10 transition-colors active:scale-95"
               >
                 <LogOut className="w-4 h-4" />
               </button>
             </Tooltip>
           ) : (
-            <div className="flex items-center justify-between p-1.5 rounded-lg bg-card/60 border border-border/60">
-              <div className="flex items-center gap-2 min-w-0">
-                <div className="w-7 h-7 rounded-md bg-primary/10 border border-primary/20 text-primary font-semibold text-xs flex items-center justify-center shrink-0">
-                  {user?.name ? user.name.charAt(0).toUpperCase() : "A"}
-                </div>
-                <div className="flex flex-col min-w-0">
-                  <span className="text-xs font-semibold text-foreground truncate leading-tight">
-                    {user?.name || "Blactify Admin"}
-                  </span>
-                  <span className="text-[10px] text-muted-foreground font-mono truncate leading-tight">
-                    {role || "VIEWER"}
-                  </span>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={handleSignOut}
-                title="Log out"
-                aria-label="Log out"
-                className="p-1 rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
-              >
-                <LogOut className="w-3.5 h-3.5" />
-              </button>
-            </div>
+                  <div className="flex items-center justify-between p-1.5 rounded-full bg-card/70 border border-border">
+                    <div className="flex items-center gap-2 min-w-0 pl-1">
+                      <div className="w-[28px] h-[28px] rounded-full bg-[#0066cc]/10 border border-[#0066cc]/20 text-[#0066cc] dark:text-[#2997ff] font-semibold text-xs flex items-center justify-center shrink-0">
+                        {user?.name ? user.name.charAt(0).toUpperCase() : "A"}
+                      </div>
+                      <div className="flex flex-col min-w-0">
+                          <span className="text-[12px] font-semibold text-foreground truncate leading-tight tracking-[-0.1px]">
+                            {user?.name || "Blactify Admin"}
+                          </span>
+                          <span className="text-[10px] text-muted-foreground font-mono truncate leading-tight">
+                            {role || "VIEWER"}
+                          </span>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleSignOut}
+                      title="Log out"
+                      aria-label="Log out"
+                      className="p-1.5 rounded-full text-muted-foreground hover:text-[#ff453a] hover:bg-[#ff453a]/10 transition-colors active:scale-95"
+                    >
+                      <LogOut className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
           )}
-        </div>
-      </aside>
+                </div>
+              </aside>
 
-      {/* Main Workspace Frame (Top Header + Dynamic Content) */}
-      <div className="flex-1 min-w-0 flex flex-col h-full overflow-hidden">
-        <TopHeader
-          sidebarCollapsed={collapsed}
-          onToggleSidebar={toggleCollapsed}
-          onOpenMobile={() => setMobileOpen(true)}
-        />
+              {/* Main Workspace Frame (Top Header + Dynamic Content) */}
+              <div className="flex-1 min-w-0 flex flex-col h-full overflow-hidden">
+                <TopHeader
+                  sidebarCollapsed={collapsed}
+                  onToggleSidebar={toggleCollapsed}
+                  onOpenMobile={() => setMobileOpen(true)}
+                />
 
-        <main className="flex-1 w-full min-w-0 px-3.5 sm:px-6 lg:px-8 2xl:px-10 pt-4 sm:pt-6 pb-8 overflow-y-auto overflow-x-hidden">
-          <div className="mx-auto w-full max-w-[1920px]">
-            {children}
-          </div>
-        </main>
-      </div>
-    </div>
-  );
+                <main className="flex-1 w-full min-w-0 px-3.5 sm:px-6 lg:px-8 2xl:px-10 pt-4 sm:pt-6 pb-8 overflow-y-auto overflow-x-hidden">
+                  <div className="mx-auto w-full max-w-[1920px]">
+                    {children}
+                  </div>
+                </main>
+              </div>
+            </div>
+          );
 }

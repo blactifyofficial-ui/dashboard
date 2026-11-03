@@ -13,19 +13,19 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import { useTheme } from 'next-themes';
-import { 
-  TrendingUp, 
-  BarChart2, 
-  Calendar, 
-  IndianRupee, 
-  ArrowUpRight, 
+import {
+  TrendingUp,
+  BarChart2,
+  Calendar,
+  IndianRupee,
+  ArrowUpRight,
   PieChart as PieIcon,
   CreditCard,
   Zap
 } from 'lucide-react';
 import { Expense } from './types';
 
-const emptySubscribe = () => () => {};
+const emptySubscribe = () => () => { };
 
 interface CustomTooltipProps {
   active?: boolean;
@@ -313,335 +313,330 @@ export default function ExpenseAnalytics({ expenses }: { expenses: Expense[] }) 
   return (
     <div className="space-y-6">
       {/* Top Filter and Display Controls */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 bg-muted/20 border border-border p-3.5 rounded-xl">
-        {/* Time range pills */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 scrollbar-none">
-          {timeRangeOptions.map((opt) => (
-            <button
-              key={opt.id}
-              onClick={() => setTimeRange(opt.id)}
-              className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all whitespace-nowrap cursor-pointer ${
-                timeRange === opt.id
-                  ? 'bg-primary text-primary-foreground font-semibold shadow-xs'
-                  : 'bg-muted/70 text-muted-foreground hover:text-foreground hover:bg-muted'
-              }`}
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 bg-muted/20 border border-border p-3.5 sm:p-4 rounded-[18px]">
+            {/* Time range pills */}
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 scrollbar-none">
+              {timeRangeOptions.map((opt) => (
+                <button
+                  key={opt.id}
+                  onClick={() => setTimeRange(opt.id)}
+                  className={`px-3.5 py-1.5 text-xs font-semibold rounded-full transition-all whitespace-nowrap cursor-pointer active:scale-95 ${timeRange === opt.id
+                      ? 'bg-primary text-primary-foreground shadow-none'
+                      : 'bg-muted/60 text-muted-foreground hover:text-foreground hover:bg-muted'
+                    }`}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Granularity & Chart Style Toggles */}
+            <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+              {/* Daily vs Monthly */}
+              <div className="flex items-center p-1 rounded-full bg-muted/40 border border-border text-xs">
+                <button
+                  type="button"
+                  onClick={() => setGranularity('daily')}
+                  className={`px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer active:scale-95 ${granularity === 'daily'
+                      ? 'bg-primary text-primary-foreground shadow-none'
+                      : 'text-muted-foreground hover:text-foreground'
+                    }`}
+                >
+                  Daily
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setGranularity('monthly')}
+                  className={`px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer active:scale-95 ${granularity === 'monthly'
+                      ? 'bg-primary text-primary-foreground shadow-none'
+                      : 'text-muted-foreground hover:text-foreground'
+                    }`}
+                >
+                  Monthly
+                </button>
+              </div>
+
+              {/* Area vs Bar */}
+              <div className="flex items-center p-1 rounded-full bg-muted/40 border border-border text-xs">
+                <button
+                  type="button"
+                  onClick={() => setChartType('area')}
+                  title="Trend Line / Area"
+              className={`px-2.5 py-1 rounded-full flex items-center gap-1 text-xs font-semibold transition-all cursor-pointer active:scale-95 ${chartType === 'area'
+                      ? 'bg-primary text-primary-foreground shadow-none'
+                      : 'text-muted-foreground hover:text-foreground'
+                    }`}
             >
-              {opt.label}
-            </button>
-          ))}
-        </div>
-
-        {/* Granularity & Chart Style Toggles */}
-        <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
-          {/* Daily vs Monthly */}
-          <div className="flex items-center p-0.5 rounded-lg bg-muted border border-border text-xs">
-            <button
-              type="button"
-              onClick={() => setGranularity('daily')}
-              className={`px-2.5 py-1 rounded-md text-xs font-medium transition-all cursor-pointer ${
-                granularity === 'daily'
-                  ? 'bg-card text-foreground shadow-xs font-semibold'
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              Daily
-            </button>
-            <button
-              type="button"
-              onClick={() => setGranularity('monthly')}
-              className={`px-2.5 py-1 rounded-md text-xs font-medium transition-all cursor-pointer ${
-                granularity === 'monthly'
-                  ? 'bg-card text-foreground shadow-xs font-semibold'
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              Monthly
-            </button>
-          </div>
-
-          {/* Area vs Bar */}
-          <div className="flex items-center p-0.5 rounded-lg bg-muted border border-border text-xs">
-            <button
-              type="button"
-              onClick={() => setChartType('area')}
-              title="Trend Line / Area"
-              className={`px-2 py-1 rounded-md flex items-center gap-1 text-xs font-medium transition-all cursor-pointer ${
-                chartType === 'area'
-                  ? 'bg-card text-foreground shadow-xs'
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              <TrendingUp size={13} />
-              <span className="hidden sm:inline">Trend</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setChartType('bar')}
-              title="Bar Chart"
-              className={`px-2 py-1 rounded-md flex items-center gap-1 text-xs font-medium transition-all cursor-pointer ${
-                chartType === 'bar'
-                  ? 'bg-card text-foreground shadow-xs'
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              <BarChart2 size={13} />
-              <span className="hidden sm:inline">Bars</span>
-            </button>
+                <TrendingUp size={13} />
+                <span className="hidden sm:inline">Trend</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setChartType('bar')}
+                title="Bar Chart"
+                className={`px-2.5 py-1 rounded-full flex items-center gap-1 text-xs font-semibold transition-all cursor-pointer active:scale-95 ${chartType === 'bar'
+                    ? 'bg-primary text-primary-foreground shadow-none'
+                    : 'text-muted-foreground hover:text-foreground'
+                  }`}
+              >
+                <BarChart2 size={13} />
+                <span className="hidden sm:inline">Bars</span>
+              </button>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* KPI Cards for the selected period */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
-        <div className="bg-card border border-border rounded-xl p-4 shadow-xs">
-          <div className="flex items-center justify-between text-muted-foreground mb-1.5">
-            <span className="text-xs uppercase font-medium tracking-wider">Total Period Spend</span>
-            <IndianRupee size={15} className="text-primary" />
-          </div>
-          <p className="text-xl sm:text-2xl font-bold text-foreground">
-            ₹{stats.total.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-          </p>
-          <p className="text-[11px] text-muted-foreground mt-1">
-            Across {stats.count} {stats.count === 1 ? 'transaction' : 'transactions'}
-          </p>
-        </div>
-
-        <div className="bg-card border border-border rounded-xl p-4 shadow-xs">
-          <div className="flex items-center justify-between text-muted-foreground mb-1.5">
-            <span className="text-xs uppercase font-medium tracking-wider">Daily Average Spend</span>
-            <Zap size={15} className="text-amber-500" />
-          </div>
-          <p className="text-xl sm:text-2xl font-bold text-foreground">
-            ₹{stats.dailyAvg.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-          </p>
-          <p className="text-[11px] text-muted-foreground mt-1">
-            Avg per active spending day
-          </p>
-        </div>
-
-        <div className="bg-card border border-border rounded-xl p-4 shadow-xs">
-          <div className="flex items-center justify-between text-muted-foreground mb-1.5">
-            <span className="text-xs uppercase font-medium tracking-wider">Peak Expense Day</span>
-            <TrendingUp size={15} className="text-emerald-500" />
-          </div>
-          <p className="text-xl sm:text-2xl font-bold text-foreground">
-            ₹{stats.peakDay.amount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-          </p>
-          <p className="text-[11px] text-muted-foreground mt-1 truncate">
-            {stats.peakDay.label !== '—' ? `On ${stats.peakDay.label}` : 'No data recorded'}
-          </p>
-        </div>
-
-        <div className="bg-card border border-border rounded-xl p-4 shadow-xs">
-          <div className="flex items-center justify-between text-muted-foreground mb-1.5">
-            <span className="text-xs uppercase font-medium tracking-wider">Single Largest Spend</span>
-            <ArrowUpRight size={15} className="text-indigo-400" />
-          </div>
-          <p className="text-xl sm:text-2xl font-bold text-foreground">
-            ₹{stats.largestItem.amount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-          </p>
-          <p className="text-[11px] text-muted-foreground mt-1 truncate" title={stats.largestItem.title}>
-            {stats.largestItem.title}
-          </p>
-        </div>
-      </div>
-
-      {/* Main Chart Card */}
-      <div className="bg-card border border-border rounded-xl p-4 sm:p-5 shadow-xs">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 mb-3 border-b border-border/70">
-          <div>
-            <h3 className="font-semibold text-base text-foreground flex items-center gap-2">
-              <TrendingUp size={16} className="text-primary" />
-              Expense {granularity === 'daily' ? 'Daily' : 'Monthly'} Trend
-            </h3>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              Spending trajectory over time with interactive point inspection
+        {/* KPI Cards for the selected period */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+          <div className="bg-card border border-border rounded-[18px] p-5 shadow-none">
+            <div className="flex items-center justify-between text-muted-foreground mb-1.5">
+              <span className="text-xs uppercase font-semibold tracking-wider">Total Period Spend</span>
+              <IndianRupee size={15} className="text-primary" />
+            </div>
+            <p className="text-xl sm:text-2xl font-bold text-foreground font-mono">
+              ₹{stats.total.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            </p>
+            <p className="text-[11px] text-muted-foreground mt-1">
+              Across {stats.count} {stats.count === 1 ? 'transaction' : 'transactions'}
             </p>
           </div>
-          <div className="text-xs text-muted-foreground">
-            Total Points: <span className="font-mono font-semibold text-foreground">{chartData.length}</span>
+
+          <div className="bg-card border border-border rounded-[18px] p-5 shadow-none">
+            <div className="flex items-center justify-between text-muted-foreground mb-1.5">
+              <span className="text-xs uppercase font-semibold tracking-wider">Daily Average Spend</span>
+              <Zap size={15} className="text-amber-500" />
+            </div>
+            <p className="text-xl sm:text-2xl font-bold text-foreground font-mono">
+              ₹{stats.dailyAvg.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            </p>
+            <p className="text-[11px] text-muted-foreground mt-1">
+              Avg per active spending day
+            </p>
+          </div>
+
+          <div className="bg-card border border-border rounded-[18px] p-5 shadow-none">
+            <div className="flex items-center justify-between text-muted-foreground mb-1.5">
+              <span className="text-xs uppercase font-semibold tracking-wider">Peak Expense Day</span>
+              <TrendingUp size={15} className="text-emerald-500" />
+            </div>
+            <p className="text-xl sm:text-2xl font-bold text-foreground font-mono">
+              ₹{stats.peakDay.amount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            </p>
+            <p className="text-[11px] text-muted-foreground mt-1 truncate">
+              {stats.peakDay.label !== '—' ? `On ${stats.peakDay.label}` : 'No data recorded'}
+            </p>
+          </div>
+
+          <div className="bg-card border border-border rounded-xl p-4 shadow-xs">
+            <div className="flex items-center justify-between text-muted-foreground mb-1.5">
+              <span className="text-xs uppercase font-medium tracking-wider">Single Largest Spend</span>
+              <ArrowUpRight size={15} className="text-indigo-400" />
+            </div>
+            <p className="text-xl sm:text-2xl font-bold text-foreground">
+              ₹{stats.largestItem.amount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            </p>
+            <p className="text-[11px] text-muted-foreground mt-1 truncate" title={stats.largestItem.title}>
+              {stats.largestItem.title}
+            </p>
           </div>
         </div>
 
-        {chartData.length === 0 ? (
-          <div className="py-20 text-center text-muted-foreground">
-            <Calendar size={32} className="mx-auto mb-2 opacity-40" />
-            <p className="text-sm font-medium">No expenses recorded for this timeframe.</p>
-            <p className="text-xs text-muted-foreground/80 mt-1">Try selecting a wider date range or &apos;All Time&apos;.</p>
-          </div>
-        ) : (
-          <div className="h-[280px] sm:h-[340px] md:h-[380px] w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              {chartType === 'area' ? (
-                <AreaChart
-                  data={chartData}
-                  margin={{ top: 20, right: 20, left: 0, bottom: 10 }}
-                >
-                  <defs>
-                    <linearGradient id="expenseTrendGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor={primaryStroke} stopOpacity={isDark ? 0.35 : 0.25} />
-                      <stop offset="95%" stopColor={primaryStroke} stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-
-                  <CartesianGrid strokeDasharray="3 3" stroke={gridStroke} vertical={false} />
-
-                  <XAxis
-                    dataKey="label"
-                    stroke={axisColor}
-                    tick={{ fill: axisColor, fontSize: 11 }}
-                    tickLine={{ stroke: gridStroke }}
-                    axisLine={{ stroke: gridStroke }}
-                  />
-
-                  <YAxis
-                    stroke={axisColor}
-                    tick={{ fill: axisColor, fontSize: 11 }}
-                    tickLine={{ stroke: gridStroke }}
-                    axisLine={{ stroke: gridStroke }}
-                    tickFormatter={(val) => {
-                      if (val >= 100000) return `₹${(val / 100000).toFixed(1)}L`;
-                      if (val >= 1000) return `₹${(val / 1000).toFixed(0)}k`;
-                      return `₹${val}`;
-                    }}
-                  />
-
-                  <Tooltip content={<CustomTooltip />} />
-
-                  <Area
-                    type="monotone"
-                    dataKey="amount"
-                    stroke={primaryStroke}
-                    strokeWidth={2.5}
-                    fillOpacity={1}
-                    fill="url(#expenseTrendGradient)"
-                    activeDot={{ r: 5, fill: primaryStroke, stroke: '#ffffff', strokeWidth: 2 }}
-                  />
-                </AreaChart>
-              ) : (
-                <BarChart
-                  data={chartData}
-                  margin={{ top: 20, right: 20, left: 0, bottom: 10 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" stroke={gridStroke} vertical={false} />
-
-                  <XAxis
-                    dataKey="label"
-                    stroke={axisColor}
-                    tick={{ fill: axisColor, fontSize: 11 }}
-                    tickLine={{ stroke: gridStroke }}
-                    axisLine={{ stroke: gridStroke }}
-                  />
-
-                  <YAxis
-                    stroke={axisColor}
-                    tick={{ fill: axisColor, fontSize: 11 }}
-                    tickLine={{ stroke: gridStroke }}
-                    axisLine={{ stroke: gridStroke }}
-                    tickFormatter={(val) => {
-                      if (val >= 100000) return `₹${(val / 100000).toFixed(1)}L`;
-                      if (val >= 1000) return `₹${(val / 1000).toFixed(0)}k`;
-                      return `₹${val}`;
-                    }}
-                  />
-
-                  <Tooltip content={<CustomTooltip />} />
-
-                  <Bar
-                    dataKey="amount"
-                    fill={primaryStroke}
-                    radius={[4, 4, 0, 0]}
-                    maxBarSize={48}
-                  />
-                </BarChart>
-              )}
-            </ResponsiveContainer>
-          </div>
-        )}
-      </div>
-
-      {/* Secondary Breakdowns: Category & Payment Method */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* Category Breakdown */}
-        <div className="bg-card border border-border rounded-xl p-4 sm:p-5 shadow-xs flex flex-col">
-          <div className="flex items-center justify-between pb-3 mb-3 border-b border-border/70">
-            <h4 className="font-semibold text-sm text-foreground flex items-center gap-2">
-              <PieIcon size={15} className="text-amber-500" />
-              Category Breakdown
-            </h4>
-            <span className="text-xs text-muted-foreground">{categoryStats.length} categories</span>
+        {/* Main Chart Card */}
+        <div className="bg-card border border-border rounded-[18px] p-5 sm:p-6 shadow-none">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 mb-3 border-b border-border/70">
+            <div>
+              <h3 className="font-semibold text-base text-foreground flex items-center gap-2">
+                <TrendingUp size={16} className="text-primary" />
+                Expense {granularity === 'daily' ? 'Daily' : 'Monthly'} Trend
+              </h3>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Spending trajectory over time with interactive point inspection
+              </p>
+            </div>
+            <div className="text-xs text-muted-foreground">
+              Total Points: <span className="font-mono font-semibold text-foreground">{chartData.length}</span>
+            </div>
           </div>
 
-          {categoryStats.length === 0 ? (
-            <div className="py-8 text-center text-xs text-muted-foreground">No category data available</div>
+          {chartData.length === 0 ? (
+            <div className="py-20 text-center text-muted-foreground">
+              <Calendar size={32} className="mx-auto mb-2 opacity-40" />
+              <p className="text-sm font-semibold">No expenses recorded for this timeframe.</p>
+              <p className="text-xs text-muted-foreground/80 mt-1">Try selecting a wider date range or &apos;All Time&apos;.</p>
+            </div>
           ) : (
-            <div className="space-y-3 overflow-y-auto max-h-[320px] pr-1">
-              {categoryStats.map((cat) => (
-                <div key={cat.name} className="space-y-1">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="font-medium text-foreground truncate max-w-[60%]">{cat.name}</span>
-                    <div className="flex items-center gap-2 font-mono">
-                      <span className="text-muted-foreground text-[11px]">({cat.count})</span>
-                      <span className="font-semibold text-foreground">
-                        ₹{cat.amount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                      </span>
-                      <span className="text-[11px] text-muted-foreground w-11 text-right">
-                        {cat.pct.toFixed(1)}%
-                      </span>
-                    </div>
-                  </div>
-                  <div className="w-full bg-muted/60 h-2 rounded-full overflow-hidden">
-                    <div
-                      className="bg-primary h-full rounded-full transition-all duration-300"
-                      style={{ width: `${Math.min(cat.pct, 100)}%` }}
+            <div className="h-[280px] sm:h-[340px] md:h-[380px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                {chartType === 'area' ? (
+                  <AreaChart
+                    data={chartData}
+                    margin={{ top: 20, right: 20, left: 0, bottom: 10 }}
+                  >
+                    <defs>
+                      <linearGradient id="expenseTrendGradient" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#0066cc" stopOpacity={isDark ? 0.35 : 0.25} />
+                        <stop offset="95%" stopColor="#0066cc" stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+
+                    <CartesianGrid strokeDasharray="3 3" stroke={gridStroke} vertical={false} />
+
+                    <XAxis
+                      dataKey="label"
+                      stroke={axisColor}
+                      tick={{ fill: axisColor, fontSize: 11 }}
+                      tickLine={{ stroke: gridStroke }}
+                      axisLine={{ stroke: gridStroke }}
                     />
-                  </div>
-                </div>
-              ))}
+
+                    <YAxis
+                      stroke={axisColor}
+                      tick={{ fill: axisColor, fontSize: 11 }}
+                      tickLine={{ stroke: gridStroke }}
+                      axisLine={{ stroke: gridStroke }}
+                      tickFormatter={(val) => {
+                        if (val >= 100000) return `₹${(val / 100000).toFixed(1)}L`;
+                        if (val >= 1000) return `₹${(val / 1000).toFixed(0)}k`;
+                        return `₹${val}`;
+                      }}
+                    />
+
+                    <Tooltip content={<CustomTooltip />} />
+
+                    <Area
+                      type="monotone"
+                      dataKey="amount"
+                      stroke="#0066cc"
+                      strokeWidth={2.5}
+                      fillOpacity={1}
+                      fill="url(#expenseTrendGradient)"
+                      activeDot={{ r: 5, fill: '#0066cc', stroke: '#ffffff', strokeWidth: 2 }}
+                    />
+                  </AreaChart>
+                ) : (
+                  <BarChart
+                    data={chartData}
+                    margin={{ top: 20, right: 20, left: 0, bottom: 10 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" stroke={gridStroke} vertical={false} />
+
+                    <XAxis
+                      dataKey="label"
+                      stroke={axisColor}
+                      tick={{ fill: axisColor, fontSize: 11 }}
+                      tickLine={{ stroke: gridStroke }}
+                      axisLine={{ stroke: gridStroke }}
+                    />
+
+                    <YAxis
+                      stroke={axisColor}
+                      tick={{ fill: axisColor, fontSize: 11 }}
+                      tickLine={{ stroke: gridStroke }}
+                      axisLine={{ stroke: gridStroke }}
+                      tickFormatter={(val) => {
+                        if (val >= 100000) return `₹${(val / 100000).toFixed(1)}L`;
+                        if (val >= 1000) return `₹${(val / 1000).toFixed(0)}k`;
+                        return `₹${val}`;
+                      }}
+                    />
+
+                    <Tooltip content={<CustomTooltip />} />
+
+                    <Bar
+                      dataKey="amount"
+                      fill={primaryStroke}
+                      radius={[4, 4, 0, 0]}
+                      maxBarSize={48}
+                    />
+                  </BarChart>
+                )}
+              </ResponsiveContainer>
             </div>
           )}
         </div>
 
-        {/* Payment Method Breakdown */}
-        <div className="bg-card border border-border rounded-xl p-4 sm:p-5 shadow-xs flex flex-col">
-          <div className="flex items-center justify-between pb-3 mb-3 border-b border-border/70">
-            <h4 className="font-semibold text-sm text-foreground flex items-center gap-2">
-              <CreditCard size={15} className="text-blue-500" />
-              Payment Methods
-            </h4>
-            <span className="text-xs text-muted-foreground">{paymentStats.length} methods</span>
-          </div>
+        {/* Secondary Breakdowns: Category & Payment Method */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {/* Category Breakdown */}
+          <div className="bg-card border border-border rounded-[18px] p-5 sm:p-6 shadow-none flex flex-col">
+            <div className="flex items-center justify-between pb-3 mb-3 border-b border-border/70">
+              <h4 className="font-semibold text-sm text-foreground flex items-center gap-2">
+                <PieIcon size={15} className="text-amber-500" />
+                Category Breakdown
+              </h4>
+              <span className="text-xs text-muted-foreground">{categoryStats.length} categories</span>
+            </div>
 
-          {paymentStats.length === 0 ? (
-            <div className="py-8 text-center text-xs text-muted-foreground">No payment data available</div>
-          ) : (
-            <div className="space-y-3 overflow-y-auto max-h-[320px] pr-1">
-              {paymentStats.map((pm) => (
-                <div key={pm.name} className="space-y-1">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="font-medium text-foreground truncate max-w-[60%]">{pm.name}</span>
-                    <div className="flex items-center gap-2 font-mono">
-                      <span className="text-muted-foreground text-[11px]">({pm.count})</span>
-                      <span className="font-semibold text-foreground">
-                        ₹{pm.amount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                      </span>
-                      <span className="text-[11px] text-muted-foreground w-11 text-right">
-                        {pm.pct.toFixed(1)}%
-                      </span>
+            {categoryStats.length === 0 ? (
+              <div className="py-8 text-center text-xs text-muted-foreground">No category data available</div>
+            ) : (
+              <div className="space-y-3 overflow-y-auto max-h-[320px] pr-1">
+                {categoryStats.map((cat) => (
+                  <div key={cat.name} className="space-y-1">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="font-semibold text-foreground truncate max-w-[60%]">{cat.name}</span>
+                      <div className="flex items-center gap-2 font-mono">
+                        <span className="text-muted-foreground text-[11px]">({cat.count})</span>
+                        <span className="font-bold text-foreground">
+                          ₹{cat.amount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </span>
+                        <span className="text-[11px] text-muted-foreground w-11 text-right">
+                          {cat.pct.toFixed(1)}%
+                        </span>
+                      </div>
+                    </div>
+                    <div className="w-full bg-muted/60 h-2 rounded-full overflow-hidden">
+                      <div
+                        className="bg-primary h-full rounded-full transition-all duration-300"
+                        style={{ width: `${Math.min(cat.pct, 100)}%` }}
+                      />
                     </div>
                   </div>
-                  <div className="w-full bg-muted/60 h-2 rounded-full overflow-hidden">
-                    <div
-                      className="bg-emerald-500 h-full rounded-full transition-all duration-300"
-                      style={{ width: `${Math.min(pm.pct, 100)}%` }}
-                    />
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Payment Method Breakdown */}
+          <div className="bg-card border border-border rounded-[18px] p-5 sm:p-6 shadow-none flex flex-col">
+            <div className="flex items-center justify-between pb-3 mb-3 border-b border-border/70">
+              <h4 className="font-semibold text-sm text-foreground flex items-center gap-2">
+                <CreditCard size={15} className="text-blue-500" />
+                Payment Methods
+              </h4>
+              <span className="text-xs text-muted-foreground">{paymentStats.length} methods</span>
             </div>
-          )}
+
+            {paymentStats.length === 0 ? (
+              <div className="py-8 text-center text-xs text-muted-foreground">No payment data available</div>
+            ) : (
+              <div className="space-y-3 overflow-y-auto max-h-[320px] pr-1">
+                {paymentStats.map((pm) => (
+                  <div key={pm.name} className="space-y-1">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="font-semibold text-foreground truncate max-w-[60%]">{pm.name}</span>
+                      <div className="flex items-center gap-2 font-mono">
+                        <span className="text-muted-foreground text-[11px]">({pm.count})</span>
+                        <span className="font-bold text-foreground">
+                          ₹{pm.amount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </span>
+                        <span className="text-[11px] text-muted-foreground w-11 text-right">
+                          {pm.pct.toFixed(1)}%
+                        </span>
+                      </div>
+                    </div>
+                    <div className="w-full bg-muted/60 h-2 rounded-full overflow-hidden">
+                      <div
+                        className="bg-[#0066cc] h-full rounded-full transition-all duration-300"
+                        style={{ width: `${Math.min(pm.pct, 100)}%` }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
-    </div>
-  );
+      );
 }

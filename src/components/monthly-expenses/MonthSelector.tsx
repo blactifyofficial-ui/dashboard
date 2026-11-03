@@ -1,9 +1,9 @@
 'use client';
 
 import { MonthMeta } from './types';
-import { 
-  ChevronLeft, 
-  ChevronRight, 
+import {
+  ChevronLeft,
+  ChevronRight,
   Calendar
 } from 'lucide-react';
 
@@ -43,21 +43,21 @@ export default function MonthSelector({
   };
 
   return (
-    <div className="bg-card border border-border rounded-xl p-2.5 sm:p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+    <div className="bg-card border border-border rounded-[18px] p-2.5 sm:p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-none">
       {/* Active Month Navigator */}
       <div className="flex items-center gap-2 flex-shrink-0">
         <button
           onClick={handlePrev}
           disabled={activeIndex <= 0}
-          className="w-9 h-9 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground disabled:opacity-30 disabled:cursor-not-allowed border border-border transition-colors"
+          className="w-9 h-9 sm:w-8 sm:h-8 flex items-center justify-center rounded-full bg-muted/60 hover:bg-muted text-muted-foreground hover:text-foreground disabled:opacity-30 disabled:cursor-not-allowed border border-border transition-all active:scale-95"
           title="Previous Month"
         >
           <ChevronLeft size={16} />
         </button>
 
-        <div className="flex items-center gap-2 px-3 h-9 sm:h-8 bg-background border border-border rounded-lg">
+        <div className="flex items-center gap-2 px-3.5 h-9 sm:h-8 bg-background border border-border rounded-full">
           <Calendar size={13} className="text-muted-foreground" />
-          <span className="text-xs sm:text-sm font-semibold text-foreground">
+          <span className="text-xs sm:text-sm font-semibold text-foreground tracking-[-0.01em]">
             {months.find((m) => m.month === activeMonth)?.label || activeMonth}
           </span>
         </div>
@@ -65,7 +65,7 @@ export default function MonthSelector({
         <button
           onClick={handleNext}
           disabled={activeIndex >= months.length - 1}
-          className="w-9 h-9 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground disabled:opacity-30 disabled:cursor-not-allowed border border-border transition-colors"
+          className="w-9 h-9 sm:w-8 sm:h-8 flex items-center justify-center rounded-full bg-muted/60 hover:bg-muted text-muted-foreground hover:text-foreground disabled:opacity-30 disabled:cursor-not-allowed border border-border transition-all active:scale-95"
           title="Next Month"
         >
           <ChevronRight size={16} />
@@ -88,22 +88,21 @@ export default function MonthSelector({
                   onSelectMonth(m.month);
                 }
               }}
-              className={`flex-shrink-0 px-3 py-1.5 min-h-[34px] flex items-center justify-center rounded-lg text-xs font-medium transition-colors ${
-                isSelected
-                  ? 'bg-primary text-primary-foreground font-semibold shadow-xs'
-                  : isLocked
-                  ? 'bg-transparent text-muted-foreground hover:text-foreground border border-dashed border-border'
-                  : 'bg-background text-foreground hover:bg-muted border border-border'
-              }`}
-            >
-              <span>{m.label}</span>
-              {m.isCompleted && !isSelected && (
-                <span className="ml-1.5 inline-block w-1.5 h-1.5 rounded-full bg-emerald-500" />
-              )}
-            </button>
-          );
+                  className = {`flex items-center gap-1.5 px-3 py-1 text-[13px] font-normal rounded-full transition-all active:scale-95 whitespace-nowrap tracking-[-0.1px] ${isSelected
+              ? 'bg-primary text-primary-foreground font-semibold shadow-none'
+              : isLocked
+                ? 'bg-transparent text-muted-foreground hover:text-foreground border border-dashed border-border'
+                : 'bg-muted/40 text-foreground hover:bg-muted border border-border'
+                  }`}
+                >
+        <span>{m.label}</span>
+        {m.isCompleted && !isSelected && (
+          <span className="ml-1.5 inline-block w-1.5 h-1.5 rounded-full bg-emerald-500" />
+        )}
+      </button>
+      );
         })}
-      </div>
     </div>
+    </div >
   );
 }

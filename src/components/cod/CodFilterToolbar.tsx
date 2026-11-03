@@ -55,39 +55,39 @@ export default function CodFilterToolbar({
                 onTimeRangeChange(opt.id);
                 onMonthChange('');
               }}
-              className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors whitespace-nowrap cursor-pointer ${
-                timeRange === opt.id && !selectedMonth
-                  ? 'bg-primary text-primary-foreground shadow-xs font-semibold'
-                  : 'bg-muted text-muted-foreground hover:text-foreground hover:bg-muted/80'
-              }`}
+          className={`px-3.5 py-1.5 text-xs font-normal rounded-full transition-all whitespace-nowrap active:scale-95 ${timeRange === opt.id && !selectedMonth
+              ? 'bg-[#0066cc] text-white'
+              : 'bg-muted/70 text-muted-foreground hover:text-foreground hover:bg-muted border border-border/60'
+            }`}
             >
-              {opt.label}
-            </button>
+          {opt.label}
+        </button>
           ))}
 
-          {/* Month selector dropdown if available */}
-          {availableMonths.length > 0 && (
-            <div className="relative inline-flex items-center">
-              <Calendar size={13} className="absolute left-2.5 text-muted-foreground pointer-events-none" />
-              <select
-                aria-label="Filter by month"
-                value={selectedMonth}
-                onChange={(e) => {
-                  onMonthChange(e.target.value);
-                  if (e.target.value) {
-                    onTimeRangeChange(e.target.value);
-                  } else {
-                    onTimeRangeChange('all');
-                  }
-                }}
-                className={`pl-7 pr-3 py-1.5 text-xs font-medium rounded-lg border appearance-none transition-colors cursor-pointer ${
-                  selectedMonth
-                    ? 'bg-primary text-primary-foreground border-primary font-semibold'
-                    : 'bg-muted text-muted-foreground border-border hover:text-foreground'
-                }`}
-              >
-                <option value="" className="bg-popover text-popover-foreground">Select Month...</option>
-                {availableMonths.map((m) => {
+        {/* Month selector dropdown if available */}
+        {availableMonths.length > 0 && (
+          <div className="relative inline-flex items-center">
+            <Calendar size={13} className="absolute left-3 text-muted-foreground pointer-events-none" />
+            <select
+              aria-label="Filter by month"
+              value={selectedMonth}
+              onChange={(e) => {
+                onMonthChange(e.target.value);
+                if (e.target.value) {
+                  onTimeRangeChange(e.target.value);
+                } else {
+                  onTimeRangeChange('all');
+                }
+              }}
+              className={`pl-8 pr-4 py-1.5 text-[13px] font-normal rounded-full border appearance-none transition-all cursor-pointer active:scale-95 tracking-[-0.1px] ${selectedMonth
+                ? 'bg-[#0066cc] text-white border-transparent'
+                : 'bg-muted/70 text-muted-foreground border-border/60 hover:text-foreground'
+                }`
+              }
+            >
+              <option value="" className="bg-popover text-popover-foreground">Select Month...</option>
+              {
+                availableMonths.map((m) => {
                   const [year, monthNum] = m.split('-');
                   const date = new Date(parseInt(year, 10), parseInt(monthNum, 10) - 1, 1);
                   const label = date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
@@ -96,94 +96,93 @@ export default function CodFilterToolbar({
                       {label}
                     </option>
                   );
-                })}
-              </select>
-            </div>
-          )}
-        </div>
-
-        {/* Courier Filter */}
-        <div className="flex items-center gap-2">
-          {availableCouriers.length > 0 && (
-            <div className="relative">
-              <select
-                aria-label="Filter by courier"
-                value={courier}
-                onChange={(e) => onCourierChange(e.target.value)}
-                className="pl-3 pr-8 py-1.5 text-xs bg-muted border border-border rounded-lg text-foreground font-medium appearance-none hover:border-neutral-700 transition-colors cursor-pointer"
-              >
-                <option value="ALL">All Couriers</option>
-                {availableCouriers.map((c) => (
-                  <option key={c} value={c}>{c}</option>
-                ))}
-              </select>
-              <Truck size={12} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
-            </div>
-          )}
-        </div>
+                })
+              }
+            </select>
+          </div>
+        )}
       </div>
 
-      {/* View Tabs & Search Input */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-1 border-t border-border/60">
-        {/* Navigation Tabs */}
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => onTabChange('remittances')}
-            className={`flex items-center gap-2 px-3.5 py-2 text-xs sm:text-sm font-semibold rounded-lg transition-colors cursor-pointer ${
-              activeTab === 'remittances'
-                ? 'bg-card text-foreground border border-border shadow-xs'
-                : 'text-muted-foreground hover:text-foreground hover:bg-muted'
-            }`}
-          >
-            <HandCoins size={15} className={activeTab === 'remittances' ? 'text-amber-400' : 'text-muted-foreground'} />
-            <span>Remittance Ledger</span>
-            <span className="px-1.5 py-0.2 rounded-md text-[11px] font-mono bg-muted text-foreground border border-border">
-              {remittanceCount}
-            </span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => onTabChange('orders')}
-            className={`flex items-center gap-2 px-3.5 py-2 text-xs sm:text-sm font-semibold rounded-lg transition-colors cursor-pointer ${
-              activeTab === 'orders'
-                ? 'bg-card text-foreground border border-border shadow-xs'
-                : 'text-muted-foreground hover:text-foreground hover:bg-muted'
-            }`}
-          >
-            <Package size={15} className={activeTab === 'orders' ? 'text-primary' : 'text-muted-foreground'} />
-            <span>COD Orders from Store</span>
-            <span className="px-1.5 py-0.2 rounded-md text-[11px] font-mono bg-muted text-foreground border border-border">
-              {ordersCount}
-            </span>
-          </button>
-        </div>
-
-        {/* Search Input */}
-        <div className="relative w-full sm:w-72">
-          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
-          <input
-            type="text"
-            placeholder={
-              activeTab === 'remittances'
-                ? 'Search ref, notes, courier...'
-                : 'Search order #, customer, tracking...'
-            }
-            value={search}
-            onChange={(e) => onSearchChange(e.target.value)}
-            className="w-full pl-9 pr-8 py-1.5 text-xs sm:text-sm bg-muted/60 border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-hidden focus:border-neutral-500 focus:bg-muted transition-colors"
-          />
-          {search && (
-            <button
-              onClick={() => onSearchChange('')}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground cursor-pointer"
+      {/* Courier Filter */}
+      <div className="flex items-center gap-2">
+        {availableCouriers.length > 0 && (
+          <div className="relative">
+            <select
+              aria-label="Filter by courier"
+              value={courier}
+              onChange={(e) => onCourierChange(e.target.value)}
+              className="pl-4 pr-8 py-1.5 text-[13px] bg-muted/70 border border-border/60 rounded-full text-foreground font-normal appearance-none hover:border-border transition-all cursor-pointer active:scale-95 tracking-[-0.1px]"
             >
-              <X size={13} />
-            </button>
-          )}
-        </div>
+              <option value="ALL">All Couriers</option>
+              {availableCouriers.map((c) => (
+                <option key={c} value={c}>{c}</option>
+              ))}
+            </select>
+            <Truck size={12} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+          </div>
+        )}
       </div>
-    </div>
+    </div >
+
+    {/* View Tabs & Search Input */ }
+  < div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-1 border-t border-border/60" >
+    {/* Navigation Tabs */}
+    <div className="flex items-center gap-2 p-1 rounded-full bg-muted border border-border w-fit">
+      <button
+        type="button"
+        onClick={() => onTabChange('remittances')}
+      className={`flex items-center gap-2 px-4 py-1.5 text-[13px] sm:text-[14px] font-normal rounded-full transition-all cursor-pointer active:scale-95 tracking-[-0.1px] ${activeTab === 'remittances'
+          ? 'bg-card text-foreground border border-border font-semibold'
+          : 'text-muted-foreground hover:text-foreground'
+        }`}
+          >
+      <HandCoins size={15} className={activeTab === 'remittances' ? 'text-[#0066cc] dark:text-[#2997ff]' : 'text-muted-foreground'} />
+      <span>Remittance Ledger</span>
+      <span className="px-2 py-0.2 rounded-full text-[11px] font-mono bg-muted text-foreground border border-border">
+        {remittanceCount}
+      </span>
+    </button>
+
+    <button
+      type="button"
+      onClick={() => onTabChange('orders')}
+      className={`flex items-center gap-2 px-4 py-1.5 text-[13px] sm:text-[14px] font-normal rounded-full transition-all cursor-pointer active:scale-95 tracking-[-0.1px] ${activeTab === 'orders'
+        ? 'bg-card text-foreground border border-border font-semibold'
+        : 'text-muted-foreground hover:text-foreground'
+        }`}
+    >
+      <Package size={15} className={activeTab === 'orders' ? 'text-[#0066cc] dark:text-[#2997ff]' : 'text-muted-foreground'} />
+      <span>COD Orders from Store</span>
+      <span className="px-2 py-0.2 rounded-full text-[11px] font-mono bg-muted text-foreground border border-border">
+        {ordersCount}
+      </span>
+    </button>
+  </div>
+
+  {/* Search Input */ }
+  <div className="relative w-full sm:w-72">
+    <Search size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+    <input
+      type="text"
+      placeholder={
+        activeTab === 'remittances'
+          ? 'Search ref, notes, courier...'
+          : 'Search order #, customer, tracking...'
+      }
+      value={search}
+      onChange={(e) => onSearchChange(e.target.value)}
+      className="w-full h-[40px] pl-10 pr-9 py-2 text-[14px] bg-card border border-border rounded-full text-foreground placeholder:text-muted-foreground/60 focus:outline-2 focus:outline-[#0071e3] focus:outline-offset-2 transition-all tracking-[-0.224px]"
+    />
+    {search && (
+      <button
+        onClick={() => onSearchChange('')}
+        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground cursor-pointer active:scale-95"
+      >
+        <X size={13} />
+      </button>
+    )}
+  </div>
+      </div >
+    </div >
   );
 }

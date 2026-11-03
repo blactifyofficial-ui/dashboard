@@ -49,7 +49,7 @@ export function DropdownMenuTrigger({
   return (
     <button
       type="button"
-      className={className}
+      className={cn("active:scale-95 transition-transform", className)}
       onClick={() => ctx.setOpen(!ctx.open)}
       aria-expanded={ctx.open}
       {...props}
@@ -82,7 +82,7 @@ export function DropdownMenuContent({
     <div
       role="menu"
       className={cn(
-        "absolute z-50 mt-1 min-w-[180px] rounded-lg border border-border bg-card p-1 text-foreground shadow-lg animate-in fade-in zoom-in-95 duration-100",
+        "absolute z-50 mt-1.5 min-w-[200px] rounded-[14px] border border-border bg-card/95 backdrop-blur-md p-1.5 text-foreground animate-in fade-in zoom-in-95 duration-100",
         alignStyles[align],
         className
       )}
@@ -117,8 +117,8 @@ export function DropdownMenuItem({
         ctx?.setOpen(false);
       }}
       className={cn(
-        "relative flex cursor-pointer select-none items-center gap-2 rounded-md px-2.5 py-1.5 text-xs font-medium outline-none transition-colors hover:bg-muted text-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
-        disabled && "opacity-50 pointer-events-none",
+        "relative flex cursor-pointer select-none items-center gap-2 rounded-[8px] px-3 py-2 text-[13px] sm:text-[14px] tracking-[-0.224px] outline-none transition-colors hover:bg-muted text-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-40",
+        disabled && "opacity-40 pointer-events-none",
         className
       )}
       {...props}
@@ -135,7 +135,7 @@ export function DropdownMenuSeparator({
   return (
     <div
       role="separator"
-      className={cn("-mx-1 my-1 h-px bg-border/60", className)}
+      className={cn("-mx-1 my-1.5 h-px bg-border/60", className)}
       {...props}
     />
   );
@@ -148,7 +148,7 @@ export function DropdownMenuLabel({
 }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={cn("px-2.5 py-1 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider", className)}
+      className={cn("px-3 py-1 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider", className)}
       {...props}
     >
       {children}

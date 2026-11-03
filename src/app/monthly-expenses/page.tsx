@@ -1,18 +1,18 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { 
-  Layers, 
+import {
+  Layers,
   Plus
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import LoadingSpinner from '@/components/LoadingSpinner';
 
-import { 
-  MonthlyExpenseEntry, 
-  MonthlyExpenseTemplate, 
-  MonthMeta, 
-  PaymentMethod, 
+import {
+  MonthlyExpenseEntry,
+  MonthlyExpenseTemplate,
+  MonthMeta,
+  PaymentMethod,
   MonthlyStats
 } from '@/components/monthly-expenses/types';
 
@@ -308,8 +308,8 @@ export default function MonthlyExpensesPage() {
       {/* Top Header */}
       <div className="flex-none flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-foreground">Monthly Expenses</h1>
-          <p className="text-xs sm:text-sm text-muted-foreground">Manage recurring bills, salaries, rent, and overheads</p>
+          <h1 className="text-[26px] sm:text-[34px] font-semibold tracking-[-0.374px] text-foreground leading-[1.2]">Monthly Expenses</h1>
+          <p className="text-[14px] sm:text-[15px] text-muted-foreground tracking-[-0.224px]">Manage recurring bills, salaries, rent, and overheads</p>
         </div>
 
         <div className="flex items-center gap-2.5 sm:gap-3 w-full sm:w-auto">

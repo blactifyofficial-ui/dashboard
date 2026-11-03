@@ -213,17 +213,17 @@ export default function ExpenseDetailPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3 sm:gap-4">
-          <Button variant="outline" size="icon" asChild className="h-9 w-9 shrink-0">
-            <Link href="/expenses" title="Back to Expenses">
-              <ArrowLeft size={16} />
-            </Link>
-          </Button>
-          <div className="min-w-0">
-            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">{isEditing ? 'Edit Expense' : expense.title}</h1>
-            <p className="text-xs sm:text-sm text-muted-foreground truncate">
-              {isEditing ? 'Modify expense details below' : `Created ${new Date(expense.createdAt).toLocaleDateString()}`}
-            </p>
-          </div>
+            <Button variant="outline" size="icon" asChild className="h-10 w-10 rounded-full shrink-0">
+              <Link href="/expenses" title="Back to Expenses">
+                <ArrowLeft size={16} />
+              </Link>
+            </Button>
+            <div className="min-w-0">
+                <h1 className="text-2xl sm:text-[34px] font-bold tracking-tight text-foreground">{isEditing ? 'Edit Expense' : expense.title}</h1>
+                <p className="text-xs sm:text-sm text-muted-foreground truncate mt-0.5">
+                  {isEditing ? 'Modify expense details below' : `Created ${new Date(expense.createdAt).toLocaleDateString()}`}
+                </p>
+            </div>
         </div>
 
         {!isEditing && (
@@ -233,6 +233,7 @@ export default function ExpenseDetailPage() {
                 variant="outline"
                 size="sm"
                 onClick={() => setIsEditing(true)}
+                className="rounded-full"
               >
                 <Pencil size={14} /> Edit
               </Button>
@@ -242,6 +243,7 @@ export default function ExpenseDetailPage() {
                 variant="destructive"
                 size="sm"
                 onClick={() => setShowDeleteModal(true)}
+                className="rounded-full"
               >
                 <Trash2 size={14} /> Delete
               </Button>
@@ -415,49 +417,48 @@ export default function ExpenseDetailPage() {
               <CardTitle className="text-base font-semibold">Activity Timeline</CardTitle>
             </CardHeader>
             <CardContent className="pt-4">
-            {expense.activities.length === 0 ? (
-              <p className="text-muted-foreground text-xs">No activity recorded.</p>
-            ) : (
-              <div className="space-y-4">
-                {expense.activities.map((activity) => (
-                  <div key={activity.id} className="flex gap-3">
-                    <div className="flex flex-col items-center">
-                      <div className={`w-2 h-2 rounded-full mt-1.5 ${
-                        activity.activityType === 'CREATED' ? 'bg-emerald-500' :
-                        activity.activityType === 'DELETED' ? 'bg-rose-500' :
-                        activity.activityType === 'UPDATED' ? 'bg-amber-500' :
-                        'bg-muted-foreground'
-                      }`} />
-                      <div className="w-px h-full bg-border mt-2" />
-                    </div>
-                    <div className="flex-1 pb-3">
-                      <p className="text-xs text-muted-foreground mb-0.5">
-                        {new Date(activity.createdAt).toLocaleString()} • {activity.actorName || 'System'}
-                      </p>
-                      {activity.activityType === 'CREATED' && (
-                        <p className="text-sm text-foreground">Expense created — ₹{parseFloat(activity.newValue || '0').toFixed(2)}</p>
-                      )}
-                      {activity.activityType === 'UPDATED' && (
-                        <p className="text-sm text-foreground">
-                          Expense updated
-                          {activity.oldValue && activity.newValue && activity.oldValue !== activity.newValue && (
-                            <span className="text-muted-foreground"> — amount changed from ₹{parseFloat(activity.oldValue).toFixed(2)} to ₹{parseFloat(activity.newValue).toFixed(2)}</span>
-                          )}
+              {expense.activities.length === 0 ? (
+                <p className="text-muted-foreground text-xs">No activity recorded.</p>
+              ) : (
+                <div className="space-y-4">
+                  {expense.activities.map((activity) => (
+                    <div key={activity.id} className="flex gap-3">
+                      <div className="flex flex-col items-center">
+                        <div className={`w-2 h-2 rounded-full mt-1.5 ${activity.activityType === 'CREATED' ? 'bg-emerald-500' :
+                            activity.activityType === 'DELETED' ? 'bg-rose-500' :
+                              activity.activityType === 'UPDATED' ? 'bg-amber-500' :
+                                'bg-muted-foreground'
+                          }`} />
+                        <div className="w-px h-full bg-border mt-2" />
+                      </div>
+                      <div className="flex-1 pb-3">
+                        <p className="text-xs text-muted-foreground mb-0.5">
+                          {new Date(activity.createdAt).toLocaleString()} • {activity.actorName || 'System'}
                         </p>
-                      )}
-                      {activity.activityType === 'DELETED' && (
-                        <p className="text-sm text-rose-500">Expense deleted</p>
-                      )}
-                      {activity.activityType === 'REMARK_ADDED' && activity.remark && (
-                        <div className="mt-1 bg-muted p-2.5 rounded-lg border border-border text-foreground text-xs">
-                          &quot;{activity.remark}&quot;
-                        </div>
-                      )}
+                        {activity.activityType === 'CREATED' && (
+                          <p className="text-sm text-foreground">Expense created — ₹{parseFloat(activity.newValue || '0').toFixed(2)}</p>
+                        )}
+                        {activity.activityType === 'UPDATED' && (
+                          <p className="text-sm text-foreground">
+                            Expense updated
+                            {activity.oldValue && activity.newValue && activity.oldValue !== activity.newValue && (
+                              <span className="text-muted-foreground"> — amount changed from ₹{parseFloat(activity.oldValue).toFixed(2)} to ₹{parseFloat(activity.newValue).toFixed(2)}</span>
+                            )}
+                          </p>
+                        )}
+                        {activity.activityType === 'DELETED' && (
+                          <p className="text-sm text-rose-500">Expense deleted</p>
+                        )}
+                        {activity.activityType === 'REMARK_ADDED' && activity.remark && (
+                          <div className="mt-1 bg-muted p-2.5 rounded-lg border border-border text-foreground text-xs">
+                            &quot;{activity.remark}&quot;
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-            )}
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>

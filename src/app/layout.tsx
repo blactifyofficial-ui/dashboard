@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Poppins } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import { ErpShell } from "@/components/shell/ErpShell";
 import SignOutLink from "@/components/SignOutLink";
@@ -12,10 +12,10 @@ import AutoSyncManager from "@/components/AutoSyncManager";
 import { AuthProvider } from "@/context/AuthContext";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 
-const poppins = Poppins({
-  variable: "--font-poppins",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -92,7 +92,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
   if (isNotAllowed) {
     return (
-      <html lang="en" suppressHydrationWarning className={`${poppins.variable} dark h-full antialiased`}>
+      <html lang="en" suppressHydrationWarning className={`${inter.variable} dark h-full antialiased`}>
         <body className="min-h-full bg-background text-foreground flex flex-col items-center justify-center font-sans gap-4">
           <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
             <div className="text-xl font-medium">You are not authorized to view this dashboard.</div>
@@ -108,7 +108,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${poppins.variable} dark h-full antialiased`}
+      className={`${inter.variable} dark h-full antialiased`}
     >
       <body className="h-[100dvh] overflow-hidden bg-background text-foreground flex flex-col md:flex-row relative selection:bg-foreground/20 font-sans transition-colors duration-150">
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>

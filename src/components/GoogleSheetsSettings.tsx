@@ -1,12 +1,12 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { 
-  FileSpreadsheet, 
-  CheckCircle2, 
-  XCircle, 
-  RefreshCw, 
-  ExternalLink, 
+import {
+  FileSpreadsheet,
+  CheckCircle2,
+  XCircle,
+  RefreshCw,
+  ExternalLink,
   AlertCircle,
   Database,
   RotateCw
@@ -160,164 +160,164 @@ export default function GoogleSheetsSettings() {
   };
 
   return (
-    <div className="bg-card p-4 sm:p-6 rounded-xl border border-border shadow-xs text-card-foreground space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-4">
-        <div className="flex items-center gap-3">
-          <div className="p-2.5 bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 rounded-lg border border-emerald-500/30">
-            <FileSpreadsheet className="w-5 h-5" />
-          </div>
-          <div>
-            <h2 className="text-base sm:text-lg font-semibold text-foreground">Google Sheets Backup &amp; Mirror</h2>
-            <p className="text-xs text-muted-foreground">Automatic real-time synchronization from PostgreSQL</p>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2">
-          {loading ? (
-            <Badge variant="outline" className="gap-1.5 px-2.5 py-0.5 text-xs font-medium bg-muted text-muted-foreground border-border">
-              <RefreshCw className="w-3.5 h-3.5 animate-spin" /> Checking...
-            </Badge>
-          ) : status?.connected ? (
-            <Badge variant="outline" className="gap-1.5 px-2.5 py-0.5 text-xs font-medium bg-emerald-500/15 text-emerald-600 dark:text-emerald-300 border-emerald-500/30">
-              <CheckCircle2 className="w-3.5 h-3.5" /> Connected
-            </Badge>
-          ) : (
-            <Badge variant="outline" className="gap-1.5 px-2.5 py-0.5 text-xs font-medium bg-rose-500/15 text-rose-600 dark:text-rose-300 border-rose-500/30">
-              <XCircle className="w-3.5 h-3.5" /> Not Connected
-            </Badge>
-          )}
-        </div>
-      </div>
-
-      {/* Connection & Configuration Info */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-        <div className="bg-muted/40 p-3.5 rounded-lg border border-border space-y-1">
-          <span className="text-xs text-muted-foreground font-medium">Spreadsheet Destination</span>
-          <div className="flex items-center gap-1.5">
-            <span className="text-xs font-mono text-foreground truncate" title={spreadsheetId}>
-              {spreadsheetId.slice(0, 12)}...
-            </span>
-            <a 
-              href={spreadsheetUrl} 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="text-emerald-600 dark:text-emerald-400 hover:opacity-80 transition-opacity p-1"
-              title="Open Google Spreadsheet in new tab"
-            >
-              <ExternalLink className="w-3.5 h-3.5" />
-            </a>
-          </div>
-        </div>
-
-        <div className="bg-muted/40 p-3.5 rounded-lg border border-border space-y-1">
-          <span className="text-xs text-muted-foreground font-medium">Last Successful Sync</span>
-          <p className="text-sm font-medium text-foreground">
-            {formatDateTime(status?.lastSuccessfulSync)}
-          </p>
-        </div>
-
-        <div className="bg-muted/40 p-3.5 rounded-lg border border-border space-y-1">
-          <span className="text-xs text-muted-foreground font-medium">Pending Sync Jobs</span>
-          <p className="text-sm font-semibold text-amber-600 dark:text-amber-400 font-mono">
-            {status?.pendingSyncsCount ?? 0}
-          </p>
-        </div>
-
-        <div className="bg-muted/40 p-3.5 rounded-lg border border-border space-y-1">
-          <span className="text-xs text-muted-foreground font-medium">Failed Sync Jobs</span>
-          <p className={`text-sm font-semibold font-mono ${(status?.failedSyncsCount ?? 0) > 0 ? 'text-rose-600 dark:text-rose-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
-            {status?.failedSyncsCount ?? 0}
-          </p>
-        </div>
-      </div>
-
-      {status?.error && (
-        <div className="p-3.5 bg-rose-500/10 border border-rose-500/20 rounded-lg flex items-start gap-3 text-rose-700 dark:text-rose-300 text-xs">
-          <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
-          <div>
-            <p className="font-medium text-rose-800 dark:text-rose-200">Connection Error / Notice</p>
-            <p className="mt-0.5 text-rose-700/90 dark:text-rose-300/90">{status.error}</p>
-          </div>
-        </div>
-      )}
-
-      {/* Tabs Synchronized List */}
-      {status?.sheetNames && status.sheetNames.length > 0 && (
-        <div className="bg-muted/40 p-3.5 rounded-lg border border-border space-y-2">
-          <div className="flex items-center gap-2 text-xs font-medium text-foreground">
-            <Database className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-            <span>Detected Sheets in Spreadsheet:</span>
-          </div>
-          <div className="flex flex-wrap gap-1.5">
-            {status.sheetNames.map((name) => (
-              <Badge key={name} variant="outline" className="px-2 py-0.5 text-[11px] font-mono border-border">
-                {name}
-              </Badge>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Last Sync Stats */}
-      {lastSyncReport && (
-        <div className="p-3.5 bg-emerald-500/10 border border-emerald-500/20 rounded-lg space-y-2 text-xs text-emerald-700 dark:text-emerald-300">
-          <p className="font-semibold text-emerald-800 dark:text-emerald-200">
-            Full Sync Completed ({lastSyncReport.totalRecords} records in {(lastSyncReport.durationMs / 1000).toFixed(1)}s)
-          </p>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
-            {lastSyncReport.entities?.map((ent: FullSyncEntityStats) => (
-              <div key={ent.entity} className="bg-card p-2 rounded border border-border">
-                <span className="text-muted-foreground block truncate">{ent.tabName}</span>
-                <span className="font-medium text-foreground font-mono">{ent.count} rows</span>
+      <div className="bg-card p-5 sm:p-6 rounded-[18px] border border-border shadow-none text-card-foreground space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-4">
+          <div className="flex items-center gap-3">
+              <div className="p-2.5 bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 rounded-full border border-emerald-500/30">
+                <FileSpreadsheet className="w-5 h-5" />
               </div>
-            ))}
-          </div>
-        </div>
-      )}
+              <div>
+                <h2 className="text-base sm:text-lg font-semibold text-foreground tracking-[-0.01em]">Google Sheets Backup &amp; Mirror</h2>
+                <p className="text-xs text-muted-foreground">Automatic real-time synchronization from PostgreSQL</p>
+              </div>
+            </div>
 
-      {/* Action Buttons */}
-      <div className="flex flex-wrap items-center gap-2.5 pt-2">
-        <Button
-          variant="secondary"
-          size="sm"
-          onClick={handleTestConnection}
-          disabled={isTesting}
-          loading={isTesting}
-          className="gap-2"
-        >
-          {!isTesting && <RefreshCw className="w-3.5 h-3.5" />}
-          Test Connection
-        </Button>
+            <div className="flex items-center gap-2">
+              {loading ? (
+                  <Badge variant="outline" className="gap-1.5 px-3 py-0.5 rounded-full text-xs font-semibold bg-muted/60 text-muted-foreground border-border">
+                    <RefreshCw className="w-3.5 h-3.5 animate-spin" /> Checking...
+                  </Badge>
+                  ) : status?.connected ? (
+                    <Badge variant="outline" className="gap-1.5 px-3 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/15 text-emerald-600 dark:text-emerald-300 border-emerald-500/30">
+                      <CheckCircle2 className="w-3.5 h-3.5" /> Connected
+                    </Badge>
+                    ) : (
+                      <Badge variant="outline" className="gap-1.5 px-3 py-0.5 rounded-full text-xs font-semibold bg-rose-500/15 text-rose-600 dark:text-rose-300 border-rose-500/30">
+                        <XCircle className="w-3.5 h-3.5" /> Not Connected
+                      </Badge>
+          )}
+                    </div>
+                  </div>
 
-        <Button
-          size="sm"
-          onClick={handleSyncAll}
-          disabled={isSyncing}
-          loading={isSyncing}
-          className="gap-2"
-        >
-          {!isSyncing && <RotateCw className="w-3.5 h-3.5" />}
-          Sync Everything
-        </Button>
+                  {/* Connection & Configuration Info */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                      <div className="bg-muted/20 p-3.5 rounded-[14px] border border-border space-y-1">
+                        <span className="text-xs text-muted-foreground font-semibold">Spreadsheet Destination</span>
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-xs font-mono text-foreground truncate" title={spreadsheetId}>
+                            {spreadsheetId.slice(0, 12)}...
+                          </span>
+                          <a
+                            href={spreadsheetUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-emerald-600 dark:text-emerald-400 hover:opacity-80 transition-opacity p-1"
+                            title="Open Google Spreadsheet in new tab"
+                          >
+                            <ExternalLink className="w-3.5 h-3.5" />
+                          </a>
+                        </div>
+                      </div>
 
-        {(status?.failedSyncsCount ?? 0) > 0 && (
-          <Button
-            variant="destructive"
-            size="sm"
-            onClick={handleRetryFailed}
-            disabled={isRetrying}
-            loading={isRetrying}
-            className="gap-2"
-          >
-            {!isRetrying && <RefreshCw className="w-3.5 h-3.5" />}
-            Retry Failed Syncs ({status?.failedSyncsCount})
-          </Button>
-        )}
-      </div>
+                      <div className="bg-muted/40 p-3.5 rounded-lg border border-border space-y-1">
+                        <span className="text-xs text-muted-foreground font-medium">Last Successful Sync</span>
+                        <p className="text-sm font-medium text-foreground">
+                          {formatDateTime(status?.lastSuccessfulSync)}
+                        </p>
+                      </div>
 
-      <p className="text-[11px] text-muted-foreground">
-        PostgreSQL is the single source of truth. All database mutations automatically queue background backup syncs to Google Sheets without interrupting normal user operations.
-      </p>
-    </div>
-  );
+                      <div className="bg-muted/40 p-3.5 rounded-lg border border-border space-y-1">
+                        <span className="text-xs text-muted-foreground font-medium">Pending Sync Jobs</span>
+                        <p className="text-sm font-semibold text-amber-600 dark:text-amber-400 font-mono">
+                          {status?.pendingSyncsCount ?? 0}
+                        </p>
+                      </div>
+
+                      <div className="bg-muted/40 p-3.5 rounded-lg border border-border space-y-1">
+                        <span className="text-xs text-muted-foreground font-medium">Failed Sync Jobs</span>
+                        <p className={`text-sm font-semibold font-mono ${(status?.failedSyncsCount ?? 0) > 0 ? 'text-rose-600 dark:text-rose-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
+                          {status?.failedSyncsCount ?? 0}
+                        </p>
+                      </div>
+                    </div>
+
+                    {status?.error && (
+                      <div className="p-3.5 bg-rose-500/10 border border-rose-500/20 rounded-lg flex items-start gap-3 text-rose-700 dark:text-rose-300 text-xs">
+                        <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
+                        <div>
+                          <p className="font-medium text-rose-800 dark:text-rose-200">Connection Error / Notice</p>
+                          <p className="mt-0.5 text-rose-700/90 dark:text-rose-300/90">{status.error}</p>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Tabs Synchronized List */}
+                    {status?.sheetNames && status.sheetNames.length > 0 && (
+                      <div className="bg-muted/40 p-3.5 rounded-lg border border-border space-y-2">
+                        <div className="flex items-center gap-2 text-xs font-medium text-foreground">
+                          <Database className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                          <span>Detected Sheets in Spreadsheet:</span>
+                        </div>
+                        <div className="flex flex-wrap gap-1.5">
+                          {status.sheetNames.map((name) => (
+                            <Badge key={name} variant="outline" className="px-2 py-0.5 text-[11px] font-mono border-border">
+                              {name}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Last Sync Stats */}
+                    {lastSyncReport && (
+                      <div className="p-3.5 bg-emerald-500/10 border border-emerald-500/20 rounded-lg space-y-2 text-xs text-emerald-700 dark:text-emerald-300">
+                        <p className="font-semibold text-emerald-800 dark:text-emerald-200">
+                          Full Sync Completed ({lastSyncReport.totalRecords} records in {(lastSyncReport.durationMs / 1000).toFixed(1)}s)
+                        </p>
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
+                          {lastSyncReport.entities?.map((ent: FullSyncEntityStats) => (
+                            <div key={ent.entity} className="bg-card p-2 rounded border border-border">
+                              <span className="text-muted-foreground block truncate">{ent.tabName}</span>
+                              <span className="font-medium text-foreground font-mono">{ent.count} rows</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Action Buttons */}
+                    <div className="flex flex-wrap items-center gap-2.5 pt-2">
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={handleTestConnection}
+                        disabled={isTesting}
+                        loading={isTesting}
+                        className="gap-2"
+                      >
+                        {!isTesting && <RefreshCw className="w-3.5 h-3.5" />}
+                        Test Connection
+                      </Button>
+
+                      <Button
+                        size="sm"
+                        onClick={handleSyncAll}
+                        disabled={isSyncing}
+                        loading={isSyncing}
+                        className="gap-2"
+                      >
+                        {!isSyncing && <RotateCw className="w-3.5 h-3.5" />}
+                        Sync Everything
+                      </Button>
+
+                      {(status?.failedSyncsCount ?? 0) > 0 && (
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={handleRetryFailed}
+                          disabled={isRetrying}
+                          loading={isRetrying}
+                          className="gap-2"
+                        >
+                          {!isRetrying && <RefreshCw className="w-3.5 h-3.5" />}
+                          Retry Failed Syncs ({status?.failedSyncsCount})
+                        </Button>
+                      )}
+                    </div>
+
+                    <p className="text-[11px] text-muted-foreground">
+                      PostgreSQL is the single source of truth. All database mutations automatically queue background backup syncs to Google Sheets without interrupting normal user operations.
+                    </p>
+                  </div>
+                  );
 }

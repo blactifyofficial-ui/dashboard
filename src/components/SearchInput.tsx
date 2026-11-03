@@ -14,11 +14,11 @@ function SearchInputInner({ initialQuery }: { initialQuery: string }) {
 
   const handleSearch = (newValue: string) => {
     setValue(newValue);
-    
+
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
     }
-    
+
     timeoutRef.current = setTimeout(() => {
       const params = new URLSearchParams(searchParams.toString());
       if (newValue) {
@@ -27,7 +27,7 @@ function SearchInputInner({ initialQuery }: { initialQuery: string }) {
         params.delete('q');
       }
       params.delete('page'); // Reset to page 1 on new search
-      
+
       startTransition(() => {
         router.replace(`${pathname}?${params.toString()}`);
       });
@@ -36,13 +36,17 @@ function SearchInputInner({ initialQuery }: { initialQuery: string }) {
 
   return (
     <div className="relative w-full md:w-auto">
-      <Search size={15} className={`absolute left-3 top-1/2 -translate-y-1/2 transition-colors pointer-events-none ${isPending ? 'text-primary' : 'text-muted-foreground'}`} />
-      <input 
-        type="text" 
+      <Search
+        size={14}
+        className={`absolute left-3.5 top-1/2 -translate-y-1/2 transition-colors pointer-events-none ${isPending ? 'text-[#0066cc] dark:text-[#2997ff]' : 'text-muted-foreground'
+          }`}
+      />
+      <input
+        type="text"
         value={value}
         onChange={(e) => handleSearch(e.target.value)}
-        placeholder="Search..." 
-        className="w-full md:w-64 bg-card border border-input rounded-lg pl-9 pr-3.5 py-2 text-xs sm:text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors shadow-xs"
+        placeholder="Search..."
+        className="w-full md:w-64 h-[40px] sm:h-[44px] bg-card border border-border rounded-full pl-10 pr-4 py-2 text-[14px] sm:text-[15px] tracking-[-0.224px] text-foreground placeholder:text-muted-foreground/60 focus:outline-2 focus:outline-[#0071e3] focus:outline-offset-2 transition-all"
       />
     </div>
   );
@@ -50,8 +54,8 @@ function SearchInputInner({ initialQuery }: { initialQuery: string }) {
 
 export default function SearchInput({ initialQuery }: { initialQuery: string }) {
   return (
-    <Suspense fallback={<div className="w-full md:w-64 h-9 bg-muted border border-border rounded-lg" />}>
-      <SearchInputInner initialQuery={initialQuery} />
-    </Suspense>
-  );
+      <Suspense fallback={<div className="w-full md:w-64 h-[40px] sm:h-[44px] bg-muted border border-border rounded-full" />}>
+        <SearchInputInner initialQuery={initialQuery} />
+      </Suspense>
+      );
 }

@@ -25,8 +25,8 @@ export default function RecordRemittanceModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-xs">
-      <div className="bg-card border border-border rounded-xl max-w-lg w-full p-5 sm:p-6 shadow-2xl relative text-foreground animate-in fade-in zoom-in-95 duration-150">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
+      <div className="bg-card border border-border rounded-[18px] max-w-lg w-full p-6 relative text-foreground animate-in fade-in zoom-in-95 duration-150">
         <RecordRemittanceForm
           remittanceToEdit={remittanceToEdit}
           paymentMethods={paymentMethods}
@@ -295,21 +295,21 @@ function RecordRemittanceForm({
         </div>
 
         {/* Actions */}
-        <div className="pt-3 border-t border-border flex items-center justify-end gap-2">
+        <div className="pt-4 border-t border-border flex items-center justify-end gap-2.5">
           <button
             type="button"
             onClick={onClose}
             disabled={submitting}
-            className="px-4 py-2 text-xs font-medium text-muted-foreground hover:text-foreground bg-secondary hover:bg-muted rounded-lg transition-colors"
+            className="px-4 py-2 text-[14px] font-normal text-muted-foreground hover:text-foreground bg-muted hover:bg-muted/80 rounded-full transition-all active:scale-95"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={submitting}
-            className="px-4 py-2 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-500 rounded-lg transition-colors shadow-xs flex items-center gap-1.5 disabled:opacity-50"
+            className="px-5 py-2 text-[14px] font-normal text-white bg-[#0066cc] hover:bg-[#0071e3] rounded-full transition-all active:scale-95 flex items-center gap-1.5 disabled:opacity-40"
           >
-            <CheckCircle2 size={14} />
+            <CheckCircle2 size={15} />
             {submitting ? 'Saving...' : remittanceToEdit ? 'Update Entry' : 'Record Payment'}
           </button>
         </div>

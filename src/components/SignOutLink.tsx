@@ -25,7 +25,7 @@ export default function SignOutLink() {
           },
         });
       }}
-      className="text-blue-500 hover:underline cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+      className="text-[#0066cc] dark:text-[#2997ff] text-[15px] sm:text-[17px] hover:underline cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed font-normal"
     >
       {loading ? 'Signing Out...' : 'Sign Out'}
     </button>

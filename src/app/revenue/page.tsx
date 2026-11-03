@@ -57,12 +57,12 @@ export default async function RevenuePage(props: {
     <div className="flex flex-col h-full space-y-4 sm:space-y-6 relative z-10 text-foreground">
       <header className="flex-none flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4">
         <div className="space-y-1">
-          <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-foreground">Revenue</h1>
-          <p className="text-muted-foreground text-xs sm:text-sm">Breakdown of sales, orders, and product performance</p>
+          <h1 className="text-[26px] sm:text-[34px] font-semibold tracking-[-0.374px] text-foreground leading-[1.2]">Revenue</h1>
+          <p className="text-muted-foreground text-[14px] sm:text-[15px] tracking-[-0.224px]">Breakdown of sales, orders, and product performance</p>
         </div>
         <Link
           href="/reports"
-          className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors shadow-xs self-start md:self-auto"
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-[14px] sm:text-[15px] font-normal tracking-[-0.224px] bg-[#0066cc] hover:bg-[#0071e3] text-white transition-all active:scale-95 self-start md:self-auto"
         >
           <FileText size={15} />
           <span>Monthly PDF Reports</span>
@@ -70,413 +70,409 @@ export default async function RevenuePage(props: {
       </header>
 
       {(canViewRevenueLedger || canViewProducts) && (
-        <div className="flex-none flex flex-wrap sm:flex-nowrap gap-1 bg-muted border border-border p-1 rounded-lg w-full sm:w-fit">
-          {canViewRevenueLedger && (
-            <Link 
-              href="/revenue?tab=monthly" 
-              className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-3.5 py-1.5 min-h-[36px] rounded-md text-xs sm:text-sm font-medium transition-colors ${
-                tab === 'monthly' ? 'bg-card text-foreground font-semibold shadow-xs border border-border' : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              <CalendarDays size={15} className="shrink-0" />
-              <span>Monthly Breakdown</span>
-            </Link>
-          )}
-          {canViewProducts && (
-            <Link 
-              href="/revenue?tab=products" 
-              className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-3.5 py-1.5 min-h-[36px] rounded-md text-xs sm:text-sm font-medium transition-colors ${
-                tab === 'products' ? 'bg-card text-foreground font-semibold shadow-xs border border-border' : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              <ShoppingBag size={15} className="shrink-0" />
-              <span>Product Performance</span>
-            </Link>
-          )}
-        </div>
+          <div className="flex-none flex flex-wrap sm:flex-nowrap gap-1 bg-muted border border-border p-1 rounded-full w-full sm:w-fit">
+            {canViewRevenueLedger && (
+              <Link
+                href="/revenue?tab=monthly"
+              className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-1.5 min-h-[36px] rounded-full text-[13px] sm:text-[14px] font-normal tracking-[-0.1px] transition-all active:scale-95 ${tab === 'monthly' ? 'bg-card text-foreground font-semibold border border-border' : 'text-muted-foreground hover:text-foreground'
+                  }`}
+              >
+                <CalendarDays size={15} className="shrink-0" />
+                <span>Monthly Breakdown</span>
+              </Link>
+            )}
+            {canViewProducts && (
+              <Link
+                href="/revenue?tab=products"
+              className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-1.5 min-h-[36px] rounded-full text-[13px] sm:text-[14px] font-normal tracking-[-0.1px] transition-all active:scale-95 ${tab === 'products' ? 'bg-card text-foreground font-semibold border border-border' : 'text-muted-foreground hover:text-foreground'
+                  }`}
+              >
+                <ShoppingBag size={15} className="shrink-0" />
+                <span>Product Performance</span>
+              </Link>
+            )}
+          </div>
       )}
 
-      <Suspense fallback={<LoadingSpinner />} key={`${tab}-${q}-${searchParams.page}-${period}-${month}-${from}-${to}`}>
-        <RevenueContent
-          searchParams={searchParams}
-          tab={tab}
-          q={q}
-          canViewExpenses={canViewExpenses}
-          canViewRevenueLedger={canViewRevenueLedger}
-          canViewProducts={canViewProducts}
-        />
-      </Suspense>
-    </div>
-  );
+          <Suspense fallback={<LoadingSpinner />} key={`${tab}-${q}-${searchParams.page}-${period}-${month}-${from}-${to}`}>
+            <RevenueContent
+              searchParams={searchParams}
+              tab={tab}
+              q={q}
+              canViewExpenses={canViewExpenses}
+              canViewRevenueLedger={canViewRevenueLedger}
+              canViewProducts={canViewProducts}
+            />
+          </Suspense>
+        </div>
+      );
 }
 
-async function RevenueContent({ 
-  searchParams, 
-  tab, 
-  q, 
-  canViewExpenses,
-  canViewRevenueLedger,
-  canViewProducts,
-}: { 
-  searchParams: { [key: string]: string | string[] | undefined }, 
-  tab: string, 
-  q: string, 
-  canViewExpenses: boolean,
-  canViewRevenueLedger: boolean,
-  canViewProducts: boolean,
+      async function RevenueContent({
+        searchParams,
+        tab,
+        q,
+        canViewExpenses,
+        canViewRevenueLedger,
+        canViewProducts,
+}: {
+        searchParams: {[key: string]: string | string[] | undefined },
+      tab: string,
+      q: string,
+      canViewExpenses: boolean,
+      canViewRevenueLedger: boolean,
+      canViewProducts: boolean,
 }) {
   const page = parseInt((searchParams.page as string) || '1', 10);
-  const pageSize = 15;
-  const offset = (page - 1) * pageSize;
+      const pageSize = 15;
+      const offset = (page - 1) * pageSize;
 
-  if (tab === 'monthly') {
+      if (tab === 'monthly') {
     if (!canViewRevenueLedger) {
       return <AccessDenied message="You do not have permission to view monthly revenue reports." />;
     }
-    const whereClause = q ? ilike(sql<string>`to_char(${orders.createdAt} AT TIME ZONE 'Asia/Kolkata', 'FMMonth YYYY')`, `%${q}%`) : undefined;
+      const whereClause = q ? ilike(sql<string>`to_char(${orders.createdAt} AT TIME ZONE 'Asia/Kolkata', 'FMMonth YYYY')`, `%${q}%`) : undefined;
 
-    const monthlyData = await db.select({
-      month: sql<string>`to_char(date_trunc('month', ${orders.createdAt} AT TIME ZONE 'Asia/Kolkata'), 'YYYY-MM')`,
-      revenue: sql<number>`COALESCE(SUM(CAST(${orders.totalPrice} AS NUMERIC)), 0)`,
-      orderCount: sql<number>`COUNT(*)`
+        const monthlyData = await db.select({
+          month: sql<string>`to_char(date_trunc('month', ${orders.createdAt} AT TIME ZONE 'Asia/Kolkata'), 'YYYY-MM')`,
+            revenue: sql<number>`COALESCE(SUM(CAST(${orders.totalPrice} AS NUMERIC)), 0)`,
+              orderCount: sql<number>`COUNT(*)`
     })
-    .from(orders)
-    .where(whereClause)
-    .groupBy(sql`date_trunc('month', ${orders.createdAt} AT TIME ZONE 'Asia/Kolkata')`)
-    .orderBy(desc(sql`date_trunc('month', ${orders.createdAt} AT TIME ZONE 'Asia/Kolkata')`));
+                .from(orders)
+                .where(whereClause)
+                .groupBy(sql`date_trunc('month', ${orders.createdAt} AT TIME ZONE 'Asia/Kolkata')`)
+              .orderBy(desc(sql`date_trunc('month', ${orders.createdAt} AT TIME ZONE 'Asia/Kolkata')`));
 
-    // Fetch monthly expenses if the user has permission to view expenses
-    const monthlyExpensesMap = new Map<string, number>();
-    if (canViewExpenses) {
+              // Fetch monthly expenses if the user has permission to view expenses
+              const monthlyExpensesMap = new Map<string, number>();
+              if (canViewExpenses) {
       const expensesList = await db.select({
-        month: sql<string>`to_char(date_trunc('month', ${expenses.expenseDate}), 'YYYY-MM')`,
-        totalExpense: sql<number>`COALESCE(SUM(CAST(${expenses.amount} AS NUMERIC)), 0)`
+                month: sql<string>`to_char(date_trunc('month', ${expenses.expenseDate}), 'YYYY-MM')`,
+                  totalExpense: sql<number>`COALESCE(SUM(CAST(${expenses.amount} AS NUMERIC)), 0)`
       })
-      .from(expenses)
-      .where(isNull(expenses.deletedAt))
-      .groupBy(sql`date_trunc('month', ${expenses.expenseDate})`);
+                    .from(expenses)
+                    .where(isNull(expenses.deletedAt))
+                    .groupBy(sql`date_trunc('month', ${expenses.expenseDate})`);
 
-      for (const exp of expensesList) {
+                  for (const exp of expensesList) {
         if (exp.month) {
-          monthlyExpensesMap.set(exp.month, Number(exp.totalExpense || 0));
+                    monthlyExpensesMap.set(exp.month, Number(exp.totalExpense || 0));
         }
       }
     }
 
     const maxRevenue = Math.max(...monthlyData.map(d => Number(d.revenue)), 0);
 
-    return (
-      <div className="flex-1 min-h-0 flex flex-col bg-card border border-border rounded-xl relative overflow-hidden shadow-xs">
-        <div className="flex-none p-4 sm:px-6 sm:py-4 border-b border-border flex flex-col md:flex-row justify-between items-start md:items-center gap-3 bg-muted/40">
-          <div>
-            <h2 className="text-base font-semibold text-foreground">Monthly Breakdown</h2>
-            <p className="text-xs text-muted-foreground">Monthly sales, operational expenses, and net profit margins</p>
-          </div>
-          <div className="w-full md:w-auto">
-            <SearchInput initialQuery={q} />
-          </div>
-        </div>
-        <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-2.5">
-          {monthlyData.length === 0 ? (
-            <div className="py-16 text-center text-muted-foreground flex flex-col items-center justify-center space-y-3">
-              <div className="w-12 h-12 rounded-lg bg-muted border border-border flex items-center justify-center text-muted-foreground">
-                <CalendarDays size={24} />
-              </div>
-              <p className="text-sm font-medium text-foreground">No revenue data available yet.</p>
-            </div>
-          ) : (
-            monthlyData.map((data, idx) => {
-              const [year, month] = (data.month || '').split('-');
-              const dateObj = year && month ? new Date(parseInt(year), parseInt(month) - 1) : null;
-              const monthDisplay = dateObj ? dateObj.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : 'Unknown';
-              const monthShort = dateObj ? dateObj.toLocaleDateString('en-US', { month: 'short' }) : '-';
-              
-              const revenueNum = Number(data.revenue);
-              const expenseNum = monthlyExpensesMap.get(data.month) || 0;
-              const netProfitNum = revenueNum - expenseNum;
-              const profitMargin = revenueNum > 0 ? Math.round((netProfitNum / revenueNum) * 100) : 0;
-              const percent = maxRevenue > 0 ? (revenueNum / maxRevenue) * 100 : 0;
-
-              return (
-                <Link 
-                  href={`/revenue/${data.month}`} 
-                  key={idx} 
-                  className="block group relative bg-muted/30 border border-border rounded-lg hover:bg-muted/60 hover:border-border transition-colors overflow-hidden"
-                >
-                  {/* Subtle Progress Bar */}
-                  <div 
-                    className="absolute inset-y-0 left-0 bg-primary/[0.04] group-hover:bg-primary/[0.08] transition-colors z-0"
-                    style={{ width: `${percent}%` }}
-                  />
-                  
-                  {/* Content */}
-                  <div className="relative z-10 p-3.5 sm:px-5 sm:py-3.5 flex flex-col md:flex-row md:items-center justify-between gap-3">
-                    <div className="flex items-center gap-3 min-w-[160px]">
-                      <div className="w-10 h-10 rounded-lg bg-muted border border-border flex flex-col items-center justify-center shrink-0">
-                        <span className="text-xs text-foreground font-semibold uppercase">{monthShort}</span>
-                      </div>
+                  return (
+                  <div className="flex-1 min-h-0 flex flex-col bg-card border border-border rounded-xl relative overflow-hidden shadow-xs">
+                    <div className="flex-none p-4 sm:px-6 sm:py-4 border-b border-border flex flex-col md:flex-row justify-between items-start md:items-center gap-3 bg-muted/40">
                       <div>
-                        <h3 className="text-sm sm:text-base font-semibold text-foreground">{monthDisplay}</h3>
-                        <p className="text-xs text-muted-foreground mt-0.5">
-                          {Number(data.orderCount)} {Number(data.orderCount) === 1 ? 'order' : 'orders'} completed
-                        </p>
+                        <h2 className="text-base font-semibold text-foreground">Monthly Breakdown</h2>
+                        <p className="text-xs text-muted-foreground">Monthly sales, operational expenses, and net profit margins</p>
+                      </div>
+                      <div className="w-full md:w-auto">
+                        <SearchInput initialQuery={q} />
                       </div>
                     </div>
-                    
-                    <div className="flex flex-wrap sm:flex-nowrap items-center gap-4 sm:gap-6 self-start md:self-auto">
-                      <div className="text-left md:text-right">
-                        <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Revenue</p>
-                        <p className="text-base sm:text-lg font-semibold font-mono text-foreground tracking-tight">
-                          ₹{revenueNum.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                        </p>
-                      </div>
-
-                      {canViewExpenses && (
-                        <>
-                          <div className="text-left md:text-right">
-                            <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Expenses</p>
-                            <p className="text-base sm:text-lg font-semibold font-mono text-muted-foreground tracking-tight">
-                              ₹{expenseNum.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                            </p>
+                    <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-2.5">
+                      {monthlyData.length === 0 ? (
+                        <div className="py-16 text-center text-muted-foreground flex flex-col items-center justify-center space-y-3">
+                          <div className="w-12 h-12 rounded-lg bg-muted border border-border flex items-center justify-center text-muted-foreground">
+                            <CalendarDays size={24} />
                           </div>
+                          <p className="text-sm font-medium text-foreground">No revenue data available yet.</p>
+                        </div>
+                      ) : (
+                        monthlyData.map((data, idx) => {
+                          const [year, month] = (data.month || '').split('-');
+                          const dateObj = year && month ? new Date(parseInt(year), parseInt(month) - 1) : null;
+                          const monthDisplay = dateObj ? dateObj.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : 'Unknown';
+                          const monthShort = dateObj ? dateObj.toLocaleDateString('en-US', { month: 'short' }) : '-';
 
-                          <div className="text-left md:text-right min-w-[120px]">
-                            <div className="flex items-center gap-1.5 justify-start md:justify-end">
-                              <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Net Profit</p>
-                              <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${
-                                netProfitNum >= 0 
-                                  ? 'text-emerald-700 bg-emerald-500/10 dark:text-emerald-400' 
-                                  : 'text-rose-700 bg-rose-500/10 dark:text-rose-400'
-                              }`}>
-                                {profitMargin >= 0 ? `+${profitMargin}%` : `${profitMargin}%`}
-                              </span>
-                            </div>
-                            <p className={`text-base sm:text-lg font-bold font-mono tracking-tight ${
-                              netProfitNum >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'
-                            }`}>
-                              ₹{netProfitNum.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                            </p>
-                          </div>
-                        </>
+                          const revenueNum = Number(data.revenue);
+                          const expenseNum = monthlyExpensesMap.get(data.month) || 0;
+                          const netProfitNum = revenueNum - expenseNum;
+                          const profitMargin = revenueNum > 0 ? Math.round((netProfitNum / revenueNum) * 100) : 0;
+                          const percent = maxRevenue > 0 ? (revenueNum / maxRevenue) * 100 : 0;
+
+                          return (
+                            <Link
+                              href={`/revenue/${data.month}`}
+                              key={idx}
+                              className="block group relative bg-muted/30 border border-border rounded-lg hover:bg-muted/60 hover:border-border transition-colors overflow-hidden"
+                            >
+                              {/* Subtle Progress Bar */}
+                              <div
+                                className="absolute inset-y-0 left-0 bg-primary/[0.04] group-hover:bg-primary/[0.08] transition-colors z-0"
+                                style={{ width: `${percent}%` }}
+                              />
+
+                              {/* Content */}
+                              <div className="relative z-10 p-3.5 sm:px-5 sm:py-3.5 flex flex-col md:flex-row md:items-center justify-between gap-3">
+                                <div className="flex items-center gap-3 min-w-[160px]">
+                                  <div className="w-10 h-10 rounded-lg bg-muted border border-border flex flex-col items-center justify-center shrink-0">
+                                    <span className="text-xs text-foreground font-semibold uppercase">{monthShort}</span>
+                                  </div>
+                                  <div>
+                                    <h3 className="text-sm sm:text-base font-semibold text-foreground">{monthDisplay}</h3>
+                                    <p className="text-xs text-muted-foreground mt-0.5">
+                                      {Number(data.orderCount)} {Number(data.orderCount) === 1 ? 'order' : 'orders'} completed
+                                    </p>
+                                  </div>
+                                </div>
+
+                                <div className="flex flex-wrap sm:flex-nowrap items-center gap-4 sm:gap-6 self-start md:self-auto">
+                                  <div className="text-left md:text-right">
+                                    <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Revenue</p>
+                                    <p className="text-base sm:text-lg font-semibold font-mono text-foreground tracking-tight">
+                                      ₹{revenueNum.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                    </p>
+                                  </div>
+
+                                  {canViewExpenses && (
+                                    <>
+                                      <div className="text-left md:text-right">
+                                        <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Expenses</p>
+                                        <p className="text-base sm:text-lg font-semibold font-mono text-muted-foreground tracking-tight">
+                                          ₹{expenseNum.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                        </p>
+                                      </div>
+
+                                      <div className="text-left md:text-right min-w-[120px]">
+                                        <div className="flex items-center gap-1.5 justify-start md:justify-end">
+                                          <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Net Profit</p>
+                                          <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${netProfitNum >= 0
+                                              ? 'text-emerald-700 bg-emerald-500/10 dark:text-emerald-400'
+                                              : 'text-rose-700 bg-rose-500/10 dark:text-rose-400'
+                                            }`}>
+                                            {profitMargin >= 0 ? `+${profitMargin}%` : `${profitMargin}%`}
+                                          </span>
+                                        </div>
+                                        <p className={`text-base sm:text-lg font-bold font-mono tracking-tight ${netProfitNum >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'
+                                          }`}>
+                                          ₹{netProfitNum.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                        </p>
+                                      </div>
+                                    </>
+                                  )}
+
+                                  <div className="hidden sm:flex items-center text-muted-foreground group-hover:text-foreground transition-colors pl-1">
+                                    <ArrowUpRight size={16} />
+                                  </div>
+                                </div>
+                              </div>
+                            </Link>
+                          );
+                        })
                       )}
-
-                      <div className="hidden sm:flex items-center text-muted-foreground group-hover:text-foreground transition-colors pl-1">
-                        <ArrowUpRight size={16} />
-                      </div>
                     </div>
                   </div>
-                </Link>
-              );
-            })
-          )}
-        </div>
-      </div>
-    );
+                  );
   } else if (tab === 'products') {
     if (!canViewProducts) {
       return <AccessDenied message="You do not have permission to view product performance." />;
     }
 
-    const period = (searchParams.period as string) || '';
-    const month = (searchParams.month as string) || '';
-    const from = (searchParams.from as string) || '';
-    const to = (searchParams.to as string) || '';
+                  const period = (searchParams.period as string) || '';
+                  const month = (searchParams.month as string) || '';
+                  const from = (searchParams.from as string) || '';
+                  const to = (searchParams.to as string) || '';
 
-    const dateRange = getProductFilterDateRange({ period, month, from, to });
+                  const dateRange = getProductFilterDateRange({period, month, from, to});
 
-    const conditions = [];
-    if (q) {
-      conditions.push(ilike(orderItems.title, `%${q}%`));
+                  const conditions = [];
+                  if (q) {
+                    conditions.push(ilike(orderItems.title, `%${q}%`));
     }
-    if (dateRange.startDate) {
-      conditions.push(gte(orders.createdAt, dateRange.startDate));
+                  if (dateRange.startDate) {
+                    conditions.push(gte(orders.createdAt, dateRange.startDate));
     }
-    if (dateRange.endDate) {
-      conditions.push(lt(orders.createdAt, dateRange.endDate));
+                  if (dateRange.endDate) {
+                    conditions.push(lt(orders.createdAt, dateRange.endDate));
     }
 
     const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
 
-    // Fetch available months from orders for the dropdown filter
-    const availableMonthsResult = await db.select({
-      month: sql<string>`to_char(date_trunc('month', ${orders.createdAt} AT TIME ZONE 'Asia/Kolkata'), 'YYYY-MM')`
+                  // Fetch available months from orders for the dropdown filter
+                  const availableMonthsResult = await db.select({
+                    month: sql<string>`to_char(date_trunc('month', ${orders.createdAt} AT TIME ZONE 'Asia/Kolkata'), 'YYYY-MM')`
     })
-    .from(orders)
-    .where(sql`${orders.createdAt} IS NOT NULL`)
-    .groupBy(sql`date_trunc('month', ${orders.createdAt} AT TIME ZONE 'Asia/Kolkata')`)
-    .orderBy(desc(sql`date_trunc('month', ${orders.createdAt} AT TIME ZONE 'Asia/Kolkata')`));
+                      .from(orders)
+                      .where(sql`${orders.createdAt} IS NOT NULL`)
+                    .groupBy(sql`date_trunc('month', ${orders.createdAt} AT TIME ZONE 'Asia/Kolkata')`)
+                    .orderBy(desc(sql`date_trunc('month', ${orders.createdAt} AT TIME ZONE 'Asia/Kolkata')`));
 
     const availableMonths = availableMonthsResult.map(r => r.month).filter(Boolean) as string[];
 
-    // Fetch total matching products count, total revenue, and total units sold for the filter
-    const [summaryResult] = await db.select({
-      totalProducts: sql<number>`count(distinct ${orderItems.title})`,
-      totalRevenue: sql<number>`COALESCE(SUM(CAST(${orderItems.price} AS NUMERIC) * CAST(${orderItems.quantity} AS NUMERIC)), 0)`,
-      totalUnits: sql<number>`COALESCE(SUM(CAST(${orderItems.quantity} AS NUMERIC)), 0)`
+                    // Fetch total matching products count, total revenue, and total units sold for the filter
+                    const [summaryResult] = await db.select({
+                      totalProducts: sql<number>`count(distinct ${orderItems.title})`,
+                        totalRevenue: sql<number>`COALESCE(SUM(CAST(${orderItems.price} AS NUMERIC) * CAST(${orderItems.quantity} AS NUMERIC)), 0)`,
+                          totalUnits: sql<number>`COALESCE(SUM(CAST(${orderItems.quantity} AS NUMERIC)), 0)`
     })
-    .from(orderItems)
-    .innerJoin(orders, eq(orderItems.orderId, orders.id))
-    .where(whereClause);
+                            .from(orderItems)
+                            .innerJoin(orders, eq(orderItems.orderId, orders.id))
+                            .where(whereClause);
 
-    const totalProducts = Number(summaryResult?.totalProducts) || 0;
-    const totalRevenue = Number(summaryResult?.totalRevenue) || 0;
-    const totalUnits = Number(summaryResult?.totalUnits) || 0;
-    const totalPages = Math.ceil(totalProducts / pageSize);
+                            const totalProducts = Number(summaryResult?.totalProducts) || 0;
+                            const totalRevenue = Number(summaryResult?.totalRevenue) || 0;
+                            const totalUnits = Number(summaryResult?.totalUnits) || 0;
+                            const totalPages = Math.ceil(totalProducts / pageSize);
 
-    const productData = await db.select({
-      title: orderItems.title,
-      imageUrl: sql<string>`MAX(${orderItems.imageUrl})`,
-      revenue: sql<number>`COALESCE(SUM(CAST(${orderItems.price} AS NUMERIC) * CAST(${orderItems.quantity} AS NUMERIC)), 0)`,
-      unitsSold: sql<number>`COALESCE(SUM(CAST(${orderItems.quantity} AS NUMERIC)), 0)`
+                            const productData = await db.select({
+                            title: orderItems.title,
+                          imageUrl: sql<string>`MAX(${orderItems.imageUrl})`,
+                            revenue: sql<number>`COALESCE(SUM(CAST(${orderItems.price} AS NUMERIC) * CAST(${orderItems.quantity} AS NUMERIC)), 0)`,
+                              unitsSold: sql<number>`COALESCE(SUM(CAST(${orderItems.quantity} AS NUMERIC)), 0)`
     })
-    .from(orderItems)
-    .innerJoin(orders, eq(orderItems.orderId, orders.id))
-    .where(whereClause)
-    .groupBy(orderItems.title)
-    .orderBy(desc(sql`COALESCE(SUM(CAST(${orderItems.price} AS NUMERIC) * CAST(${orderItems.quantity} AS NUMERIC)), 0)`))
-    .limit(pageSize)
-    .offset(offset);
+                                .from(orderItems)
+                                .innerJoin(orders, eq(orderItems.orderId, orders.id))
+                                .where(whereClause)
+                                .groupBy(orderItems.title)
+                                .orderBy(desc(sql`COALESCE(SUM(CAST(${orderItems.price} AS NUMERIC) * CAST(${orderItems.quantity} AS NUMERIC)), 0)`))
+                                .limit(pageSize)
+                                .offset(offset);
 
     const buildPageUrl = (targetPage: number) => {
       const p = new URLSearchParams();
-      p.set('tab', 'products');
-      p.set('page', targetPage.toString());
-      if (q) p.set('q', q);
-      if (period && period !== 'all') p.set('period', period);
-      if (month) p.set('month', month);
-      if (from) p.set('from', from);
-      if (to) p.set('to', to);
-      return `/revenue?${p.toString()}`;
+                                p.set('tab', 'products');
+                                p.set('page', targetPage.toString());
+                                if (q) p.set('q', q);
+                                if (period && period !== 'all') p.set('period', period);
+                                if (month) p.set('month', month);
+                                if (from) p.set('from', from);
+                                if (to) p.set('to', to);
+                                return `/revenue?${p.toString()}`;
     };
 
-    return (
-      <div className="flex-1 min-h-0 flex flex-col bg-card border border-border rounded-xl relative overflow-hidden shadow-xs">
-        <div className="flex-none p-4 sm:px-6 sm:py-4 border-b border-border flex flex-col md:flex-row justify-between items-start md:items-center gap-3 bg-muted/40">
-          <div>
-            <h2 className="text-base font-semibold text-foreground">Product Performance</h2>
-            <p className="text-xs text-muted-foreground">Catalog revenue, volume, and sales breakdown</p>
-          </div>
-          <div className="w-full md:w-auto">
-            <SearchInput initialQuery={q} />
-          </div>
-        </div>
+                                return (
+                                <div className="flex-1 min-h-0 flex flex-col bg-card border border-border rounded-xl relative overflow-hidden shadow-xs">
+                                  <div className="flex-none p-4 sm:px-6 sm:py-4 border-b border-border flex flex-col md:flex-row justify-between items-start md:items-center gap-3 bg-muted/40">
+                                    <div>
+                                      <h2 className="text-base font-semibold text-foreground">Product Performance</h2>
+                                      <p className="text-xs text-muted-foreground">Catalog revenue, volume, and sales breakdown</p>
+                                    </div>
+                                    <div className="w-full md:w-auto">
+                                      <SearchInput initialQuery={q} />
+                                    </div>
+                                  </div>
 
-        <ProductFilterToolbar
-          currentPeriod={period || 'all'}
-          currentMonth={month}
-          currentFrom={from}
-          currentTo={to}
-          availableMonths={availableMonths}
-          totalProducts={totalProducts}
-          totalRevenue={totalRevenue}
-          totalUnits={totalUnits}
-          activeLabel={dateRange.label}
-        />
+                                  <ProductFilterToolbar
+                                    currentPeriod={period || 'all'}
+                                    currentMonth={month}
+                                    currentFrom={from}
+                                    currentTo={to}
+                                    availableMonths={availableMonths}
+                                    totalProducts={totalProducts}
+                                    totalRevenue={totalRevenue}
+                                    totalUnits={totalUnits}
+                                    activeLabel={dateRange.label}
+                                  />
 
-        <div className="flex-1 min-h-0 relative z-10 w-full overflow-x-auto overflow-y-auto">
-          <Table className="min-w-[500px]">
-            <TableHeader className="sticky top-0 bg-muted/80 backdrop-blur-none z-20">
-              <TableRow>
-                <TableHead className="font-semibold text-xs">Product</TableHead>
-                <TableHead className="font-semibold text-xs text-center w-28">Units Sold</TableHead>
-                <TableHead className="font-semibold text-xs text-right w-36">Revenue</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {productData.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={3} className="py-16 text-center text-muted-foreground">
-                    <div className="flex flex-col items-center justify-center space-y-2.5">
-                      <div className="w-10 h-10 rounded-lg bg-muted border border-border flex items-center justify-center text-muted-foreground">
-                        <ShoppingBag size={20} />
-                      </div>
-                      <p className="text-sm font-medium text-foreground">No product sales recorded for {dateRange.label}</p>
-                      <p className="text-xs text-muted-foreground">Try selecting a different date range or search keyword</p>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ) : (
-                productData.map((data, idx) => (
-                  <TableRow key={idx} className="hover:bg-muted/40 transition-colors">
-                    <TableCell className="font-medium text-foreground">
-                      <div className="flex items-center gap-3">
-                        {data.imageUrl ? (
-                          <div className="relative w-9 h-9 rounded-lg overflow-hidden bg-muted border border-border shrink-0">
-                            <Image 
-                              src={data.imageUrl} 
-                              alt={data.title || 'Product'} 
-                              fill
-                              sizes="36px"
-                              className="object-cover" 
-                            />
-                          </div>
-                        ) : (
-                          <div className="w-9 h-9 rounded-lg bg-muted border border-border flex items-center justify-center text-foreground shrink-0 text-xs font-semibold">
-                            {data.title ? data.title.charAt(0).toUpperCase() : '?'}
-                          </div>
-                        )}
-                        <Link href={`https://fvprhj-0y.myshopify.com/products/${data.title?.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '')}`} target="_blank" rel="noopener noreferrer" className="truncate hover:text-primary transition-colors text-foreground flex items-center gap-1 group/link max-w-[200px] sm:max-w-xs md:max-w-md">
-                          <span className="truncate text-xs sm:text-sm font-medium">{data.title || 'Unknown Product'}</span>
-                          <ArrowUpRight size={13} className="text-muted-foreground group-hover/link:text-primary transition-colors shrink-0" />
-                        </Link>
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-center">
-                      <Badge variant="neutral" size="sm" className="font-mono">
-                        {Number(data.unitsSold)}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right font-medium text-foreground text-xs sm:text-sm whitespace-nowrap font-mono">
-                      ₹{Number(data.revenue).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </div>
-        
-        {totalPages > 1 && (
-          <div className="flex-none p-3.5 sm:px-6 border-t border-border flex flex-col sm:flex-row justify-between items-center gap-3 bg-muted/20 relative z-10">
-            <div className="text-xs text-muted-foreground">
-              Showing <span className="font-medium font-mono text-foreground">{totalProducts === 0 ? 0 : offset + 1}</span> to <span className="font-medium font-mono text-foreground">{Math.min(offset + pageSize, totalProducts)}</span> of <span className="font-medium font-mono text-foreground">{totalProducts}</span> products
-            </div>
-            <div className="flex space-x-2 w-full sm:w-auto justify-end">
-              {page > 1 ? (
-                <Button
-                  variant="outline"
-                  size="xs"
-                  asChild
-                >
-                  <Link href={buildPageUrl(page - 1)}>
-                    Previous
-                  </Link>
-                </Button>
-              ) : (
-                <Button variant="outline" size="xs" disabled>
-                  Previous
-                </Button>
-              )}
-              
-              {page < totalPages ? (
-                <Button
-                  variant="outline"
-                  size="xs"
-                  asChild
-                >
-                  <Link href={buildPageUrl(page + 1)}>
-                    Next
-                  </Link>
-                </Button>
-              ) : (
-                <Button variant="outline" size="xs" disabled>
-                  Next
-                </Button>
-              )}
-            </div>
-          </div>
-        )}
-      </div>
-    );
+                                  <div className="flex-1 min-h-0 relative z-10 w-full overflow-x-auto overflow-y-auto">
+                                    <Table className="min-w-[500px]">
+                                      <TableHeader className="sticky top-0 bg-muted/80 backdrop-blur-none z-20">
+                                        <TableRow>
+                                          <TableHead className="font-semibold text-xs">Product</TableHead>
+                                          <TableHead className="font-semibold text-xs text-center w-28">Units Sold</TableHead>
+                                          <TableHead className="font-semibold text-xs text-right w-36">Revenue</TableHead>
+                                        </TableRow>
+                                      </TableHeader>
+                                      <TableBody>
+                                        {productData.length === 0 ? (
+                                          <TableRow>
+                                            <TableCell colSpan={3} className="py-16 text-center text-muted-foreground">
+                                              <div className="flex flex-col items-center justify-center space-y-2.5">
+                                                <div className="w-10 h-10 rounded-lg bg-muted border border-border flex items-center justify-center text-muted-foreground">
+                                                  <ShoppingBag size={20} />
+                                                </div>
+                                                <p className="text-sm font-medium text-foreground">No product sales recorded for {dateRange.label}</p>
+                                                <p className="text-xs text-muted-foreground">Try selecting a different date range or search keyword</p>
+                                              </div>
+                                            </TableCell>
+                                          </TableRow>
+                                        ) : (
+                                          productData.map((data, idx) => (
+                                            <TableRow key={idx} className="hover:bg-muted/40 transition-colors">
+                                              <TableCell className="font-medium text-foreground">
+                                                <div className="flex items-center gap-3">
+                                                  {data.imageUrl ? (
+                                                    <div className="relative w-9 h-9 rounded-lg overflow-hidden bg-muted border border-border shrink-0">
+                                                      <Image
+                                                        src={data.imageUrl}
+                                                        alt={data.title || 'Product'}
+                                                        fill
+                                                        sizes="36px"
+                                                        className="object-cover"
+                                                      />
+                                                    </div>
+                                                  ) : (
+                                                    <div className="w-9 h-9 rounded-lg bg-muted border border-border flex items-center justify-center text-foreground shrink-0 text-xs font-semibold">
+                                                      {data.title ? data.title.charAt(0).toUpperCase() : '?'}
+                                                    </div>
+                                                  )}
+                                                  <Link href={`https://fvprhj-0y.myshopify.com/products/${data.title?.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '')}`} target="_blank" rel="noopener noreferrer" className="truncate hover:text-primary transition-colors text-foreground flex items-center gap-1 group/link max-w-[200px] sm:max-w-xs md:max-w-md">
+                                                    <span className="truncate text-xs sm:text-sm font-medium">{data.title || 'Unknown Product'}</span>
+                                                    <ArrowUpRight size={13} className="text-muted-foreground group-hover/link:text-primary transition-colors shrink-0" />
+                                                  </Link>
+                                                </div>
+                                              </TableCell>
+                                              <TableCell className="text-center">
+                                                <Badge variant="neutral" size="sm" className="font-mono">
+                                                  {Number(data.unitsSold)}
+                                                </Badge>
+                                              </TableCell>
+                                              <TableCell className="text-right font-medium text-foreground text-xs sm:text-sm whitespace-nowrap font-mono">
+                                                ₹{Number(data.revenue).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                              </TableCell>
+                                            </TableRow>
+                                          ))
+                                        )}
+                                      </TableBody>
+                                    </Table>
+                                  </div>
+
+                                  {totalPages > 1 && (
+                                    <div className="flex-none p-3.5 sm:px-6 border-t border-border flex flex-col sm:flex-row justify-between items-center gap-3 bg-muted/20 relative z-10">
+                                      <div className="text-xs text-muted-foreground">
+                                        Showing <span className="font-medium font-mono text-foreground">{totalProducts === 0 ? 0 : offset + 1}</span> to <span className="font-medium font-mono text-foreground">{Math.min(offset + pageSize, totalProducts)}</span> of <span className="font-medium font-mono text-foreground">{totalProducts}</span> products
+                                      </div>
+                                      <div className="flex space-x-2 w-full sm:w-auto justify-end">
+                                        {page > 1 ? (
+                                          <Button
+                                            variant="outline"
+                                            size="xs"
+                                            asChild
+                                          >
+                                            <Link href={buildPageUrl(page - 1)}>
+                                              Previous
+                                            </Link>
+                                          </Button>
+                                        ) : (
+                                          <Button variant="outline" size="xs" disabled>
+                                            Previous
+                                          </Button>
+                                        )}
+
+                                        {page < totalPages ? (
+                                          <Button
+                                            variant="outline"
+                                            size="xs"
+                                            asChild
+                                          >
+                                            <Link href={buildPageUrl(page + 1)}>
+                                              Next
+                                            </Link>
+                                          </Button>
+                                        ) : (
+                                          <Button variant="outline" size="xs" disabled>
+                                            Next
+                                          </Button>
+                                        )}
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                                );
   }
 }

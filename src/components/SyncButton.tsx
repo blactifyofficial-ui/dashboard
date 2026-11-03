@@ -107,32 +107,32 @@ export default function SyncButton() {
           onClick={handleSync}
           disabled={isSyncing}
           loading={isSyncing}
-          className="w-full sm:w-auto h-11 px-6 rounded-lg font-semibold text-sm gap-2"
+          className="w-full sm:w-auto h-[44px] px-7 rounded-full font-normal text-[15px] sm:text-[17px] tracking-[-0.374px] gap-2"
         >
           {!isSyncing && <RefreshCw size={16} className="shrink-0" />}
           <span>{isSyncing ? 'Syncing Orders...' : 'Sync Orders & Products Now'}</span>
         </Button>
 
-        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-          <span className="flex h-2 w-2 relative">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-          </span>
-          <span className="text-foreground font-medium">Auto-sync active</span>
-          <span className="text-muted-foreground">•</span>
-          <span className="flex items-center gap-1 text-muted-foreground">
-            <Clock size={12} />
-            {timeAgo || 'Checking...'}
-          </span>
+          <div className="flex items-center gap-2 text-[12px] text-muted-foreground tracking-[-0.1px]">
+            <span className="flex h-2 w-2 relative">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#0066cc] opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-[#0066cc]"></span>
+            </span>
+            <span className="text-foreground font-semibold">Auto-sync active</span>
+            <span className="text-muted-foreground">•</span>
+            <span className="flex items-center gap-1 text-muted-foreground">
+              <Clock size={12} />
+              {timeAgo || 'Checking...'}
+            </span>
+          </div>
         </div>
-      </div>
 
-      <div className="flex items-center gap-2 text-xs text-muted-foreground bg-muted/60 border border-border px-3 py-2 rounded-lg">
-        <CheckCircle2 size={14} className="text-emerald-500 shrink-0" />
-        <span>
-          Orders automatically sync in the background on page load and every 3 minutes while the dashboard is open.
-        </span>
-      </div>
-    </div>
-  );
+          <div className="flex items-center gap-2.5 text-[12px] sm:text-[13px] text-muted-foreground bg-muted/40 border border-border px-4 py-2.5 rounded-full">
+            <CheckCircle2 size={15} className="text-[#0066cc] dark:text-[#2997ff] shrink-0" />
+            <span>
+              Orders automatically sync in the background on page load and every 3 minutes while the dashboard is open.
+            </span>
+          </div>
+        </div>
+        );
 }

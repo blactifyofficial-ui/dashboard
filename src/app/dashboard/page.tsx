@@ -32,9 +32,9 @@ export default async function Dashboard() {
       redirect('/login');
     }
     return (
-      <div className="bg-card border border-border rounded-xl p-8 text-center text-muted-foreground">
-        <p className="text-base font-medium text-foreground mb-1">Access Restricted</p>
-        <p className="text-sm">{authRes.error}</p>
+      <div className="bg-card border border-border rounded-[18px] p-8 text-center text-muted-foreground">
+        <p className="text-[17px] font-semibold text-foreground mb-1 tracking-[-0.374px]">Access Restricted</p>
+        <p className="text-[14px] tracking-[-0.224px]">{authRes.error}</p>
       </div>
     );
   }
@@ -48,9 +48,9 @@ export default async function Dashboard() {
       redirect(defaultRoute);
     }
     return (
-      <div className="bg-card border border-border rounded-xl p-8 text-center text-muted-foreground">
-        <p className="text-base font-medium text-foreground mb-1">Access Restricted</p>
-        <p className="text-sm">You do not have permission to view the Overview dashboard.</p>
+      <div className="bg-card border border-border rounded-[18px] p-8 text-center text-muted-foreground">
+        <p className="text-[17px] font-semibold text-foreground mb-1 tracking-[-0.374px]">Access Restricted</p>
+        <p className="text-[14px] tracking-[-0.224px]">You do not have permission to view the Overview dashboard.</p>
       </div>
     );
   }
@@ -66,15 +66,17 @@ export default async function Dashboard() {
       {/* Header */}
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4">
         <div className="space-y-1">
-          <div className="flex items-center gap-2">
-            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">Sales Command Center</h1>
-            <span className="text-[10px] uppercase font-mono font-semibold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+          <div className="flex items-center gap-2.5">
+            <h1 className="text-[26px] sm:text-[34px] font-semibold tracking-[-0.374px] text-foreground leading-[1.2]">
+              Sales Command Center
+            </h1>
+            <span className="text-[11px] font-normal px-2.5 py-0.5 rounded-full bg-[#0066cc]/10 text-[#0066cc] dark:text-[#2997ff] border border-[#0066cc]/20">
               Live Overview
             </span>
           </div>
-          <p className="text-muted-foreground text-xs sm:text-sm flex items-center gap-2">
+          <p className="text-muted-foreground text-[14px] sm:text-[15px] tracking-[-0.224px] flex items-center gap-2">
             <span className="relative flex h-2 w-2 shrink-0">
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-[#0066cc]"></span>
             </span>
             <span>Real-time operational metrics &amp; Shopify synchronization</span>
           </p>
@@ -82,31 +84,31 @@ export default async function Dashboard() {
 
         {/* Quick Shortcut Buttons */}
         {(canViewRevenueReports || canViewReports || showInventoryShortcut) && (
-          <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-2.5 flex-wrap">
             {canViewReports && (
               <Link
                 href="/reports"
-                className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors flex items-center gap-1.5 shadow-xs"
+                className="px-4 py-2 text-[14px] font-normal rounded-full bg-[#0066cc] hover:bg-[#0071e3] text-white transition-all flex items-center gap-1.5 active:scale-95 tracking-[-0.224px]"
               >
-                <FileText size={14} />
+                <FileText size={15} />
                 <span>Monthly Reports</span>
               </Link>
             )}
             {canViewRevenueReports && (
               <Link
                 href="/revenue"
-                className="px-3 py-1.5 text-xs font-medium rounded-lg bg-card border border-border hover:bg-muted text-foreground transition-colors flex items-center gap-1.5 shadow-xs"
+                className="px-4 py-2 text-[14px] font-normal rounded-full bg-card border border-border hover:bg-muted/60 text-foreground transition-all flex items-center gap-1.5 active:scale-95 tracking-[-0.224px]"
               >
-                <BarChart3 size={14} className="text-muted-foreground" />
+                <BarChart3 size={15} className="text-muted-foreground" />
                 <span>Revenue Ledger</span>
               </Link>
             )}
             {showInventoryShortcut && (
               <Link
                 href="/inventory"
-                className="px-3 py-1.5 text-xs font-medium rounded-lg bg-card border border-border hover:bg-muted text-foreground transition-colors flex items-center gap-1.5 shadow-xs"
+                className="px-4 py-2 text-[14px] font-normal rounded-full bg-card border border-border hover:bg-muted/60 text-foreground transition-all flex items-center gap-1.5 active:scale-95 tracking-[-0.224px]"
               >
-                <Boxes size={14} className="text-muted-foreground" />
+                <Boxes size={15} className="text-muted-foreground" />
                 <span>Inventory Stock</span>
               </Link>
             )}

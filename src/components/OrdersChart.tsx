@@ -15,7 +15,7 @@ import {
 import { useTheme } from 'next-themes';
 import { BarChart2, TrendingUp } from 'lucide-react';
 
-const emptySubscribe = () => () => {};
+const emptySubscribe = () => () => { };
 
 export interface OrderDataPoint {
   date: string;
@@ -38,18 +38,18 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
     const title = label || data.label;
 
     return (
-      <div className="p-3 rounded-xl border border-border shadow-xl bg-card/95 backdrop-blur-md text-card-foreground min-w-[170px] space-y-2">
+      <div className="p-3 rounded-[14px] border border-border bg-card/95 backdrop-blur-md text-card-foreground min-w-[170px] space-y-2">
         <div className="flex items-center justify-between gap-2 pb-1.5 border-b border-border/60">
-          <span className="text-xs font-semibold text-foreground">{title}</span>
+          <span className="text-xs font-semibold text-foreground tracking-[-0.12px]">{title}</span>
           <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-mono">Daily</span>
         </div>
         <div className="space-y-1.5">
           <div className="flex items-center justify-between text-xs">
             <span className="text-muted-foreground flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-blue-500 inline-block shrink-0" />
+              <span className="w-2 h-2 rounded-full bg-[#0066cc] dark:bg-[#2997ff] inline-block shrink-0" />
               Orders:
             </span>
-            <span className="font-bold font-mono text-foreground">
+            <span className="font-semibold font-mono text-foreground">
               {orders.toLocaleString('en-IN')}
             </span>
           </div>
@@ -57,10 +57,10 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
           {rev !== undefined && rev > 0 && (
             <div className="flex items-center justify-between text-xs">
               <span className="text-muted-foreground flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block shrink-0" />
+                <span className="w-2 h-2 rounded-full bg-[#0066cc] dark:bg-[#2997ff] inline-block shrink-0" />
                 Revenue:
               </span>
-              <span className="font-bold font-mono text-emerald-600 dark:text-emerald-400">
+              <span className="font-semibold font-mono text-foreground">
                 ₹{rev.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </span>
             </div>
@@ -83,10 +83,10 @@ export default function OrdersChart({
   const isDark = mounted ? resolvedTheme === 'dark' : true;
 
   const gridStroke = isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.06)';
-  const axisColor = isDark ? '#94a3b8' : '#64748b';
-  const barFillTop = isDark ? '#818cf8' : '#4f46e5';
-  const barFillBottom = isDark ? 'rgba(99, 102, 241, 0.35)' : 'rgba(79, 70, 229, 0.4)';
-  const dotRing = isDark ? '#0c0d10' : '#ffffff';
+  const axisColor = isDark ? '#cccccc' : '#7a7a7a';
+  const barFillTop = isDark ? '#2997ff' : '#0066cc';
+  const barFillBottom = isDark ? 'rgba(41, 151, 255, 0.25)' : 'rgba(0, 102, 204, 0.25)';
+  const dotRing = isDark ? '#1d1d1f' : '#ffffff';
 
   const formattedData = (data || []).map((d) => {
     let label = d.day;
@@ -126,32 +126,30 @@ export default function OrdersChart({
         </div>
 
         {/* View Switcher: Bar vs Trend */}
-        <div className="flex items-center p-0.5 rounded-lg bg-muted/70 border border-border/80 text-xs">
-          <button
-            type="button"
-            onClick={() => setChartType('bar')}
-            className={`px-2.5 py-1 rounded-md flex items-center gap-1.5 text-xs font-medium transition-all ${
-              chartType === 'bar'
-                ? 'bg-card text-foreground shadow-xs'
-                : 'text-muted-foreground hover:text-foreground'
-            }`}
-          >
-            <BarChart2 size={13} />
-            <span>Bars</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setChartType('area')}
-            className={`px-2.5 py-1 rounded-md flex items-center gap-1.5 text-xs font-medium transition-all ${
-              chartType === 'area'
-                ? 'bg-card text-foreground shadow-xs'
-                : 'text-muted-foreground hover:text-foreground'
-            }`}
-          >
-            <TrendingUp size={13} />
-            <span>Trend</span>
-          </button>
-        </div>
+          <div className="flex items-center p-0.5 rounded-full bg-muted/70 border border-border text-xs">
+            <button
+              type="button"
+              onClick={() => setChartType('bar')}
+              className={`px-3 py-1 rounded-full flex items-center gap-1.5 text-xs font-normal transition-all active:scale-95 ${chartType === 'bar'
+                  ? 'bg-card text-foreground'
+                  : 'text-muted-foreground hover:text-foreground'
+                }`}
+            >
+              <BarChart2 size={13} />
+              <span>Bars</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setChartType('area')}
+              className={`px-3 py-1 rounded-full flex items-center gap-1.5 text-xs font-normal transition-all active:scale-95 ${chartType === 'area'
+                  ? 'bg-card text-foreground'
+                  : 'text-muted-foreground hover:text-foreground'
+                }`}
+            >
+              <TrendingUp size={13} />
+              <span>Trend</span>
+            </button>
+          </div>
       </div>
 
       {/* Chart Canvas */}

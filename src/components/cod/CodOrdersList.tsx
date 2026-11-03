@@ -49,8 +49,8 @@ export default function CodOrdersList({ orders }: CodOrdersListProps) {
 
   if (orders.length === 0) {
     return (
-      <div className="bg-card border border-border rounded-xl p-10 sm:p-14 text-center">
-        <div className="w-12 h-12 rounded-xl bg-muted border border-border text-muted-foreground mx-auto flex items-center justify-center mb-3">
+      <div className="bg-card border border-border rounded-[18px] p-10 sm:p-14 text-center">
+        <div className="w-12 h-12 rounded-full bg-muted border border-border text-muted-foreground mx-auto flex items-center justify-center mb-3">
           <Package size={24} />
         </div>
         <h3 className="text-base font-semibold text-foreground">
@@ -66,7 +66,7 @@ export default function CodOrdersList({ orders }: CodOrdersListProps) {
   return (
     <div className="space-y-3">
       {/* Table Container using 21st.dev Table */}
-      <div className="bg-card border border-border rounded-xl overflow-hidden shadow-xs">
+      <div className="bg-card border border-border rounded-[18px] overflow-hidden">
         <div className="overflow-x-auto">
           <Table className="min-w-[700px]">
             <TableHeader className="bg-muted/40">

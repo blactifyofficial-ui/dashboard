@@ -71,28 +71,28 @@ function getDueDayBadge(dueDayStr: string | null | undefined, monthStr: string, 
 
   if (diffDays < 0) {
     return (
-      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20">
+      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20">
         <AlertTriangle size={11} />
         Overdue {Math.abs(diffDays)}d
       </span>
     );
   } else if (diffDays === 0) {
     return (
-      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/20">
+      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/20">
         <Clock size={11} />
         Due Today
       </span>
     );
   } else if (diffDays <= 5) {
     return (
-      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium bg-muted text-foreground border border-border">
+      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-muted/60 text-foreground border border-border">
         <Clock size={11} />
         Due in {diffDays}d
       </span>
     );
   } else {
     return (
-      <span className="text-xs text-muted-foreground">
+      <span className="text-xs text-muted-foreground font-semibold">
         Due {dueDay}th
       </span>
     );
@@ -131,30 +131,30 @@ export default function MonthlyExpenseList({
   const paidCount = entries.filter((e) => e.status === 'PAID').length;
 
   return (
-    <div className="flex-1 min-h-0 flex flex-col bg-card border border-border rounded-xl overflow-hidden shadow-xs">
+    <div className="flex-1 min-h-0 flex flex-col bg-card border border-border rounded-[18px] overflow-hidden shadow-none">
       {/* Search & Filter Toolbar */}
-      <div className="flex-none p-3 sm:p-4 border-b border-border flex flex-col md:flex-row justify-between items-stretch md:items-center gap-3 bg-muted/20">
+      <div className="flex-none p-3 sm:p-4 border-b border-border flex flex-col md:flex-row justify-between items-stretch md:items-center gap-3 bg-muted/10">
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
           {/* Search Box */}
           <div className="relative flex-1 sm:w-64">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4 pointer-events-none" />
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4 pointer-events-none" />
             <Input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search expenses..."
-              className="pl-9 h-9 text-xs"
+              className="pl-9 h-10 rounded-full text-xs"
             />
           </div>
 
           {/* Filter Pills */}
-          <div className="flex items-center bg-muted/50 border border-border p-0.5 rounded-lg overflow-x-auto no-scrollbar">
+          <div className="flex items-center bg-muted/40 border border-border p-1 rounded-full overflow-x-auto no-scrollbar">
             <button
               type="button"
               onClick={() => setFilter('ALL')}
-              className={`flex-1 sm:flex-none px-3 py-1 text-xs font-medium rounded-md transition-colors whitespace-nowrap ${
+              className={`flex-1 sm:flex-none px-3.5 py-1 text-xs font-semibold rounded-full transition-all active:scale-95 whitespace-nowrap ${
                 filter === 'ALL'
-                  ? 'bg-card text-foreground font-semibold shadow-xs'
+                  ? 'bg-primary text-primary-foreground font-semibold shadow-none'
                   : 'text-muted-foreground hover:text-foreground'
               }`}
             >
@@ -163,9 +163,9 @@ export default function MonthlyExpenseList({
             <button
               type="button"
               onClick={() => setFilter('PENDING')}
-              className={`flex-1 sm:flex-none px-3 py-1 text-xs font-medium rounded-md transition-colors whitespace-nowrap ${
+              className={`flex-1 sm:flex-none px-3.5 py-1 text-xs font-semibold rounded-full transition-all active:scale-95 whitespace-nowrap ${
                 filter === 'PENDING'
-                  ? 'bg-card text-foreground font-semibold shadow-xs'
+                  ? 'bg-primary text-primary-foreground font-semibold shadow-none'
                   : 'text-muted-foreground hover:text-foreground'
               }`}
             >
@@ -174,9 +174,9 @@ export default function MonthlyExpenseList({
             <button
               type="button"
               onClick={() => setFilter('PAID')}
-              className={`flex-1 sm:flex-none px-3 py-1 text-xs font-medium rounded-md transition-colors whitespace-nowrap ${
+              className={`flex-1 sm:flex-none px-3.5 py-1 text-xs font-semibold rounded-full transition-all active:scale-95 whitespace-nowrap ${
                 filter === 'PAID'
-                  ? 'bg-card text-foreground font-semibold shadow-xs'
+                  ? 'bg-primary text-primary-foreground font-semibold shadow-none'
                   : 'text-muted-foreground hover:text-foreground'
               }`}
             >
@@ -191,7 +191,7 @@ export default function MonthlyExpenseList({
             variant="outline"
             size="sm"
             onClick={onOpenTemplates}
-            className="h-9"
+            className="h-9 rounded-full"
           >
             <SlidersHorizontal size={14} />
             <span>Templates</span>
@@ -200,7 +200,7 @@ export default function MonthlyExpenseList({
           <Button
             size="sm"
             onClick={onAddClick}
-            className="h-9"
+            className="h-9 rounded-full"
           >
             <Plus size={14} />
             <span>Add Bill</span>
@@ -212,10 +212,10 @@ export default function MonthlyExpenseList({
       <div className="flex-1 overflow-x-auto min-h-0">
         {filteredEntries.length === 0 ? (
           <div className="py-16 text-center text-muted-foreground space-y-2 px-4">
-            <div className="w-10 h-10 mx-auto rounded-lg bg-muted border border-border flex items-center justify-center text-muted-foreground">
+            <div className="w-10 h-10 mx-auto rounded-full bg-muted border border-border flex items-center justify-center text-muted-foreground">
               <FileText size={18} />
             </div>
-            <p className="text-sm font-medium text-foreground">
+            <p className="text-sm font-semibold text-foreground">
               {entries.length === 0 ? 'No recurring bills found for this month.' : 'No bills match your search filter.'}
             </p>
             {entries.length === 0 && (
@@ -223,6 +223,7 @@ export default function MonthlyExpenseList({
                 <Button
                   size="sm"
                   onClick={onAddClick}
+                  className="rounded-full"
                 >
                   <Plus size={14} /> Add Bill
                 </Button>
@@ -230,6 +231,7 @@ export default function MonthlyExpenseList({
                   variant="outline"
                   size="sm"
                   onClick={onOpenTemplates}
+                  className="rounded-full"
                 >
                   Configure Templates
                 </Button>
@@ -238,15 +240,15 @@ export default function MonthlyExpenseList({
           </div>
         ) : (
           <Table className="min-w-[700px]">
-            <TableHeader className="sticky top-0 bg-muted/40 z-10">
+            <TableHeader className="sticky top-0 bg-muted/40 z-10 backdrop-blur-md">
               <TableRow className="hover:bg-muted/40">
                 <TableHead className="w-12 text-center">Status</TableHead>
-                <TableHead className="font-medium">Expense</TableHead>
-                <TableHead className="font-medium">Category</TableHead>
-                <TableHead className="font-medium">Due Date</TableHead>
-                <TableHead className="font-medium">Payment Info</TableHead>
-                <TableHead className="font-medium text-right">Amount</TableHead>
-                <TableHead className="font-medium text-right">Actions</TableHead>
+                <TableHead className="font-semibold text-xs tracking-[-0.01em]">Expense</TableHead>
+                <TableHead className="font-semibold text-xs tracking-[-0.01em]">Category</TableHead>
+                <TableHead className="font-semibold text-xs tracking-[-0.01em]">Due Date</TableHead>
+                <TableHead className="font-semibold text-xs tracking-[-0.01em]">Payment Info</TableHead>
+                <TableHead className="font-semibold text-xs tracking-[-0.01em] text-right">Amount</TableHead>
+                <TableHead className="font-semibold text-xs tracking-[-0.01em] text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

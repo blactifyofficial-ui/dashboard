@@ -1,16 +1,16 @@
 'use client';
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { 
-  Plus, 
-  Search, 
-  X, 
-  Loader2, 
-  Banknote, 
-  CreditCard, 
-  Hash, 
-  Pencil, 
-  Trash2, 
+import {
+  Plus,
+  Search,
+  X,
+  Loader2,
+  Banknote,
+  CreditCard,
+  Hash,
+  Pencil,
+  Trash2,
   Check
 } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -215,7 +215,7 @@ export default function PayoutsPage() {
   // Metrics Calculations
   const metrics = useMemo(() => {
     const totalDistributed = payouts.reduce((sum, p) => sum + parseFloat(p.amount || '0'), 0);
-    
+
     // Payouts this month
     const now = new Date();
     const currentMonthPrefix = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
@@ -273,464 +273,465 @@ export default function PayoutsPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 flex-shrink-0">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-lg sm:text-xl lg:text-2xl font-bold tracking-tight text-foreground flex items-center gap-2.5">
-              <span>Partner Payouts</span>
-            </h1>
-            <span className="px-2 py-0.5 rounded-md text-xs font-medium bg-muted text-foreground border border-border">
-              Payout Distributions
-            </span>
-          </div>
-          <p className="text-xs sm:text-sm text-muted-foreground mt-1">
-            Record, manage, and monitor all dividend payouts and profit withdrawals taken by partners.
-          </p>
-        </div>
-
-        {/* Top Header Action Buttons */}
-        {canManagePayouts && (
-          <div className="flex items-center gap-2">
-            <Button
-              size="sm"
-              onClick={() => handleOpenAddPayout()}
-            >
-              <Plus size={14} />
-              <span>Record Payout</span>
-            </Button>
-          </div>
-        )}
-      </div>
-
-      {/* KPI Cards Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        {/* Card 1: Total Payouts */}
-        <div className="bg-card border border-border rounded-xl p-4 sm:p-5 shadow-xs">
-          <p className="text-[11px] font-semibold text-muted-foreground mb-1 uppercase tracking-wider">Total Payouts Distributed</p>
-          <p className="text-xl sm:text-2xl font-bold font-mono text-foreground tracking-tight">
-            {formatCurrency(metrics.totalDistributed)}
-          </p>
-          <p className="mt-1 text-xs text-muted-foreground">
-            {metrics.totalCount} {metrics.totalCount === 1 ? 'payout recorded' : 'payouts recorded'}
-          </p>
-        </div>
-
-        {/* Card 2: This Month's Payouts */}
-        <div className="bg-card border border-border rounded-xl p-4 sm:p-5 shadow-xs">
-          <p className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 mb-1 uppercase tracking-wider">This Month Payouts</p>
-          <p className="text-xl sm:text-2xl font-bold font-mono text-emerald-600 dark:text-emerald-400 tracking-tight">
-            {formatCurrency(metrics.thisMonthPayouts)}
-          </p>
-          <p className="mt-1 text-xs text-muted-foreground">
-            Current calendar month
-          </p>
-        </div>
-
-        {/* Card 3: Partners with Payouts */}
-        <div className="bg-card border border-border rounded-xl p-4 sm:p-5 shadow-xs">
-          <p className="text-[11px] font-semibold text-muted-foreground mb-1 uppercase tracking-wider">Beneficiary Partners</p>
-          <p className="text-xl sm:text-2xl font-bold font-mono text-foreground tracking-tight">
-            {metrics.partnersWithPayoutsCount} / {partners.length}
-          </p>
-          <p className="mt-1 text-xs text-muted-foreground">
-            Partners who received payouts
-          </p>
-        </div>
-
-        {/* Card 4: Average Payout */}
-        <div className="bg-card border border-border rounded-xl p-4 sm:p-5 shadow-xs">
-          <p className="text-[11px] font-semibold text-muted-foreground mb-1 uppercase tracking-wider">Average Per Payout</p>
-          <p className="text-xl sm:text-2xl font-bold font-mono text-foreground tracking-tight">
-            {formatCurrency(metrics.avgPayout)}
-          </p>
-          <p className="mt-1 text-xs text-muted-foreground">
-            Across all transactions
-          </p>
-        </div>
-      </div>
-
-      {/* Partner Payout Quick Summary Cards */}
-      <div className="bg-card border border-border rounded-xl p-4 sm:p-5 shadow-xs">
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Partner Payout Summary</h2>
-            <Badge variant="outline" size="sm">
-              {partners.length} {partners.length === 1 ? 'Partner' : 'Partners'}
-            </Badge>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          {partners.map((partner) => {
-            const partnerPayouts = payouts.filter((p) => p.partnerId === partner.id);
-            const totalPayoutAmt = partner.totalPayout || 0;
-            const payoutShare = metrics.totalDistributed > 0 ? ((totalPayoutAmt / metrics.totalDistributed) * 100).toFixed(1) : '0.0';
-
-            return (
-              <div
-                key={partner.id}
-                className="bg-card border border-border rounded-lg p-3.5 flex flex-col justify-between"
-              >
-                <div>
-                  <div className="flex items-start justify-between gap-2 mb-2">
-                    <div>
-                      <h4 className="text-xs sm:text-sm font-bold text-foreground truncate">{partner.name}</h4>
-                      <p className="text-[11px] text-muted-foreground">Equity: <span className="font-mono text-foreground">{partner.equityPercentage}%</span></p>
-                    </div>
-                    <span className="px-2 py-0.5 rounded text-[10px] font-mono font-medium bg-muted text-muted-foreground border border-border">
-                      {payoutShare}% Share
-                    </span>
-                  </div>
-
-                  <div className="pt-2 border-t border-border flex items-center justify-between">
-                    <span className="text-xs text-muted-foreground">Total Payouts:</span>
-                    <span className="text-sm font-bold font-mono text-foreground">
-                      {formatCurrency(totalPayoutAmt)}
-                    </span>
-                  </div>
-
-                  <div className="mt-1 flex items-center justify-between text-[11px] text-muted-foreground">
-                    <span>Transactions:</span>
-                    <span className="font-mono text-foreground">{partnerPayouts.length} entries</span>
-                  </div>
-                </div>
-
-                <div className="mt-3 pt-2.5 border-t border-border flex items-center justify-end">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleOpenAddPayout(partner.id)}
-                    className="w-full"
-                  >
-                    <Banknote size={13} className="text-muted-foreground" />
-                    <span>Record Payout</span>
-                  </Button>
-                </div>
+              <h1 className="text-2xl sm:text-[34px] font-bold tracking-tight text-foreground flex items-center gap-2.5">
+                <span>Partner Payouts</span>
+              </h1>
+                <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-muted/60 text-foreground border border-border">
+                  Payout Distributions
+                </span>
               </div>
-            );
-          })}
-        </div>
-      </div>
+              <p className="text-xs sm:text-sm text-muted-foreground mt-1">
+                Record, manage, and monitor all dividend payouts and profit withdrawals taken by partners.
+              </p>
+          </div>
 
-      {/* Search & Filter Controls */}
-      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 flex-shrink-0">
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-          <div className="relative flex-1 sm:w-64">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-3.5 h-3.5" />
-            <Input
-              type="text"
-              placeholder="Search by partner, UTR, notes..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-8 pr-8 h-9 text-xs"
-            />
-            {searchQuery && (
-              <button
-                type="button"
-                onClick={() => setSearchQuery('')}
-                className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-1"
+          {/* Top Header Action Buttons */}
+          {canManagePayouts && (
+            <div className="flex items-center gap-2">
+              <Button
+                size="sm"
+                onClick={() => handleOpenAddPayout()}
+                className="rounded-full"
               >
-                <X size={13} />
-              </button>
-            )}
-          </div>
-
-          <div className="flex items-center gap-2">
-            <select
-              value={partnerFilter}
-              onChange={(e) => setPartnerFilter(e.target.value)}
-              className="flex-1 sm:flex-initial bg-card border border-border rounded-lg px-2.5 py-2 min-h-[38px] text-xs text-foreground focus:outline-none focus:border-border-hover transition-colors"
-            >
-              <option value="ALL" className="bg-card text-foreground">All Partners</option>
-              {partners.map((p) => (
-                <option key={p.id} value={p.id} className="bg-card text-foreground">
-                  {p.name}
-                </option>
-              ))}
-            </select>
-
-            <select
-              value={paymentMethodFilter}
-              onChange={(e) => setPaymentMethodFilter(e.target.value)}
-              className="flex-1 sm:flex-initial bg-card border border-border rounded-lg px-2.5 py-2 min-h-[38px] text-xs text-foreground focus:outline-none focus:border-border-hover transition-colors"
-            >
-              <option value="ALL" className="bg-card text-foreground">All Payment Methods</option>
-              {paymentMethods.map((pm) => (
-                <option key={pm.id} value={pm.id} className="bg-card text-foreground">
-                  {pm.name}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-
-        <span className="text-xs text-muted-foreground self-end md:self-center font-mono">
-          Showing {filteredPayouts.length} {filteredPayouts.length === 1 ? 'payout' : 'payouts'}
-        </span>
-      </div>
-
-      {/* Payouts Ledger Table */}
-      <div className="bg-card border border-border rounded-xl overflow-hidden flex flex-col flex-1 min-h-0 shadow-xs">
-        <div className="p-4 sm:p-5 border-b border-border flex items-center justify-between bg-muted/40">
-          <div className="flex items-center gap-2">
-            <h3 className="text-sm sm:text-base font-semibold text-foreground">
-              Payout History Ledger
-            </h3>
-            <span className="px-2 py-0.5 rounded-md text-xs font-medium bg-muted text-foreground border border-border">
-              {filteredPayouts.length} {filteredPayouts.length === 1 ? 'entry' : 'entries'}
-            </span>
-          </div>
-        </div>
-
-        <div className="overflow-x-auto">
-          <Table className="min-w-[700px]">
-            <TableHeader>
-              <TableRow className="bg-muted/20 hover:bg-muted/20">
-                <TableHead className="font-medium">Date</TableHead>
-                <TableHead className="font-medium">Partner</TableHead>
-                <TableHead className="font-medium">Payout Amount</TableHead>
-                <TableHead className="font-medium">Payment Method</TableHead>
-                <TableHead className="font-medium">Reference / UTR</TableHead>
-                <TableHead className="font-medium">Notes</TableHead>
-                <TableHead className="font-medium text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredPayouts.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={7} className="py-16 text-center text-muted-foreground">
-                    <div className="w-10 h-10 mx-auto rounded-lg bg-muted border border-border flex items-center justify-center text-muted-foreground mb-2">
-                      <Banknote size={18} className="text-muted-foreground" />
-                    </div>
-                    <div className="text-sm font-medium text-foreground">
-                      No payout records found
-                    </div>
-                    <p className="text-xs text-muted-foreground max-w-sm mx-auto mt-1 mb-3">
-                      Record profit distributions and partner payouts to see them logged in this ledger.
-                    </p>
-                    <Button
-                      size="sm"
-                      onClick={() => handleOpenAddPayout()}
-                    >
-                      <Plus size={14} />
-                      <span>Record First Payout</span>
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ) : (
-                filteredPayouts.map((txn) => (
-                  <TableRow key={txn.id} className="hover:bg-muted/40 transition-colors group">
-                    <TableCell className="text-muted-foreground whitespace-nowrap text-xs font-mono">
-                      {formatDisplayDate(txn.transactionDate)}
-                    </TableCell>
-                    <TableCell className="font-semibold text-foreground whitespace-nowrap">
-                      {txn.partnerName || '—'}
-                    </TableCell>
-                    <TableCell className="font-bold font-mono whitespace-nowrap text-emerald-600 dark:text-emerald-400">
-                      {formatCurrency(txn.amount)}
-                    </TableCell>
-                    <TableCell className="text-muted-foreground whitespace-nowrap text-xs">
-                      {txn.paymentMethodName ? (
-                        <span className="inline-flex items-center gap-1">
-                          <CreditCard size={11} className="text-muted-foreground" />
-                          {txn.paymentMethodName}
-                        </span>
-                      ) : (
-                        '—'
-                      )}
-                    </TableCell>
-                    <TableCell className="text-muted-foreground font-mono text-xs whitespace-nowrap">
-                      {txn.referenceNumber ? (
-                        <span className="inline-flex items-center gap-1">
-                          <Hash size={11} className="text-muted-foreground" />
-                          {txn.referenceNumber}
-                        </span>
-                      ) : (
-                        '—'
-                      )}
-                    </TableCell>
-                    <TableCell className="text-muted-foreground text-xs max-w-xs truncate">
-                      {txn.notes || '—'}
-                    </TableCell>
-                    <TableCell className="text-right whitespace-nowrap">
-                      <div className="flex items-center justify-end gap-1">
-                        {canManagePayouts && (
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleOpenEditPayout(txn)}
-                            className="h-7 w-7"
-                            title="Edit payout"
-                          >
-                            <Pencil size={13} />
-                          </Button>
-                        )}
-                        {canDeletePayouts && (
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => {
-                              setDeleteConfirm({
-                                isOpen: true,
-                                id: txn.id,
-                                amount: txn.amount,
-                                partnerName: txn.partnerName || 'Partner',
-                              });
-                            }}
-                            className="h-7 w-7 text-muted-foreground hover:text-rose-500"
-                            title="Delete payout"
-                          >
-                            <Trash2 size={13} />
-                          </Button>
-                        )}
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </div>
-      </div>
-
-      {/* Record / Edit Payout Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-3 sm:p-4 overflow-y-auto">
-          <div className="bg-card border border-border rounded-xl w-full max-w-lg shadow-2xl overflow-hidden my-auto max-h-[90dvh] flex flex-col">
-            <div className="p-4 sm:p-5 border-b border-border flex items-center justify-between bg-muted/30 flex-shrink-0">
-              <div className="flex items-center gap-2.5">
-                <div className="p-1.5 rounded-lg bg-muted text-foreground border border-border">
-                  <Banknote size={15} />
-                </div>
-                <h3 className="text-sm sm:text-base font-bold text-foreground">
-                  {editingPayout ? 'Edit Partner Payout' : 'Record Partner Payout'}
-                </h3>
-              </div>
-              <button
-                onClick={() => setIsModalOpen(false)}
-                className="w-8 h-8 flex items-center justify-center text-muted-foreground hover:text-foreground rounded-lg bg-muted hover:bg-muted/80 transition-colors"
-              >
-                <X size={15} />
-              </button>
+                <Plus size={14} />
+                <span>Record Payout</span>
+              </Button>
             </div>
-
-            <form onSubmit={handleSubmitPayout} className="p-4 sm:p-5 space-y-3.5 overflow-y-auto flex-1">
-              <div>
-                <label className="block text-xs font-semibold text-foreground mb-1.5">
-                  Select Partner <span className="text-rose-500">*</span>
-                </label>
-                <select
-                  required
-                  value={formData.partnerId}
-                  onChange={(e) => setFormData({ ...formData, partnerId: e.target.value })}
-                  className="w-full min-h-[38px] px-3 bg-card border border-border rounded-lg text-xs text-foreground focus:outline-none focus:border-border-hover transition-colors"
-                >
-                  <option value="" disabled className="bg-card text-muted-foreground">Select a partner</option>
-                  {partners.map((p) => (
-                    <option key={p.id} value={p.id} className="bg-card text-foreground">
-                      {p.name} ({p.equityPercentage}% Equity)
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-semibold text-foreground mb-1.5">
-                    Payout Amount (₹) <span className="text-rose-500">*</span>
-                  </label>
-                  <input
-                    type="number"
-                    inputMode="decimal"
-                    step="0.01"
-                    min="1"
-                    required
-                    placeholder="e.g. 50000"
-                    value={formData.amount}
-                    onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                    className="w-full min-h-[38px] px-3 bg-card border border-border rounded-lg text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-border-hover transition-colors font-mono"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-foreground mb-1.5">Payout Date</label>
-                  <input
-                    type="date"
-                    required
-                    value={formData.transactionDate}
-                    onChange={(e) => setFormData({ ...formData, transactionDate: e.target.value })}
-                    className="w-full min-h-[38px] px-3 bg-card border border-border rounded-lg text-xs text-foreground focus:outline-none focus:border-border-hover transition-colors"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-foreground mb-1.5">Payment Method</label>
-                <select
-                  value={formData.paymentMethodId}
-                  onChange={(e) => setFormData({ ...formData, paymentMethodId: e.target.value })}
-                  className="w-full min-h-[38px] px-3 bg-card border border-border rounded-lg text-xs text-foreground focus:outline-none focus:border-border-hover transition-colors"
-                >
-                  <option value="" className="bg-card text-foreground">None / Cash</option>
-                  {paymentMethods.map((pm) => (
-                    <option key={pm.id} value={pm.id} className="bg-card text-foreground">
-                      {pm.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-foreground mb-1.5">Reference Number / UTR / Txn ID</label>
-                <input
-                  type="text"
-                  placeholder="e.g. UPI/2026/10/123456 or Bank Ref"
-                  value={formData.referenceNumber}
-                  onChange={(e) => setFormData({ ...formData, referenceNumber: e.target.value })}
-                  className="w-full min-h-[38px] px-3 bg-card border border-border rounded-lg text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-border-hover font-mono transition-colors"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-foreground mb-1.5">Notes &amp; Remarks</label>
-                <textarea
-                  rows={2}
-                  placeholder="e.g. Monthly dividend transfer / profit payout..."
-                  value={formData.notes}
-                  onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                  className="w-full p-2.5 bg-card border border-border rounded-lg text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-border-hover resize-none transition-colors"
-                />
-              </div>
-
-              <div className="pt-3 border-t border-border flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2.5">
-                <button
-                  type="button"
-                  onClick={() => setIsModalOpen(false)}
-                  className="px-3.5 py-2 min-h-[38px] rounded-lg text-xs font-medium text-foreground bg-muted hover:bg-muted/80 border border-border transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="px-4 py-2 min-h-[38px] bg-primary text-primary-foreground hover:opacity-90 text-xs font-semibold rounded-lg flex items-center justify-center gap-1.5 transition-opacity disabled:opacity-50"
-                >
-                  {isSubmitting ? <Loader2 size={13} className="animate-spin" /> : <Check size={13} />}
-                  <span>{editingPayout ? 'Save Changes' : 'Record Payout'}</span>
-                </button>
-              </div>
-            </form>
-          </div>
+          )}
         </div>
-      )}
 
-      {/* Confirm Delete Modal */}
-      <ConfirmModal
-        isOpen={deleteConfirm.isOpen}
-        title="Delete Payout Record?"
-        message={`Are you sure you want to delete this payout of ${formatCurrency(deleteConfirm.amount)} for ${deleteConfirm.partnerName}?`}
-        onConfirm={handleConfirmDelete}
-        onCancel={() => setDeleteConfirm((prev) => ({ ...prev, isOpen: false }))}
-        confirmText="Delete Payout"
-        isLoading={isDeleting}
-      />
-    </div>
-  );
+        {/* KPI Cards Grid */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          {/* Card 1: Total Payouts */}
+            <div className="bg-card border border-border rounded-[18px] p-5 sm:p-6 shadow-none">
+              <p className="text-[11px] font-semibold text-muted-foreground mb-1 uppercase tracking-wider">Total Payouts Distributed</p>
+                <p className="text-2xl sm:text-[32px] font-bold font-mono text-foreground tracking-tight">
+                  {formatCurrency(metrics.totalDistributed)}
+                </p>
+                  <p className="mt-1 text-xs text-muted-foreground font-semibold">
+                    {metrics.totalCount} {metrics.totalCount === 1 ? 'payout recorded' : 'payouts recorded'}
+                  </p>
+                </div>
+
+                {/* Card 2: This Month's Payouts */}
+                  <div className="bg-card border border-border rounded-[18px] p-5 sm:p-6 shadow-none">
+                    <p className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 mb-1 uppercase tracking-wider">This Month Payouts</p>
+                      <p className="text-2xl sm:text-[32px] font-bold font-mono text-emerald-600 dark:text-emerald-400 tracking-tight">
+                        {formatCurrency(metrics.thisMonthPayouts)}
+                      </p>
+                        <p className="mt-1 text-xs text-muted-foreground font-semibold">
+                          Current calendar month
+                        </p>
+                      </div>
+
+                      {/* Card 3: Partners with Payouts */}
+                        <div className="bg-card border border-border rounded-[18px] p-5 sm:p-6 shadow-none">
+                          <p className="text-[11px] font-semibold text-muted-foreground mb-1 uppercase tracking-wider">Beneficiary Partners</p>
+                            <p className="text-2xl sm:text-[32px] font-bold font-mono text-foreground tracking-tight">
+                              {metrics.partnersWithPayoutsCount} / {partners.length}
+                            </p>
+                              <p className="mt-1 text-xs text-muted-foreground font-semibold">
+                                Partners who received payouts
+                              </p>
+                            </div>
+
+                            {/* Card 4: Average Payout */}
+                              <div className="bg-card border border-border rounded-[18px] p-5 sm:p-6 shadow-none">
+                                <p className="text-[11px] font-semibold text-muted-foreground mb-1 uppercase tracking-wider">Average Per Payout</p>
+                                  <p className="text-2xl sm:text-[32px] font-bold font-mono text-foreground tracking-tight">
+                                    {formatCurrency(metrics.avgPayout)}
+                                  </p>
+                                    <p className="mt-1 text-xs text-muted-foreground font-semibold">
+                                      Across all transactions
+                                    </p>
+                                  </div>
+                              </div>
+
+                              {/* Partner Payout Quick Summary Cards */}
+                                <div className="bg-card border border-border rounded-[18px] p-5 sm:p-6 shadow-none">
+                                  <div className="flex items-center justify-between mb-3">
+                                    <div className="flex items-center gap-2">
+                                      <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Partner Payout Summary</h2>
+                                      <Badge variant="outline" size="sm">
+                                        {partners.length} {partners.length === 1 ? 'Partner' : 'Partners'}
+                                      </Badge>
+                                    </div>
+                                  </div>
+
+                                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                                    {partners.map((partner) => {
+                                      const partnerPayouts = payouts.filter((p) => p.partnerId === partner.id);
+                                      const totalPayoutAmt = partner.totalPayout || 0;
+                                      const payoutShare = metrics.totalDistributed > 0 ? ((totalPayoutAmt / metrics.totalDistributed) * 100).toFixed(1) : '0.0';
+
+                                      return (
+                                        <div
+                                          key={partner.id}
+                                          className="bg-card border border-border rounded-[14px] p-4 flex flex-col justify-between shadow-none"
+                                        >
+                                          <div>
+                                            <div className="flex items-start justify-between gap-2 mb-2">
+                                              <div>
+                                                <h4 className="text-xs sm:text-sm font-bold text-foreground truncate">{partner.name}</h4>
+                                                <p className="text-[11px] text-muted-foreground font-semibold">Equity: <span className="font-mono text-foreground">{partner.equityPercentage}%</span></p>
+                                              </div>
+                                                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-semibold bg-muted/60 text-muted-foreground border border-border">
+                                                  {payoutShare}% Share
+                                                </span>
+                                            </div>
+
+                                            <div className="pt-2 border-t border-border flex items-center justify-between">
+                                              <span className="text-xs text-muted-foreground font-semibold">Total Payouts:</span>
+                                              <span className="text-sm font-bold font-mono text-foreground">
+                                                {formatCurrency(totalPayoutAmt)}
+                                              </span>
+                                            </div>
+
+                                            <div className="mt-1 flex items-center justify-between text-[11px] text-muted-foreground">
+                                              <span>Transactions:</span>
+                                              <span className="font-mono text-foreground font-semibold">{partnerPayouts.length} entries</span>
+                                            </div>
+                                          </div>
+
+                                          <div className="mt-3 pt-2.5 border-t border-border flex items-center justify-end">
+                                            <Button
+                                              variant="outline"
+                                              size="sm"
+                                              onClick={() => handleOpenAddPayout(partner.id)}
+                                              className="w-full rounded-full"
+                                            >
+                                              <Banknote size={13} className="text-muted-foreground" />
+                                              <span>Record Payout</span>
+                                            </Button>
+                                          </div>
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
+                                </div>
+
+                                {/* Search & Filter Controls */}
+                                <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 flex-shrink-0">
+                                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                                    <div className="relative flex-1 sm:w-64">
+                                      <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground w-3.5 h-3.5" />
+                                      <Input
+                                        type="text"
+                                        placeholder="Search by partner, UTR, notes..."
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                        className="pl-9 pr-8 h-10 rounded-full text-xs"
+                                      />
+                                      {searchQuery && (
+                                        <button
+                                          type="button"
+                                          onClick={() => setSearchQuery('')}
+                                          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-1"
+                                        >
+                                          <X size={13} />
+                                        </button>
+                                      )}
+                                    </div>
+
+                                    <div className="flex items-center gap-2">
+                                      <select
+                                        value={partnerFilter}
+                                        onChange={(e) => setPartnerFilter(e.target.value)}
+                                        className="flex-1 sm:flex-initial bg-card border border-border rounded-full px-3.5 py-2 min-h-[40px] text-xs font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-[#0071e3] transition-colors"
+                                      >
+                                        <option value="ALL" className="bg-card text-foreground">All Partners</option>
+                                        {partners.map((p) => (
+                                          <option key={p.id} value={p.id} className="bg-card text-foreground">
+                                            {p.name}
+                                          </option>
+                                        ))}
+                                      </select>
+
+                                      <select
+                                        value={paymentMethodFilter}
+                                        onChange={(e) => setPaymentMethodFilter(e.target.value)}
+                                        className="flex-1 sm:flex-initial bg-card border border-border rounded-full px-3.5 py-2 min-h-[40px] text-xs font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-[#0071e3] transition-colors"
+                                      >
+                                        <option value="ALL" className="bg-card text-foreground">All Payment Methods</option>
+                                        {paymentMethods.map((pm) => (
+                                          <option key={pm.id} value={pm.id} className="bg-card text-foreground">
+                                            {pm.name}
+                                          </option>
+                                        ))}
+                                      </select>
+                                    </div>
+                                  </div>
+
+                                  <span className="text-xs text-muted-foreground self-end md:self-center font-mono">
+                                    Showing {filteredPayouts.length} {filteredPayouts.length === 1 ? 'payout' : 'payouts'}
+                                  </span>
+                                </div>
+
+                                {/* Payouts Ledger Table */}
+                                    <div className="bg-card border border-border rounded-[18px] overflow-hidden flex flex-col flex-1 min-h-0 shadow-none">
+                                      <div className="p-4 sm:p-5 border-b border-border flex items-center justify-between bg-muted/20">
+                                        <div className="flex items-center gap-2">
+                                            <h3 className="text-sm sm:text-base font-semibold text-foreground tracking-[-0.01em]">
+                                              Payout History Ledger
+                                            </h3>
+                                              <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-muted/60 text-foreground border border-border">
+                                                {filteredPayouts.length} {filteredPayouts.length === 1 ? 'entry' : 'entries'}
+                                              </span>
+                                            </div>
+                                        </div>
+
+                                        <div className="overflow-x-auto">
+                                          <Table className="min-w-[700px]">
+                                            <TableHeader>
+                                              <TableRow className="bg-muted/20 hover:bg-muted/20">
+                                                <TableHead className="font-medium">Date</TableHead>
+                                                <TableHead className="font-medium">Partner</TableHead>
+                                                <TableHead className="font-medium">Payout Amount</TableHead>
+                                                <TableHead className="font-medium">Payment Method</TableHead>
+                                                <TableHead className="font-medium">Reference / UTR</TableHead>
+                                                <TableHead className="font-medium">Notes</TableHead>
+                                                <TableHead className="font-medium text-right">Actions</TableHead>
+                                              </TableRow>
+                                            </TableHeader>
+                                            <TableBody>
+                                              {filteredPayouts.length === 0 ? (
+                                                <TableRow>
+                                                  <TableCell colSpan={7} className="py-16 text-center text-muted-foreground">
+                                                    <div className="w-10 h-10 mx-auto rounded-lg bg-muted border border-border flex items-center justify-center text-muted-foreground mb-2">
+                                                      <Banknote size={18} className="text-muted-foreground" />
+                                                    </div>
+                                                    <div className="text-sm font-medium text-foreground">
+                                                      No payout records found
+                                                    </div>
+                                                    <p className="text-xs text-muted-foreground max-w-sm mx-auto mt-1 mb-3">
+                                                      Record profit distributions and partner payouts to see them logged in this ledger.
+                                                    </p>
+                                                    <Button
+                                                      size="sm"
+                                                      onClick={() => handleOpenAddPayout()}
+                                                    >
+                                                      <Plus size={14} />
+                                                      <span>Record First Payout</span>
+                                                    </Button>
+                                                  </TableCell>
+                                                </TableRow>
+                                              ) : (
+                                                filteredPayouts.map((txn) => (
+                                                  <TableRow key={txn.id} className="hover:bg-muted/40 transition-colors group">
+                                                    <TableCell className="text-muted-foreground whitespace-nowrap text-xs font-mono">
+                                                      {formatDisplayDate(txn.transactionDate)}
+                                                    </TableCell>
+                                                    <TableCell className="font-semibold text-foreground whitespace-nowrap">
+                                                      {txn.partnerName || '—'}
+                                                    </TableCell>
+                                                    <TableCell className="font-bold font-mono whitespace-nowrap text-emerald-600 dark:text-emerald-400">
+                                                      {formatCurrency(txn.amount)}
+                                                    </TableCell>
+                                                    <TableCell className="text-muted-foreground whitespace-nowrap text-xs">
+                                                      {txn.paymentMethodName ? (
+                                                        <span className="inline-flex items-center gap-1">
+                                                          <CreditCard size={11} className="text-muted-foreground" />
+                                                          {txn.paymentMethodName}
+                                                        </span>
+                                                      ) : (
+                                                        '—'
+                                                      )}
+                                                    </TableCell>
+                                                    <TableCell className="text-muted-foreground font-mono text-xs whitespace-nowrap">
+                                                      {txn.referenceNumber ? (
+                                                        <span className="inline-flex items-center gap-1">
+                                                          <Hash size={11} className="text-muted-foreground" />
+                                                          {txn.referenceNumber}
+                                                        </span>
+                                                      ) : (
+                                                        '—'
+                                                      )}
+                                                    </TableCell>
+                                                    <TableCell className="text-muted-foreground text-xs max-w-xs truncate">
+                                                      {txn.notes || '—'}
+                                                    </TableCell>
+                                                    <TableCell className="text-right whitespace-nowrap">
+                                                      <div className="flex items-center justify-end gap-1">
+                                                        {canManagePayouts && (
+                                                          <Button
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            onClick={() => handleOpenEditPayout(txn)}
+                                                            className="h-7 w-7"
+                                                            title="Edit payout"
+                                                          >
+                                                            <Pencil size={13} />
+                                                          </Button>
+                                                        )}
+                                                        {canDeletePayouts && (
+                                                          <Button
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            onClick={() => {
+                                                              setDeleteConfirm({
+                                                                isOpen: true,
+                                                                id: txn.id,
+                                                                amount: txn.amount,
+                                                                partnerName: txn.partnerName || 'Partner',
+                                                              });
+                                                            }}
+                                                            className="h-7 w-7 text-muted-foreground hover:text-rose-500"
+                                                            title="Delete payout"
+                                                          >
+                                                            <Trash2 size={13} />
+                                                          </Button>
+                                                        )}
+                                                      </div>
+                                                    </TableCell>
+                                                  </TableRow>
+                                                ))
+                                              )}
+                                            </TableBody>
+                                          </Table>
+                                        </div>
+                                      </div>
+
+                                      {/* Record / Edit Payout Modal */}
+                                      {isModalOpen && (
+                                        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-3 sm:p-4 overflow-y-auto">
+                                          <div className="bg-card border border-border rounded-xl w-full max-w-lg shadow-2xl overflow-hidden my-auto max-h-[90dvh] flex flex-col">
+                                            <div className="p-4 sm:p-5 border-b border-border flex items-center justify-between bg-muted/30 flex-shrink-0">
+                                              <div className="flex items-center gap-2.5">
+                                                <div className="p-1.5 rounded-lg bg-muted text-foreground border border-border">
+                                                  <Banknote size={15} />
+                                                </div>
+                                                <h3 className="text-sm sm:text-base font-bold text-foreground">
+                                                  {editingPayout ? 'Edit Partner Payout' : 'Record Partner Payout'}
+                                                </h3>
+                                              </div>
+                                              <button
+                                                onClick={() => setIsModalOpen(false)}
+                                                className="w-8 h-8 flex items-center justify-center text-muted-foreground hover:text-foreground rounded-lg bg-muted hover:bg-muted/80 transition-colors"
+                                              >
+                                                <X size={15} />
+                                              </button>
+                                            </div>
+
+                                            <form onSubmit={handleSubmitPayout} className="p-4 sm:p-5 space-y-3.5 overflow-y-auto flex-1">
+                                              <div>
+                                                <label className="block text-xs font-semibold text-foreground mb-1.5">
+                                                  Select Partner <span className="text-rose-500">*</span>
+                                                </label>
+                                                <select
+                                                  required
+                                                  value={formData.partnerId}
+                                                  onChange={(e) => setFormData({ ...formData, partnerId: e.target.value })}
+                                                  className="w-full min-h-[38px] px-3 bg-card border border-border rounded-lg text-xs text-foreground focus:outline-none focus:border-border-hover transition-colors"
+                                                >
+                                                  <option value="" disabled className="bg-card text-muted-foreground">Select a partner</option>
+                                                  {partners.map((p) => (
+                                                    <option key={p.id} value={p.id} className="bg-card text-foreground">
+                                                      {p.name} ({p.equityPercentage}% Equity)
+                                                    </option>
+                                                  ))}
+                                                </select>
+                                              </div>
+
+                                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                                <div>
+                                                  <label className="block text-xs font-semibold text-foreground mb-1.5">
+                                                    Payout Amount (₹) <span className="text-rose-500">*</span>
+                                                  </label>
+                                                  <input
+                                                    type="number"
+                                                    inputMode="decimal"
+                                                    step="0.01"
+                                                    min="1"
+                                                    required
+                                                    placeholder="e.g. 50000"
+                                                    value={formData.amount}
+                                                    onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+                                                    className="w-full min-h-[38px] px-3 bg-card border border-border rounded-lg text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-border-hover transition-colors font-mono"
+                                                  />
+                                                </div>
+
+                                                <div>
+                                                  <label className="block text-xs font-semibold text-foreground mb-1.5">Payout Date</label>
+                                                  <input
+                                                    type="date"
+                                                    required
+                                                    value={formData.transactionDate}
+                                                    onChange={(e) => setFormData({ ...formData, transactionDate: e.target.value })}
+                                                    className="w-full min-h-[38px] px-3 bg-card border border-border rounded-lg text-xs text-foreground focus:outline-none focus:border-border-hover transition-colors"
+                                                  />
+                                                </div>
+                                              </div>
+
+                                              <div>
+                                                <label className="block text-xs font-semibold text-foreground mb-1.5">Payment Method</label>
+                                                <select
+                                                  value={formData.paymentMethodId}
+                                                  onChange={(e) => setFormData({ ...formData, paymentMethodId: e.target.value })}
+                                                  className="w-full min-h-[38px] px-3 bg-card border border-border rounded-lg text-xs text-foreground focus:outline-none focus:border-border-hover transition-colors"
+                                                >
+                                                  <option value="" className="bg-card text-foreground">None / Cash</option>
+                                                  {paymentMethods.map((pm) => (
+                                                    <option key={pm.id} value={pm.id} className="bg-card text-foreground">
+                                                      {pm.name}
+                                                    </option>
+                                                  ))}
+                                                </select>
+                                              </div>
+
+                                              <div>
+                                                <label className="block text-xs font-semibold text-foreground mb-1.5">Reference Number / UTR / Txn ID</label>
+                                                <input
+                                                  type="text"
+                                                  placeholder="e.g. UPI/2026/10/123456 or Bank Ref"
+                                                  value={formData.referenceNumber}
+                                                  onChange={(e) => setFormData({ ...formData, referenceNumber: e.target.value })}
+                                                  className="w-full min-h-[38px] px-3 bg-card border border-border rounded-lg text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-border-hover font-mono transition-colors"
+                                                />
+                                              </div>
+
+                                              <div>
+                                                <label className="block text-xs font-semibold text-foreground mb-1.5">Notes &amp; Remarks</label>
+                                                <textarea
+                                                  rows={2}
+                                                  placeholder="e.g. Monthly dividend transfer / profit payout..."
+                                                  value={formData.notes}
+                                                  onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                                                  className="w-full p-2.5 bg-card border border-border rounded-lg text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-border-hover resize-none transition-colors"
+                                                />
+                                              </div>
+
+                                              <div className="pt-3 border-t border-border flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2.5">
+                                                <button
+                                                  type="button"
+                                                  onClick={() => setIsModalOpen(false)}
+                                                  className="px-3.5 py-2 min-h-[38px] rounded-lg text-xs font-medium text-foreground bg-muted hover:bg-muted/80 border border-border transition-colors"
+                                                >
+                                                  Cancel
+                                                </button>
+                                                <button
+                                                  type="submit"
+                                                  disabled={isSubmitting}
+                                                  className="px-4 py-2 min-h-[38px] bg-primary text-primary-foreground hover:opacity-90 text-xs font-semibold rounded-lg flex items-center justify-center gap-1.5 transition-opacity disabled:opacity-50"
+                                                >
+                                                  {isSubmitting ? <Loader2 size={13} className="animate-spin" /> : <Check size={13} />}
+                                                  <span>{editingPayout ? 'Save Changes' : 'Record Payout'}</span>
+                                                </button>
+                                              </div>
+                                            </form>
+                                          </div>
+                                        </div>
+                                      )}
+
+                                      {/* Confirm Delete Modal */}
+                                      <ConfirmModal
+                                        isOpen={deleteConfirm.isOpen}
+                                        title="Delete Payout Record?"
+                                        message={`Are you sure you want to delete this payout of ${formatCurrency(deleteConfirm.amount)} for ${deleteConfirm.partnerName}?`}
+                                        onConfirm={handleConfirmDelete}
+                                        onCancel={() => setDeleteConfirm((prev) => ({ ...prev, isOpen: false }))}
+                                        confirmText="Delete Payout"
+                                        isLoading={isDeleting}
+                                      />
+                                    </div>
+                                    );
 }
