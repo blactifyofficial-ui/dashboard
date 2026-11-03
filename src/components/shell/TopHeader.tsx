@@ -3,7 +3,6 @@
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import {
-  Menu,
   RefreshCw,
   LayoutDashboard,
   BarChart3,
@@ -33,11 +32,7 @@ import { authClient } from "@/lib/auth/client";
 import { useNetworkStatus } from "@/components/NetworkStatusIndicator";
 import toast from "react-hot-toast";
 
-export function TopHeader({
-  onOpenMobile,
-}: {
-  onOpenMobile: () => void;
-}) {
+export function TopHeader() {
   const router = useRouter();
   const { user, role } = useAuth();
   const { isOnline } = useNetworkStatus();
@@ -212,75 +207,63 @@ export function TopHeader({
 
   return (
     <>
-      <header className="h-[52px] shrink-0 border-b border-border bg-card/85 backdrop-blur-md px-3 sm:px-6 flex items-center justify-between sticky top-0 z-30 transition-colors">
-        {/* Mobile Hamburger menu */}
-        <div className="flex items-center md:hidden">
-          <button
-            type="button"
-            onClick={onOpenMobile}
-            aria-label="Open sidebar menu"
-            className="p-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted border border-border transition-colors active:scale-95"
-          >
-            <Menu className="w-4 h-4" />
-          </button>
-        </div>
-
-        {/* Right: User Profile Menu */}
-        <div className="ml-auto flex items-center">
-          <DropdownMenu>
-            <DropdownMenuTrigger
-              aria-label="User account menu"
-              className="flex items-center gap-2 p-0.5 rounded-full hover:bg-muted transition-colors cursor-pointer outline-none focus-visible:ring-1 focus-visible:ring-ring border border-border"
-            >
-              <div className="w-[34px] h-[34px] rounded-full bg-[#0066cc]/10 border border-[#0066cc]/20 text-[#0066cc] dark:text-[#2997ff] font-semibold text-[13px] flex items-center justify-center shrink-0">
-                {user?.name ? user.name.charAt(0).toUpperCase() : user?.email?.charAt(0).toUpperCase() || "A"}
-              </div>
-            </DropdownMenuTrigger>
-
-            <DropdownMenuContent align="right" className="w-56 p-1.5">
-              <DropdownMenuLabel className="pb-1.5">
-                <div className="flex flex-col">
-                  <span className="font-semibold text-foreground text-[13px] tracking-[-0.12px] truncate">
-                    {user?.name || "Blactify Admin"}
-                  </span>
-                  <span className="text-[11px] text-muted-foreground font-mono truncate font-normal">
-                    {user?.email || "admin@blactify.com"}
-                  </span>
-                </div>
-                <div className="mt-1.5">
-                  <Badge variant="neutral" size="xs">
-                    {role || "VIEWER"}
-                  </Badge>
-                </div>
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onSelect={() => router.push("/settings")}>
-                <Settings className="w-3.5 h-3.5 text-muted-foreground mr-1.5" />
-                <span>Account Settings</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem onSelect={() => router.push("/team")}>
-                <Users className="w-3.5 h-3.5 text-muted-foreground mr-1.5" />
-                <span>Team & Permissions</span>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onSelect={handleSignOut}
-                className="text-[#ff453a] hover:bg-[#ff453a]/10"
+        <header className="hidden md:flex h-[52px] shrink-0 border-b border-border bg-card/85 backdrop-blur-md px-3 sm:px-6 items-center justify-between sticky top-0 z-30 transition-colors">
+          {/* Right: User Profile Menu */}
+          <div className="ml-auto flex items-center">
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                aria-label="User account menu"
+                className="flex items-center gap-2 p-0.5 rounded-full hover:bg-muted transition-colors cursor-pointer outline-none focus-visible:ring-1 focus-visible:ring-ring border border-border"
               >
-                <LogOut className="w-3.5 h-3.5 mr-1.5" />
-                <span>Log out</span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      </header>
+                <div className="w-[34px] h-[34px] rounded-full bg-[#0066cc]/10 border border-[#0066cc]/20 text-[#0066cc] dark:text-[#2997ff] font-semibold text-[13px] flex items-center justify-center shrink-0">
+                  {user?.name ? user.name.charAt(0).toUpperCase() : user?.email?.charAt(0).toUpperCase() || "A"}
+                </div>
+              </DropdownMenuTrigger>
 
-      {/* Global Command Palette */}
-      <CommandMenu
-        open={commandOpen}
-        onOpenChange={setCommandOpen}
-        items={commandItems}
-      />
-    </>
-  );
+              <DropdownMenuContent align="right" className="w-56 p-1.5">
+                <DropdownMenuLabel className="pb-1.5">
+                  <div className="flex flex-col">
+                    <span className="font-semibold text-foreground text-[13px] tracking-[-0.12px] truncate">
+                      {user?.name || "Blactify Admin"}
+                    </span>
+                    <span className="text-[11px] text-muted-foreground font-mono truncate font-normal">
+                      {user?.email || "admin@blactify.com"}
+                    </span>
+                  </div>
+                  <div className="mt-1.5">
+                    <Badge variant="neutral" size="xs">
+                      {role || "VIEWER"}
+                    </Badge>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onSelect={() => router.push("/settings")}>
+                  <Settings className="w-3.5 h-3.5 text-muted-foreground mr-1.5" />
+                  <span>Account Settings</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => router.push("/team")}>
+                  <Users className="w-3.5 h-3.5 text-muted-foreground mr-1.5" />
+                  <span>Team & Permissions</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onSelect={handleSignOut}
+                  className="text-[#ff453a] hover:bg-[#ff453a]/10"
+                >
+                  <LogOut className="w-3.5 h-3.5 mr-1.5" />
+                  <span>Log out</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </header>
+
+        {/* Global Command Palette */}
+        <CommandMenu
+          open={commandOpen}
+          onOpenChange={setCommandOpen}
+          items={commandItems}
+        />
+      </>
+      );
 }

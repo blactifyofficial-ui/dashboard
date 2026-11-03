@@ -11,6 +11,7 @@ import { ilike, eq } from "drizzle-orm";
 import AutoSyncManager from "@/components/AutoSyncManager";
 import { AuthProvider } from "@/context/AuthContext";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
+import SplashScreen from "@/components/SplashScreen";
 
   const inter = localFont({
     src: "./fonts/Inter-Variable.woff2",
@@ -100,6 +101,7 @@ import { ThemeProvider } from "@/components/theme/ThemeProvider";
         <html lang="en" suppressHydrationWarning className={`${inter.variable} h-full antialiased`}>
           <body className="min-h-full bg-background text-foreground flex flex-col items-center justify-center font-sans gap-4">
             <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+              <SplashScreen />
               <div className="text-xl font-medium">You are not authorized to view this dashboard.</div>
               <SignOutLink />
               <Toaster
@@ -122,6 +124,7 @@ import { ThemeProvider } from "@/components/theme/ThemeProvider";
 >
 <body className="h-[100dvh] overflow-hidden bg-background text-foreground flex flex-col md:flex-row relative selection:bg-foreground/20 font-sans transition-colors duration-150">
   <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+    <SplashScreen />
     <AuthProvider
       initialUser={session?.user || null}
       initialRole={userRole}

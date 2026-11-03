@@ -83,7 +83,7 @@ export function NetworkStatusBanner() {
     <div
       role="status"
       aria-live="polite"
-      className="fixed bottom-4 right-4 z-50 flex items-center gap-2.5 px-4 py-2 rounded-full bg-card/90 backdrop-blur-md text-foreground text-xs font-medium shadow-2xl animate-in slide-in-from-bottom-2 duration-200 select-none border border-amber-500/30"
+      className="fixed bottom-20 md:bottom-4 right-4 z-50 flex items-center gap-2.5 px-4 py-2 rounded-full bg-card/90 backdrop-blur-md text-foreground text-xs font-medium shadow-2xl animate-in slide-in-from-bottom-2 duration-200 select-none border border-amber-500/30"
     >
       <span className="relative flex h-2 w-2 shrink-0">
         <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500" />

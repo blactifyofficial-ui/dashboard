@@ -76,7 +76,7 @@ export default async function Dashboard() {
             <h1 className="text-[26px] sm:text-[34px] font-semibold tracking-[-0.374px] text-foreground leading-[1.2]">
               Sales Command Center
             </h1>
-            <span className="text-[11px] font-normal px-2.5 py-0.5 rounded-full bg-[#0066cc]/10 text-[#0066cc] dark:text-[#2997ff] border border-[#0066cc]/20">
+            <span className="hidden md:inline-flex text-[11px] font-normal px-2.5 py-0.5 rounded-full bg-[#0066cc]/10 text-[#0066cc] dark:text-[#2997ff] border border-[#0066cc]/20 whitespace-nowrap">
               Live Overview
             </span>
           </div>
@@ -90,11 +90,11 @@ export default async function Dashboard() {
 
         {/* Quick Shortcut Buttons */}
         {(canViewRevenueReports || canViewReports || showInventoryShortcut) && (
-          <div className="flex items-center gap-2.5 flex-wrap">
+          <div className="flex items-center gap-2.5 flex-nowrap overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden py-1 -my-1 max-w-full">
             {canViewReports && (
               <Link
                 href="/reports"
-                className="px-4 py-2 text-[14px] font-normal rounded-full bg-[#0066cc] hover:bg-[#0071e3] text-white transition-all flex items-center gap-1.5 active:scale-95 tracking-[-0.224px]"
+                className="px-4 py-2 text-[14px] font-normal rounded-full bg-[#0066cc] hover:bg-[#0071e3] text-white transition-all flex items-center gap-1.5 active:scale-95 tracking-[-0.224px] shrink-0 whitespace-nowrap"
               >
                 <FileText size={15} />
                 <span>Monthly Reports</span>
@@ -103,7 +103,7 @@ export default async function Dashboard() {
             {canViewRevenueReports && (
               <Link
                 href="/revenue"
-                className="px-4 py-2 text-[14px] font-normal rounded-full bg-card border border-border hover:bg-muted/60 text-foreground transition-all flex items-center gap-1.5 active:scale-95 tracking-[-0.224px]"
+                className="px-4 py-2 text-[14px] font-normal rounded-full bg-card border border-border hover:bg-muted/60 text-foreground transition-all flex items-center gap-1.5 active:scale-95 tracking-[-0.224px] shrink-0 whitespace-nowrap"
               >
                 <BarChart3 size={15} className="text-muted-foreground" />
                 <span>Revenue Ledger</span>
@@ -112,7 +112,7 @@ export default async function Dashboard() {
             {showInventoryShortcut && (
               <Link
                 href="/inventory"
-                className="px-4 py-2 text-[14px] font-normal rounded-full bg-card border border-border hover:bg-muted/60 text-foreground transition-all flex items-center gap-1.5 active:scale-95 tracking-[-0.224px]"
+                className="px-4 py-2 text-[14px] font-normal rounded-full bg-card border border-border hover:bg-muted/60 text-foreground transition-all flex items-center gap-1.5 active:scale-95 tracking-[-0.224px] shrink-0 whitespace-nowrap"
               >
                 <Boxes size={15} className="text-muted-foreground" />
                 <span>Inventory Stock</span>

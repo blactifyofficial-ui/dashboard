@@ -78,11 +78,11 @@ export default async function RevenuePage(props: {
       </header>
 
       {(canViewRevenueLedger || canViewProducts) && (
-          <div className="flex-none flex flex-wrap sm:flex-nowrap gap-1 bg-muted border border-border p-1 rounded-full w-full sm:w-fit">
+          <div className="flex-none flex flex-nowrap overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden gap-1 bg-muted border border-border p-1 rounded-full w-full sm:w-fit">
             {canViewRevenueLedger && (
               <Link
                 href="/revenue?tab=monthly"
-              className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-1.5 min-h-[36px] rounded-full text-[13px] sm:text-[14px] font-normal tracking-[-0.1px] transition-all active:scale-95 ${tab === 'monthly' ? 'bg-card text-foreground font-semibold border border-border' : 'text-muted-foreground hover:text-foreground'
+                className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-1.5 min-h-[36px] rounded-full text-[13px] sm:text-[14px] font-normal tracking-[-0.1px] transition-all active:scale-95 ${tab === 'monthly' ? 'bg-card text-foreground font-semibold border border-border' : 'text-muted-foreground hover:text-foreground'
                   }`}
               >
                 <CalendarDays size={15} className="shrink-0" />
@@ -92,7 +92,7 @@ export default async function RevenuePage(props: {
             {canViewProducts && (
               <Link
                 href="/revenue?tab=products"
-              className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-1.5 min-h-[36px] rounded-full text-[13px] sm:text-[14px] font-normal tracking-[-0.1px] transition-all active:scale-95 ${tab === 'products' ? 'bg-card text-foreground font-semibold border border-border' : 'text-muted-foreground hover:text-foreground'
+                className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-1.5 min-h-[36px] rounded-full text-[13px] sm:text-[14px] font-normal tracking-[-0.1px] transition-all active:scale-95 ${tab === 'products' ? 'bg-card text-foreground font-semibold border border-border' : 'text-muted-foreground hover:text-foreground'
                   }`}
               >
                 <ShoppingBag size={15} className="shrink-0" />
@@ -250,8 +250,8 @@ export default async function RevenuePage(props: {
                                         <div className="flex items-center gap-1.5 justify-start md:justify-end">
                                           <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Net Profit</p>
                                           <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${netProfitNum >= 0
-                                              ? 'text-emerald-700 bg-emerald-500/10 dark:text-emerald-400'
-                                              : 'text-rose-700 bg-rose-500/10 dark:text-rose-400'
+                                            ? 'text-emerald-700 bg-emerald-500/10 dark:text-emerald-400'
+                                            : 'text-rose-700 bg-rose-500/10 dark:text-rose-400'
                                             }`}>
                                             {profitMargin >= 0 ? `+${profitMargin}%` : `${profitMargin}%`}
                                           </span>
