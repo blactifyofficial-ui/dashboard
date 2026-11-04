@@ -6,7 +6,7 @@ import Link from 'next/link';
 import RevenueChart from '@/components/RevenueChart';
 import MonthOrdersTable from '@/components/MonthOrdersTable';
 import { isCodOrder, getCodAmountToCollect, getPrepaidAmount } from '@/lib/order-utils';
-import { getStoreMonthRange, getStoreNow, getStoreDay } from '@/lib/date-utils';
+import { getStoreMonthRange, getStoreNow, getStoreDay, getStoreYesterdayRange } from '@/lib/date-utils';
 import { Suspense } from 'react';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { requirePermission } from '@/lib/auth-utils';
@@ -27,26 +27,26 @@ export default async function MonthRevenuePage(props: {
 
   const params = await props.params;
   const monthParam = params.month; // e.g. "2026-10"
-  
+
   const [yearStr, monthStr] = monthParam.split('-');
   const year = parseInt(yearStr, 10);
   const month = parseInt(monthStr, 10);
-  
+
   if (isNaN(year) || isNaN(month)) {
     return <div className="text-foreground">Invalid month</div>;
   }
 
   // Calculate month boundaries in store timezone (Asia/Kolkata, UTC+05:30)
   const { startDate, endDate } = getStoreMonthRange(year, month);
-  
+
   const monthDisplay = new Date(year, month - 1, 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 
   return (
     <div className="space-y-4 sm:space-y-6 relative z-10 text-foreground">
       <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-center gap-2.5 sm:gap-3">
-          <Link 
-            href="/revenue" 
+          <Link
+            href="/revenue"
             aria-label="Back to Revenue"
             className="min-h-[38px] min-w-[38px] flex items-center justify-center rounded-lg bg-card hover:bg-muted text-foreground transition-colors border border-border shrink-0 shadow-xs"
           >
@@ -109,10 +109,32 @@ async function MonthRevenueContent({ year, month, startDate, endDate, canViewExp
 
   // Calculate daily 24h data for the chart using store timezone (Asia/Kolkata)
   const dailyDataMap = new Map<number, { revenue: number; ordersCount: number }>();
-  
+
   const now = getStoreNow();
   const isCurrentMonth = year === now.year && month === now.month;
   const isFutureMonth = year > now.year || (year === now.year && month > now.month);
+
+  // If current month and day 1, yesterday's orders occurred in previous month.
+  // Fetch them so the 24h Yesterday view has full data.
+  let yesterdayExtraOrders: Array<{ createdAt: string; revenue: number }> = [];
+  if (isCurrentMonth && now.day === 1) {
+    const yRange = getStoreYesterdayRange();
+    const yOrders = await db.select({
+      createdAt: orders.createdAt,
+      totalPrice: orders.totalPrice,
+    })
+      .from(orders)
+      .where(
+        and(
+          gte(orders.createdAt, yRange.startDate),
+          lt(orders.createdAt, yRange.endDate)
+        )
+      );
+    yesterdayExtraOrders = yOrders.map((o) => ({
+      createdAt: o.createdAt ? o.createdAt.toISOString() : '',
+      revenue: parseFloat(o.totalPrice || '0') || 0,
+    }));
+  }
 
   const daysInMonth = new Date(year, month, 0).getDate();
 
@@ -137,13 +159,13 @@ async function MonthRevenueContent({ year, month, startDate, endDate, canViewExp
   for (let i = 1; i <= daysToShow; i++) {
     dailyDataMap.set(i, { revenue: 0, ordersCount: 0 });
   }
-  
+
   let totalRevenue = 0;
   let normalOrdersCount = 0;
   let normalRevenue = 0;
   let codOrdersCount = 0;
   let codRevenue = 0;
-  
+
   monthOrders.forEach((order) => {
     const revenue = parseFloat(order.totalPrice || '0') || 0;
     totalRevenue += revenue;
@@ -198,13 +220,23 @@ async function MonthRevenueContent({ year, month, startDate, endDate, canViewExp
 
   const netProfit = totalRevenue - monthExpenses;
   const netMargin = totalRevenue > 0 ? Math.round((netProfit / totalRevenue) * 100) : 0;
-  
+
+  const monthDisplay = new Date(year, month - 1, 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
   const monthShort = new Date(year, month - 1, 1).toLocaleDateString('en-US', { month: 'short' });
   const chartData = Array.from(dailyDataMap.entries()).map(([day, val]) => ({
     day: `${day} ${monthShort}`,
+    dayNum: day,
     revenue: Math.round(val.revenue * 100) / 100,
     ordersCount: val.ordersCount,
   }));
+
+  const orderPoints = [
+    ...yesterdayExtraOrders,
+    ...monthOrders.map((o) => ({
+      createdAt: o.createdAt ? o.createdAt.toISOString() : '',
+      revenue: parseFloat(o.totalPrice || '0') || 0,
+    })),
+  ];
 
   return (
     <div className="space-y-4 sm:space-y-5">
@@ -234,20 +266,18 @@ async function MonthRevenueContent({ year, month, startDate, endDate, canViewExp
                 Net Profit
               </p>
               <span
-                className={`inline-flex items-center gap-0.5 text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${
-                  netProfit >= 0
+                className={`inline-flex items-center gap-0.5 text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${netProfit >= 0
                     ? 'text-emerald-700 bg-emerald-500/10 dark:text-emerald-400'
                     : 'text-rose-700 bg-rose-500/10 dark:text-rose-400'
-                }`}
+                  }`}
               >
                 {netProfit >= 0 ? <TrendingUp size={10} /> : <TrendingDown size={10} />}
                 {netMargin >= 0 ? `+${netMargin}%` : `${netMargin}%`}
               </span>
             </div>
             <div className="my-1.5">
-              <p className={`text-base sm:text-lg md:text-xl font-bold tracking-tight font-mono ${
-                netProfit >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'
-              }`}>
+              <p className={`text-base sm:text-lg md:text-xl font-bold tracking-tight font-mono ${netProfit >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'
+                }`}>
                 ₹{netProfit.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </p>
             </div>
@@ -277,7 +307,7 @@ async function MonthRevenueContent({ year, month, startDate, endDate, canViewExp
             </div>
           </div>
         )}
-        
+
         {/* Total Orders */}
         <div className="bg-card border border-border rounded-xl p-3.5 sm:p-4 shadow-xs relative overflow-hidden flex flex-col justify-between">
           <div className="flex items-center justify-between gap-2">
@@ -335,7 +365,14 @@ async function MonthRevenueContent({ year, month, startDate, endDate, canViewExp
 
       {/* Chart Section */}
       <div className="bg-card border border-border rounded-xl p-3.5 sm:p-5 shadow-xs relative overflow-hidden">
-        <RevenueChart data={chartData} isCurrentMonth={isCurrentMonth} />
+        <RevenueChart
+          data={chartData}
+          orderPoints={orderPoints}
+          isCurrentMonth={isCurrentMonth}
+          year={year}
+          month={month}
+          monthDisplay={monthDisplay}
+        />
       </div>
 
       {/* Detailed Orders Breakdown Table */}

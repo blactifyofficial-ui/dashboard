@@ -32,181 +32,181 @@ import { authClient } from "@/lib/auth/client";
 import { useNetworkStatus } from "@/components/NetworkStatusIndicator";
 import toast from "react-hot-toast";
 
-export function TopHeader() {
-  const router = useRouter();
-  const { user, role } = useAuth();
-  const { isOnline } = useNetworkStatus();
-  const [commandOpen, setCommandOpen] = React.useState(false);
-  const [isSyncing, setIsSyncing] = React.useState(false);
+  export function TopHeader() {
+    const router = useRouter();
+    const { user, role } = useAuth();
+    const { isOnline } = useNetworkStatus();
+    const [commandOpen, setCommandOpen] = React.useState(false);
+    const [isSyncing, setIsSyncing] = React.useState(false);
 
-  // Global ⌘K hotkey listener
-  React.useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
-        e.preventDefault();
-        setCommandOpen((open) => !open);
+    // Global ⌘K hotkey listener
+    React.useEffect(() => {
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+          e.preventDefault();
+          setCommandOpen((open) => !open);
+        }
+      };
+      window.addEventListener("keydown", handleKeyDown);
+      return () => window.removeEventListener("keydown", handleKeyDown);
+    }, []);
+
+    const handleManualSync = async () => {
+      if (isSyncing) return;
+      if (!isOnline) {
+        toast.error("You are currently offline. Please reconnect to sync with Shopify.", { id: "shopify-sync" });
+        return;
+      }
+      setIsSyncing(true);
+      toast.loading("Initiating live Shopify sync...", { id: "shopify-sync" });
+      try {
+        const res = await fetch("/api/sync-orders", { method: "POST" });
+        const data = await res.json().catch(() => ({}));
+        if (res.ok) {
+          toast.success(data.message || "Orders synced successfully with Shopify", { id: "shopify-sync" });
+        } else {
+          toast.error(data.error || "Sync failed", { id: "shopify-sync" });
+        }
+      } catch {
+        toast.error("Network error triggering sync", { id: "shopify-sync" });
+      } finally {
+        setIsSyncing(false);
       }
     };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, []);
 
-  const handleManualSync = async () => {
-    if (isSyncing) return;
-    if (!isOnline) {
-      toast.error("You are currently offline. Please reconnect to sync with Shopify.", { id: "shopify-sync" });
-      return;
-    }
-    setIsSyncing(true);
-    toast.loading("Initiating live Shopify sync...", { id: "shopify-sync" });
-    try {
-      const res = await fetch("/api/sync-orders", { method: "POST" });
-      const data = await res.json().catch(() => ({}));
-      if (res.ok) {
-        toast.success(data.message || "Orders synced successfully with Shopify", { id: "shopify-sync" });
-      } else {
-        toast.error(data.error || "Sync failed", { id: "shopify-sync" });
+    const handleSignOut = async () => {
+      try {
+        await authClient.signOut();
+        router.replace("/login");
+        router.refresh();
+      } catch (e) {
+        console.error(e);
+        router.replace("/login");
+        router.refresh();
       }
-    } catch {
-      toast.error("Network error triggering sync", { id: "shopify-sync" });
-    } finally {
-      setIsSyncing(false);
-    }
-  };
+    };
 
-  const handleSignOut = async () => {
-    try {
-      await authClient.signOut();
-      router.replace("/login");
-      router.refresh();
-    } catch (e) {
-      console.error(e);
-      router.replace("/login");
-      router.refresh();
-    }
-  };
+    // Build command menu items
+    const commandItems: CommandItem[] = [
+      {
+        id: "cmd-overview",
+        title: "Overview",
+        description: "Sales command center & real-time KPIs",
+        category: "Navigation",
+        icon: LayoutDashboard,
+        shortcut: "G O",
+        onSelect: () => router.push("/dashboard"),
+      },
+      {
+        id: "cmd-revenue",
+        title: "Revenue",
+        description: "Monthly revenue, net profit & product analytics",
+        category: "Navigation",
+        icon: BarChart3,
+        shortcut: "G R",
+        onSelect: () => router.push("/revenue"),
+      },
+      {
+        id: "cmd-cod",
+        title: "COD Collection",
+        description: "Track cash remittances and outstanding orders",
+        category: "Navigation",
+        icon: HandCoins,
+        shortcut: "G C",
+        onSelect: () => router.push("/cod"),
+      },
+      {
+        id: "cmd-inventory",
+        title: "Inventory & Stock",
+        description: "Live Shopify SKU stock and valuation",
+        category: "Navigation",
+        icon: Boxes,
+        shortcut: "G I",
+        onSelect: () => router.push("/inventory"),
+      },
+      {
+        id: "cmd-monthly-bills",
+        title: "Monthly Bills",
+        description: "Recurring operational commitments and bills",
+        category: "Navigation",
+        icon: CalendarCheck,
+        shortcut: "G M",
+        onSelect: () => router.push("/monthly-expenses"),
+      },
+      {
+        id: "cmd-expenses",
+        title: "Expenses Ledger",
+        description: "Operational expenditure, categories & analytics",
+        category: "Navigation",
+        icon: Wallet,
+        shortcut: "G E",
+        onSelect: () => router.push("/expenses"),
+      },
+      {
+        id: "cmd-add-expense",
+        title: "Record New Expense",
+        description: "Submit a new daily operational expense entry",
+        category: "Quick Actions",
+        icon: Wallet,
+        shortcut: "N E",
+        onSelect: () => router.push("/expenses/add"),
+      },
+      {
+        id: "cmd-partners",
+        title: "Partners & Equity",
+        description: "Cap table, equity distribution & partner transactions",
+        category: "Navigation",
+        icon: Handshake,
+        shortcut: "G P",
+        onSelect: () => router.push("/partners"),
+      },
+      {
+        id: "cmd-payouts",
+        title: "Partner Payouts",
+        description: "Record and review partner profit distributions",
+        category: "Navigation",
+        icon: Banknote,
+        onSelect: () => router.push("/payouts"),
+      },
+      {
+        id: "cmd-meta-ads",
+        title: "Meta Ads",
+        description: "Daily campaign budget calendar & planner",
+        category: "Navigation",
+        icon: Megaphone,
+        shortcut: "G A",
+        onSelect: () => router.push("/meta-ads"),
+      },
+      {
+        id: "cmd-team",
+        title: "Team & Roles",
+        description: "Manage users, access permissions & partner scoping",
+        category: "Navigation",
+        icon: Users,
+        shortcut: "G T",
+        onSelect: () => router.push("/team"),
+      },
+      {
+        id: "cmd-settings",
+        title: "System Settings",
+        description: "Google Sheets backup, manual sync & preferences",
+        category: "Navigation",
+        icon: Settings,
+        shortcut: "G S",
+        onSelect: () => router.push("/settings"),
+      },
+      {
+        id: "cmd-sync",
+        title: "Trigger Shopify Sync",
+        description: "Pull latest orders, items, and webhooks from Shopify",
+        category: "Quick Actions",
+        icon: RefreshCw,
+        onSelect: handleManualSync,
+      },
+    ];
 
-  // Build command menu items
-  const commandItems: CommandItem[] = [
-    {
-      id: "cmd-overview",
-      title: "Overview",
-      description: "Sales command center & real-time KPIs",
-      category: "Navigation",
-      icon: LayoutDashboard,
-      shortcut: "G O",
-      onSelect: () => router.push("/dashboard"),
-    },
-    {
-      id: "cmd-revenue",
-      title: "Revenue",
-      description: "Monthly revenue, net profit & product analytics",
-      category: "Navigation",
-      icon: BarChart3,
-      shortcut: "G R",
-      onSelect: () => router.push("/revenue"),
-    },
-    {
-      id: "cmd-cod",
-      title: "COD Collection",
-      description: "Track cash remittances and outstanding orders",
-      category: "Navigation",
-      icon: HandCoins,
-      shortcut: "G C",
-      onSelect: () => router.push("/cod"),
-    },
-    {
-      id: "cmd-inventory",
-      title: "Inventory & Stock",
-      description: "Live Shopify SKU stock and valuation",
-      category: "Navigation",
-      icon: Boxes,
-      shortcut: "G I",
-      onSelect: () => router.push("/inventory"),
-    },
-    {
-      id: "cmd-monthly-bills",
-      title: "Monthly Bills",
-      description: "Recurring operational commitments and bills",
-      category: "Navigation",
-      icon: CalendarCheck,
-      shortcut: "G M",
-      onSelect: () => router.push("/monthly-expenses"),
-    },
-    {
-      id: "cmd-expenses",
-      title: "Expenses Ledger",
-      description: "Operational expenditure, categories & analytics",
-      category: "Navigation",
-      icon: Wallet,
-      shortcut: "G E",
-      onSelect: () => router.push("/expenses"),
-    },
-    {
-      id: "cmd-add-expense",
-      title: "Record New Expense",
-      description: "Submit a new daily operational expense entry",
-      category: "Quick Actions",
-      icon: Wallet,
-      shortcut: "N E",
-      onSelect: () => router.push("/expenses/add"),
-    },
-    {
-      id: "cmd-partners",
-      title: "Partners & Equity",
-      description: "Cap table, equity distribution & partner transactions",
-      category: "Navigation",
-      icon: Handshake,
-      shortcut: "G P",
-      onSelect: () => router.push("/partners"),
-    },
-    {
-      id: "cmd-payouts",
-      title: "Partner Payouts",
-      description: "Record and review partner profit distributions",
-      category: "Navigation",
-      icon: Banknote,
-      onSelect: () => router.push("/payouts"),
-    },
-    {
-      id: "cmd-meta-ads",
-      title: "Meta Ads",
-      description: "Daily campaign budget calendar & planner",
-      category: "Navigation",
-      icon: Megaphone,
-      shortcut: "G A",
-      onSelect: () => router.push("/meta-ads"),
-    },
-    {
-      id: "cmd-team",
-      title: "Team & Roles",
-      description: "Manage users, access permissions & partner scoping",
-      category: "Navigation",
-      icon: Users,
-      shortcut: "G T",
-      onSelect: () => router.push("/team"),
-    },
-    {
-      id: "cmd-settings",
-      title: "System Settings",
-      description: "Google Sheets backup, manual sync & preferences",
-      category: "Navigation",
-      icon: Settings,
-      shortcut: "G S",
-      onSelect: () => router.push("/settings"),
-    },
-    {
-      id: "cmd-sync",
-      title: "Trigger Shopify Sync",
-      description: "Pull latest orders, items, and webhooks from Shopify",
-      category: "Quick Actions",
-      icon: RefreshCw,
-      onSelect: handleManualSync,
-    },
-  ];
-
-  return (
-    <>
+    return (
+      <>
         <header className="hidden md:flex h-[52px] shrink-0 border-b border-border bg-card/85 backdrop-blur-md px-3 sm:px-6 items-center justify-between sticky top-0 z-30 transition-colors">
           {/* Right: User Profile Menu */}
           <div className="ml-auto flex items-center">
@@ -265,5 +265,5 @@ export function TopHeader() {
           items={commandItems}
         />
       </>
-      );
-}
+    );
+  }

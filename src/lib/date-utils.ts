@@ -292,3 +292,179 @@ export function getProductFilterDateRange(params: {
       };
   }
 }
+
+export interface HourlyDataPoint {
+  hour: number;
+  label: string;
+  timeRange: string;
+  revenue: number;
+  ordersCount: number;
+  day?: string;
+}
+
+/**
+ * Formats a 0-23 hour number into 12-hour format (e.g. 0 -> '12 AM', 13 -> '1 PM').
+ */
+export function formatStoreHour(hour: number): string {
+  const h = ((hour % 24) + 24) % 24;
+  if (h === 0) return '12 AM';
+  if (h < 12) return `${h} AM`;
+  if (h === 12) return '12 PM';
+  return `${h - 12} PM`;
+}
+
+/**
+ * Returns the hour of the day (0-23) in store timezone (Asia/Kolkata).
+ */
+export function getStoreHour(date?: Date | string | number | null): number {
+  const d = date ? (typeof date === 'string' || typeof date === 'number' ? new Date(date) : date) : new Date();
+  const validDate = isNaN(d.getTime()) ? new Date() : d;
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    timeZone: STORE_TIMEZONE,
+    hour: 'numeric',
+    hourCycle: 'h23',
+  });
+  const val = parseInt(formatter.format(validDate), 10);
+  return isNaN(val) ? 0 : val;
+}
+
+/**
+ * Computes 24 hourly buckets (00:00 to 23:00) in store timezone for a given calendar day.
+ */
+export function computeDayHourlyBuckets(
+  orderPoints: Array<{ createdAt: string; revenue: number }>,
+  targetYear: number,
+  targetMonth: number,
+  targetDay: number
+): HourlyDataPoint[] {
+  const hourFormatter = new Intl.DateTimeFormat('en-US', {
+    timeZone: STORE_TIMEZONE,
+    hour: 'numeric',
+    hourCycle: 'h23',
+  });
+
+  const datePartsFormatter = new Intl.DateTimeFormat('en-US', {
+    timeZone: STORE_TIMEZONE,
+    year: 'numeric',
+    month: 'numeric',
+    day: 'numeric',
+  });
+
+  const pad = (n: number) => (n < 10 ? `0${n}` : `${n}`);
+
+  const buckets: HourlyDataPoint[] = Array.from({ length: 24 }, (_, h) => {
+    const nextH = (h + 1) % 24;
+    const hourLabel = formatStoreHour(h);
+    return {
+      hour: h,
+      label: hourLabel,
+      timeRange: `${pad(h)}:00 – ${pad(nextH)}:00 (${hourLabel})`,
+      revenue: 0,
+      ordersCount: 0,
+      day: hourLabel,
+    };
+  });
+
+  for (const o of orderPoints) {
+    if (!o.createdAt) continue;
+    const d = new Date(o.createdAt);
+    if (isNaN(d.getTime())) continue;
+
+    const parts = datePartsFormatter.formatToParts(d);
+    const yr = parseInt(parts.find((p) => p.type === 'year')?.value || '0', 10);
+    const mo = parseInt(parts.find((p) => p.type === 'month')?.value || '0', 10);
+    const dy = parseInt(parts.find((p) => p.type === 'day')?.value || '0', 10);
+
+    if (yr === targetYear && mo === targetMonth && dy === targetDay) {
+      const hr = parseInt(hourFormatter.format(d), 10);
+      if (hr >= 0 && hr < 24) {
+        buckets[hr].revenue += o.revenue;
+        buckets[hr].ordersCount += 1;
+      }
+    }
+  }
+
+  return buckets.map((b) => ({
+    ...b,
+    revenue: Math.round(b.revenue * 100) / 100,
+  }));
+}
+
+/**
+ * Computes 24 hourly buckets for the rolling past 24 hours in store timezone.
+ */
+export function computeLast24HoursBuckets(
+  orderPoints: Array<{ createdAt: string; revenue: number }>,
+  referenceDate?: Date
+): HourlyDataPoint[] {
+  const ref = referenceDate || new Date();
+  const hourFormatter = new Intl.DateTimeFormat('en-US', {
+    timeZone: STORE_TIMEZONE,
+    hour: 'numeric',
+    hourCycle: 'h23',
+  });
+  const datePartsFormatter = new Intl.DateTimeFormat('en-US', {
+    timeZone: STORE_TIMEZONE,
+    year: 'numeric',
+    month: 'numeric',
+    day: 'numeric',
+  });
+
+  const pad = (n: number) => (n < 10 ? `0${n}` : `${n}`);
+  const refMs = ref.getTime();
+
+  // Create slot map for the 24 hours
+  const slotMap = new Map<string, number>();
+  const buckets: HourlyDataPoint[] = [];
+
+  for (let i = 23; i >= 0; i--) {
+    const slotDate = new Date(refMs - i * 60 * 60 * 1000);
+    const parts = datePartsFormatter.formatToParts(slotDate);
+    const yr = parseInt(parts.find((p) => p.type === 'year')?.value || '0', 10);
+    const mo = parseInt(parts.find((p) => p.type === 'month')?.value || '0', 10);
+    const dy = parseInt(parts.find((p) => p.type === 'day')?.value || '0', 10);
+    const hr = parseInt(hourFormatter.format(slotDate), 10);
+
+    const key = `${yr}-${mo}-${dy}-${hr}`;
+    const nextH = (hr + 1) % 24;
+    const hourLabel = formatStoreHour(hr);
+    const isCurrent = i === 0;
+
+    const index = buckets.length;
+    slotMap.set(key, index);
+
+    buckets.push({
+      hour: hr,
+      label: isCurrent ? `${hourLabel} (Now)` : hourLabel,
+      timeRange: `${pad(hr)}:00 – ${pad(nextH)}:00 (${dy}/${mo})`,
+      revenue: 0,
+      ordersCount: 0,
+      day: hourLabel,
+    });
+  }
+
+  for (const o of orderPoints) {
+    if (!o.createdAt) continue;
+    const d = new Date(o.createdAt);
+    if (isNaN(d.getTime())) continue;
+
+    const parts = datePartsFormatter.formatToParts(d);
+    const yr = parseInt(parts.find((p) => p.type === 'year')?.value || '0', 10);
+    const mo = parseInt(parts.find((p) => p.type === 'month')?.value || '0', 10);
+    const dy = parseInt(parts.find((p) => p.type === 'day')?.value || '0', 10);
+    const hr = parseInt(hourFormatter.format(d), 10);
+
+    const key = `${yr}-${mo}-${dy}-${hr}`;
+    const idx = slotMap.get(key);
+    if (idx !== undefined) {
+      buckets[idx].revenue += o.revenue;
+      buckets[idx].ordersCount += 1;
+    }
+  }
+
+  return buckets.map((b) => ({
+    ...b,
+    revenue: Math.round(b.revenue * 100) / 100,
+  }));
+}
+

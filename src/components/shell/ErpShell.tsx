@@ -134,7 +134,7 @@ export function ErpShell({ children }: { children: React.ReactNode }) {
       {/* Desktop Layout Rail Spacer (reserves space for sidebar so page content never jumps) */}
       <div className="hidden md:block w-16 shrink-0" />
 
-        {/* Desktop Sidebar Navigation (100% Unchanged for Big Screens, hidden on mobile) */}
+      {/* Desktop Sidebar Navigation (100% Unchanged for Big Screens, hidden on mobile) */}
       <aside
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
@@ -203,69 +203,69 @@ export function ErpShell({ children }: { children: React.ReactNode }) {
                   gIdx > 0 && <div className="my-2 mx-auto w-6 border-t border-sidebar-border/60" />
                 )}
 
-                    {
-                      filteredItems.map((item) => {
-                        const isActive =
-                          pathname === item.href ||
-                          (item.href !== "/dashboard" &&
-                            item.href !== "/" &&
-                            pathname.startsWith(item.href + "/"));
-                        const Icon = item.icon;
+                {
+                  filteredItems.map((item) => {
+                    const isActive =
+                      pathname === item.href ||
+                      (item.href !== "/dashboard" &&
+                        item.href !== "/" &&
+                        pathname.startsWith(item.href + "/"));
+                    const Icon = item.icon;
 
-                            const navContent= (
-                              <Link
-                                key={item.href}
-                                href={item.href}
-                                className={cn(
-                                  "group flex items-center rounded-full text-[13px] sm:text-[14px] font-normal transition-all duration-150 select-none active:scale-95 tracking-[-0.224px]",
-                                  isExpanded
-                                    ? "gap-2.5 px-3 py-2 min-h-[36px] w-full"
-                                    : "justify-center p-2 h-9 w-9 mx-auto",
-                                  isActive
-                                    ? "bg-[#0066cc] text-white font-normal"
-                                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-                                )}
-                              >
-                                <Icon
-                                  className={cn(
-                                    "w-4 h-4 shrink-0 transition-colors",
-                                    isActive
-                                        ? "text-white"
-                                        : "text-muted-foreground group-hover:text-foreground"
-                                  )}
-                                  strokeWidth={1.75}
-                                />
-                                {isExpanded && (
-                                  <span className="truncate whitespace-nowrap animate-in fade-in duration-150">
-                                    {item.label}
-                                  </span>
-                                )}
-                                {isExpanded && item.badge && (
-                                  <span className="ml-auto text-[10px] font-mono px-2 py-0.5 rounded-full bg-white/20 text-white shrink-0">
-                                    {item.badge}
-                                  </span>
-                                )}
-                              </Link>
-                            );
+                    const navContent = (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        className={cn(
+                          "group flex items-center rounded-full text-[13px] sm:text-[14px] font-normal transition-all duration-150 select-none active:scale-95 tracking-[-0.224px]",
+                          isExpanded
+                            ? "gap-2.5 px-3 py-2 min-h-[36px] w-full"
+                            : "justify-center p-2 h-9 w-9 mx-auto",
+                          isActive
+                            ? "bg-[#0066cc] text-white font-normal"
+                            : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                        )}
+                      >
+                        <Icon
+                          className={cn(
+                            "w-4 h-4 shrink-0 transition-colors",
+                            isActive
+                              ? "text-white"
+                              : "text-muted-foreground group-hover:text-foreground"
+                          )}
+                          strokeWidth={1.75}
+                        />
+                        {isExpanded && (
+                          <span className="truncate whitespace-nowrap animate-in fade-in duration-150">
+                            {item.label}
+                          </span>
+                        )}
+                        {isExpanded && item.badge && (
+                          <span className="ml-auto text-[10px] font-mono px-2 py-0.5 rounded-full bg-white/20 text-white shrink-0">
+                            {item.badge}
+                          </span>
+                        )}
+                      </Link>
+                    );
 
-                        if (!isExpanded) {
-                          return (
-                            <Tooltip
-                              key={item.href}
-                              content={item.label}
-                              position="right"
-                            >
-                        { navContent }
-                      </Tooltip>
+                    if (!isExpanded) {
+                      return (
+                        <Tooltip
+                          key={item.href}
+                          content={item.label}
+                          position="right"
+                        >
+                          {navContent}
+                        </Tooltip>
+                      );
+                    }
+
+                    return navContent;
+                  })}
+              </div>
             );
-          }
-
-          return navContent;
-                })}
-        </div>
-        );
           })}
-    </nav>
+        </nav>
 
         {/* Footer Actions: Theme & Sign Out */}
         <div className="p-2 border-t border-sidebar-border bg-sidebar shrink-0 overflow-hidden">
@@ -284,56 +284,56 @@ export function ErpShell({ children }: { children: React.ReactNode }) {
               </Tooltip>
             </div>
           ) : (
-          <div className="flex items-center justify-between p-1.5 px-3 rounded-full bg-card/70 border border-border animate-in fade-in duration-150">
-            <div className="flex items-center gap-2">
-              <ThemeSwitcher className="h-7 w-7 rounded-full" />
-              <span className="text-[12px] text-muted-foreground font-normal">Theme</span>
+            <div className="flex items-center justify-between p-1.5 px-3 rounded-full bg-card/70 border border-border animate-in fade-in duration-150">
+              <div className="flex items-center gap-2">
+                <ThemeSwitcher className="h-7 w-7 rounded-full" />
+                <span className="text-[12px] text-muted-foreground font-normal">Theme</span>
+              </div>
+              <button
+                type="button"
+                onClick={handleSignOut}
+                title="Log out"
+                aria-label="Log out"
+                className="flex items-center gap-1.5 py-1 px-2.5 rounded-full text-[12px] text-muted-foreground hover:text-[#ff453a] hover:bg-[#ff453a]/10 transition-colors active:scale-95"
+              >
+                <span>Log out</span>
+                <LogOut className="w-3.5 h-3.5" />
+              </button>
             </div>
-            <button
-              type="button"
-              onClick={handleSignOut}
-              title="Log out"
-              aria-label="Log out"
-              className="flex items-center gap-1.5 py-1 px-2.5 rounded-full text-[12px] text-muted-foreground hover:text-[#ff453a] hover:bg-[#ff453a]/10 transition-colors active:scale-95"
-            >
-              <span>Log out</span>
-              <LogOut className="w-3.5 h-3.5" />
-            </button>
-          </div>
           )}
-      </div>
+        </div>
       </aside>
 
-  {/* Main Workspace Frame */}
-  <div className="flex-1 min-w-0 flex flex-col h-full overflow-hidden relative">
-    {/* Mobile Gradient Top Header (Floating, unboxed, seamless scroll) */}
-    <MobileHeader />
+        {/* Main Workspace Frame */}
+        <div className="flex-1 min-w-0 flex flex-col h-full overflow-hidden relative">
+          {/* Mobile Gradient Top Header (Floating, unboxed, seamless scroll) */}
+          <MobileHeader />
 
-      {/* Desktop Top Header (100% Unchanged on Desktop, hidden on mobile) */}
-      <TopHeader />
+          {/* Desktop Top Header (100% Unchanged on Desktop, hidden on mobile) */}
+          <TopHeader />
 
-      {/* Dynamic Page Content */}
-      <main className="flex-1 w-full min-w-0 px-4 sm:px-6 lg:px-8 2xl:px-10 pt-[max(4.25rem,calc(env(safe-area-inset-top)+2.75rem))] md:pt-6 pb-28 md:pb-8 overflow-y-auto overflow-x-hidden">
-        <div className="mx-auto w-full max-w-[1920px]">
-          {children}
+          {/* Dynamic Page Content */}
+            <main className="flex-1 w-full min-w-0 px-4 sm:px-6 lg:px-8 2xl:px-10 pt-[max(4.25rem,calc(env(safe-area-inset-top)+2.75rem))] md:pt-6 pb-28 md:pb-8 overflow-y-auto overflow-x-hidden">
+              <div className="mx-auto w-full max-w-[1920px]">
+                {children}
+              </div>
+            </main>
         </div>
-      </main>
-  </div>
 
-  {/* Mobile Floating Bottom Navigation Dock */ }
-  <MobileBottomDock
-    onOpenMore={() => setIsAppSheetOpen(true)}
-    isMoreOpen={isAppSheetOpen}
-  />
+        {/* Mobile Floating Bottom Navigation Dock */}
+        <MobileBottomDock
+          onOpenMore={() => setIsAppSheetOpen(true)}
+          isMoreOpen={isAppSheetOpen}
+        />
 
-  {/* Mobile Slide-up App Sheet for Secondary Modules */ }
-  <MobileAppSheet
-    open={isAppSheetOpen}
-    onOpenChange={setIsAppSheetOpen}
-  />
+        {/* Mobile Slide-up App Sheet for Secondary Modules */}
+        <MobileAppSheet
+          open={isAppSheetOpen}
+          onOpenChange={setIsAppSheetOpen}
+        />
 
-  {/* Floating Offline Notification Banner */ }
-  <NetworkStatusBanner />
-    </div >
-  );
+        {/* Floating Offline Notification Banner */}
+        <NetworkStatusBanner />
+      </div >
+      );
 }
