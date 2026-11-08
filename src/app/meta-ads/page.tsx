@@ -22,7 +22,6 @@ import ConfirmModal from '@/components/ConfirmModal';
 import { useAuth } from '@/context/AuthContext';
 import AccessDenied from '@/components/AccessDenied';
 import MetaAdsCalendar, { DailyPlanItem } from '@/components/meta-ads/MetaAdsCalendar';
-import DailyCampaignPlanner, { CampaignEntry } from '@/components/meta-ads/DailyCampaignPlanner';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -94,7 +93,6 @@ export default function MetaAdsPage() {
   const canViewAds = hasPermission('meta_ads:view');
   const canEditAds = hasPermission('meta_ads:edit');
   const canDeleteAds = hasPermission('meta_ads:delete');
-  const canManagePlanner = hasPermission('meta_ads:manage_planner') || canEditAds;
 
   // Tabs: 'planner' | 'billing'
   const [activeTab, setActiveTab] = useState<'planner' | 'billing'>('planner');
@@ -296,14 +294,31 @@ export default function MetaAdsPage() {
   };
 
   // Open Payment Modal
-  const handleOpenPaymentModal = () => {
-    const range = getPeriodRange(0, currentDaysNum);
-    setWeekStartDate(range.start);
-    setWeekEndDate(range.end);
-    setPaymentPreset('current_week');
-    const days = calculateDays(range.start, range.end);
-    const calc = Math.round(currentDailyBudgetNum * days);
-    setAmountPaid(calc > 0 ? calc.toString() : '');
+  const handleOpenPaymentModal = (startDate?: string | React.MouseEvent, endDate?: string) => {
+    const sDate = typeof startDate === 'string' ? startDate : undefined;
+    const eDate = typeof endDate === 'string' ? endDate : undefined;
+
+    if (sDate && eDate) {
+      setWeekStartDate(sDate);
+      setWeekEndDate(eDate);
+      setPaymentPreset('custom');
+      const days = calculateDays(sDate, eDate);
+      const calc = Math.round(currentDailyBudgetNum * days);
+      setAmountPaid(calc > 0 ? calc.toString() : '');
+    } else if (sDate) {
+      setWeekStartDate(sDate);
+      setWeekEndDate(sDate);
+      setPaymentPreset('custom');
+      setAmountPaid(currentDailyBudgetNum > 0 ? currentDailyBudgetNum.toString() : '');
+    } else {
+      const range = getPeriodRange(0, currentDaysNum);
+      setWeekStartDate(range.start);
+      setWeekEndDate(range.end);
+      setPaymentPreset('current_week');
+      const days = calculateDays(range.start, range.end);
+      const calc = Math.round(currentDailyBudgetNum * days);
+      setAmountPaid(calc > 0 ? calc.toString() : '');
+    }
     setPaymentDate(formatLocalDate(new Date()));
     setReferenceNumber('');
     setPaymentNotes('');
@@ -357,44 +372,6 @@ export default function MetaAdsPage() {
       else toast.error('An error occurred');
     } finally {
       setSavingBudget(false);
-    }
-  };
-
-  // Handle Save Daily Planner
-  const handleSaveDailyPlan = async (planData: {
-    date: string;
-    totalBudget: number;
-    campaignCount: number;
-    distributionMode: 'ALL_SAME' | 'DIFFERENT';
-    campaigns: CampaignEntry[];
-    status: 'IN_PROGRESS' | 'DONE' | 'NOT_DONE';
-    notes: string;
-  }): Promise<boolean> => {
-    try {
-      const res = await fetch('/api/meta-ads/planner', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(planData),
-      });
-
-      if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.error || 'Failed to save plan');
-      }
-
-      const resData = await res.json();
-      if (resData.plan) {
-        setPlansMap((prev) => ({
-          ...prev,
-          [resData.plan.date]: resData.plan,
-        }));
-      }
-
-      return true;
-    } catch (error) {
-      if (error instanceof Error) toast.error(error.message);
-      else toast.error('Failed to save daily plan');
-      return false;
     }
   };
 
@@ -515,7 +492,7 @@ export default function MetaAdsPage() {
         {canEditAds && (
           <div className="flex items-center gap-3 w-full sm:w-auto">
             <Button
-              onClick={handleOpenPaymentModal}
+              onClick={() => handleOpenPaymentModal()}
               size="sm"
               className="w-full sm:w-auto gap-2 rounded-full"
             >
@@ -623,32 +600,18 @@ export default function MetaAdsPage() {
 
             {/* TAB 1: Daily Planner View */}
             {activeTab === 'planner' && (
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-                {/* Left Side: Daily Campaign Planner */}
-                <div className="lg:col-span-6 xl:col-span-6 bg-card border border-border rounded-[18px] p-5 sm:p-6 flex flex-col justify-between shadow-none">
-                  <DailyCampaignPlanner
-                    key={selectedDate}
-                    selectedDate={selectedDate}
-                    onDateChange={(d) => setSelectedDate(d)}
-                    currentPlan={plansMap[selectedDate] || null}
-                    defaultDailyBudget={currentDailyBudgetNum}
-                    onSavePlan={handleSaveDailyPlan}
-                    canEdit={canManagePlanner}
-                    todayStr={todayStr}
-                  />
-                </div>
-
-                {/* Right Side: Interactive Calendar */}
-                <div className="lg:col-span-6 xl:col-span-6 bg-card border border-border rounded-xl p-5 sm:p-6 flex flex-col justify-between">
-                  <MetaAdsCalendar
-                    currentMonth={currentMonth}
-                    onMonthChange={(m) => setCurrentMonth(m)}
-                    selectedDate={selectedDate}
-                    onSelectDate={(d) => setSelectedDate(d)}
-                    plansMap={plansMap}
-                    todayStr={todayStr}
-                  />
-                </div>
+              <div className="bg-card border border-border rounded-xl p-5 sm:p-6 flex flex-col justify-between">
+                <MetaAdsCalendar
+                  currentMonth={currentMonth}
+                  onMonthChange={(m) => setCurrentMonth(m)}
+                  selectedDate={selectedDate}
+                  onSelectDate={(d) => setSelectedDate(d)}
+                  transactions={transactions}
+                  plansMap={plansMap}
+                  todayStr={todayStr}
+                  canEdit={canEditAds}
+                  onRecordPayment={handleOpenPaymentModal}
+                />
               </div>
             )}
 
@@ -760,7 +723,7 @@ export default function MetaAdsPage() {
                       {canEditAds && (
                         <Button
                           size="xs"
-                          onClick={handleOpenPaymentModal}
+                          onClick={() => handleOpenPaymentModal()}
                           className="gap-1.5"
                         >
                           <Plus size={13} />
