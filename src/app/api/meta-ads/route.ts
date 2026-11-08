@@ -7,9 +7,10 @@ import {
   expenseActivities, 
   expenseCategories, 
   paymentMethods, 
-  users 
+  users,
+  orders
 } from '@/db/schema';
-import { eq, desc, ilike, or } from 'drizzle-orm';
+import { eq, desc, ilike, or, sql } from 'drizzle-orm';
 import { requirePermission } from '@/lib/auth-utils';
 import { enqueueSyncJob } from '@/lib/google-sheets';
 import { updateMonthlyReportForDateOrMonth } from '@/lib/financial-report-service';
@@ -114,6 +115,27 @@ export async function GET() {
     const weeklyBudgetNum = parseFloat(setting?.weeklyBudget || '0') || (dailyBudgetNum * daysNum);
     const monthlyBudgetEstimate = dailyBudgetNum * 30;
 
+    // 5. Fetch daily orders aggregation (count & total revenue / worth)
+    const dailyOrders = await db
+      .select({
+        date: sql<string>`to_char(${orders.createdAt} at time zone 'Asia/Kolkata', 'YYYY-MM-DD')`,
+        ordersCount: sql<number>`count(*)`,
+        totalRevenue: sql<number>`COALESCE(SUM(CAST(${orders.totalPrice} AS NUMERIC)), 0)`
+      })
+      .from(orders)
+      .where(sql`${orders.createdAt} IS NOT NULL`)
+      .groupBy(sql`to_char(${orders.createdAt} at time zone 'Asia/Kolkata', 'YYYY-MM-DD')`);
+
+    const dailyOrdersMap: Record<string, { ordersCount: number; totalRevenue: number }> = {};
+    dailyOrders.forEach(d => {
+      if (d.date) {
+        dailyOrdersMap[d.date] = {
+          ordersCount: Number(d.ordersCount) || 0,
+          totalRevenue: Number(d.totalRevenue) || 0,
+        };
+      }
+    });
+
     return NextResponse.json({
       settings: {
         ...setting,
@@ -124,6 +146,7 @@ export async function GET() {
       },
       transactions,
       paymentMethods: activePaymentMethods,
+      dailyOrders: dailyOrdersMap,
       summary: {
         dailyBudget: dailyBudgetNum,
         days: daysNum,
