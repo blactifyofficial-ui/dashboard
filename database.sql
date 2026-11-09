@@ -545,4 +545,73 @@ CREATE INDEX IF NOT EXISTS "idx_monthly_financial_reports_year" ON "monthly_fina
 CREATE INDEX IF NOT EXISTS "idx_google_sheets_sync_queue_status_retry" ON "google_sheets_sync_queue" ("status", "next_retry_at");
 CREATE INDEX IF NOT EXISTS "idx_google_sheets_sync_queue_created_at" ON "google_sheets_sync_queue" ("created_at" DESC);
 
+-- ==============================================================================
+-- 14. DEBTS & LOANS (BORROW & LEND LEDGER)
+-- ==============================================================================
+
+CREATE TABLE IF NOT EXISTS "debt_contacts" (
+    "id" TEXT PRIMARY KEY NOT NULL,
+    "name" TEXT NOT NULL,
+    "phone" TEXT,
+    "email" TEXT,
+    "category" TEXT NOT NULL DEFAULT 'GENERAL',
+    "notes" TEXT,
+    "created_by_id" TEXT,
+    "created_at" TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL,
+    "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL,
+    CONSTRAINT "debt_contacts_created_by_id_user_id_fk" FOREIGN KEY ("created_by_id") REFERENCES "user"("id") ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS "debts" (
+    "id" TEXT PRIMARY KEY NOT NULL,
+    "type" TEXT NOT NULL, -- 'BORROWED' | 'LENT'
+    "contact_id" TEXT,
+    "contact_name" TEXT NOT NULL,
+    "contact_phone" TEXT,
+    "contact_email" TEXT,
+    "category" TEXT NOT NULL DEFAULT 'GENERAL',
+    "amount" NUMERIC NOT NULL,
+    "remaining_amount" NUMERIC NOT NULL,
+    "transaction_date" TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL,
+    "due_date" TIMESTAMP WITH TIME ZONE,
+    "payment_method_id" TEXT,
+    "status" TEXT NOT NULL DEFAULT 'ACTIVE', -- 'ACTIVE', 'PARTIALLY_SETTLED', 'SETTLED', 'CANCELLED'
+    "reference_number" TEXT,
+    "notes" TEXT,
+    "created_by_id" TEXT,
+    "settled_at" TIMESTAMP WITH TIME ZONE,
+    "created_at" TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL,
+    "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL,
+    CONSTRAINT "debts_contact_id_debt_contacts_id_fk" FOREIGN KEY ("contact_id") REFERENCES "debt_contacts"("id") ON DELETE SET NULL ON UPDATE CASCADE,
+    CONSTRAINT "debts_payment_method_id_payment_methods_id_fk" FOREIGN KEY ("payment_method_id") REFERENCES "payment_methods"("id") ON DELETE SET NULL ON UPDATE NO ACTION,
+    CONSTRAINT "debts_created_by_id_user_id_fk" FOREIGN KEY ("created_by_id") REFERENCES "user"("id") ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS "debt_settlements" (
+    "id" TEXT PRIMARY KEY NOT NULL,
+    "debt_id" TEXT NOT NULL,
+    "amount" NUMERIC NOT NULL,
+    "settlement_date" TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL,
+    "payment_method_id" TEXT,
+    "reference_number" TEXT,
+    "notes" TEXT,
+    "expense_id" TEXT,
+    "created_by_id" TEXT,
+    "created_at" TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL,
+    CONSTRAINT "debt_settlements_debt_id_debts_id_fk" FOREIGN KEY ("debt_id") REFERENCES "debts"("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT "debt_settlements_payment_method_id_payment_methods_id_fk" FOREIGN KEY ("payment_method_id") REFERENCES "payment_methods"("id") ON DELETE SET NULL ON UPDATE NO ACTION,
+    CONSTRAINT "debt_settlements_expense_id_expenses_id_fk" FOREIGN KEY ("expense_id") REFERENCES "expenses"("id") ON DELETE SET NULL ON UPDATE CASCADE,
+    CONSTRAINT "debt_settlements_created_by_id_user_id_fk" FOREIGN KEY ("created_by_id") REFERENCES "user"("id") ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+-- Debts & Settlements Indexes
+CREATE INDEX IF NOT EXISTS "idx_debt_contacts_name" ON "debt_contacts"("name");
+CREATE INDEX IF NOT EXISTS "idx_debts_contact_id" ON "debts"("contact_id");
+CREATE INDEX IF NOT EXISTS "idx_debts_type" ON "debts"("type");
+CREATE INDEX IF NOT EXISTS "idx_debts_status" ON "debts"("status");
+CREATE INDEX IF NOT EXISTS "idx_debts_contact" ON "debts"("contact_name");
+CREATE INDEX IF NOT EXISTS "idx_debts_due_date" ON "debts"("due_date");
+CREATE INDEX IF NOT EXISTS "idx_debt_settlements_debt_id" ON "debt_settlements"("debt_id");
+CREATE INDEX IF NOT EXISTS "idx_debt_settlements_date" ON "debt_settlements"("settlement_date" DESC);
+
 

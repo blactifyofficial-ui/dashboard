@@ -332,6 +332,53 @@ export const monthlyFinancialReports = pgTable('monthly_financial_reports', {
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
 });
 
+export const debtContacts = pgTable('debt_contacts', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull(),
+  phone: text('phone'),
+  email: text('email'),
+  category: text('category').default('GENERAL').notNull(), // 'BUSINESS', 'PERSONAL', 'VENDOR', 'PARTNER', 'EMERGENCY', etc.
+  notes: text('notes'),
+  createdById: text('created_by_id').references(() => users.id),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+});
+
+export const debts = pgTable('debts', {
+  id: text('id').primaryKey(),
+  type: text('type').notNull(), // 'BORROWED' | 'LENT'
+  contactId: text('contact_id').references(() => debtContacts.id, { onDelete: 'set null' }),
+  contactName: text('contact_name').notNull(),
+  contactPhone: text('contact_phone'),
+  contactEmail: text('contact_email'),
+  category: text('category').default('GENERAL').notNull(), // 'BUSINESS', 'PERSONAL', 'VENDOR', 'PARTNER', 'EMERGENCY', etc.
+  amount: numeric('amount').notNull(), // Original principal
+  remainingAmount: numeric('remaining_amount').notNull(), // Outstanding balance
+  transactionDate: timestamp('transaction_date', { withTimezone: true }).defaultNow().notNull(),
+  dueDate: timestamp('due_date', { withTimezone: true }),
+  paymentMethodId: text('payment_method_id').references(() => paymentMethods.id),
+  status: text('status').default('ACTIVE').notNull(), // 'ACTIVE', 'PARTIALLY_SETTLED', 'SETTLED', 'CANCELLED'
+  referenceNumber: text('reference_number'),
+  notes: text('notes'),
+  createdById: text('created_by_id').references(() => users.id),
+  settledAt: timestamp('settled_at', { withTimezone: true }),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+});
+
+export const debtSettlements = pgTable('debt_settlements', {
+  id: text('id').primaryKey(),
+  debtId: text('debt_id').references(() => debts.id, { onDelete: 'cascade' }).notNull(),
+  amount: numeric('amount').notNull(),
+  settlementDate: timestamp('settlement_date', { withTimezone: true }).defaultNow().notNull(),
+  paymentMethodId: text('payment_method_id').references(() => paymentMethods.id),
+  referenceNumber: text('reference_number'),
+  notes: text('notes'),
+  expenseId: text('expense_id').references(() => expenses.id),
+  createdById: text('created_by_id').references(() => users.id),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+});
+
 
 
 

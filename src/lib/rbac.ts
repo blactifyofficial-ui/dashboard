@@ -76,6 +76,11 @@ export const PERMISSIONS = {
   'reports:view': ['SUPER_ADMIN', 'ADMIN', 'PARTNER', 'VIEWER'],
   'reports:export': ['SUPER_ADMIN', 'ADMIN', 'PARTNER'],
   'reports:generate': ['SUPER_ADMIN', 'ADMIN'],
+
+  // --- 13. Debts & Loans (Borrow & Lend) ---
+  'debts:view': ['SUPER_ADMIN', 'ADMIN', 'PARTNER', 'VIEWER'],
+  'debts:manage': ['SUPER_ADMIN', 'ADMIN'],
+  'debts:delete': ['SUPER_ADMIN'],
 } as const;
 
 export type Permission = keyof typeof PERMISSIONS;
@@ -92,7 +97,8 @@ export type PermissionCategory =
   | 'Monthly Bills'
   | 'Team & Roles'
   | 'Settings & Integrations'
-  | 'Financial Reports';
+  | 'Financial Reports'
+  | 'Borrow & Lend';
 
 export interface PermissionItem {
   key: Permission;
@@ -177,6 +183,11 @@ export const PERMISSION_CATALOG: PermissionItem[] = [
   { key: 'reports:view', label: 'View Monthly Financial Reports', description: 'Access company-level closed month financial reports and executive summaries', category: 'Financial Reports' },
   { key: 'reports:export', label: 'Download PDF Financial Reports', description: 'Download official executive financial PDF reports for any completed month', category: 'Financial Reports' },
   { key: 'reports:generate', label: 'Generate & Email Monthly Reports', description: 'Compile closed month statements, regenerate reports, and trigger email delivery', category: 'Financial Reports' },
+
+  // 13. Borrow & Lend (Debts & Loans)
+  { key: 'debts:view', label: 'View Borrow & Lend Records', description: 'Access debt and credit records, balances, and party ledgers', category: 'Borrow & Lend' },
+  { key: 'debts:manage', label: 'Manage Debts & Record Settlements', description: 'Add or edit borrowed or lent amounts and record repayments', category: 'Borrow & Lend' },
+  { key: 'debts:delete', label: 'Delete Debt & Settlement Records', description: 'Permanently remove debt, loan, and settlement transactions', category: 'Borrow & Lend' },
 ];
 
 export const ROLE_COLOR_PALETTES: Record<string, { badge: string; bg: string; text: string; border: string }> = {
@@ -276,6 +287,9 @@ export function hasPermission(
     if (permission === 'reports:view' && customPermissions.some((p) => p.startsWith('reports:'))) {
       return true;
     }
+    if (permission === 'debts:view' && customPermissions.some((p) => p.startsWith('debts:'))) {
+      return true;
+    }
     if (permission === 'team:view' && (customPermissions.some((p) => p.startsWith('team:')) || customPermissions.includes('settings:manage_users'))) {
       return true;
     }
@@ -301,6 +315,7 @@ export function hasPermission(
   if (permission === 'expenses:view' && hasPermission(role, 'expenses:edit')) return true;
   if (permission === 'cod:view' && hasPermission(role, 'cod:manage')) return true;
   if (permission === 'inventory:view' && hasPermission(role, 'inventory:sync')) return true;
+  if (permission === 'debts:view' && hasPermission(role, 'debts:manage')) return true;
 
   return false;
 }
@@ -319,6 +334,7 @@ export const ROUTE_PERMISSIONS: Record<string, Permission> = {
   '/payouts': 'payouts:view_self',
   '/expenses': 'expenses:view',
   '/monthly-expenses': 'monthly_expenses:view',
+  '/debts': 'debts:view',
   '/team': 'team:view',
   '/settings': 'settings:view',
   '/reports': 'reports:view',
@@ -337,6 +353,11 @@ export const PAGE_PERMISSIONS: Record<string, readonly Permission[]> = {
     'overview:view_chart',
     'overview:view_recent_orders',
     'overview:view_top_products',
+  ],
+  '/debts': [
+    'debts:view',
+    'debts:manage',
+    'debts:delete',
   ],
   '/revenue': [
     'revenue:view',
