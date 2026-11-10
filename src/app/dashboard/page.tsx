@@ -8,6 +8,7 @@ import DashboardKpis from '@/components/dashboard/DashboardKpis';
 import PaymentAndFulfillmentCard from '@/components/dashboard/PaymentAndFulfillmentCard';
 import RecentOrdersWidget from '@/components/dashboard/RecentOrdersWidget';
 import TopProductsWidget from '@/components/dashboard/TopProductsWidget';
+import TodaySavingsWidget from '@/components/dashboard/TodaySavingsWidget';
 import { Suspense } from 'react';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { requireAuth, type AuthResult } from '@/lib/auth-utils';
@@ -157,6 +158,7 @@ async function DashboardContent({ authRes: initialAuthRes }: { authRes?: AuthRes
   const canViewExpenses = hasPermission(role, 'expenses:view', customPerms);
   const canViewMonthlyExpenses = hasPermission(role, 'monthly_expenses:view', customPerms);
   const canViewInventory = hasPermission(role, 'inventory:view', customPerms);
+  const canViewSavings = hasPermission(role, 'savings:view', customPerms);
   const canSeeExpenseData = canViewRevenue && (canViewExpenses || canViewMonthlyExpenses);
 
   // Dates in Store Timezone (IST Asia/Kolkata)
@@ -513,6 +515,9 @@ async function DashboardContent({ authRes: initialAuthRes }: { authRes?: AuthRes
 
   return (
     <div className="space-y-6">
+      {/* Daily Savings Widget */}
+      {canViewSavings && <TodaySavingsWidget />}
+
       {/* 1. Primary Operational KPIs */}
       <DashboardKpis
         canViewRevenue={canViewRevenue}

@@ -81,6 +81,11 @@ export const PERMISSIONS = {
   'debts:view': ['SUPER_ADMIN', 'ADMIN', 'PARTNER', 'VIEWER'],
   'debts:manage': ['SUPER_ADMIN', 'ADMIN'],
   'debts:delete': ['SUPER_ADMIN'],
+
+  // --- 14. Daily Savings ---
+  'savings:view': ['SUPER_ADMIN', 'ADMIN', 'PARTNER', 'VIEWER'],
+  'savings:manage': ['SUPER_ADMIN', 'ADMIN'],
+  'savings:delete': ['SUPER_ADMIN'],
 } as const;
 
 export type Permission = keyof typeof PERMISSIONS;
@@ -98,7 +103,8 @@ export type PermissionCategory =
   | 'Team & Roles'
   | 'Settings & Integrations'
   | 'Financial Reports'
-  | 'Borrow & Lend';
+  | 'Borrow & Lend'
+  | 'Daily Savings';
 
 export interface PermissionItem {
   key: Permission;
@@ -188,6 +194,11 @@ export const PERMISSION_CATALOG: PermissionItem[] = [
   { key: 'debts:view', label: 'View Borrow & Lend Records', description: 'Access debt and credit records, balances, and party ledgers', category: 'Borrow & Lend' },
   { key: 'debts:manage', label: 'Manage Debts & Record Settlements', description: 'Add or edit borrowed or lent amounts and record repayments', category: 'Borrow & Lend' },
   { key: 'debts:delete', label: 'Delete Debt & Settlement Records', description: 'Permanently remove debt, loan, and settlement transactions', category: 'Borrow & Lend' },
+
+  // 14. Daily Savings
+  { key: 'savings:view', label: 'View Daily Savings & Streaks', description: 'Access daily savings calendar, streak tracker, and monthly totals', category: 'Daily Savings' },
+  { key: 'savings:manage', label: 'Record & Manage Daily Savings', description: 'Log daily savings, adjust goals, and edit savings records', category: 'Daily Savings' },
+  { key: 'savings:delete', label: 'Delete Daily Savings Records', description: 'Permanently remove daily savings entries', category: 'Daily Savings' },
 ];
 
 export const ROLE_COLOR_PALETTES: Record<string, { badge: string; bg: string; text: string; border: string }> = {
@@ -290,6 +301,9 @@ export function hasPermission(
     if (permission === 'debts:view' && customPermissions.some((p) => p.startsWith('debts:'))) {
       return true;
     }
+    if (permission === 'savings:view' && customPermissions.some((p) => p.startsWith('savings:'))) {
+      return true;
+    }
     if (permission === 'team:view' && (customPermissions.some((p) => p.startsWith('team:')) || customPermissions.includes('settings:manage_users'))) {
       return true;
     }
@@ -316,6 +330,7 @@ export function hasPermission(
   if (permission === 'cod:view' && hasPermission(role, 'cod:manage')) return true;
   if (permission === 'inventory:view' && hasPermission(role, 'inventory:sync')) return true;
   if (permission === 'debts:view' && hasPermission(role, 'debts:manage')) return true;
+  if (permission === 'savings:view' && hasPermission(role, 'savings:manage')) return true;
 
   return false;
 }
@@ -335,6 +350,7 @@ export const ROUTE_PERMISSIONS: Record<string, Permission> = {
   '/expenses': 'expenses:view',
   '/monthly-expenses': 'monthly_expenses:view',
   '/debts': 'debts:view',
+  '/savings': 'savings:view',
   '/team': 'team:view',
   '/settings': 'settings:view',
   '/reports': 'reports:view',
@@ -358,6 +374,11 @@ export const PAGE_PERMISSIONS: Record<string, readonly Permission[]> = {
     'debts:view',
     'debts:manage',
     'debts:delete',
+  ],
+  '/savings': [
+    'savings:view',
+    'savings:manage',
+    'savings:delete',
   ],
   '/revenue': [
     'revenue:view',

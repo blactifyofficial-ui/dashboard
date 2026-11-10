@@ -19,6 +19,7 @@ import {
   Users,
   Settings,
   LogOut,
+  PiggyBank,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { canAccessRoute } from "@/lib/rbac";
@@ -60,6 +61,7 @@ const NAV_GROUPS: NavGroupDef[] = [
       { href: "/reports", label: "Monthly Reports", icon: FileText },
       { href: "/monthly-expenses", label: "Monthly Bills", icon: CalendarCheck },
       { href: "/expenses", label: "Daily Expenses", icon: Wallet },
+      { href: "/savings", label: "Daily Savings", icon: PiggyBank },
       { href: "/debts", label: "Borrow & Lend", icon: ArrowLeftRight },
       { href: "/payouts", label: "Partner Payouts", icon: Banknote },
       { href: "/partners", label: "Partners & Equity", icon: Handshake },

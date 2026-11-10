@@ -16,6 +16,7 @@ import {
   X,
   LogOut,
   RefreshCw,
+  PiggyBank,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { canAccessRoute } from "@/lib/rbac";
@@ -37,6 +38,7 @@ interface AppTileDef {
 }
 
 const SECONDARY_APP_MODULES: AppTileDef[] = [
+  { href: "/savings", label: "Daily Savings", category: "Finance", icon: PiggyBank },
   { href: "/monthly-expenses", label: "Monthly Bills", category: "Finance", icon: CalendarCheck },
   { href: "/inventory", label: "Inventory", category: "Operations", icon: Boxes },
   { href: "/reports", label: "Monthly Reports", category: "Finance", icon: FileText },

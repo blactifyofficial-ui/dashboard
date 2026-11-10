@@ -379,6 +379,33 @@ export const debtSettlements = pgTable('debt_settlements', {
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
 });
 
+export const dailySavings = pgTable('daily_savings', {
+  id: text('id').primaryKey(),
+  date: text('date').notNull().unique(), // 'YYYY-MM-DD'
+  amount: numeric('amount').notNull(),
+  targetAmount: numeric('target_amount').default('0'),
+  destination: text('destination').default('BANK_ACCOUNT').notNull(), // 'BANK_ACCOUNT', 'CASH', 'EMERGENCY_FUND', 'INVESTMENT'
+  paymentMethodId: text('payment_method_id').references(() => paymentMethods.id),
+  note: text('note'),
+  expenseId: text('expense_id').references(() => expenses.id),
+  createdById: text('created_by_id').references(() => users.id),
+  updatedById: text('updated_by_id').references(() => users.id),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+});
+
+export const dailySavingsSettings = pgTable('daily_savings_settings', {
+  id: text('id').primaryKey().default('default'),
+  dailyTarget: numeric('daily_target').default('500').notNull(),
+  monthlyTarget: numeric('monthly_target').default('15000').notNull(),
+  mirrorToExpenses: text('mirror_to_expenses').default('false').notNull(),
+  expenseCategoryId: text('expense_category_id').references(() => expenseCategories.id),
+  currency: text('currency').default('INR').notNull(),
+  updatedById: text('updated_by_id').references(() => users.id),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+});
+
+
 
 
 
