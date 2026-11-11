@@ -72,8 +72,8 @@ function calculateStreaks(allDates: string[], todayStr: string): { currentStreak
 export async function GET(req: Request) {
   try {
     const authResult = await requireAuth();
-    if (authResult.error) {
-      return NextResponse.json({ error: authResult.error }, { status: authResult.status });
+    if (authResult.error || !authResult.user) {
+      return NextResponse.json({ error: authResult.error || 'Unauthorized' }, { status: authResult.status || 401 });
     }
 
     if (!hasPermission(authResult.role, 'savings:view', authResult.permissions)) {
@@ -232,8 +232,8 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   try {
     const authResult = await requireAuth();
-    if (authResult.error) {
-      return NextResponse.json({ error: authResult.error }, { status: authResult.status });
+    if (authResult.error || !authResult.user) {
+      return NextResponse.json({ error: authResult.error || 'Unauthorized' }, { status: authResult.status || 401 });
     }
 
     if (!hasPermission(authResult.role, 'savings:manage', authResult.permissions)) {

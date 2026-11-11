@@ -8,8 +8,8 @@ import { hasPermission } from '@/lib/rbac';
 export async function GET() {
   try {
     const authResult = await requireAuth();
-    if (authResult.error) {
-      return NextResponse.json({ error: authResult.error }, { status: authResult.status });
+    if (authResult.error || !authResult.user) {
+      return NextResponse.json({ error: authResult.error || 'Unauthorized' }, { status: authResult.status || 401 });
     }
 
     let [settings] = await db.select().from(dailySavingsSettings).limit(1);
@@ -46,8 +46,8 @@ export async function GET() {
 export async function PUT(req: Request) {
   try {
     const authResult = await requireAuth();
-    if (authResult.error) {
-      return NextResponse.json({ error: authResult.error }, { status: authResult.status });
+    if (authResult.error || !authResult.user) {
+      return NextResponse.json({ error: authResult.error || 'Unauthorized' }, { status: authResult.status || 401 });
     }
 
     if (!hasPermission(authResult.role, 'savings:manage', authResult.permissions)) {

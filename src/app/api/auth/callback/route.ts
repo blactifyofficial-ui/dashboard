@@ -1,9 +1,17 @@
 import { NextResponse } from 'next/server';
+import { handleGoogleOAuthCallback } from '@/lib/auth/google-oauth';
+
+export const dynamic = 'force-dynamic';
 
 export async function GET(req: Request) {
   const url = new URL(req.url);
   const code = url.searchParams.get('code');
   const shop = url.searchParams.get('shop');
+
+  // If this is a Google OAuth callback (has code/state or error, but no shop param)
+  if (code && !shop) {
+    return handleGoogleOAuthCallback(req);
+  }
 
   const clientId = process.env.SHOPIFY_CLIENT_ID;
   const clientSecret = process.env.SHOPIFY_CLIENT_SECRET;

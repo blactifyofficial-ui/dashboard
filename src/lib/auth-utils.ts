@@ -1,21 +1,34 @@
 import { auth } from '@/lib/auth/server';
+import { SessionUser } from '@/lib/auth/token';
 import { db } from '@/db';
 import { allowedUsers, customRoles, UserRole, userRoles } from '@/db/schema';
 import { ilike, eq } from 'drizzle-orm';
 import { hasPermission, Permission } from '@/lib/rbac';
 
-export type AuthResult = {
-  error?: string;
-  status?: 401 | 403 | 503;
-  user?: NonNullable<Awaited<ReturnType<typeof auth.getSession>>['data']>['user'];
-  role?: UserRole;
-  partnerId?: string | null;
-  permissions?: string[];
+export type AuthSuccess = {
+  user: SessionUser;
+  role: UserRole;
+  partnerId: string | null;
+  permissions: string[];
+  isOffline?: boolean;
+  error?: undefined;
+  status?: undefined;
+};
+
+export type AuthFailure = {
+  error: string;
+  status: 401 | 403 | 503;
+  user?: never;
+  role?: never;
+  partnerId?: never;
+  permissions?: never;
   isOffline?: boolean;
 };
 
+export type AuthResult = AuthSuccess | AuthFailure;
+
 export async function requireAuth(): Promise<AuthResult> {
-  let sessionUser: NonNullable<Awaited<ReturnType<typeof auth.getSession>>['data']>['user'] | null = null;
+  let sessionUser: SessionUser | null = null;
   try {
     const { data: session } = await auth.getSession();
     sessionUser = session?.user || null;
@@ -38,74 +51,67 @@ export async function requireAuth(): Promise<AuthResult> {
     const role = (allowed.role || 'VIEWER') as UserRole;
     let permissions: string[] = [];
 
-      // If role is a custom role (not in built-in userRoles), fetch its permissions
-      if (!userRoles.includes(role as typeof userRoles[number])) {
-        const [customRoleRecord] = await db
-          .select()
-          .from(customRoles)
-          .where(eq(customRoles.code, role))
-          .limit(1);
+    // If role is a custom role (not in built-in userRoles), fetch its permissions
+    if (!userRoles.includes(role as typeof userRoles[number])) {
+      const [customRoleRecord] = await db
+        .select()
+        .from(customRoles)
+        .where(eq(customRoles.code, role))
+        .limit(1);
 
-          if (customRoleRecord?.permissions) {
-            try {
-              permissions = JSON.parse(customRoleRecord.permissions);
-            } catch (err) {
-              console.error('Failed to parse custom role permissions JSON:', err);
-            }
-          }
+      if (customRoleRecord?.permissions) {
+        try {
+          permissions = JSON.parse(customRoleRecord.permissions);
+        } catch (err) {
+          console.error('Failed to parse custom role permissions JSON:', err);
         }
-
-        return {
-          user: sessionUser,
-          role,
-          partnerId: allowed.partnerId || null,
-          permissions,
-        };
-      } catch (err) {
-        console.error('requireAuth caught error:', err);
-        // If user already has a valid session and only the database query failed
-        // (e.g. offline, Neon DB fetch error, transient network issue), do NOT return 401!
-        // Returning 401 triggers an infinite redirect loop between protected pages and /login.
-        if (sessionUser) {
-          return {
-            user: sessionUser,
-            role: 'VIEWER',
-            partnerId: null,
-            permissions: [],
-            error: 'Database connection failed. You may be offline or the database is currently unreachable.',
-            status: 503,
-            isOffline: true,
-          };
-        }
-        return { error: 'Authentication service temporarily unavailable', status: 401 };
       }
     }
 
-    export async function requirePermission(permission: Permission): Promise<AuthResult> {
-      const authRes = await requireAuth();
-      if (authRes.error) {
-        return authRes;
-      }
+    return {
+      user: sessionUser,
+      role,
+      partnerId: allowed.partnerId || null,
+      permissions,
+    };
+  } catch (err) {
+    console.error('requireAuth caught error:', err);
+    // If user already has a valid session and only the database query failed
+    // (e.g. offline, Neon DB fetch error, transient network issue), do NOT return 401!
+    // Returning 401 triggers an infinite redirect loop between protected pages and /login.
+    if (sessionUser) {
+      return {
+        error: 'Database connection failed. You may be offline or the database is currently unreachable.',
+        status: 503,
+        isOffline: true,
+      };
+    }
+    return { error: 'Authentication service temporarily unavailable', status: 401 };
+  }
+}
 
-        if (!hasPermission(authRes.role, permission, authRes.permissions)) {
-          return { error: `Forbidden: Role '${authRes.role}' does not have permission for '${permission}'`, status: 403 };
-        }
+export async function requirePermission(permission: Permission): Promise<AuthResult> {
+  const authRes = await requireAuth();
+  if (authRes.error) {
+    return authRes;
+  }
 
-        return authRes;
-      }
+  if (!hasPermission(authRes.role, permission, authRes.permissions)) {
+    return { error: `Forbidden: Role '${authRes.role}' does not have permission for '${permission}'`, status: 403 };
+  }
 
-      export async function requireRole(allowedRoles: readonly UserRole[]): Promise<AuthResult> {
-        const authRes = await requireAuth();
-        if (authRes.error) {
-          return authRes;
-        }
+  return authRes;
+}
 
-        if (!authRes.role || !allowedRoles.includes(authRes.role)) {
-          return { error: `Forbidden: Role '${authRes.role}' is not in allowed roles`, status: 403 };
-        }
+export async function requireRole(allowedRoles: readonly UserRole[]): Promise<AuthResult> {
+  const authRes = await requireAuth();
+  if (authRes.error) {
+    return authRes;
+  }
 
-        return authRes;
-      }
+  if (!authRes.role || !allowedRoles.includes(authRes.role)) {
+    return { error: `Forbidden: Role '${authRes.role}' is not in allowed roles`, status: 403 };
+  }
 
-
-
+  return authRes;
+}

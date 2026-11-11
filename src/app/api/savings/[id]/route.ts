@@ -11,8 +11,8 @@ export async function PUT(
 ) {
   try {
     const authResult = await requireAuth();
-    if (authResult.error) {
-      return NextResponse.json({ error: authResult.error }, { status: authResult.status });
+    if (authResult.error || !authResult.user) {
+      return NextResponse.json({ error: authResult.error || 'Unauthorized' }, { status: authResult.status || 401 });
     }
 
     if (!hasPermission(authResult.role, 'savings:manage', authResult.permissions)) {
@@ -87,8 +87,8 @@ export async function DELETE(
 ) {
   try {
     const authResult = await requireAuth();
-    if (authResult.error) {
-      return NextResponse.json({ error: authResult.error }, { status: authResult.status });
+    if (authResult.error || !authResult.user) {
+      return NextResponse.json({ error: authResult.error || 'Unauthorized' }, { status: authResult.status || 401 });
     }
 
     if (!hasPermission(authResult.role, 'savings:delete', authResult.permissions)) {
