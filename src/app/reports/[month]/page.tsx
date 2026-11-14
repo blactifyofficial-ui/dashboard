@@ -3,7 +3,7 @@ import { hasPermission, canAccessRoute } from '@/lib/rbac';
 import AccessDenied from '@/components/AccessDenied';
 import { redirect } from 'next/navigation';
 import { getOrCompileMonthlyReport } from '@/lib/financial-report-service';
-import { getStoreNow } from '@/lib/date-utils';
+import { getStoreNow, isFirstWeekOfMonth, getMonthlyReportsAvailability } from '@/lib/date-utils';
 import { ReportActionButtons } from '@/components/reports/ReportActionButtons';
 import { ReportKpiGrid } from '@/components/reports/ReportKpiGrid';
 import { ReportSalesBreakdown } from '@/components/reports/ReportSalesBreakdown';
@@ -15,6 +15,9 @@ import {
   ArrowLeft,
   CheckCircle2,
   Sparkles,
+  Lock,
+  CalendarCheck,
+  Clock,
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -33,6 +36,41 @@ export default async function MonthlyReportDetailPage(props: {
 
   if (!canAccessRoute(authRes.role, '/reports', authRes.permissions)) {
     return <AccessDenied message="You do not have permission to view monthly company financial reports." />;
+  }
+
+  if (!isFirstWeekOfMonth()) {
+    const availability = getMonthlyReportsAvailability();
+    return (
+      <div className="p-8 max-w-xl mx-auto text-center space-y-4 relative z-10 text-foreground">
+        <div className="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-600 dark:text-amber-400 mx-auto shadow-2xs">
+          <Lock size={26} />
+        </div>
+        <div className="space-y-1.5">
+          <h2 className="text-xl font-bold text-foreground">Monthly Financial Report Unavailable</h2>
+          <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+            Monthly financial reports and breakdown tables are accessible exclusively during the <strong>1st week of every month (Days 1–7)</strong>. Outside of this window, reports are hidden from all users and will reopen on <strong>{availability.nextWindowStart}</strong>.
+          </p>
+        </div>
+        <div className="flex flex-wrap items-center justify-center gap-2 pt-2">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-muted border border-border text-xs text-muted-foreground">
+            <CalendarCheck size={14} className="text-amber-600 dark:text-amber-400" />
+            <span>Availability: <strong>Days 1–7 of each month</strong></span>
+          </div>
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-muted border border-border text-xs text-muted-foreground">
+            <Clock size={14} className="text-primary" />
+            <span>Reopens: <strong>{availability.nextWindowStart}</strong></span>
+          </div>
+        </div>
+        <div className="pt-3">
+          <Link
+            href="/reports"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-card border border-border text-xs sm:text-sm font-semibold hover:bg-muted transition-colors shadow-xs"
+          >
+            <ArrowLeft size={16} /> Back to Reports
+          </Link>
+        </div>
+      </div>
+    );
   }
 
   const { month } = await props.params;
@@ -182,11 +220,10 @@ export default async function MonthlyReportDetailPage(props: {
                 </td>
                 <td className="py-2.5 px-4 text-right">
                   <span
-                    className={`inline-flex items-center gap-1 font-semibold ${
-                      (reportData.kpis.mom.revenueGrowthPct || 0) >= 0
+                    className={`inline-flex items-center gap-1 font-semibold ${(reportData.kpis.mom.revenueGrowthPct || 0) >= 0
                         ? 'text-emerald-600 dark:text-emerald-400'
                         : 'text-rose-600 dark:text-rose-400'
-                    }`}
+                      }`}
                   >
                     {formatGrowth(reportData.kpis.mom.revenueGrowthPct)}
                   </span>
@@ -207,11 +244,10 @@ export default async function MonthlyReportDetailPage(props: {
               <tr className="hover:bg-muted/40 transition-colors">
                 <td className="py-2.5 px-4 font-semibold text-foreground">Net Operating Profit</td>
                 <td
-                  className={`py-2.5 px-4 text-right font-mono font-bold ${
-                    reportData.kpis.netProfit >= 0
+                  className={`py-2.5 px-4 text-right font-mono font-bold ${reportData.kpis.netProfit >= 0
                       ? 'text-emerald-600 dark:text-emerald-400'
                       : 'text-rose-600 dark:text-rose-400'
-                  }`}
+                    }`}
                 >
                   {reportData.kpis.netProfit < 0 ? '-' : ''}
                   {fmtINR(Math.abs(reportData.kpis.netProfit))}
@@ -221,11 +257,10 @@ export default async function MonthlyReportDetailPage(props: {
                 </td>
                 <td className="py-2.5 px-4 text-right">
                   <span
-                    className={`inline-flex items-center gap-1 font-semibold ${
-                      (reportData.kpis.mom.profitGrowthPct || 0) >= 0
+                    className={`inline-flex items-center gap-1 font-semibold ${(reportData.kpis.mom.profitGrowthPct || 0) >= 0
                         ? 'text-emerald-600 dark:text-emerald-400'
                         : 'text-rose-600 dark:text-rose-400'
-                    }`}
+                      }`}
                   >
                     {formatGrowth(reportData.kpis.mom.profitGrowthPct)}
                   </span>
@@ -242,11 +277,10 @@ export default async function MonthlyReportDetailPage(props: {
                 </td>
                 <td className="py-2.5 px-4 text-right">
                   <span
-                    className={`inline-flex items-center gap-1 font-semibold ${
-                      (reportData.kpis.mom.ordersGrowthPct || 0) >= 0
+                    className={`inline-flex items-center gap-1 font-semibold ${(reportData.kpis.mom.ordersGrowthPct || 0) >= 0
                         ? 'text-emerald-600 dark:text-emerald-400'
                         : 'text-rose-600 dark:text-rose-400'
-                    }`}
+                      }`}
                   >
                     {formatGrowth(reportData.kpis.mom.ordersGrowthPct)}
                   </span>

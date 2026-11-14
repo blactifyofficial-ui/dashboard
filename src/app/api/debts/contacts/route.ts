@@ -88,7 +88,37 @@ export async function GET() {
       };
     });
 
-    return NextResponse.json({ contacts: enrichedContacts });
+    // Also include any distinct contact names from debts that aren't yet in debtContacts
+    const existingNames = new Set(contacts.map((c) => c.name.trim().toLowerCase()));
+    const unlinkedContacts: typeof enrichedContacts = [];
+
+    for (const d of allDebts) {
+      const cleanName = (d.contactName || '').trim();
+      if (!cleanName) continue;
+      const lower = cleanName.toLowerCase();
+      if (!existingNames.has(lower)) {
+        existingNames.add(lower);
+        const stats = contactStats[`name:${lower}`] || { activeLent: 0, activeBorrowed: 0, openDebtCount: 0 };
+        const netBalance = stats.activeLent - stats.activeBorrowed;
+        unlinkedContacts.push({
+          id: `unlinked_${Buffer.from(cleanName, 'utf8').toString('hex')}`,
+          name: cleanName,
+          phone: null,
+          email: null,
+          category: 'GENERAL',
+          notes: null,
+          createdById: null,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          activeLent: stats.activeLent,
+          activeBorrowed: stats.activeBorrowed,
+          netBalance,
+          openDebtCount: stats.openDebtCount,
+        });
+      }
+    }
+
+    return NextResponse.json({ contacts: [...enrichedContacts, ...unlinkedContacts] });
   } catch (error) {
     console.error('Error in GET /api/debts/contacts:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

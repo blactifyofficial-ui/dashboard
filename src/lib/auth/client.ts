@@ -17,6 +17,7 @@ export const authClient = {
     }) => {
       if (provider === "google") {
         const targetUrl = `/api/auth/google?callbackURL=${encodeURIComponent(callbackURL)}`;
+        // eslint-disable-next-line @next/next/no-location-assign-relative-destination
         window.location.href = targetUrl;
       } else {
         throw new Error(`Unsupported social provider: ${provider}`);

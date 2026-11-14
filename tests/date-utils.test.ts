@@ -1,13 +1,15 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert';
-import { 
-  getStoreDateParts, 
-  getStoreDay, 
-  getStoreMonthRange, 
-  getStoreNow, 
-  formatStoreDate, 
+import {
+  getStoreDateParts,
+  getStoreDay,
+  getStoreMonthRange,
+  getStoreNow,
+  formatStoreDate,
   formatStoreTime,
-  getProductFilterDateRange 
+  getProductFilterDateRange,
+  isFirstWeekOfMonth,
+  getMonthlyReportsAvailability
 } from '../src/lib/date-utils';
 
 describe('Store Timezone & Date Utils (Asia/Kolkata 24h day)', () => {
@@ -115,6 +117,48 @@ describe('Store Timezone & Date Utils (Asia/Kolkata 24h day)', () => {
       assert.strictEqual(res.startDate?.toISOString(), '2026-10-04T18:30:00.000Z');
       assert.strictEqual(res.endDate?.toISOString(), '2026-10-10T18:30:00.000Z');
       assert.strictEqual(res.periodKey, 'custom');
+    });
+  });
+
+  describe('Monthly Financial Reports Availability Window (1st Week of Month, Days 1–7)', () => {
+    it('should return true for Days 1 to 7 (1st week of the month)', () => {
+      // Nov 1, 2026 IST (2026-10-31T18:30:00.000Z)
+      assert.strictEqual(isFirstWeekOfMonth('2026-11-01T06:00:00.000+05:30'), true);
+      // Nov 3, 2026 IST
+      assert.strictEqual(isFirstWeekOfMonth('2026-11-03T12:00:00.000+05:30'), true);
+      // Nov 7, 2026 IST 23:59:59 (Day 7)
+      assert.strictEqual(isFirstWeekOfMonth('2026-11-07T23:59:59.000+05:30'), true);
+    });
+
+    it('should return false after Day 7 (Day 8 onwards until end of month)', () => {
+      // Nov 8, 2026 IST (Day 8)
+      assert.strictEqual(isFirstWeekOfMonth('2026-11-08T00:01:00.000+05:30'), false);
+      // Nov 15, 2026 IST (Day 15)
+      assert.strictEqual(isFirstWeekOfMonth('2026-11-15T15:30:00.000+05:30'), false);
+      // Nov 30, 2026 IST (Day 30)
+      assert.strictEqual(isFirstWeekOfMonth('2026-11-30T22:00:00.000+05:30'), false);
+    });
+
+    it('should return correct window details and next opening schedule', () => {
+      // On Nov 15, 2026 (outside 1st week window)
+      const availabilityClosed = getMonthlyReportsAvailability('2026-11-15T10:00:00.000+05:30');
+      assert.strictEqual(availabilityClosed.isAvailable, false);
+      assert.strictEqual(availabilityClosed.currentDay, 15);
+      assert.strictEqual(availabilityClosed.nextWindowStart, 'Dec 1, 2026');
+      assert.strictEqual(availabilityClosed.nextWindowEnd, 'Dec 7, 2026');
+      assert.match(availabilityClosed.windowDescription, /Next window: Dec 1, 2026 – Dec 7, 2026/);
+
+      // On Nov 2, 2026 (within 1st week window)
+      const availabilityActive = getMonthlyReportsAvailability('2026-11-02T10:00:00.000+05:30');
+      assert.strictEqual(availabilityActive.isAvailable, true);
+      assert.strictEqual(availabilityActive.currentDay, 2);
+      assert.match(availabilityActive.windowDescription, /Active window: Nov 1, 2026 – Nov 7, 2026/);
+
+      // Across year boundary on Dec 20, 2026
+      const availabilityYearEnd = getMonthlyReportsAvailability('2026-12-20T10:00:00.000+05:30');
+      assert.strictEqual(availabilityYearEnd.isAvailable, false);
+      assert.strictEqual(availabilityYearEnd.nextWindowStart, 'Jan 1, 2027');
+      assert.strictEqual(availabilityYearEnd.nextWindowEnd, 'Jan 7, 2027');
     });
   });
 });

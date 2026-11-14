@@ -8,6 +8,7 @@ import {
 } from '../src/lib/financial-report-service';
 import { buildFinancialReportPdf, generateFinancialReportPdfBuffer } from '../src/lib/financial-report-pdf';
 import { hasPermission, canAccessRoute } from '../src/lib/rbac';
+import { isFirstWeekOfMonth, getMonthlyReportsAvailability } from '../src/lib/date-utils';
 
 describe('Monthly Financial Report Service & Date Calculations', () => {
   test('should parse valid month string correctly', () => {
@@ -172,4 +173,37 @@ describe('Reports RBAC & Route Access Guard', () => {
     assert.equal(canAccessRoute('ADMIN', '/reports/2026-10'), true);
   });
 });
+
+describe('Monthly Financial Reports 1st-Week Schedule Visibility Rule', () => {
+  test('Reports table must be available during the 1st week of every month (Days 1 to 7)', () => {
+    // Days 1 through 7 should always permit table visibility
+    for (let day = 1; day <= 7; day++) {
+      const paddedDay = day < 10 ? `0${day}` : `${day}`;
+      const isVisible = isFirstWeekOfMonth(`2026-11-${paddedDay}T12:00:00.000+05:30`);
+      assert.equal(isVisible, true, `Day ${day} should be within the 1st week window`);
+    }
+  });
+
+  test('Reports table must be hidden from all users after the 1st week (Day 8 onwards)', () => {
+    // Days 8 through 31 must hide the table from whoever has access to the page
+    for (let day = 8; day <= 30; day++) {
+      const paddedDay = day < 10 ? `0${day}` : `${day}`;
+      const isVisible = isFirstWeekOfMonth(`2026-11-${paddedDay}T12:00:00.000+05:30`);
+      assert.equal(isVisible, false, `Day ${day} must hide the reports table`);
+    }
+  });
+
+  test('Availability helper provides accurate next reopening dates when table is hidden', () => {
+    // After 1st week of November, reopens on Dec 1
+    const infoNov = getMonthlyReportsAvailability('2026-11-15T00:00:00.000+05:30');
+    assert.equal(infoNov.isAvailable, false);
+    assert.equal(infoNov.nextWindowStart, 'Dec 1, 2026');
+
+    // After 1st week of December, reopens on Jan 1
+    const infoDec = getMonthlyReportsAvailability('2026-12-15T00:00:00.000+05:30');
+    assert.equal(infoDec.isAvailable, false);
+    assert.equal(infoDec.nextWindowStart, 'Jan 1, 2027');
+  });
+});
+
 

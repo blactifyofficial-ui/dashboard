@@ -161,153 +161,160 @@ function RecordSettlementModalContent({
             <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
               Quick Presets
             </label>
-            <div className="grid grid-cols-3 gap-2">
-              <button
-                type="button"
-                onClick={() => handlePresetClick(1.0)}
-                className="py-1.5 px-2 text-xs font-semibold rounded-full bg-muted hover:bg-muted/80 text-foreground border border-border transition-colors"
-              >
-                100% (Full)
-              </button>
-              <button
-                type="button"
-                onClick={() => handlePresetClick(0.5)}
-                className="py-1.5 px-2 text-xs font-semibold rounded-full bg-muted hover:bg-muted/80 text-foreground border border-border transition-colors"
-              >
-                50% (Half)
-              </button>
-              <button
-                type="button"
-                onClick={() => handlePresetClick(0.25)}
-                className="py-1.5 px-2 text-xs font-semibold rounded-full bg-muted hover:bg-muted/80 text-foreground border border-border transition-colors"
-              >
-                25%
-              </button>
+              <div className="grid grid-cols-4 gap-2">
+                <button
+                  type="button"
+                  onClick={() => handlePresetClick(1.0)}
+                  className="py-1.5 px-1.5 text-xs font-semibold rounded-full bg-muted hover:bg-muted/80 text-foreground border border-border transition-colors text-center"
+                >
+                  100%
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handlePresetClick(0.5)}
+                  className="py-1.5 px-1.5 text-xs font-semibold rounded-full bg-muted hover:bg-muted/80 text-foreground border border-border transition-colors text-center"
+                >
+                  50% (1/2)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handlePresetClick(1 / 3)}
+                  className="py-1.5 px-1.5 text-xs font-semibold rounded-full bg-muted hover:bg-muted/80 text-foreground border border-border transition-colors text-center"
+                >
+                  33% (1/3)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handlePresetClick(0.25)}
+                  className="py-1.5 px-1.5 text-xs font-semibold rounded-full bg-muted hover:bg-muted/80 text-foreground border border-border transition-colors text-center"
+                >
+                  25% (1/4)
+                </button>
+              </div>
             </div>
-          </div>
 
-          {/* Settlement Amount */}
-          <div>
-            <label className="text-xs font-medium text-foreground mb-1 flex items-center justify-between">
-              <span>Settlement Amount (₹) <span className="text-rose-500">*</span></span>
-              {settlementAmount > 0 && (
-                <span className="text-[11px] font-mono text-muted-foreground">
-                  New Balance: {formatCurrency(resultingRemaining)}
-                </span>
-              )}
-            </label>
-            <Input
-              type="number"
-              step="0.01"
-              min="0.01"
-              max={currentRemaining}
-              value={formData.amount}
-              onChange={(e) => setFormData((prev) => ({ ...prev, amount: e.target.value }))}
-              placeholder="Enter payment amount"
-              className="h-10 text-sm font-mono font-bold bg-card border-border text-emerald-600 dark:text-emerald-400"
-              required
-            />
-            {willBeFullySettled && (
-              <p className="text-[11px] text-emerald-600 dark:text-emerald-400 mt-1 flex items-center gap-1 font-semibold">
-                <CheckCircle2 className="w-3.5 h-3.5" />
-                This payment will mark this debt as 100% settled.
-              </p>
-            )}
-          </div>
-
-          {/* Date & Payment Method */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {/* Settlement Amount */}
             <div>
-              <label className="text-xs font-medium text-foreground mb-1 flex items-center gap-1.5">
-                <Calendar className="w-3.5 h-3.5 text-muted-foreground" />
-                Payment Date
+              <label className="text-xs font-medium text-foreground mb-1 flex items-center justify-between">
+                <span>Settlement Amount (₹) <span className="text-rose-500">*</span></span>
+                {settlementAmount > 0 && (
+                  <span className="text-[11px] font-mono text-muted-foreground">
+                    New Balance: {formatCurrency(resultingRemaining)}
+                  </span>
+                )}
               </label>
               <Input
-                type="date"
-                value={formData.settlementDate}
-                onChange={(e) => setFormData((prev) => ({ ...prev, settlementDate: e.target.value }))}
-                className="h-10 text-xs bg-card border-border text-foreground"
+                type="number"
+                step="0.01"
+                min="0.01"
+                max={currentRemaining}
+                value={formData.amount}
+                onChange={(e) => setFormData((prev) => ({ ...prev, amount: e.target.value }))}
+                placeholder="Enter payment amount"
+                className="h-10 text-sm font-mono font-bold bg-card border-border text-emerald-600 dark:text-emerald-400"
                 required
+              />
+              {willBeFullySettled && (
+                <p className="text-[11px] text-emerald-600 dark:text-emerald-400 mt-1 flex items-center gap-1 font-semibold">
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  This payment will mark this debt as 100% settled.
+                </p>
+              )}
+            </div>
+
+            {/* Date & Payment Method */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="text-xs font-medium text-foreground mb-1 flex items-center gap-1.5">
+                  <Calendar className="w-3.5 h-3.5 text-muted-foreground" />
+                  Payment Date
+                </label>
+                <Input
+                  type="date"
+                  value={formData.settlementDate}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, settlementDate: e.target.value }))}
+                  className="h-10 text-xs bg-card border-border text-foreground"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-medium text-foreground mb-1 flex items-center gap-1.5">
+                  <CreditCard className="w-3.5 h-3.5 text-muted-foreground" />
+                  Payment Method
+                </label>
+                <select
+                  value={formData.paymentMethodId}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, paymentMethodId: e.target.value }))}
+                  className="w-full h-10 px-3 text-xs bg-card border border-border rounded-[11px] text-foreground focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer"
+                >
+                  <option value="" className="bg-card text-foreground">Select Method (Optional)</option>
+                  {paymentMethods.map((pm) => (
+                    <option key={pm.id} value={pm.id} className="bg-card text-foreground">
+                      {pm.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Notes */}
+            <div>
+              <label className="text-xs font-medium text-foreground mb-1 flex items-center gap-1.5">
+                <FileText className="w-3.5 h-3.5 text-muted-foreground" />
+                Settlement Notes
+              </label>
+              <textarea
+                rows={2}
+                value={formData.notes}
+                onChange={(e) => setFormData((prev) => ({ ...prev, notes: e.target.value }))}
+                placeholder="e.g. Part payment received via Google Pay"
+                className="w-full p-2.5 text-xs bg-card border border-border rounded-[11px] text-foreground focus:outline-none focus:ring-2 focus:ring-primary resize-none placeholder:text-muted-foreground/60"
               />
             </div>
 
-            <div>
-              <label className="text-xs font-medium text-foreground mb-1 flex items-center gap-1.5">
-                <CreditCard className="w-3.5 h-3.5 text-muted-foreground" />
-                Payment Method
+            {/* Optional: Record in Expenses */}
+            <div className="flex items-center gap-2 p-3 rounded-xl bg-muted/40 border border-border">
+              <input
+                type="checkbox"
+                id="settlementRecordExpense"
+                checked={formData.recordAsExpense}
+                onChange={(e) => setFormData((prev) => ({ ...prev, recordAsExpense: e.target.checked }))}
+                className="rounded border-border bg-card text-primary focus:ring-primary h-4 w-4 cursor-pointer"
+              />
+              <label htmlFor="settlementRecordExpense" className="text-xs text-foreground cursor-pointer font-medium">
+                {debt.type === 'BORROWED'
+                  ? 'Also log this repayment outflow as an entry in Daily Expenses'
+                  : 'Also log this receipt in Daily Expenses ledger'}
               </label>
-              <select
-                value={formData.paymentMethodId}
-                onChange={(e) => setFormData((prev) => ({ ...prev, paymentMethodId: e.target.value }))}
-                className="w-full h-10 px-3 text-xs bg-card border border-border rounded-[11px] text-foreground focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer"
-              >
-                <option value="" className="bg-card text-foreground">Select Method (Optional)</option>
-                {paymentMethods.map((pm) => (
-                  <option key={pm.id} value={pm.id} className="bg-card text-foreground">
-                    {pm.name}
-                  </option>
-                ))}
-              </select>
             </div>
-          </div>
 
-          {/* Notes */}
-          <div>
-            <label className="text-xs font-medium text-foreground mb-1 flex items-center gap-1.5">
-              <FileText className="w-3.5 h-3.5 text-muted-foreground" />
-              Settlement Notes
-            </label>
-            <textarea
-              rows={2}
-              value={formData.notes}
-              onChange={(e) => setFormData((prev) => ({ ...prev, notes: e.target.value }))}
-              placeholder="e.g. Part payment received via Google Pay"
-              className="w-full p-2.5 text-xs bg-card border border-border rounded-[11px] text-foreground focus:outline-none focus:ring-2 focus:ring-primary resize-none placeholder:text-muted-foreground/60"
-            />
-          </div>
-
-          {/* Optional: Record in Expenses */}
-          <div className="flex items-center gap-2 p-3 rounded-xl bg-muted/40 border border-border">
-            <input
-              type="checkbox"
-              id="settlementRecordExpense"
-              checked={formData.recordAsExpense}
-              onChange={(e) => setFormData((prev) => ({ ...prev, recordAsExpense: e.target.checked }))}
-              className="rounded border-border bg-card text-primary focus:ring-primary h-4 w-4 cursor-pointer"
-            />
-            <label htmlFor="settlementRecordExpense" className="text-xs text-foreground cursor-pointer font-medium">
-              {debt.type === 'BORROWED'
-                ? 'Also log this repayment outflow as an entry in Daily Expenses'
-                : 'Also log this receipt in Daily Expenses ledger'}
-            </label>
-          </div>
-
-          {/* Footer buttons */}
-          <div className="flex items-center justify-end gap-2 pt-3 border-t border-border">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onClose}
-              disabled={saving}
-              className="text-xs h-9 px-4 rounded-full border-border text-foreground hover:bg-muted"
-            >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              disabled={saving}
-              className="text-xs h-9 px-5 font-semibold rounded-full text-white bg-emerald-600 hover:bg-emerald-500"
-            >
-              {saving ? (
-                <>
-                  <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
-                  Recording...
-                </>
-              ) : (
-                'Confirm Settlement'
-              )}
-            </Button>
-          </div>
+            {/* Footer buttons */}
+            <div className="flex items-center justify-end gap-2 pt-3 border-t border-border">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onClose}
+                disabled={saving}
+                className="text-xs h-9 px-4 rounded-full border-border text-foreground hover:bg-muted"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={saving}
+                className="text-xs h-9 px-5 font-semibold rounded-full text-white bg-emerald-600 hover:bg-emerald-500"
+              >
+                {saving ? (
+                  <>
+                    <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
+                    Recording...
+                  </>
+                ) : (
+                  'Confirm Settlement'
+                )}
+              </Button>
+            </div>
         </form>
       </div>
     </div>

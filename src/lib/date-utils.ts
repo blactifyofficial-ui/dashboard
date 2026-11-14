@@ -468,3 +468,61 @@ export function computeLast24HoursBuckets(
   }));
 }
 
+/**
+ * Checks whether the current date (or provided date) falls within the 1st week of the month (Days 1–7)
+ * in store timezone (Asia/Kolkata).
+ */
+export function isFirstWeekOfMonth(date?: Date | string | number | null): boolean {
+  const parts = getStoreDateParts(date);
+  return parts.day >= 1 && parts.day <= 7;
+}
+
+export interface MonthlyReportsAvailability {
+  isAvailable: boolean;
+  currentDay: number;
+  currentMonthName: string;
+  nextWindowStart: string;
+  nextWindowEnd: string;
+  windowDescription: string;
+}
+
+/**
+ * Returns formatted details about the 1st week availability window for monthly financial reports.
+ */
+export function getMonthlyReportsAvailability(date?: Date | string | number | null): MonthlyReportsAvailability {
+  const parts = getStoreDateParts(date);
+  const isAvailable = parts.day >= 1 && parts.day <= 7;
+
+  const currentMonthDate = new Date(parts.year, parts.month - 1, 1);
+  const currentMonthName = currentMonthDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+  // Calculate next month window
+  let nextYear = parts.year;
+  let nextMonth = parts.month + 1;
+  if (nextMonth > 12) {
+    nextMonth = 1;
+    nextYear += 1;
+  }
+  const nextMonthDate = new Date(nextYear, nextMonth - 1, 1);
+  const nextMonthName = nextMonthDate.toLocaleDateString('en-US', { month: 'short' });
+
+  const nextWindowStart = `${nextMonthName} 1, ${nextYear}`;
+  const nextWindowEnd = `${nextMonthName} 7, ${nextYear}`;
+
+  const currentMonthShort = currentMonthDate.toLocaleDateString('en-US', { month: 'short' });
+  const currentWindowStart = `${currentMonthShort} 1, ${parts.year}`;
+  const currentWindowEnd = `${currentMonthShort} 7, ${parts.year}`;
+
+  return {
+    isAvailable,
+    currentDay: parts.day,
+    currentMonthName,
+    nextWindowStart,
+    nextWindowEnd,
+    windowDescription: isAvailable
+      ? `Active window: ${currentWindowStart} – ${currentWindowEnd}`
+      : `Next window: ${nextWindowStart} – ${nextWindowEnd}`,
+  };
+}
+
+

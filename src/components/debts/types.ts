@@ -106,3 +106,15 @@ export interface SettlementFormData {
   recordAsExpense: boolean;
 }
 
+export interface PersonSettlementFormData {
+  contactId: string;
+  type: DebtType;
+  debtId?: string;
+  amount: string;
+  settlementDate: string;
+  paymentMethodId: string;
+  referenceNumber?: string;
+  notes: string;
+  recordAsExpense: boolean;
+}
+

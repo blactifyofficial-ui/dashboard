@@ -12,6 +12,8 @@ import AddDebtModal from '@/components/debts/AddDebtModal';
 import RecordSettlementModal from '@/components/debts/RecordSettlementModal';
 import DebtLedgerModal from '@/components/debts/DebtLedgerModal';
 import ManageContactsModal from '@/components/debts/ManageContactsModal';
+import PersonDebtCard from '@/components/debts/PersonDebtCard';
+import AdjustPersonAmountModal from '@/components/debts/AdjustPersonAmountModal';
 import { Debt, DebtContact, DebtsSummary, DebtType, PaymentMethod } from '@/components/debts/types';
 import { Button } from '@/components/ui/button';
 import {
@@ -36,6 +38,9 @@ export default function DebtsPage() {
   const [summary, setSummary] = useState<DebtsSummary | null>(null);
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
 
+  // View mode: 'PERSONS' (Person Cards) vs 'TRANSACTIONS' (Table)
+  const [viewMode, setViewMode] = useState<'PERSONS' | 'TRANSACTIONS'>('PERSONS');
+
   // Filters state
   const [typeFilter, setTypeFilter] = useState<'ALL' | 'LENT' | 'BORROWED'>('ALL');
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
@@ -48,6 +53,9 @@ export default function DebtsPage() {
   const [addModalDefaultType, setAddModalDefaultType] = useState<DebtType>('LENT');
   const [initialModalContact, setInitialModalContact] = useState<DebtContact | null>(null);
   const [editingDebt, setEditingDebt] = useState<Debt | null>(null);
+
+  const [isAdjustAmountModalOpen, setIsAdjustAmountModalOpen] = useState(false);
+  const [adjustingContact, setAdjustingContact] = useState<DebtContact | null>(null);
 
   const [isSettlementModalOpen, setIsSettlementModalOpen] = useState(false);
   const [settlementDebt, setSettlementDebt] = useState<Debt | null>(null);
@@ -141,7 +149,53 @@ export default function DebtsPage() {
     };
   }, [debts]);
 
+  // Filtered Contacts for Person Cards view
+  const filteredContacts = useMemo(() => {
+    return contacts.filter((c) => {
+      // Search
+      if (searchQuery.trim()) {
+        const q = searchQuery.trim().toLowerCase();
+        const matchesName = c.name.toLowerCase().includes(q);
+        const matchesCategory = c.category && c.category.toLowerCase().includes(q);
+        const matchesPhone = c.phone && c.phone.toLowerCase().includes(q);
+        const matchesNotes = c.notes && c.notes.toLowerCase().includes(q);
+        if (!matchesName && !matchesCategory && !matchesPhone && !matchesNotes) {
+          return false;
+        }
+      }
+
+      // Category filter
+      if (categoryFilter !== 'ALL' && c.category?.toUpperCase() !== categoryFilter.toUpperCase()) {
+        return false;
+      }
+
+      // Type filter
+      if (typeFilter === 'LENT' && (c.activeLent || 0) <= 0.001) {
+        return false;
+      }
+      if (typeFilter === 'BORROWED' && (c.activeBorrowed || 0) <= 0.001) {
+        return false;
+      }
+
+      // Status filter
+      const hasBalance = (c.activeLent || 0) > 0.001 || (c.activeBorrowed || 0) > 0.001;
+      if (statusFilter === 'ACTIVE' && !hasBalance) {
+        return false;
+      }
+      if (statusFilter === 'SETTLED' && hasBalance) {
+        return false;
+      }
+
+      return true;
+    });
+  }, [contacts, searchQuery, categoryFilter, typeFilter, statusFilter]);
+
   // Handlers
+  const handleAdjustPersonAmount = (contact: DebtContact) => {
+    setAdjustingContact(contact);
+    setIsAdjustAmountModalOpen(true);
+  };
+
   const handleOpenAdd = (type: DebtType, contact?: DebtContact) => {
     setEditingDebt(null);
     setInitialModalContact(contact || null);
@@ -272,7 +326,7 @@ export default function DebtsPage() {
       {/* KPI Cards */}
       <DebtsSummaryCards summary={summary} />
 
-      {/* Filter Toolbar */}
+      {/* Filter Toolbar & View Switcher */}
       <DebtsFilterToolbar
         typeFilter={typeFilter}
         onTypeFilterChange={setTypeFilter}
@@ -283,14 +337,58 @@ export default function DebtsPage() {
         searchQuery={searchQuery}
         onSearchQueryChange={setSearchQuery}
         counts={filterCounts}
+        viewMode={viewMode}
+        onViewModeChange={setViewMode}
       />
 
-      {/* Main Table */}
+      {/* Main Content: Person Cards vs Table */}
       {loading ? (
         <div className="py-20 flex flex-col items-center justify-center bg-card border border-border rounded-[18px]">
           <LoadingSpinner />
           <p className="text-xs text-muted-foreground mt-2">Loading debt ledger...</p>
         </div>
+      ) : viewMode === 'PERSONS' ? (
+        filteredContacts.length === 0 ? (
+          <div className="bg-card border border-border rounded-[18px] p-12 text-center shadow-none">
+            <div className="w-12 h-12 rounded-full bg-muted/60 border border-border flex items-center justify-center mx-auto mb-3 text-muted-foreground">
+              <Users className="w-6 h-6" />
+            </div>
+            <h3 className="text-base font-semibold text-foreground mb-1">
+              {searchQuery || categoryFilter !== 'ALL' || statusFilter !== 'ALL' || typeFilter !== 'ALL'
+                ? 'No persons match your current filters'
+                : 'No registered persons yet'}
+            </h3>
+            <p className="text-xs text-muted-foreground max-w-sm mx-auto mb-4">
+              {contacts.length === 0
+                ? 'Add your first contact or click "Lend Money" or "Borrow Money" to record loans and track balances per person.'
+                : 'Try adjusting your search query or filters to find the person you are looking for.'}
+            </p>
+            {contacts.length === 0 && canManage && (
+              <Button
+                size="sm"
+                onClick={() => setIsContactsModalOpen(true)}
+                className="h-9 px-4 text-xs font-semibold rounded-full bg-primary text-primary-foreground"
+              >
+                <Users className="w-3.5 h-3.5 mr-1.5" />
+                Add Person to Directory
+              </Button>
+            )}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filteredContacts.map((contact) => (
+              <PersonDebtCard
+                key={contact.id}
+                contact={contact}
+                debts={debts}
+                canManage={canManage}
+                onAdjustAmount={handleAdjustPersonAmount}
+                onLendMoney={(c) => handleOpenAdd('LENT', c)}
+                onBorrowMoney={(c) => handleOpenAdd('BORROWED', c)}
+              />
+            ))}
+          </div>
+        )
       ) : (
         <DebtsTable
           debts={debts}
@@ -304,6 +402,20 @@ export default function DebtsPage() {
       )}
 
       {/* Modals */}
+      <AdjustPersonAmountModal
+        open={isAdjustAmountModalOpen}
+        onClose={() => {
+          setIsAdjustAmountModalOpen(false);
+          setAdjustingContact(null);
+        }}
+        onSuccess={() => {
+          fetchDebts(true);
+          fetchContacts();
+        }}
+        contact={adjustingContact}
+        debts={debts}
+        paymentMethods={paymentMethods}
+      />
       <AddDebtModal
         open={isAddModalOpen}
         onClose={() => {

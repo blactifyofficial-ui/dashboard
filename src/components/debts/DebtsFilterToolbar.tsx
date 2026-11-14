@@ -1,6 +1,6 @@
 'use client';
 
-import { Search, X, ChevronDown } from 'lucide-react';
+import { Search, X, ChevronDown, Users, Receipt } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 
 interface DebtsFilterToolbarProps {
@@ -18,6 +18,8 @@ interface DebtsFilterToolbarProps {
     borrowed: number;
     settled: number;
   };
+  viewMode?: 'PERSONS' | 'TRANSACTIONS';
+  onViewModeChange?: (mode: 'PERSONS' | 'TRANSACTIONS') => void;
 }
 
 const CATEGORIES = [
@@ -41,79 +43,113 @@ export default function DebtsFilterToolbar({
   searchQuery,
   onSearchQueryChange,
   counts,
+  viewMode = 'PERSONS',
+  onViewModeChange,
 }: DebtsFilterToolbarProps) {
   return (
     <div className="space-y-3.5">
-      {/* Top row: Type Segment Tabs */}
-      <div className="flex flex-wrap items-center gap-2 border-b border-border pb-3">
-        <button
-          type="button"
-          onClick={() => onTypeFilterChange('ALL')}
-          className={`flex items-center gap-2 px-3.5 py-2 rounded-full text-xs font-semibold transition-all border ${
-            typeFilter === 'ALL'
-              ? 'bg-muted text-foreground border-border shadow-sm'
-              : 'text-muted-foreground hover:text-foreground hover:bg-muted/50 border-transparent'
-          }`}
-        >
-          <span>All Records</span>
-          <span
-            className={`px-2 py-0.5 rounded-full text-[10px] font-mono ${
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 border-b border-border pb-3">
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            onClick={() => onTypeFilterChange('ALL')}
+            className={`flex items-center gap-2 px-3.5 py-2 rounded-full text-xs font-semibold transition-all border ${
               typeFilter === 'ALL'
-                ? 'bg-foreground/10 text-foreground font-bold'
-                : 'bg-muted text-muted-foreground'
+                ? 'bg-muted text-foreground border-border shadow-sm'
+                : 'text-muted-foreground hover:text-foreground hover:bg-muted/50 border-transparent'
             }`}
           >
-            {counts.all}
-          </span>
-        </button>
+            <span>All Records</span>
+            <span
+              className={`px-2 py-0.5 rounded-full text-[10px] font-mono ${
+                typeFilter === 'ALL'
+                  ? 'bg-foreground/10 text-foreground font-bold'
+                  : 'bg-muted text-muted-foreground'
+              }`}
+            >
+              {counts.all}
+            </span>
+          </button>
 
-        <button
-          type="button"
-          onClick={() => onTypeFilterChange('LENT')}
-          className={`flex items-center gap-2 px-3.5 py-2 rounded-full text-xs font-semibold transition-all border ${
-            typeFilter === 'LENT'
-              ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-500/30 shadow-sm'
-              : 'text-muted-foreground hover:text-emerald-600 dark:hover:text-emerald-300 hover:bg-emerald-500/10 border-transparent'
-          }`}
-        >
-          <span className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-            You Lent (Receivables)
-          </span>
-          <span
-            className={`px-2 py-0.5 rounded-full text-[10px] font-mono ${
+          <button
+            type="button"
+            onClick={() => onTypeFilterChange('LENT')}
+            className={`flex items-center gap-2 px-3.5 py-2 rounded-full text-xs font-semibold transition-all border ${
               typeFilter === 'LENT'
-                ? 'bg-emerald-500/25 text-emerald-800 dark:text-emerald-200 font-bold'
-                : 'bg-muted text-muted-foreground'
+                ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-500/30 shadow-sm'
+                : 'text-muted-foreground hover:text-emerald-600 dark:hover:text-emerald-300 hover:bg-emerald-500/10 border-transparent'
             }`}
           >
-            {counts.lent}
-          </span>
-        </button>
+            <span className="flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+              You Lent (Receivables)
+            </span>
+            <span
+              className={`px-2 py-0.5 rounded-full text-[10px] font-mono ${
+                typeFilter === 'LENT'
+                  ? 'bg-emerald-500/25 text-emerald-800 dark:text-emerald-200 font-bold'
+                  : 'bg-muted text-muted-foreground'
+              }`}
+            >
+              {counts.lent}
+            </span>
+          </button>
 
-        <button
-          type="button"
-          onClick={() => onTypeFilterChange('BORROWED')}
-          className={`flex items-center gap-2 px-3.5 py-2 rounded-full text-xs font-semibold transition-all border ${
-            typeFilter === 'BORROWED'
-              ? 'bg-amber-500/15 text-amber-700 dark:text-amber-300 border-amber-500/30 shadow-sm'
-              : 'text-muted-foreground hover:text-amber-600 dark:hover:text-amber-300 hover:bg-amber-500/10 border-transparent'
-          }`}
-        >
-          <span className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-amber-500"></span>
-            You Borrowed (Payables)
-          </span>
-          <span
-            className={`px-2 py-0.5 rounded-full text-[10px] font-mono ${
+          <button
+            type="button"
+            onClick={() => onTypeFilterChange('BORROWED')}
+            className={`flex items-center gap-2 px-3.5 py-2 rounded-full text-xs font-semibold transition-all border ${
               typeFilter === 'BORROWED'
-                ? 'bg-amber-500/25 text-amber-800 dark:text-amber-200 font-bold'
-                : 'bg-muted text-muted-foreground'
+                ? 'bg-amber-500/15 text-amber-700 dark:text-amber-300 border-amber-500/30 shadow-sm'
+                : 'text-muted-foreground hover:text-amber-600 dark:hover:text-amber-300 hover:bg-amber-500/10 border-transparent'
             }`}
           >
-            {counts.borrowed}
-          </span>
-        </button>
+            <span className="flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-amber-500"></span>
+              You Borrowed (Payables)
+            </span>
+            <span
+              className={`px-2 py-0.5 rounded-full text-[10px] font-mono ${
+                typeFilter === 'BORROWED'
+                  ? 'bg-amber-500/25 text-amber-800 dark:text-amber-200 font-bold'
+                  : 'bg-muted text-muted-foreground'
+              }`}
+            >
+              {counts.borrowed}
+            </span>
+          </button>
+        </div>
+
+        {/* View Mode Switcher */}
+        {onViewModeChange && (
+          <div className="flex items-center p-0.5 rounded-full bg-muted/60 border border-border shrink-0 self-start sm:self-auto">
+            <button
+              type="button"
+              onClick={() => onViewModeChange('PERSONS')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
+                viewMode === 'PERSONS'
+                  ? 'bg-card text-foreground shadow-xs border border-border'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              <Users className="w-3.5 h-3.5 text-primary" />
+              <span>By Person</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => onViewModeChange('TRANSACTIONS')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
+                viewMode === 'TRANSACTIONS'
+                  ? 'bg-card text-foreground shadow-xs border border-border'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              <Receipt className="w-3.5 h-3.5" />
+              <span>All Loans</span>
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Bottom row: Search input, status dropdown, category dropdown */}
@@ -173,4 +209,3 @@ export default function DebtsFilterToolbar({
     </div>
   );
 }
-

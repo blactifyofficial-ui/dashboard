@@ -1,10 +1,8 @@
-import test, { describe, it } from 'node:test';
+import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   signSessionToken,
   verifySessionToken,
-  SESSION_COOKIE_NAME,
-  DEFAULT_MAX_AGE_SECONDS,
 } from '../../src/lib/auth/token';
 
 describe('Direct Google Auth - Token Engine', () => {
