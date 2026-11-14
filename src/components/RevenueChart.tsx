@@ -164,6 +164,7 @@ function CustomTooltip({ active, payload, label, activeMetric, viewMode }: Custo
             year,
             month,
             monthDisplay,
+            activePeriodLabel,
 }: {
             data: RevenueData[];
           orderPoints?: OrderPoint[];
@@ -171,6 +172,7 @@ function CustomTooltip({ active, payload, label, activeMetric, viewMode }: Custo
           year?: number;
           month?: number;
           monthDisplay?: string;
+          activePeriodLabel?: string;
 }) {
   const [metric, setMetric] = useState<'revenue' | 'orders'>('revenue');
           const [chartType, setChartType] = useState<'area' | 'bar'>('area');
@@ -520,9 +522,9 @@ function CustomTooltip({ active, payload, label, activeMetric, viewMode }: Custo
                               </div>
                             )}
 
-                            {isCurrentMonth && viewMode === 'month' && (
+                            {viewMode === 'month' && (
                               <span className="text-[10px] text-muted-foreground bg-muted border border-border/60 px-2 py-0.5 rounded-md font-medium">
-                                Month-to-date
+                                {activePeriodLabel || (isCurrentMonth ? 'Month-to-date' : 'Full Month')}
                               </span>
                             )}
 

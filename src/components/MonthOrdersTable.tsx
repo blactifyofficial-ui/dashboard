@@ -12,11 +12,14 @@ import {
   Clock,
   SlidersHorizontal,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Calendar,
+  ChevronDown,
+  X,
 } from 'lucide-react';
 
 import { isCodOrder, getCodAmountToCollect, getPrepaidAmount } from '@/lib/order-utils';
-import { formatStoreDate, formatStoreTime } from '@/lib/date-utils';
+import { formatStoreDate, formatStoreTime, MonthWeekPreset } from '@/lib/date-utils';
 import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -42,9 +45,19 @@ export interface MonthOrderDetail {
 
 interface MonthOrdersTableProps {
   orders: MonthOrderDetail[];
+  selectedWeekId?: string;
+  onSelectWeekId?: (weekId: string) => void;
+  availableWeeks?: MonthWeekPreset[];
+  activeWeekLabel?: string;
 }
 
-export default function MonthOrdersTable({ orders }: MonthOrdersTableProps) {
+export default function MonthOrdersTable({
+  orders,
+  selectedWeekId,
+  onSelectWeekId,
+  availableWeeks,
+  activeWeekLabel,
+}: MonthOrdersTableProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState<'ALL' | 'NORMAL' | 'COD'>('ALL');
   const [fulfillmentFilter, setFulfillmentFilter] = useState<'ALL' | 'FULFILLED' | 'UNFULFILLED'>('ALL');
@@ -217,12 +230,32 @@ export default function MonthOrdersTable({ orders }: MonthOrdersTableProps) {
               </button>
             </div>
 
-            {/* Fulfillment Status Toggle */}
+            {/* Controls: Fulfillment Status & Optional Week Selector */}
+            <div className="flex items-center gap-2 flex-wrap">
+              {availableWeeks && availableWeeks.length > 0 && onSelectWeekId && (
+                <div className="relative flex items-center">
+                  <select
+                    value={selectedWeekId || 'all'}
+                    onChange={(e) => onSelectWeekId(e.target.value)}
+                    className="appearance-none bg-card border border-border rounded-full pl-3 pr-7 py-1 text-xs font-medium text-foreground focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer h-[28px]"
+                    title="Filter ledger by week"
+                  >
+                    {availableWeeks.map((w) => (
+                      <option key={w.id} value={w.id} className="bg-popover text-foreground">
+                        {w.label} ({w.rangeLabel})
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown size={12} className="text-muted-foreground absolute right-2.5 pointer-events-none" />
+                </div>
+              )}
+
+              {/* Fulfillment Status Toggle */}
               <div className="flex items-center gap-1.5 text-xs flex-nowrap overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                 <SlidersHorizontal size={13} className="text-muted-foreground mr-1 hidden sm:inline shrink-0" />
                 <button
                   onClick={() => handleFulfillmentChange('ALL')}
-              className={`px-3 py-1 rounded-full border text-xs transition-all active:scale-95 shrink-0 whitespace-nowrap ${fulfillmentFilter === 'ALL'
+                  className={`px-3 py-1 rounded-full border text-xs transition-all active:scale-95 shrink-0 whitespace-nowrap ${fulfillmentFilter === 'ALL'
                     ? 'bg-card text-foreground border-border font-semibold'
                     : 'text-muted-foreground border-border hover:text-foreground'
                     }`}
@@ -231,35 +264,54 @@ export default function MonthOrdersTable({ orders }: MonthOrdersTableProps) {
                 </button>
                 <button
                   onClick={() => handleFulfillmentChange('FULFILLED')}
-              className={`px-3 py-1 rounded-full border text-xs transition-all active:scale-95 shrink-0 whitespace-nowrap ${fulfillmentFilter === 'FULFILLED'
-                ? 'bg-[#0066cc]/15 text-[#0066cc] dark:text-[#2997ff] border-[#0066cc]/30 font-semibold'
-                : 'text-muted-foreground border-border hover:text-foreground'
-                }`}
-            >
-              Fulfilled
-            </button>
-            <button
-              onClick={() => handleFulfillmentChange('UNFULFILLED')}
-              className={`px-3 py-1 rounded-full border text-xs transition-all active:scale-95 shrink-0 whitespace-nowrap ${fulfillmentFilter === 'UNFULFILLED'
-                ? 'bg-amber-500/15 text-amber-700 dark:text-amber-300 border-amber-500/30 font-semibold'
-                : 'text-muted-foreground border-border hover:text-foreground'
-                }`}
-            >
-              Unfulfilled
-            </button>
-          </div>
-        </div >
+                  className={`px-3 py-1 rounded-full border text-xs transition-all active:scale-95 shrink-0 whitespace-nowrap ${fulfillmentFilter === 'FULFILLED'
+                    ? 'bg-[#0066cc]/15 text-[#0066cc] dark:text-[#2997ff] border-[#0066cc]/30 font-semibold'
+                    : 'text-muted-foreground border-border hover:text-foreground'
+                    }`}
+                >
+                  Fulfilled
+                </button>
+                <button
+                  onClick={() => handleFulfillmentChange('UNFULFILLED')}
+                  className={`px-3 py-1 rounded-full border text-xs transition-all active:scale-95 shrink-0 whitespace-nowrap ${fulfillmentFilter === 'UNFULFILLED'
+                    ? 'bg-amber-500/15 text-amber-700 dark:text-amber-300 border-amber-500/30 font-semibold'
+                    : 'text-muted-foreground border-border hover:text-foreground'
+                    }`}
+                >
+                  Unfulfilled
+                </button>
+              </div>
+            </div>
+        </div>
 
         {/* Showing Summary text */}
-        < div className="flex items-center justify-between text-xs text-muted-foreground pt-1.5 border-t border-border/80" >
-          <span>
-            Showing <strong className="text-foreground font-mono">{filteredOrders.length}</strong> {filteredOrders.length === 1 ? 'order' : 'orders'}
-            {filterType !== 'ALL' && ` (${filterType === 'NORMAL' ? 'Prepaid' : 'COD'})`}
-          </span>
+        <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground pt-1.5 border-t border-border/80">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span>
+              Showing <strong className="text-foreground font-mono">{filteredOrders.length}</strong> {filteredOrders.length === 1 ? 'order' : 'orders'}
+              {filterType !== 'ALL' && ` (${filterType === 'NORMAL' ? 'Prepaid' : 'COD'})`}
+            </span>
+            {selectedWeekId && selectedWeekId !== 'all' && activeWeekLabel && (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-primary/10 text-primary border border-primary/20">
+                <Calendar size={10} />
+                <span>{activeWeekLabel}</span>
+                {onSelectWeekId && (
+                  <button
+                    type="button"
+                    onClick={() => onSelectWeekId('all')}
+                    className="hover:text-foreground ml-0.5 p-0.5"
+                    title="Clear week filter and view all month"
+                  >
+                    <X size={10} />
+                  </button>
+                )}
+              </span>
+            )}
+          </div>
           <span>
             Filtered Total: <strong className="text-foreground font-mono">₹{filteredTotalRevenue.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>
           </span>
-        </div >
+        </div>
       </div >
 
       {/* Orders Table (Desktop & Tablet) using 21st.dev Table */}

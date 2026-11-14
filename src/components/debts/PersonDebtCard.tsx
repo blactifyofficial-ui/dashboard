@@ -139,24 +139,22 @@ export default function PersonDebtCard({
             <span className="text-muted-foreground font-medium">Net Position:</span>
             <div className="flex items-center gap-1.5">
               <span
-                className={`font-mono font-bold text-xs sm:text-sm ${
-                  netBalance > 0.001
+                className={`font-mono font-bold text-xs sm:text-sm ${netBalance > 0.001
                     ? 'text-emerald-600 dark:text-emerald-400'
                     : netBalance < -0.001
-                    ? 'text-amber-600 dark:text-amber-400'
-                    : 'text-muted-foreground'
-                }`}
+                      ? 'text-amber-600 dark:text-amber-400'
+                      : 'text-muted-foreground'
+                  }`}
               >
                 {netBalance > 0 ? `+${formatCurrency(netBalance)}` : formatCurrency(netBalance)}
               </span>
               <span
-                className={`text-[9px] font-bold px-1.5 py-0.2 rounded-sm ${
-                  netBalance > 0.001
+                className={`text-[9px] font-bold px-1.5 py-0.2 rounded-sm ${netBalance > 0.001
                     ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
                     : netBalance < -0.001
-                    ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400'
-                    : 'bg-muted text-muted-foreground'
-                }`}
+                      ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400'
+                      : 'bg-muted text-muted-foreground'
+                  }`}
               >
                 {netBalance > 0.001 ? 'THEY OWE' : netBalance < -0.001 ? 'YOU OWE' : 'CLEAR'}
               </span>
@@ -172,11 +170,10 @@ export default function PersonDebtCard({
             size="sm"
             onClick={() => onAdjustAmount(contact)}
             disabled={!hasActiveBalance}
-            className={`flex-1 h-8 px-3 text-xs font-semibold rounded-full shadow-xs transition-all ${
-              hasActiveBalance
+            className={`flex-1 h-8 px-3 text-xs font-semibold rounded-full shadow-xs transition-all ${hasActiveBalance
                 ? 'bg-primary text-primary-foreground hover:bg-primary/90'
                 : 'bg-muted text-muted-foreground cursor-not-allowed border border-border'
-            }`}
+              }`}
             title={hasActiveBalance ? `Adjust or settle balance for ${contact.name}` : 'No active balance to adjust'}
           >
             <Sliders className="w-3.5 h-3.5 mr-1.5" />

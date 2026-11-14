@@ -44,8 +44,8 @@ function AdjustPersonAmountModalContent({
     (contact.activeLent || 0) > 0
       ? 'LENT'
       : (contact.activeBorrowed || 0) > 0
-      ? 'BORROWED'
-      : 'LENT';
+        ? 'BORROWED'
+        : 'LENT';
 
   const [selectedType, setSelectedType] = useState<DebtType>(initialType);
 
@@ -181,11 +181,10 @@ function AdjustPersonAmountModalContent({
                 setRecordAsExpense(false);
                 setSelectedDebtId('ALL');
               }}
-              className={`py-2 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-all ${
-                selectedType === 'LENT'
+              className={`py-2 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-all ${selectedType === 'LENT'
                   ? 'bg-card text-emerald-600 dark:text-emerald-400 shadow-xs border border-border'
                   : 'text-muted-foreground hover:text-foreground'
-              }`}
+                }`}
             >
               <ArrowUpRight className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
               <span>Lent Recovery</span>
@@ -203,11 +202,10 @@ function AdjustPersonAmountModalContent({
                 setRecordAsExpense(true);
                 setSelectedDebtId('ALL');
               }}
-              className={`py-2 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-all ${
-                selectedType === 'BORROWED'
+              className={`py-2 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-all ${selectedType === 'BORROWED'
                   ? 'bg-card text-amber-600 dark:text-amber-400 shadow-xs border border-border'
                   : 'text-muted-foreground hover:text-foreground'
-              }`}
+                }`}
             >
               <ArrowDownLeft className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
               <span>Borrowed Repay</span>
@@ -261,11 +259,10 @@ function AdjustPersonAmountModalContent({
             <div className="pt-2 border-t border-border flex items-center justify-between text-xs">
               <span className="text-muted-foreground font-medium">New Remaining Balance:</span>
               <span
-                className={`font-mono font-bold text-sm ${
-                  willBeFullySettled
+                className={`font-mono font-bold text-sm ${willBeFullySettled
                     ? 'text-emerald-600 dark:text-emerald-400'
                     : 'text-foreground'
-                }`}
+                  }`}
               >
                 {formatCurrency(resultingRemaining)}
               </span>

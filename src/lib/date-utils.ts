@@ -525,4 +525,104 @@ export function getMonthlyReportsAvailability(date?: Date | string | number | nu
   };
 }
 
+export interface MonthWeekPreset {
+  id: string; // 'all' | 'current_week' | 'last_week' | 'w1' | 'w2' | 'w3' | 'w4' | 'w5'
+  label: string; // 'All Month' | 'Current Week' | 'Last Week' | 'Week 1' | ...
+  shortLabel: string; // 'All' | 'This Week' | 'Last Week' | 'W1' | 'W2' | ...
+  rangeLabel: string; // '1–30 Nov' | '9–15 Nov' | '2–8 Nov' | ...
+  startDay: number; // 1-31
+  endDay: number; // 1-31
+  isCurrentWeek?: boolean;
+  isLastWeek?: boolean;
+}
+
+/**
+ * Generates structured weekly presets for a given month in store timezone (Asia/Kolkata).
+ * Includes All Month, Current Week & Last Week (if current month), and Week 1–5 blocks.
+ */
+export function getMonthWeekPresets(year: number, month: number): MonthWeekPreset[] {
+  const daysInMonth = new Date(year, month, 0).getDate();
+  const monthShort = new Date(year, month - 1, 1).toLocaleDateString('en-US', { month: 'short' });
+  const now = getStoreNow();
+  const isCurrentMonth = year === now.year && month === now.month;
+
+  const presets: MonthWeekPreset[] = [
+    {
+      id: 'all',
+      label: 'All Month',
+      shortLabel: 'All',
+      rangeLabel: `1–${daysInMonth} ${monthShort}`,
+      startDay: 1,
+      endDay: daysInMonth,
+    },
+  ];
+
+  if (isCurrentMonth) {
+    const todayDay = now.day;
+    const todayDateObj = new Date(
+      `${now.year}-${String(now.month).padStart(2, '0')}-${String(todayDay).padStart(2, '0')}T12:00:00+05:30`
+    );
+    const dayOfWeek = todayDateObj.getDay(); // 0 = Sun, 1 = Mon ...
+    const isoDayOfWeek = dayOfWeek === 0 ? 7 : dayOfWeek; // 1 = Mon, 7 = Sun
+
+    // Current Week (Monday to Sunday)
+    const cwStart = todayDay - (isoDayOfWeek - 1);
+    const cwEnd = todayDay + (7 - isoDayOfWeek);
+    const clippedCwStart = Math.max(1, cwStart);
+    const clippedCwEnd = Math.min(daysInMonth, cwEnd);
+
+    presets.push({
+      id: 'current_week',
+      label: 'Current Week',
+      shortLabel: 'This Week',
+      rangeLabel: `${clippedCwStart}–${clippedCwEnd} ${monthShort}`,
+      startDay: clippedCwStart,
+      endDay: clippedCwEnd,
+      isCurrentWeek: true,
+    });
+
+    // Last Week (Previous Monday to Sunday)
+    const lwStart = cwStart - 7;
+    const lwEnd = cwStart - 1;
+    if (lwEnd >= 1) {
+      const clippedLwStart = Math.max(1, lwStart);
+      const clippedLwEnd = Math.min(daysInMonth, lwEnd);
+      presets.push({
+        id: 'last_week',
+        label: 'Last Week',
+        shortLabel: 'Last Week',
+        rangeLabel: `${clippedLwStart}–${clippedLwEnd} ${monthShort}`,
+        startDay: clippedLwStart,
+        endDay: clippedLwEnd,
+        isLastWeek: true,
+      });
+    }
+  }
+
+  // Standard Week blocks: Week 1 (1–7), Week 2 (8–14), Week 3 (15–21), Week 4 (22–28), Week 5 (29–end)
+  const weekBlocks = [
+    { num: 1, start: 1, end: 7 },
+    { num: 2, start: 8, end: 14 },
+    { num: 3, start: 15, end: 21 },
+    { num: 4, start: 22, end: 28 },
+    { num: 5, start: 29, end: daysInMonth },
+  ];
+
+  for (const wb of weekBlocks) {
+    if (wb.start <= daysInMonth) {
+      const actualEnd = Math.min(daysInMonth, wb.end);
+      presets.push({
+        id: `w${wb.num}`,
+        label: `Week ${wb.num}`,
+        shortLabel: `W${wb.num}`,
+        rangeLabel: `${wb.start}–${actualEnd} ${monthShort}`,
+        startDay: wb.start,
+        endDay: actualEnd,
+      });
+    }
+  }
+
+  return presets;
+}
+
 

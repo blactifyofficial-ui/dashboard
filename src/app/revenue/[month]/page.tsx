@@ -1,12 +1,10 @@
 import { db } from '@/db';
 import { orders, expenses } from '@/db/schema';
-import { and, gte, lt, desc, isNull, sql } from 'drizzle-orm';
-import { CalendarDays, Inbox, ArrowLeft, CreditCard, Banknote, TrendingUp, TrendingDown, Wallet, FileText } from 'lucide-react';
+import { and, gte, lt, desc, isNull } from 'drizzle-orm';
+import { ArrowLeft, FileText } from 'lucide-react';
 import Link from 'next/link';
-import RevenueChart from '@/components/RevenueChart';
-import MonthOrdersTable from '@/components/MonthOrdersTable';
-import { isCodOrder, getCodAmountToCollect, getPrepaidAmount } from '@/lib/order-utils';
-import { getStoreMonthRange, getStoreNow, getStoreDay, getStoreYesterdayRange } from '@/lib/date-utils';
+import MonthRevenueView from '@/components/revenue/MonthRevenueView';
+import { getStoreMonthRange, getStoreNow, getStoreYesterdayRange } from '@/lib/date-utils';
 import { Suspense } from 'react';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { requirePermission } from '@/lib/auth-utils';
@@ -17,6 +15,7 @@ export const dynamic = "force-dynamic";
 
 export default async function MonthRevenuePage(props: {
   params: Promise<{ month: string }>;
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const authRes = await requirePermission('revenue:view');
   if ('error' in authRes) {
@@ -26,6 +25,8 @@ export default async function MonthRevenuePage(props: {
   const canViewExpenses = hasPermission(authRes.role, 'expenses:view', authRes.permissions);
 
   const params = await props.params;
+  const searchParams = props.searchParams ? await props.searchParams : {};
+  const weekParam = typeof searchParams.week === 'string' ? searchParams.week : 'all';
   const monthParam = params.month; // e.g. "2026-10"
 
   const [yearStr, monthStr] = monthParam.split('-');
@@ -67,18 +68,33 @@ export default async function MonthRevenuePage(props: {
       </header>
 
       <Suspense fallback={<LoadingSpinner />}>
-        <MonthRevenueContent year={year} month={month} startDate={startDate} endDate={endDate} canViewExpenses={canViewExpenses} />
+        <MonthRevenueContent
+          year={year}
+          month={month}
+          startDate={startDate}
+          endDate={endDate}
+          canViewExpenses={canViewExpenses}
+          initialWeekId={weekParam}
+        />
       </Suspense>
     </div>
   );
 }
 
-async function MonthRevenueContent({ year, month, startDate, endDate, canViewExpenses }: {
+async function MonthRevenueContent({
+  year,
+  month,
+  startDate,
+  endDate,
+  canViewExpenses,
+  initialWeekId = 'all',
+}: {
   year: number;
   month: number;
   startDate: Date;
   endDate: Date;
   canViewExpenses: boolean;
+  initialWeekId?: string;
 }) {
   // Get orders for this month with all details, filtered by store 24h timezone boundaries
   const monthOrders = await db.select({
@@ -107,12 +123,8 @@ async function MonthRevenueContent({ year, month, startDate, endDate, canViewExp
     )
     .orderBy(desc(orders.createdAt));
 
-  // Calculate daily 24h data for the chart using store timezone (Asia/Kolkata)
-  const dailyDataMap = new Map<number, { revenue: number; ordersCount: number }>();
-
   const now = getStoreNow();
   const isCurrentMonth = year === now.year && month === now.month;
-  const isFutureMonth = year > now.year || (year === now.year && month > now.month);
 
   // If current month and day 1, yesterday's orders occurred in previous month.
   // Fetch them so the 24h Yesterday view has full data.
@@ -136,73 +148,13 @@ async function MonthRevenueContent({ year, month, startDate, endDate, canViewExp
     }));
   }
 
-  const daysInMonth = new Date(year, month, 0).getDate();
-
-  // Find the highest day that has an order in this month in store timezone
-  let latestOrderDay = 0;
-  monthOrders.forEach((order) => {
-    if (order.createdAt) {
-      const d = getStoreDay(order.createdAt);
-      if (d > latestOrderDay) latestOrderDay = d;
-    }
-  });
-
-  // For the ongoing current month, only plot days up to today (or latest order date)
-  let daysToShow = daysInMonth;
-  if (isCurrentMonth) {
-    const todayDate = now.day;
-    daysToShow = Math.min(daysInMonth, Math.max(todayDate, latestOrderDay));
-  } else if (isFutureMonth) {
-    daysToShow = latestOrderDay;
-  }
-
-  for (let i = 1; i <= daysToShow; i++) {
-    dailyDataMap.set(i, { revenue: 0, ordersCount: 0 });
-  }
-
-  let totalRevenue = 0;
-  let normalOrdersCount = 0;
-  let normalRevenue = 0;
-  let codOrdersCount = 0;
-  let codRevenue = 0;
-
-  monthOrders.forEach((order) => {
-    const revenue = parseFloat(order.totalPrice || '0') || 0;
-    totalRevenue += revenue;
-
-    if (order.createdAt) {
-      const day = getStoreDay(order.createdAt);
-      const current = dailyDataMap.get(day) || { revenue: 0, ordersCount: 0 };
-      dailyDataMap.set(day, {
-        revenue: current.revenue + revenue,
-        ordersCount: current.ordersCount + 1,
-      });
-    }
-
-    if (isCodOrder(order)) {
-      codOrdersCount++;
-      if (order.financialStatus === 'partially_paid') {
-        const codPortion = getCodAmountToCollect(order);
-        const prepaidPortion = getPrepaidAmount(order);
-        codRevenue += codPortion;
-        normalRevenue += prepaidPortion;
-      } else {
-        codRevenue += revenue;
-      }
-    } else {
-      normalOrdersCount++;
-      normalRevenue += revenue;
-    }
-  });
-
-  // Query expenses for the month if user has permission
-  let monthExpenses = 0;
-  let expenseCount = 0;
+  // Fetch individual expenses with expenseDate for exact weekly filtering
+  let expensesList: Array<{ amount: number; expenseDate: Date | string | null }> = [];
   if (canViewExpenses) {
-    const [expensesResult] = await db
+    const expensesRows = await db
       .select({
-        total: sql<number>`COALESCE(SUM(CAST(${expenses.amount} AS NUMERIC)), 0)`,
-        count: sql<number>`COUNT(*)`,
+        amount: expenses.amount,
+        expenseDate: expenses.expenseDate,
       })
       .from(expenses)
       .where(
@@ -212,171 +164,24 @@ async function MonthRevenueContent({ year, month, startDate, endDate, canViewExp
           lt(expenses.expenseDate, endDate)
         )
       );
-    if (expensesResult) {
-      monthExpenses = Number(expensesResult.total ?? 0);
-      expenseCount = Number(expensesResult.count ?? 0);
-    }
+    expensesList = expensesRows.map((e) => ({
+      amount: parseFloat(e.amount || '0') || 0,
+      expenseDate: e.expenseDate,
+    }));
   }
 
-  const netProfit = totalRevenue - monthExpenses;
-  const netMargin = totalRevenue > 0 ? Math.round((netProfit / totalRevenue) * 100) : 0;
-
   const monthDisplay = new Date(year, month - 1, 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-  const monthShort = new Date(year, month - 1, 1).toLocaleDateString('en-US', { month: 'short' });
-  const chartData = Array.from(dailyDataMap.entries()).map(([day, val]) => ({
-    day: `${day} ${monthShort}`,
-    dayNum: day,
-    revenue: Math.round(val.revenue * 100) / 100,
-    ordersCount: val.ordersCount,
-  }));
-
-  const orderPoints = [
-    ...yesterdayExtraOrders,
-    ...monthOrders.map((o) => ({
-      createdAt: o.createdAt ? o.createdAt.toISOString() : '',
-      revenue: parseFloat(o.totalPrice || '0') || 0,
-    })),
-  ];
 
   return (
-    <div className="space-y-4 sm:space-y-5">
-      {/* Summary Cards Grid */}
-      <div className={`grid grid-cols-2 ${canViewExpenses ? 'lg:grid-cols-3 xl:grid-cols-6' : 'lg:grid-cols-4'} gap-2.5 sm:gap-3.5`}>
-        {/* Total Revenue */}
-        <div className="bg-card border border-border rounded-xl p-3.5 sm:p-4 shadow-xs relative overflow-hidden flex flex-col justify-between">
-          <div className="flex items-center justify-between gap-2">
-            <p className="text-[10px] sm:text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Total Revenue</p>
-            <CalendarDays size={16} className="text-muted-foreground shrink-0" />
-          </div>
-          <div className="my-1.5">
-            <p className="text-base sm:text-lg md:text-xl font-bold text-foreground tracking-tight font-mono">
-              ₹{totalRevenue.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-            </p>
-          </div>
-          <p className="text-[10px] sm:text-[11px] text-muted-foreground pt-1.5 border-t border-border truncate">
-            Across {monthOrders.length} orders
-          </p>
-        </div>
-
-        {/* Monthly Net Profit */}
-        {canViewExpenses && (
-          <div className={`bg-card border ${netProfit >= 0 ? 'border-emerald-500/30' : 'border-rose-500/30'} rounded-xl p-3.5 sm:p-4 shadow-xs relative overflow-hidden flex flex-col justify-between`}>
-            <div className="flex items-center justify-between gap-2">
-              <p className={`text-[10px] sm:text-[11px] font-semibold ${netProfit >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'} uppercase tracking-wider`}>
-                Net Profit
-              </p>
-              <span
-                className={`inline-flex items-center gap-0.5 text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${netProfit >= 0
-                    ? 'text-emerald-700 bg-emerald-500/10 dark:text-emerald-400'
-                    : 'text-rose-700 bg-rose-500/10 dark:text-rose-400'
-                  }`}
-              >
-                {netProfit >= 0 ? <TrendingUp size={10} /> : <TrendingDown size={10} />}
-                {netMargin >= 0 ? `+${netMargin}%` : `${netMargin}%`}
-              </span>
-            </div>
-            <div className="my-1.5">
-              <p className={`text-base sm:text-lg md:text-xl font-bold tracking-tight font-mono ${netProfit >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'
-                }`}>
-                ₹{netProfit.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-              </p>
-            </div>
-            <p className="text-[10px] sm:text-[11px] text-muted-foreground pt-1.5 border-t border-border truncate">
-              Margin: <strong className={netProfit >= 0 ? 'text-emerald-600 dark:text-emerald-400 font-semibold' : 'text-rose-600 dark:text-rose-400 font-semibold'}>{netMargin}%</strong> of sales
-            </p>
-          </div>
-        )}
-
-        {/* Total Expenses */}
-        {canViewExpenses && (
-          <div className="bg-card border border-border rounded-xl p-3.5 sm:p-4 shadow-xs relative overflow-hidden flex flex-col justify-between">
-            <div className="flex items-center justify-between gap-2">
-              <p className="text-[10px] sm:text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Total Expenses</p>
-              <Wallet size={16} className="text-rose-500 shrink-0" />
-            </div>
-            <div className="my-1.5">
-              <p className="text-base sm:text-lg md:text-xl font-bold text-foreground tracking-tight font-mono">
-                ₹{monthExpenses.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-              </p>
-            </div>
-            <div className="pt-1.5 border-t border-border flex items-center justify-between text-[10px] sm:text-[11px] text-muted-foreground">
-              <span>{expenseCount} {expenseCount === 1 ? 'entry' : 'entries'}</span>
-              <Link href="/expenses" className="text-primary hover:underline font-medium">
-                View →
-              </Link>
-            </div>
-          </div>
-        )}
-
-        {/* Total Orders */}
-        <div className="bg-card border border-border rounded-xl p-3.5 sm:p-4 shadow-xs relative overflow-hidden flex flex-col justify-between">
-          <div className="flex items-center justify-between gap-2">
-            <p className="text-[10px] sm:text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Total Orders</p>
-            <Inbox size={16} className="text-muted-foreground shrink-0" />
-          </div>
-          <div className="my-1.5">
-            <p className="text-base sm:text-lg md:text-xl font-bold text-foreground tracking-tight font-mono">
-              {monthOrders.length}
-            </p>
-          </div>
-          <p className="text-[10px] sm:text-[11px] text-muted-foreground pt-1.5 border-t border-border truncate">
-            Avg: ₹{(monthOrders.length > 0 ? totalRevenue / monthOrders.length : 0).toLocaleString('en-IN', { maximumFractionDigits: 0 })} / order
-          </p>
-        </div>
-
-        {/* Normal / Prepaid Orders */}
-        <div className="bg-card border border-emerald-500/30 rounded-xl p-3.5 sm:p-4 shadow-xs relative overflow-hidden flex flex-col justify-between">
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex items-center gap-1.5 min-w-0">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"></span>
-              <p className="text-[10px] sm:text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider truncate">Normal (Prepaid)</p>
-            </div>
-            <CreditCard size={16} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
-          </div>
-          <div className="my-1.5">
-            <p className="text-base sm:text-lg md:text-xl font-bold text-emerald-600 dark:text-emerald-400 tracking-tight font-mono">
-              ₹{normalRevenue.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-            </p>
-          </div>
-          <p className="text-[10px] sm:text-[11px] text-muted-foreground pt-1.5 border-t border-border truncate">
-            <strong className="text-emerald-700 dark:text-emerald-300 font-semibold">{normalOrdersCount}</strong> {normalOrdersCount === 1 ? 'order' : 'orders'} ({monthOrders.length > 0 ? Math.round((normalOrdersCount / monthOrders.length) * 100) : 0}%)
-          </p>
-        </div>
-
-        {/* COD Orders */}
-        <div className="bg-card border border-amber-500/30 rounded-xl p-3.5 sm:p-4 shadow-xs relative overflow-hidden flex flex-col justify-between">
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex items-center gap-1.5 min-w-0">
-              <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0"></span>
-              <p className="text-[10px] sm:text-[11px] font-semibold text-amber-600 dark:text-amber-400 uppercase tracking-wider truncate">COD Orders</p>
-            </div>
-            <Banknote size={16} className="text-amber-600 dark:text-amber-400 shrink-0" />
-          </div>
-          <div className="my-1.5">
-            <p className="text-base sm:text-lg md:text-xl font-bold text-amber-600 dark:text-amber-400 tracking-tight font-mono">
-              ₹{codRevenue.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-            </p>
-          </div>
-          <p className="text-[10px] sm:text-[11px] text-muted-foreground pt-1.5 border-t border-border truncate">
-            <strong className="text-amber-700 dark:text-amber-300 font-semibold">{codOrdersCount}</strong> {codOrdersCount === 1 ? 'order' : 'orders'} ({monthOrders.length > 0 ? Math.round((codOrdersCount / monthOrders.length) * 100) : 0}%)
-          </p>
-        </div>
-      </div>
-
-      {/* Chart Section */}
-      <div className="bg-card border border-border rounded-xl p-3.5 sm:p-5 shadow-xs relative overflow-hidden">
-        <RevenueChart
-          data={chartData}
-          orderPoints={orderPoints}
-          isCurrentMonth={isCurrentMonth}
-          year={year}
-          month={month}
-          monthDisplay={monthDisplay}
-        />
-      </div>
-
-      {/* Detailed Orders Breakdown Table */}
-      <MonthOrdersTable orders={monthOrders} />
-    </div>
+    <MonthRevenueView
+      year={year}
+      month={month}
+      monthDisplay={monthDisplay}
+      monthOrders={monthOrders}
+      expenses={expensesList}
+      yesterdayExtraOrders={yesterdayExtraOrders}
+      canViewExpenses={canViewExpenses}
+      initialWeekId={initialWeekId}
+    />
   );
 }
