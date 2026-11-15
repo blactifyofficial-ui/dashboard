@@ -38,14 +38,14 @@ interface AppTileDef {
 }
 
 const SECONDARY_APP_MODULES: AppTileDef[] = [
-  { href: "/savings", label: "Daily Savings", category: "Finance", icon: PiggyBank },
-  { href: "/monthly-expenses", label: "Monthly Bills", category: "Finance", icon: CalendarCheck },
   { href: "/inventory", label: "Inventory", category: "Operations", icon: Boxes },
-  { href: "/reports", label: "Monthly Reports", category: "Finance", icon: FileText },
-  { href: "/meta-ads", label: "Meta Ads", category: "Growth", icon: Megaphone },
-  { href: "/payouts", label: "Partner Payouts", category: "Finance", icon: Banknote },
-  { href: "/debts", label: "Borrow & Lend", category: "Finance", icon: ArrowLeftRight },
-  { href: "/partners", label: "Partners & Equity", category: "Finance", icon: Handshake },
+  { href: "/meta-ads", label: "Meta Ads", category: "Operations", icon: Megaphone },
+  { href: "/savings", label: "Daily Savings", category: "Expenses", icon: PiggyBank },
+  { href: "/monthly-expenses", label: "Monthly Bills", category: "Expenses", icon: CalendarCheck },
+  { href: "/reports", label: "Monthly Reports", category: "Reports", icon: FileText },
+  { href: "/debts", label: "Borrow & Lend", category: "Capital", icon: ArrowLeftRight },
+  { href: "/payouts", label: "Partner Payouts", category: "Capital", icon: Banknote },
+  { href: "/partners", label: "Partners & Equity", category: "Capital", icon: Handshake },
   { href: "/team", label: "Team & Roles", category: "Admin", icon: Users },
   { href: "/settings", label: "Settings", category: "Admin", icon: Settings },
 ];
@@ -172,18 +172,16 @@ export function MobileAppSheet({ open, onOpenChange }: MobileAppSheetProps) {
                 key={item.href}
                 href={item.href}
                 onClick={() => onOpenChange(false)}
-                className={`flex items-center gap-3 p-3 rounded-2xl border transition-all active:scale-95 ${
-                  isActive
+                className={`flex items-center gap-3 p-3 rounded-2xl border transition-all active:scale-95 ${isActive
                     ? "bg-[#0066cc]/10 border-[#0066cc]/40 text-[#0066cc] dark:text-[#2997ff]"
                     : "bg-muted/40 hover:bg-muted/70 border-border/50 text-foreground"
-                }`}
+                  }`}
               >
                 <div
-                  className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
-                    isActive
+                  className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${isActive
                       ? "bg-[#0066cc] text-white"
                       : "bg-card text-muted-foreground border border-border/50"
-                  }`}
+                    }`}
                 >
                   <Icon className="w-4 h-4" strokeWidth={1.8} />
                 </div>
