@@ -51,146 +51,146 @@ interface MonthOrdersTableProps {
   activeWeekLabel?: string;
 }
 
-export default function MonthOrdersTable({
-  orders,
-  selectedWeekId,
-  onSelectWeekId,
-  availableWeeks,
-  activeWeekLabel,
-}: MonthOrdersTableProps) {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [filterType, setFilterType] = useState<'ALL' | 'NORMAL' | 'COD'>('ALL');
-  const [fulfillmentFilter, setFulfillmentFilter] = useState<'ALL' | 'FULFILLED' | 'UNFULFILLED'>('ALL');
-  const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 15;
+  export default function MonthOrdersTable({
+    orders,
+    selectedWeekId,
+    onSelectWeekId,
+    availableWeeks,
+    activeWeekLabel,
+  }: MonthOrdersTableProps) {
+    const [searchQuery, setSearchQuery] = useState('');
+    const [filterType, setFilterType] = useState<'ALL' | 'NORMAL' | 'COD'>('ALL');
+    const [fulfillmentFilter, setFulfillmentFilter] = useState<'ALL' | 'FULFILLED' | 'UNFULFILLED'>('ALL');
+    const [currentPage, setCurrentPage] = useState(1);
+    const pageSize = 15;
 
-  const orderStats = useMemo(() => {
-    let codCount = 0;
-    let normalCount = 0;
-    let codRevenue = 0;
-    let normalRevenue = 0;
+    const orderStats = useMemo(() => {
+      let codCount = 0;
+      let normalCount = 0;
+      let codRevenue = 0;
+      let normalRevenue = 0;
 
-    orders.forEach((order) => {
-      const isCod = isCodOrder(order);
-      const price = parseFloat(order.totalPrice || '0') || 0;
-      if (isCod) {
-        codCount++;
-        codRevenue += price;
-      } else {
-        normalCount++;
-        normalRevenue += price;
-      }
-    });
+      orders.forEach((order) => {
+        const isCod = isCodOrder(order);
+        const price = parseFloat(order.totalPrice || '0') || 0;
+        if (isCod) {
+          codCount++;
+          codRevenue += price;
+        } else {
+          normalCount++;
+          normalRevenue += price;
+        }
+      });
 
-    return { codCount, normalCount, codRevenue, normalRevenue };
-  }, [orders]);
+      return { codCount, normalCount, codRevenue, normalRevenue };
+    }, [orders]);
 
-  const filteredOrders = useMemo(() => {
-    return orders.filter((order) => {
-      const isCod = isCodOrder(order);
+    const filteredOrders = useMemo(() => {
+      return orders.filter((order) => {
+        const isCod = isCodOrder(order);
 
-      // Type filter
-      if (filterType === 'NORMAL' && isCod) return false;
-      if (filterType === 'COD' && !isCod) return false;
+        // Type filter
+        if (filterType === 'NORMAL' && isCod) return false;
+        if (filterType === 'COD' && !isCod) return false;
 
-      // Fulfillment filter
-      if (fulfillmentFilter === 'FULFILLED' && order.fulfillmentStatus !== 'fulfilled') return false;
-      if (fulfillmentFilter === 'UNFULFILLED' && order.fulfillmentStatus === 'fulfilled') return false;
+        // Fulfillment filter
+        if (fulfillmentFilter === 'FULFILLED' && order.fulfillmentStatus !== 'fulfilled') return false;
+        if (fulfillmentFilter === 'UNFULFILLED' && order.fulfillmentStatus === 'fulfilled') return false;
 
-      // Search query
-      if (searchQuery.trim()) {
-        const query = searchQuery.toLowerCase().trim();
-        const orderNum = (order.orderNumber || '').toLowerCase();
-        const name = (order.customerName || '').toLowerCase();
-        const email = (order.customerEmail || '').toLowerCase();
-        const amount = (order.totalPrice || '').toLowerCase();
-        const gateway = (order.paymentGateway || '').toLowerCase();
-        const status = (order.financialStatus || '').toLowerCase();
+        // Search query
+        if (searchQuery.trim()) {
+          const query = searchQuery.toLowerCase().trim();
+          const orderNum = (order.orderNumber || '').toLowerCase();
+          const name = (order.customerName || '').toLowerCase();
+          const email = (order.customerEmail || '').toLowerCase();
+          const amount = (order.totalPrice || '').toLowerCase();
+          const gateway = (order.paymentGateway || '').toLowerCase();
+          const status = (order.financialStatus || '').toLowerCase();
 
-        const matches =
-          orderNum.includes(query) ||
-          name.includes(query) ||
-          email.includes(query) ||
-          amount.includes(query) ||
-          gateway.includes(query) ||
-          status.includes(query);
+          const matches =
+            orderNum.includes(query) ||
+            name.includes(query) ||
+            email.includes(query) ||
+            amount.includes(query) ||
+            gateway.includes(query) ||
+            status.includes(query);
 
-        if (!matches) return false;
-      }
+          if (!matches) return false;
+        }
 
-      return true;
-    });
-  }, [orders, filterType, fulfillmentFilter, searchQuery]);
+        return true;
+      });
+    }, [orders, filterType, fulfillmentFilter, searchQuery]);
 
-  const totalPages = Math.ceil(filteredOrders.length / pageSize) || 1;
-  const paginatedOrders = useMemo(() => {
-    const start = (currentPage - 1) * pageSize;
-    return filteredOrders.slice(start, start + pageSize);
-  }, [filteredOrders, currentPage, pageSize]);
+    const totalPages = Math.ceil(filteredOrders.length / pageSize) || 1;
+    const paginatedOrders = useMemo(() => {
+      const start = (currentPage - 1) * pageSize;
+      return filteredOrders.slice(start, start + pageSize);
+    }, [filteredOrders, currentPage, pageSize]);
 
-  // Reset page on search or filter change
-  const handleFilterChange = (type: 'ALL' | 'NORMAL' | 'COD') => {
-    setFilterType(type);
-    setCurrentPage(1);
-  };
+    // Reset page on search or filter change
+    const handleFilterChange = (type: 'ALL' | 'NORMAL' | 'COD') => {
+      setFilterType(type);
+      setCurrentPage(1);
+    };
 
-  const handleFulfillmentChange = (type: 'ALL' | 'FULFILLED' | 'UNFULFILLED') => {
-    setFulfillmentFilter(type);
-    setCurrentPage(1);
-  };
+    const handleFulfillmentChange = (type: 'ALL' | 'FULFILLED' | 'UNFULFILLED') => {
+      setFulfillmentFilter(type);
+      setCurrentPage(1);
+    };
 
-  const handleSearchChange = (val: string) => {
-    setSearchQuery(val);
-    setCurrentPage(1);
-  };
+    const handleSearchChange = (val: string) => {
+      setSearchQuery(val);
+      setCurrentPage(1);
+    };
 
-  const filteredTotalRevenue = useMemo(() => {
-    return filteredOrders.reduce((sum, o) => sum + (parseFloat(o.totalPrice || '0') || 0), 0);
-  }, [filteredOrders]);
+    const filteredTotalRevenue = useMemo(() => {
+      return filteredOrders.reduce((sum, o) => sum + (parseFloat(o.totalPrice || '0') || 0), 0);
+    }, [filteredOrders]);
 
-  return (
-    <div className="bg-card border border-border rounded-[18px] relative overflow-hidden flex flex-col">
-      {/* Header & Filter Controls */}
-      <div className="p-4 sm:p-5 border-b border-border relative z-10 space-y-3.5 bg-muted/20">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
-          <div>
-            <h2 className="text-[17px] font-semibold text-foreground tracking-[-0.374px]">
-              Order Details &amp; Payment Ledger
-            </h2>
-            <p className="text-muted-foreground text-[13px] tracking-[-0.1px] mt-0.5">
-              Comprehensive transaction records with real-time payment channels and fulfillment states
-            </p>
+    return (
+      <div className="bg-card border border-border rounded-[18px] relative overflow-hidden flex flex-col">
+        {/* Header & Filter Controls */}
+        <div className="p-4 sm:p-5 border-b border-border relative z-10 space-y-3.5 bg-muted/20">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+            <div>
+              <h2 className="text-[17px] font-semibold text-foreground tracking-[-0.374px]">
+                Order Details &amp; Payment Ledger
+              </h2>
+              <p className="text-muted-foreground text-[13px] tracking-[-0.1px] mt-0.5">
+                Comprehensive transaction records with real-time payment channels and fulfillment states
+              </p>
+            </div>
+
+            {/* Search Input with 21st.dev Input */}
+            <div className="relative w-full lg:w-72">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" size={14} />
+              <Input
+                type="text"
+                pill
+                placeholder="Search by order #, name, email..."
+                value={searchQuery}
+                onChange={(e) => handleSearchChange(e.target.value)}
+                className="pl-9 pr-14 h-[40px] text-[13px] tracking-[-0.1px]"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => handleSearchChange('')}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-[11px] text-muted-foreground hover:text-foreground px-2 py-0.5 rounded-full bg-muted hover:bg-accent transition-colors active:scale-95"
+                >
+                  Clear
+                </button>
+              )}
+            </div>
           </div>
 
-          {/* Search Input with 21st.dev Input */}
-          <div className="relative w-full lg:w-72">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" size={14} />
-            <Input
-              type="text"
-              pill
-              placeholder="Search by order #, name, email..."
-              value={searchQuery}
-              onChange={(e) => handleSearchChange(e.target.value)}
-              className="pl-9 pr-14 h-[40px] text-[13px] tracking-[-0.1px]"
-            />
-            {searchQuery && (
-              <button
-                onClick={() => handleSearchChange('')}
-                className="absolute right-2 top-1/2 -translate-y-1/2 text-[11px] text-muted-foreground hover:text-foreground px-2 py-0.5 rounded-full bg-muted hover:bg-accent transition-colors active:scale-95"
-              >
-                Clear
-              </button>
-            )}
-          </div>
-        </div>
-
-        {/* Filter Toolbar */}
-        <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
-          {/* Order Type Tabs */}
+          {/* Filter Toolbar */}
+          <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
+            {/* Order Type Tabs */}
             <div className="flex flex-nowrap items-center gap-1 bg-muted/70 p-1 rounded-full border border-border overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden max-w-full">
               <button
                 onClick={() => handleFilterChange('ALL')}
-              className={`px-3 py-1 rounded-full text-xs font-normal transition-all active:scale-95 flex items-center gap-1.5 shrink-0 whitespace-nowrap ${filterType === 'ALL'
+                className={`px-3 py-1 rounded-full text-xs font-normal transition-all active:scale-95 flex items-center gap-1.5 shrink-0 whitespace-nowrap ${filterType === 'ALL'
                   ? 'bg-card text-foreground font-semibold border border-border'
                   : 'text-muted-foreground hover:text-foreground'
                   }`}
@@ -217,7 +217,7 @@ export default function MonthOrdersTable({
 
               <button
                 onClick={() => handleFilterChange('COD')}
-          className={`px-3 py-1 rounded-full text-xs font-normal transition-all flex items-center gap-1.5 active:scale-95 shrink-0 whitespace-nowrap ${filterType === 'COD'
+                className={`px-3 py-1 rounded-full text-xs font-normal transition-all flex items-center gap-1.5 active:scale-95 shrink-0 whitespace-nowrap ${filterType === 'COD'
                   ? 'bg-amber-500/15 text-amber-700 dark:text-amber-300 font-semibold border border-amber-500/30'
                   : 'text-muted-foreground hover:text-foreground'
                   }`}
@@ -264,27 +264,27 @@ export default function MonthOrdersTable({
                 </button>
                 <button
                   onClick={() => handleFulfillmentChange('FULFILLED')}
-                  className={`px-3 py-1 rounded-full border text-xs transition-all active:scale-95 shrink-0 whitespace-nowrap ${fulfillmentFilter === 'FULFILLED'
-                    ? 'bg-[#0066cc]/15 text-[#0066cc] dark:text-[#2997ff] border-[#0066cc]/30 font-semibold'
-                    : 'text-muted-foreground border-border hover:text-foreground'
-                    }`}
+            className={`px-3 py-1 rounded-full border text-xs transition-all active:scale-95 shrink-0 whitespace-nowrap ${fulfillmentFilter === 'FULFILLED'
+              ? 'bg-[#0066cc]/15 text-[#0066cc] dark:text-[#2997ff] border-[#0066cc]/30 font-semibold'
+              : 'text-muted-foreground border-border hover:text-foreground'
+              }`}
                 >
-                  Fulfilled
-                </button>
-                <button
-                  onClick={() => handleFulfillmentChange('UNFULFILLED')}
-                  className={`px-3 py-1 rounded-full border text-xs transition-all active:scale-95 shrink-0 whitespace-nowrap ${fulfillmentFilter === 'UNFULFILLED'
-                    ? 'bg-amber-500/15 text-amber-700 dark:text-amber-300 border-amber-500/30 font-semibold'
-                    : 'text-muted-foreground border-border hover:text-foreground'
-                    }`}
-                >
-                  Unfulfilled
-                </button>
-              </div>
-            </div>
+            Fulfilled
+          </button>
+          <button
+            onClick={() => handleFulfillmentChange('UNFULFILLED')}
+            className={`px-3 py-1 rounded-full border text-xs transition-all active:scale-95 shrink-0 whitespace-nowrap ${fulfillmentFilter === 'UNFULFILLED'
+              ? 'bg-amber-500/15 text-amber-700 dark:text-amber-300 border-amber-500/30 font-semibold'
+              : 'text-muted-foreground border-border hover:text-foreground'
+              }`}
+          >
+            Unfulfilled
+          </button>
         </div>
+      </div>
+        </div >
 
-        {/* Showing Summary text */}
+      {/* Showing Summary text */ }
         <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground pt-1.5 border-t border-border/80">
           <div className="flex items-center gap-2 flex-wrap">
             <span>
@@ -311,11 +311,11 @@ export default function MonthOrdersTable({
           <span>
             Filtered Total: <strong className="text-foreground font-mono">₹{filteredTotalRevenue.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>
           </span>
-        </div>
+        </div >
       </div >
 
-      {/* Orders Table (Desktop & Tablet) using 21st.dev Table */}
-      < div className="relative z-10 w-full overflow-x-auto" >
+      {/* Orders Table (Desktop & Tablet) using 21st.dev Table */ }
+      < div className = "relative z-10 w-full overflow-x-auto" >
         <Table className="min-w-[700px]">
           <TableHeader className="bg-muted/40">
             <TableRow>
@@ -498,39 +498,39 @@ export default function MonthOrdersTable({
         </Table>
       </div >
 
-      {/* Pagination Footer */}
-      {
-        totalPages > 1 && (
-          <div className="p-3 sm:px-5 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-3 bg-muted/20 relative z-10">
-            <div className="text-xs text-muted-foreground">
-              Page <span className="font-medium font-mono text-foreground">{currentPage}</span> of <span className="font-medium font-mono text-foreground">{totalPages}</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <Button
-                variant="outline"
-                size="xs"
-                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                disabled={currentPage <= 1}
-                className="gap-1"
-              >
-                <ChevronLeft size={13} />
-                <span>Previous</span>
-              </Button>
-              <Button
-                variant="outline"
-                size="xs"
-                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                disabled={currentPage >= totalPages}
-                className="gap-1"
-              >
-                <span>Next</span>
-                <ChevronRight size={13} />
-              </Button>
-            </div>
+      {/* Pagination Footer */ }
+    {
+      totalPages > 1 && (
+        <div className="p-3 sm:px-5 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-3 bg-muted/20 relative z-10">
+          <div className="text-xs text-muted-foreground">
+            Page <span className="font-medium font-mono text-foreground">{currentPage}</span> of <span className="font-medium font-mono text-foreground">{totalPages}</span>
           </div>
-        )
-      }
+          <div className="flex items-center gap-1.5">
+            <Button
+              variant="outline"
+              size="xs"
+              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+              disabled={currentPage <= 1}
+              className="gap-1"
+            >
+              <ChevronLeft size={13} />
+              <span>Previous</span>
+            </Button>
+            <Button
+              variant="outline"
+              size="xs"
+              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+              disabled={currentPage >= totalPages}
+              className="gap-1"
+            >
+              <span>Next</span>
+              <ChevronRight size={13} />
+            </Button>
+          </div>
+        </div>
+      )
+    }
     </div >
   );
-}
+  }
 

@@ -538,7 +538,9 @@ export interface MonthWeekPreset {
 
 /**
  * Generates structured weekly presets for a given month in store timezone (Asia/Kolkata).
- * Includes All Month, Current Week & Last Week (if current month), and Week 1–5 blocks.
+ * Partitions the entire month into non-overlapping calendar weeks (Monday to Sunday)
+ * so that the sum of all individual weeks strictly equals the full month total.
+ * Dynamically identifies and highlights "Current Week" and "Last Week".
  */
 export function getMonthWeekPresets(year: number, month: number): MonthWeekPreset[] {
   const daysInMonth = new Date(year, month, 0).getDate();
@@ -546,80 +548,74 @@ export function getMonthWeekPresets(year: number, month: number): MonthWeekPrese
   const now = getStoreNow();
   const isCurrentMonth = year === now.year && month === now.month;
 
+  // Partition the month into non-overlapping calendar weeks (Monday to Sunday)
+  const weeks: Array<{ weekNum: number; startDay: number; endDay: number }> = [];
+  let currentStart = 1;
+  let weekNum = 1;
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateObj = new Date(
+      `${year}-${String(month).padStart(2, '0')}-${String(d).padStart(2, '0')}T12:00:00+05:30`
+    );
+    const dayOfWeek = dateObj.getDay(); // 0 = Sun, 1 = Mon ... 6 = Sat
+    // Sunday closes the week, or the last day of the month closes the final week
+    if (dayOfWeek === 0 || d === daysInMonth) {
+      weeks.push({ weekNum, startDay: currentStart, endDay: d });
+      currentStart = d + 1;
+      weekNum++;
+    }
+  }
+
+  let currentWeekNum = -1;
+  if (isCurrentMonth) {
+    const match = weeks.find((w) => now.day >= w.startDay && now.day <= w.endDay);
+    if (match) currentWeekNum = match.weekNum;
+  }
+
   const presets: MonthWeekPreset[] = [
     {
       id: 'all',
       label: 'All Month',
-      shortLabel: 'All',
+      shortLabel: 'All Month',
       rangeLabel: `1–${daysInMonth} ${monthShort}`,
       startDay: 1,
       endDay: daysInMonth,
     },
   ];
 
-  if (isCurrentMonth) {
-    const todayDay = now.day;
-    const todayDateObj = new Date(
-      `${now.year}-${String(now.month).padStart(2, '0')}-${String(todayDay).padStart(2, '0')}T12:00:00+05:30`
-    );
-    const dayOfWeek = todayDateObj.getDay(); // 0 = Sun, 1 = Mon ...
-    const isoDayOfWeek = dayOfWeek === 0 ? 7 : dayOfWeek; // 1 = Mon, 7 = Sun
+  for (const w of weeks) {
+    const isCurrent = isCurrentMonth && w.weekNum === currentWeekNum;
+    const isLast = isCurrentMonth && w.weekNum === currentWeekNum - 1;
 
-    // Current Week (Monday to Sunday)
-    const cwStart = todayDay - (isoDayOfWeek - 1);
-    const cwEnd = todayDay + (7 - isoDayOfWeek);
-    const clippedCwStart = Math.max(1, cwStart);
-    const clippedCwEnd = Math.min(daysInMonth, cwEnd);
+    let id = `w${w.weekNum}`;
+    let label = `Week ${w.weekNum}`;
+    let shortLabel = `Week ${w.weekNum}`;
+
+    if (isCurrent) {
+      id = 'current_week';
+      label = `Week ${w.weekNum} • Current Week`;
+      shortLabel = `Current Week (W${w.weekNum})`;
+    } else if (isLast) {
+      id = 'last_week';
+      label = `Week ${w.weekNum} • Last Week`;
+      shortLabel = `Last Week (W${w.weekNum})`;
+    }
+
+    const rangeLabel =
+      w.startDay === w.endDay
+        ? `${w.startDay} ${monthShort}`
+        : `${w.startDay}–${w.endDay} ${monthShort}`;
 
     presets.push({
-      id: 'current_week',
-      label: 'Current Week',
-      shortLabel: 'This Week',
-      rangeLabel: `${clippedCwStart}–${clippedCwEnd} ${monthShort}`,
-      startDay: clippedCwStart,
-      endDay: clippedCwEnd,
-      isCurrentWeek: true,
+      id,
+      label,
+      shortLabel,
+      rangeLabel,
+      startDay: w.startDay,
+      endDay: w.endDay,
+      isCurrentWeek: isCurrent,
+      isLastWeek: isLast,
     });
-
-    // Last Week (Previous Monday to Sunday)
-    const lwStart = cwStart - 7;
-    const lwEnd = cwStart - 1;
-    if (lwEnd >= 1) {
-      const clippedLwStart = Math.max(1, lwStart);
-      const clippedLwEnd = Math.min(daysInMonth, lwEnd);
-      presets.push({
-        id: 'last_week',
-        label: 'Last Week',
-        shortLabel: 'Last Week',
-        rangeLabel: `${clippedLwStart}–${clippedLwEnd} ${monthShort}`,
-        startDay: clippedLwStart,
-        endDay: clippedLwEnd,
-        isLastWeek: true,
-      });
-    }
-  }
-
-  // Standard Week blocks: Week 1 (1–7), Week 2 (8–14), Week 3 (15–21), Week 4 (22–28), Week 5 (29–end)
-  const weekBlocks = [
-    { num: 1, start: 1, end: 7 },
-    { num: 2, start: 8, end: 14 },
-    { num: 3, start: 15, end: 21 },
-    { num: 4, start: 22, end: 28 },
-    { num: 5, start: 29, end: daysInMonth },
-  ];
-
-  for (const wb of weekBlocks) {
-    if (wb.start <= daysInMonth) {
-      const actualEnd = Math.min(daysInMonth, wb.end);
-      presets.push({
-        id: `w${wb.num}`,
-        label: `Week ${wb.num}`,
-        shortLabel: `W${wb.num}`,
-        rangeLabel: `${wb.start}–${actualEnd} ${monthShort}`,
-        startDay: wb.start,
-        endDay: actualEnd,
-      });
-    }
   }
 
   return presets;

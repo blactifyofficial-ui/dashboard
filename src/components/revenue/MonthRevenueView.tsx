@@ -55,8 +55,14 @@ export default function MonthRevenueView({
   const presets = useMemo(() => getMonthWeekPresets(year, month), [year, month]);
 
   const [selectedWeekId, setSelectedWeekId] = useState<string>(() => {
-    if (initialWeekId && presets.some((p) => p.id === initialWeekId)) {
-      return initialWeekId;
+    if (initialWeekId) {
+      const match = presets.find(
+        (p) =>
+          p.id === initialWeekId ||
+          ((initialWeekId === 'current' || initialWeekId === 'current_week') && p.isCurrentWeek) ||
+          ((initialWeekId === 'last' || initialWeekId === 'last_week') && p.isLastWeek)
+      );
+      if (match) return match.id;
     }
     return 'all';
   });

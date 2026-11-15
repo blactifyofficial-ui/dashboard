@@ -45,10 +45,14 @@ export default function MonthRevenueWeeklyToolbar({
               </span>
               <span className="text-muted-foreground">•</span>
               <span className="font-mono">{activeStats.orderCount} orders</span>
+              <span className="text-muted-foreground">•</span>
+              <span className="font-mono font-semibold">
+                ₹{activeStats.revenue.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </span>
             </span>
           ) : (
             <span className="text-[11px] text-muted-foreground hidden sm:inline">
-              Viewing full month totals across all weeks
+              Viewing full month totals • Non-overlapping weeks partition the month cleanly
             </span>
           )}
         </div>
@@ -92,7 +96,7 @@ export default function MonthRevenueWeeklyToolbar({
               type="button"
               onClick={() => onSelectWeek(preset)}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs transition-all active:scale-95 shrink-0 whitespace-nowrap border ${buttonClasses}`}
-              title={`${preset.label} (${preset.rangeLabel}): ${stats.orderCount} orders, ₹${stats.revenue.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`}
+              title={`${preset.label} (${preset.rangeLabel}): ${stats.orderCount} orders, ₹${stats.revenue.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
             >
               {preset.isCurrentWeek && (
                 <span className="relative flex h-2 w-2 mr-0.5">
@@ -105,7 +109,7 @@ export default function MonthRevenueWeeklyToolbar({
                 <Sparkles size={11} className="text-sky-500 dark:text-sky-400 shrink-0" />
               )}
 
-              <span>{preset.label}</span>
+              <span>{preset.shortLabel}</span>
               <span className="text-[10px] text-muted-foreground opacity-80 font-normal">
                 ({preset.rangeLabel})
               </span>
