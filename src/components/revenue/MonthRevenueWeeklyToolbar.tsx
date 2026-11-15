@@ -115,11 +115,10 @@ export default function MonthRevenueWeeklyToolbar({
               </span>
 
               <span
-                className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono ${
-                  isSelected
+                className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono ${isSelected
                     ? 'bg-foreground/15 text-foreground font-bold'
                     : 'bg-muted border border-border/80 text-muted-foreground'
-                }`}
+                  }`}
               >
                 {stats.orderCount}
               </span>

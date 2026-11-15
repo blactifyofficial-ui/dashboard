@@ -55,17 +55,17 @@ export default function MonthRevenueView({
   const presets = useMemo(() => getMonthWeekPresets(year, month), [year, month]);
 
   const [selectedWeekId, setSelectedWeekId] = useState<string>(() => {
-    if (initialWeekId) {
-      const match = presets.find(
-        (p) =>
-          p.id === initialWeekId ||
-          ((initialWeekId === 'current' || initialWeekId === 'current_week') && p.isCurrentWeek) ||
-          ((initialWeekId === 'last' || initialWeekId === 'last_week') && p.isLastWeek)
-      );
-      if (match) return match.id;
-    }
-    return 'all';
-  });
+      if (initialWeekId) {
+        const match = presets.find(
+          (p) =>
+            p.id === initialWeekId ||
+            ((initialWeekId === 'current' || initialWeekId === 'current_week') && p.isCurrentWeek) ||
+            ((initialWeekId === 'last' || initialWeekId === 'last_week') && p.isLastWeek)
+        );
+        if (match) return match.id;
+      }
+      return 'all';
+    });
 
   const activePreset = useMemo(
     () => presets.find((p) => p.id === selectedWeekId) || presets[0],
@@ -260,9 +260,8 @@ export default function MonthRevenueView({
 
       {/* Summary Cards Grid */}
       <div
-        className={`grid grid-cols-2 ${
-          canViewExpenses ? 'lg:grid-cols-3 xl:grid-cols-6' : 'lg:grid-cols-4'
-        } gap-2.5 sm:gap-3.5`}
+        className={`grid grid-cols-2 ${canViewExpenses ? 'lg:grid-cols-3 xl:grid-cols-6' : 'lg:grid-cols-4'
+          } gap-2.5 sm:gap-3.5`}
       >
         {/* Total Revenue */}
         <div className="bg-card border border-border rounded-xl p-3.5 sm:p-4 shadow-xs relative overflow-hidden flex flex-col justify-between">
@@ -290,26 +289,23 @@ export default function MonthRevenueView({
         {/* Monthly Net Profit */}
         {canViewExpenses && (
           <div
-            className={`bg-card border ${
-              netProfit >= 0 ? 'border-emerald-500/30' : 'border-rose-500/30'
-            } rounded-xl p-3.5 sm:p-4 shadow-xs relative overflow-hidden flex flex-col justify-between`}
+            className={`bg-card border ${netProfit >= 0 ? 'border-emerald-500/30' : 'border-rose-500/30'
+              } rounded-xl p-3.5 sm:p-4 shadow-xs relative overflow-hidden flex flex-col justify-between`}
           >
             <div className="flex items-center justify-between gap-2">
               <p
-                className={`text-[10px] sm:text-[11px] font-semibold ${
-                  netProfit >= 0
+                className={`text-[10px] sm:text-[11px] font-semibold ${netProfit >= 0
                     ? 'text-emerald-600 dark:text-emerald-400'
                     : 'text-rose-600 dark:text-rose-400'
-                } uppercase tracking-wider`}
+                  } uppercase tracking-wider`}
               >
                 Net Profit
               </p>
               <span
-                className={`inline-flex items-center gap-0.5 text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${
-                  netProfit >= 0
+                className={`inline-flex items-center gap-0.5 text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${netProfit >= 0
                     ? 'text-emerald-700 bg-emerald-500/10 dark:text-emerald-400'
                     : 'text-rose-700 bg-rose-500/10 dark:text-rose-400'
-                }`}
+                  }`}
               >
                 {netProfit >= 0 ? <TrendingUp size={10} /> : <TrendingDown size={10} />}
                 {netMargin >= 0 ? `+${netMargin}%` : `${netMargin}%`}
@@ -317,11 +313,10 @@ export default function MonthRevenueView({
             </div>
             <div className="my-1.5">
               <p
-                className={`text-base sm:text-lg md:text-xl font-bold tracking-tight font-mono ${
-                  netProfit >= 0
+                className={`text-base sm:text-lg md:text-xl font-bold tracking-tight font-mono ${netProfit >= 0
                     ? 'text-emerald-600 dark:text-emerald-400'
                     : 'text-rose-600 dark:text-rose-400'
-                }`}
+                  }`}
               >
                 ₹
                 {netProfit.toLocaleString('en-IN', {

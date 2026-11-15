@@ -583,42 +583,42 @@ export function getMonthWeekPresets(year: number, month: number): MonthWeekPrese
     },
   ];
 
-  for (const w of weeks) {
-    const isCurrent = isCurrentMonth && w.weekNum === currentWeekNum;
-    const isLast = isCurrentMonth && w.weekNum === currentWeekNum - 1;
+    for (const w of weeks) {
+      const isCurrent = isCurrentMonth && w.weekNum === currentWeekNum;
+      const isLast = isCurrentMonth && w.weekNum === currentWeekNum - 1;
 
-    let id = `w${w.weekNum}`;
-    let label = `Week ${w.weekNum}`;
-    let shortLabel = `Week ${w.weekNum}`;
+      let id = `w${w.weekNum}`;
+      let label = `Week ${w.weekNum}`;
+      let shortLabel = `Week ${w.weekNum}`;
 
-    if (isCurrent) {
-      id = 'current_week';
-      label = `Week ${w.weekNum} • Current Week`;
-      shortLabel = `Current Week (W${w.weekNum})`;
-    } else if (isLast) {
-      id = 'last_week';
-      label = `Week ${w.weekNum} • Last Week`;
-      shortLabel = `Last Week (W${w.weekNum})`;
+        if (isCurrent) {
+          id = 'current_week';
+          label = `Week ${w.weekNum} • Current Week`;
+          shortLabel = `Current Week (W${w.weekNum})`;
+        } else if (isLast) {
+          id = 'last_week';
+          label = `Week ${w.weekNum} • Last Week`;
+          shortLabel = `Last Week (W${w.weekNum})`;
+        }
+
+      const rangeLabel =
+        w.startDay === w.endDay
+          ? `${w.startDay} ${monthShort}`
+          : `${w.startDay}–${w.endDay} ${monthShort}`;
+
+        presets.push({
+          id,
+          label,
+          shortLabel,
+          rangeLabel,
+          startDay: w.startDay,
+          endDay: w.endDay,
+          isCurrentWeek: isCurrent,
+          isLastWeek: isLast,
+        });
+      }
+
+      return presets;
     }
-
-    const rangeLabel =
-      w.startDay === w.endDay
-        ? `${w.startDay} ${monthShort}`
-        : `${w.startDay}–${w.endDay} ${monthShort}`;
-
-    presets.push({
-      id,
-      label,
-      shortLabel,
-      rangeLabel,
-      startDay: w.startDay,
-      endDay: w.endDay,
-      isCurrentWeek: isCurrent,
-      isLastWeek: isLast,
-    });
-  }
-
-  return presets;
-}
 
 
